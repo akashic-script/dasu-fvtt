@@ -1,10 +1,7 @@
 import DASUItemBase from './base-item.mjs';
 
 export default class DASUSpell extends DASUItemBase {
-  static LOCALIZATION_PREFIXES = [
-    'DASU.Item.base',
-    'DASU.Item.Spell',
-  ];
+  static LOCALIZATION_PREFIXES = ['DASU.Item.base', 'DASU.Item.Spell'];
 
   static defineSchema() {
     const fields = foundry.data.fields;

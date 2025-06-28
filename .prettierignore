@@ -1,0 +1,13 @@
+# Handlebars templates
+*.hbs
+
+# Package files
+package-lock.json
+
+# Generated files
+node_modules/
+dist/
+build/
+
+# FoundryVTT specific
+foundryconfig.json 

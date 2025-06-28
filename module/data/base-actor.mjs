@@ -1,6 +1,5 @@
-export default class DASUActorBase extends foundry.abstract
-  .TypeDataModel {
-  static LOCALIZATION_PREFIXES = ["DASU.Actor.base"];
+export default class DASUActorBase extends foundry.abstract.TypeDataModel {
+  static LOCALIZATION_PREFIXES = ['DASU.Actor.base'];
 
   static defineSchema() {
     const fields = foundry.data.fields;

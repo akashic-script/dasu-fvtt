@@ -42,23 +42,23 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     },
     features: {
       template: 'systems/dasu/templates/actor/features.hbs',
-      scrollable: [""],
+      scrollable: [''],
     },
     biography: {
       template: 'systems/dasu/templates/actor/biography.hbs',
-      scrollable: [""],
+      scrollable: [''],
     },
     gear: {
       template: 'systems/dasu/templates/actor/gear.hbs',
-      scrollable: [""],
+      scrollable: [''],
     },
     spells: {
       template: 'systems/dasu/templates/actor/spells.hbs',
-      scrollable: [""],
+      scrollable: [''],
     },
     effects: {
       template: 'systems/dasu/templates/actor/effects.hbs',
-      scrollable: [""],
+      scrollable: [''],
     },
   };
 

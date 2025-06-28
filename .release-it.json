@@ -1,0 +1,30 @@
+{
+  "github": {
+    "release": true,
+    "releaseName": "Release ${version}",
+    "releaseNotes": "npx auto-changelog --stdout --commit-limit false -u",
+    "assets": ["dasu.zip", "system.json"]
+  },
+  "git": {
+    "commitMessage": "chore: release ${version}",
+    "tagName": "v${version}",
+    "tagMessage": "Release ${version}"
+  },
+  "npm": {
+    "publish": false
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": "angular",
+      "infile": "CHANGELOG.md"
+    }
+  },
+  "hooks": {
+    "before:init": ["npm run lint", "npm run format:check"],
+    "after:bump": ["npm run format"],
+    "after:git:release": [
+      "echo 'Release created! GitHub Actions will handle the build process.'",
+      "echo 'The workflow will create dasu.zip and update the release with FoundryVTT files.'"
+    ]
+  }
+}

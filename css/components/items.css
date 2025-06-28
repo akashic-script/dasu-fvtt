@@ -51,7 +51,8 @@
     align-items: center;
     display: flex;
 
-    h3, h4 {
+    h3,
+    h4 {
       margin: 0;
       white-space: nowrap;
       overflow-x: hidden;
@@ -77,8 +78,8 @@
     padding: 0 2px; /* to align with the header border */
     border-bottom: 1px solid var(--dasu-c-faint);
 
-    &:last-child { 
-      border-bottom: none; 
+    &:last-child {
+      border-bottom: none;
     }
 
     .item-name {
@@ -127,4 +128,4 @@
 .item-formula {
   flex: 0 0 200px;
   padding: 0 8px;
-} 
+}

@@ -1,10 +1,7 @@
 import DASUItemBase from './base-item.mjs';
 
 export default class DASUGear extends DASUItemBase {
-  static LOCALIZATION_PREFIXES = [
-    'DASU.Item.base',
-    'DASU.Item.Gear',
-  ];
+  static LOCALIZATION_PREFIXES = ['DASU.Item.base', 'DASU.Item.Gear'];
 
   static defineSchema() {
     const fields = foundry.data.fields;

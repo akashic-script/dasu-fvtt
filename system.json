@@ -11,23 +11,23 @@
   ],
   "documentTypes": {
     "Actor": {
-        "summoner": {
-            "htmlFields": ["biography"]
-        },
-        "daemon": {
-            "htmlFields": ["biography"]
-        }
+      "summoner": {
+        "htmlFields": ["biography"]
+      },
+      "daemon": {
+        "htmlFields": ["biography"]
+      }
     },
     "Item": {
-        "feature": {
-            "htmlFields": ["description"]
-        },
-        "gear": {
-            "htmlFields": ["description"]
-        },
-        "spell": {
-            "htmlFields": ["description"]
-        }
+      "feature": {
+        "htmlFields": ["description"]
+      },
+      "gear": {
+        "htmlFields": ["description"]
+      },
+      "spell": {
+        "htmlFields": ["description"]
+      }
     }
   },
   "flags": {

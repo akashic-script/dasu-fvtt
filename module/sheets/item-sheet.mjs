@@ -46,8 +46,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       template: 'systems/dasu/templates/item/description.hbs',
     },
     attributesFeature: {
-      template:
-        'systems/dasu/templates/item/attribute-parts/feature.hbs',
+      template: 'systems/dasu/templates/item/attribute-parts/feature.hbs',
     },
     attributesGear: {
       template: 'systems/dasu/templates/item/attribute-parts/gear.hbs',
@@ -198,17 +197,17 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
   async _onRender(context, options) {
     await super._onRender(context, options);
     new DragDrop.implementation({
-      dragSelector: ".draggable",
+      dragSelector: '.draggable',
       dropSelector: null,
       permissions: {
         dragstart: this._canDragStart.bind(this),
-        drop: this._canDragDrop.bind(this)
+        drop: this._canDragDrop.bind(this),
       },
       callbacks: {
         dragstart: this._onDragStart.bind(this),
         dragover: this._onDragOver.bind(this),
-        drop: this._onDrop.bind(this)
-      }
+        drop: this._onDrop.bind(this),
+      },
     }).bind(this.element);
     // You may want to add other special handling here
     // Foundry comes with a large number of utility classes, e.g. SearchFilter
@@ -391,7 +390,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    * @param {DragEvent} event       The originating DragEvent
    * @protected
    */
-  _onDragOver(event) { }
+  _onDragOver(event) {}
 
   /**
    * Callback actions which occur when a dragged element is dropped on a target.
@@ -404,7 +403,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     const allowed = Hooks.call('dropItemSheetData', item, this, data);
     if (allowed === false) return;
 
-    // Although you will find implmentations to all doc types here, it is important to keep 
+    // Although you will find implmentations to all doc types here, it is important to keep
     // in mind that only Active Effects are "valid" for items.
     // Actors have items, but items do not have actors.
     // Items in items is not implemented on Foudry per default. If you need an implementation with that,

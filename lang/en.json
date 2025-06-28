@@ -22,27 +22,27 @@
       },
       "base": {
         "FIELDS": {
-          "biography": {"label": "Biography"},
+          "biography": { "label": "Biography" },
           "health": {
-            "value": {"label": "Health"},
-            "max": {"label": "Maximum Health"}
+            "value": { "label": "Health" },
+            "max": { "label": "Maximum Health" }
           },
           "power": {
-            "value": {"label": "Power"},
-            "max": {"label": "Maximum Power"}
+            "value": { "label": "Power" },
+            "max": { "label": "Maximum Power" }
           }
         }
       },
       "Summoner": {
         "FIELDS": {
-          "attributes.level.value": {"label": "Level"}
+          "attributes.level.value": { "label": "Level" }
         }
       },
       "Daemon": {
         "FIELDS": {
-          "cr": {"label": "CR"}
+          "cr": { "label": "CR" }
         },
-        "xp": {"label": "XP"}
+        "xp": { "label": "XP" }
       }
     },
     "Item": {
@@ -53,17 +53,17 @@
       },
       "Gear": {
         "FIELDS": {
-          "rollFormula": {"label": "Roll Formula"},
-          "numDice": {"label": "Number of Dice"},
-          "dieSize": {"label": "Die Size"},
-          "rollMod": {"label": "Roll Modifier"},
-          "quantity": {"label": "Quantity"},
-          "weight": {"label": "Weight"}
+          "rollFormula": { "label": "Roll Formula" },
+          "numDice": { "label": "Number of Dice" },
+          "dieSize": { "label": "Die Size" },
+          "rollMod": { "label": "Roll Modifier" },
+          "quantity": { "label": "Quantity" },
+          "weight": { "label": "Weight" }
         }
       },
       "Spell": {
         "FIELDS": {
-          "level": {"label": "Spell Level"}
+          "level": { "label": "Spell Level" }
         },
         "SpellLVL": "Level {level} Spells",
         "AddLVL": "Add LVL {level}"

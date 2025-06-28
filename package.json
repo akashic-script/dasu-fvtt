@@ -3,7 +3,18 @@
   "version": "0.0.0",
   "description": "Daemon System for Foundry VTT",
   "scripts": {
-    "createSymlinks": "node src/create-symlinks.mjs"
+    "createSymlinks": "node src/create-symlinks.mjs",
+    "lint": "eslint . --ext .js,.mjs",
+    "lint:fix": "eslint . --ext .js,.mjs --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "commit": "cz",
+    "prepare": "husky install",
+    "release": "release-it",
+    "release:patch": "release-it patch",
+    "release:minor": "release-it minor",
+    "release:major": "release-it major",
+    "release:dry": "release-it --dry-run"
   },
   "browserslist": [
     "last 3 versions"
@@ -12,6 +23,26 @@
   "license": "Apache-2.0",
   "private": true,
   "devDependencies": {
-    "js-yaml": "^4.1.0"
+    "@commitlint/cli": "^17.8.1",
+    "@commitlint/config-conventional": "^17.8.1",
+    "@release-it/conventional-changelog": "^10.0.1",
+    "commitizen": "^4.3.1",
+    "conventional-changelog-cli": "^4.1.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8.57.1",
+    "husky": "^8.0.3",
+    "js-yaml": "^4.1.0",
+    "lint-staged": "^13.3.0",
+    "prettier": "^2.8.8",
+    "release-it": "^19.0.3"
+  },
+  "lint-staged": {
+    "*.{js,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }
