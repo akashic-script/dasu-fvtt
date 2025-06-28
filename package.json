@@ -1,0 +1,20 @@
+{
+  "name": "dasu",
+  "version": "3.0.0",
+  "description": "CSS compiler for the DASU system",
+  "scripts": {
+    "build": "sass src/scss/dasu.scss css/dasu.css --style=expanded --no-source-map",
+    "watch": "sass src/scss/dasu.scss css/dasu.css --style=expanded --source-map --watch",
+    "createSymlinks": "node src/create-symlinks.mjs"
+  },
+  "browserslist": [
+    "last 3 versions"
+  ],
+  "author": "Asacolips",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "sass": "^1.53.0",
+    "js-yaml": "^4.1.0"
+  }
+}
