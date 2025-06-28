@@ -33,12 +33,12 @@
           }
         }
       },
-      "Character": {
+      "Summoner": {
         "FIELDS": {
           "attributes.level.value": {"label": "Level"}
         }
       },
-      "NPC": {
+      "Daemon": {
         "FIELDS": {
           "cr": {"label": "CR"}
         },
@@ -79,8 +79,8 @@
   },
   "TYPES": {
     "Actor": {
-      "character": "Character",
-      "npc": "NPC"
+      "summoner": "Summoner",
+      "daemon": "Daemon"
     },
     "Item": {
       "gear": "Gear",

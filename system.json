@@ -10,10 +10,10 @@
   ],
   "documentTypes": {
     "Actor": {
-        "character": {
+        "summoner": {
             "htmlFields": ["biography"]
         },
-        "npc": {
+        "daemon": {
             "htmlFields": ["biography"]
         }
     },
