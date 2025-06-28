@@ -1,4 +1,4 @@
-// Flexbox.
+/* Flexbox Utilities */
 .flex-group-center,
 .flex-group-left,
 .flex-group-right {
@@ -29,7 +29,7 @@
   flex: 2;
 }
 
-// Alignment styles.
+/* Alignment styles */
 .align-left {
   justify-content: flex-start;
   text-align: left;
@@ -43,4 +43,4 @@
 .align-center {
   justify-content: center;
   text-align: center;
-}
+} 

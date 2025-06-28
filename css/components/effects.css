@@ -1,46 +1,48 @@
-// Section Header
-.items-header {
+/* Effects Styles */
+/* Section Header */
+.effects-header {
   height: 28px;
   margin: 2px 0;
   padding: 0;
   align-items: center;
   background: rgba(0, 0, 0, 0.05);
-  border: $border-groove;
+  border: var(--border-groove);
   font-weight: bold;
+
   > * {
     font-size: 14px;
     text-align: center;
   }
-  .item-name {
+
+  .effect-name {
     font-weight: bold;
     padding-left: 5px;
     text-align: left;
     display: flex;
-    // font-size: 16px;
   }
 }
 
-// -----------------------------------------
-// Items Lists
-// -----------------------------------------
+/* -----------------------------------------
+   Effects Lists
+   ----------------------------------------- */
 
-.items-list {
+.effects-list {
   list-style: none;
   margin: 0;
   padding: 0;
   overflow-y: auto;
   scrollbar-width: thin;
-  color: $c-tan;
+  color: var(--dasu-c-tan);
 
-  // Child lists
-  .item-list {
+  /* Child lists */
+  .effect-list {
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  // Item Name
-  .item-name {
+  /* Effect Name */
+  .effect-name {
     flex: 2;
     margin: 0;
     overflow: hidden;
@@ -48,6 +50,7 @@
     text-align: left;
     align-items: center;
     display: flex;
+
     h3, h4 {
       margin: 0;
       white-space: nowrap;
@@ -55,11 +58,12 @@
     }
   }
 
-  // Control Buttons
-  .item-controls {
+  /* Control Buttons */
+  .effect-controls {
     display: flex;
     flex: 0 0 100px;
     justify-content: flex-end;
+
     a {
       font-size: 12px;
       text-align: center;
@@ -67,15 +71,20 @@
     }
   }
 
-  // Individual Item
-  .item {
+  /* Individual Effect */
+  .effect {
     align-items: center;
-    padding: 0 2px; // to align with the header border
-    border-bottom: 1px solid $c-faint;
-    &:last-child { border-bottom: none; }
-    .item-name {
-      color: $c-dark;
-      .item-image {
+    padding: 0 2px; /* to align with the header border */
+    border-bottom: 1px solid var(--dasu-c-faint);
+
+    &:last-child { 
+      border-bottom: none; 
+    }
+
+    .effect-name {
+      color: var(--dasu-c-dark);
+
+      .effect-image {
         flex: 0 0 30px;
         height: 30px;
         background-size: 30px;
@@ -85,37 +94,52 @@
     }
   }
 
-  .item-prop {
+  .effect-prop {
     text-align: center;
     border-left: 1px solid #c9c7b8;
     border-right: 1px solid #c9c7b8;
     font-size: 12px;
   }
 
-  // Section Header
-  .items-header {
+  /* Section Header */
+  .effects-header {
     height: 28px;
     margin: 2px 0;
     padding: 0;
     align-items: center;
     background: rgba(0, 0, 0, 0.05);
-    border: $border-groove;
+    border: var(--border-groove);
     font-weight: bold;
+
     > * {
       font-size: 12px;
       text-align: center;
     }
-    .item-name {
+
+    .effect-name {
       padding-left: 5px;
       text-align: left;
-      // font-size: 16px;
     }
   }
 }
 
-// Example style for DASU (can be removed if not needed).
-.item-formula {
-  
+/* Example style for DASU (can be removed if not needed) */
+.effect-formula {
   flex: 0 0 200px;
   padding: 0 8px;
 }
+
+.effects .item {
+  .effect-source,
+  .effect-duration,
+  .effect-controls {
+    text-align: center;
+    border-left: 1px solid #c9c7b8;
+    border-right: 1px solid #c9c7b8;
+    font-size: 12px;
+  }
+
+  .effect-controls {
+    border: none;
+  }
+} 

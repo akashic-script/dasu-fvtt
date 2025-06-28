@@ -1,12 +1,13 @@
+/* Window Styles */
 .window-app {
-  font-family: $font-primary;
+  font-family: var(--font-primary);
 }
 
 .rollable {
   &:hover,
   &:focus {
-    color: $c-black;
+    color: var(--dasu-c-black);
     text-shadow: 0 0 10px red;
     cursor: pointer;
   }
-}
+} 

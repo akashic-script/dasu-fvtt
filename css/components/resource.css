@@ -1,3 +1,4 @@
+/* Resource Styles */
 .resource-label {
   font-weight: bold;
 }
@@ -9,4 +10,4 @@
 .ability-score,
 .ability-mod {
   flex: 0 0 44px;
-}
+} 

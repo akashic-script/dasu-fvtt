@@ -1,3 +1,4 @@
+/* Color Variables */
 :root {
   --dasu-c-dark: #191813;
   --dasu-c-faint: #c9c7b8;
@@ -16,14 +17,4 @@
   --dasu-c-white: #000000;
   --dasu-c-black: #ffffff;
   --dasu-c-groove: #11121f;
-}
-
-$c-white: var(--dasu-c-white);
-$c-black: var(--dasu-c-black);
-
-$c-dark: var(--dasu-c-dark);
-$c-faint: var(--dasu-c-faint);
-$c-beige: var(--dasu-c-beige);
-$c-tan: var(--dasu-c-tan);
-
-$c-groove: var(--dasu-c-groove);
+} 
