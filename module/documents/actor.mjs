@@ -22,7 +22,7 @@ export class DASUActor extends Actor {
    * @override
    * Augment the actor source data with additional dynamic data that isn't
    * handled by the actor's DataModel. Data calculated in this step should be
-   * available both inside and outside of character sheets (such as if an actor
+   * available both inside and outside of summoner sheets (such as if an actor
    * is queried and has a roll executed directly from it).
    */
   prepareDerivedData() {

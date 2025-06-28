@@ -69,9 +69,9 @@
       </div>
 
       <div class='resource flex-group-center'>
-        {{#if (eq actor.type 'character')}}
+        {{#if (eq actor.type 'summoner')}}
           <label class='resource-label'>
-            {{localize 'DASU.Actor.Character.FIELDS.attributes.level.value.label'}}
+            {{localize 'DASU.Actor.Summoner.FIELDS.attributes.level.value.label'}}
           </label>
           <div class='resource-content flexrow flex-center flex-between'>
             <input
@@ -82,9 +82,9 @@
             />
           </div>
         {{/if}}
-        {{#if (eq actor.type 'npc')}}
+        {{#if (eq actor.type 'daemon')}}
           <label class='resource-label'>
-            {{localize 'DASU.Actor.NPC.FIELDS.cr.label'}} / {{localize 'DASU.Actor.NPC.xp.label'}}
+            {{localize 'DASU.Actor.Daemon.FIELDS.cr.label'}} / {{localize 'DASU.Actor.Daemon.xp.label'}}
           </label>
           <div class='resource-content flexrow flex-center flex-between'>
             <input

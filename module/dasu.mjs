@@ -51,10 +51,10 @@ Hooks.once('init', function () {
 
   // Note that you don't need to declare a DataModel
   // for the base actor/item classes - they are included
-  // with the Character/NPC as part of super.defineSchema()
+  // with the Summoner/Daemon as part of super.defineSchema()
   CONFIG.Actor.dataModels = {
-    character: models.DASUCharacter,
-    npc: models.DASUNPC,
+    summoner: models.DASUSummoner,
+    daemon: models.DASUDaemon,
   };
   CONFIG.Item.documentClass = DASUItem;
   CONFIG.Item.dataModels = {

@@ -1,9 +1,9 @@
 import DASUActorBase from './base-actor.mjs';
 
-export default class DASUCharacter extends DASUActorBase {
+export default class DASUSummoner extends DASUActorBase {
   static LOCALIZATION_PREFIXES = [
     ...super.LOCALIZATION_PREFIXES,
-    'DASU.Actor.Character',
+    'DASU.Actor.Summoner',
   ];
 
   static defineSchema() {

@@ -1,7 +1,7 @@
 // Export Actors
 export { default as DASUActorBase } from './base-actor.mjs';
-export { default as DASUCharacter } from './actor-character.mjs';
-export { default as DASUNPC } from './actor-npc.mjs';
+export { default as DASUSummoner } from './actor-summoner.mjs';
+export { default as DASUDaemon } from './actor-daemon.mjs';
 
 // Export Items
 export { default as DASUItemBase } from './base-item.mjs';
