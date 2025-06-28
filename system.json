@@ -5,7 +5,8 @@
   "authors": [
     {
       "name": "Spyrella",
-      "discord": "spyrella"
+      "discord": "spyrella",
+      "url": "https://github.com/spyrella/"
     }
   ],
   "documentTypes": {
@@ -35,10 +36,10 @@
       "paths": ["css", "lang", "templates"]
     }
   },
-  "url": "Replace this with a link to your public repository",
+  "url": "{{URL}}",
   "license": "LICENSE.txt",
   "readme": "README.md",
-  "bugs": "Replace this with a link to file issues or tickets",
+  "bugs": "{{URL}}/issues",
   "changelog": "CHANGELOG.md",
   "media": [
     {
@@ -47,7 +48,7 @@
       "thumbnail": "systems/dasu/assets/anvil-impact.png"
     }
   ],
-  "version": "3.0.0",
+  "version": "{{VERSION}}",
   "compatibility": {
     "minimum": "13.339",
     "verified": "13.339"
@@ -64,8 +65,8 @@
   "packs": [],
   "packFolders": [],
   "socket": false,
-  "manifest": "Replace this with a link to the /latest release system.json so people can receive updates after they've installed the system",
-  "download": "This must link to a .zip file of the current version",
+  "manifest": "{{MANIFEST}}",
+  "download": "{{DOWNLOAD}}",
   "background": "systems/dasu/assets/anvil-impact.png",
   "grid": {
     "type": 1,
@@ -73,6 +74,6 @@
     "units": "ft",
     "diagonals": 0
   },
-  "primaryTokenAttribute": "health",
-  "secondaryTokenAttribute": "power"
+  "primaryTokenAttribute": "hp",
+  "secondaryTokenAttribute": "wp"
 }

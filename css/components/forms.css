@@ -1,5 +1,6 @@
+/* Form Styles */
 .item-form {
-  font-family: $font-primary;
+  font-family: var(--font-primary);
 }
 
 .sheet-header {
@@ -46,10 +47,10 @@
 
 .tox {
   .tox-editor-container {
-    background: $c-white;
+    background: var(--dasu-c-white);
   }
 
   .tox-edit-area {
     padding: 0 8px;
   }
-}
+} 
