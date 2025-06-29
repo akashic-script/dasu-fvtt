@@ -89,43 +89,32 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     // Control which parts show based on document subtype
     switch (this.document.type) {
       case 'ability':
-        console.log('DASU: Rendering ability');
         // Always use attributesAbility for all ability items
         // Category-specific rendering is handled within the ability template
         options.parts.push('attributesAbility', 'effects');
         break;
       case 'weapon':
-        console.log('DASU: Rendering weapon');
         options.parts.push('attributesWeapon', 'effects');
         break;
       case 'tag':
-        console.log('DASU: Rendering tag');
         options.parts.push('attributesTag', 'description', 'effects');
         break;
       case 'tactic':
-        console.log('DASU: Rendering tactic');
         options.parts.push('attributesTactic', 'effects');
         break;
       case 'special':
-        console.log('DASU: Rendering special');
         options.parts.push('attributesSpecial', 'description', 'effects');
         break;
       case 'scar':
-        console.log('DASU: Rendering scar');
         options.parts.push('attributesScar', 'description', 'effects');
         break;
     }
-    console.log('DASU: Final parts array:', options.parts);
   }
 
   /* -------------------------------------------- */
 
   /** @override */
   async _prepareContext(options) {
-    console.log(
-      'DASU: Preparing main context for item type:',
-      this.document.type
-    );
     const context = {
       // Validates both permissions and compendium status
       editable: this.isEditable,
@@ -144,7 +133,6 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
 
     // Add shared context for header
     if (this.document.type === 'ability') {
-      console.log('DASU: Adding ability-specific context');
       // Use ABILITY_CATEGORIES from config instead of hardcoded options
       context.itemCategories = {};
       const abilityCategories = globalThis.DASU?.ABILITY_CATEGORIES || [
@@ -161,7 +149,6 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     }
 
     if (this.document.type === 'weapon') {
-      console.log('DASU: Adding weapon-specific context');
       context.rangeTypes = {
         melee: 'Melee',
         ranged: 'Ranged',
@@ -169,19 +156,13 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       };
     }
 
-    console.log('DASU: Main context prepared, parts:', options.parts);
     return context;
   }
 
   /** @override */
   async _preparePartContext(partId, context) {
-    console.log('DASU: Preparing part context for:', partId);
     switch (partId) {
       case 'attributesAbility':
-        console.log(
-          'DASU: Preparing ability context for category:',
-          this.item.system.category
-        );
         // This is the unified ability partial that renders different content based on category
         context.tab = context.tabs[partId];
         // Add damage types for the select dropdowns (if needed by the category)
@@ -247,12 +228,10 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
         break;
       case 'attributesTag':
       case 'attributesScar':
-        console.log('DASU: Preparing simple context for:', partId);
         // Necessary for preserving active tab on re-render
         context.tab = context.tabs[partId];
         break;
       case 'attributesWeapon':
-        console.log('DASU: Preparing weapon context');
         // Necessary for preserving active tab on re-render
         context.tab = context.tabs[partId];
         // Add damage types for the select dropdowns
@@ -279,7 +258,6 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
           );
         break;
       case 'attributesTactic':
-        console.log('DASU: Preparing tactic context');
         // Necessary for preserving active tab on re-render
         context.tab = context.tabs[partId];
         // Add enriched description for ProseMirror
@@ -294,7 +272,6 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
           );
         break;
       case 'description':
-        console.log('DASU: Preparing description context');
         context.tab = context.tabs[partId];
         // Enrich description info for display
         // Enrichment turns text like `[[/r 1d20]]` into buttons
@@ -312,13 +289,11 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
           );
         break;
       case 'effects':
-        console.log('DASU: Preparing effects context');
         context.tab = context.tabs[partId];
         // Prepare active effects for easier access
         context.effects = prepareActiveEffectCategories(this.item.effects);
         break;
       default:
-        console.log('DASU: No specific context preparation for:', partId);
     }
     return context;
   }
@@ -488,10 +463,6 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     const oldCategory = this.document.system.category;
 
     if (oldCategory === newCategory) return;
-
-    console.log(
-      `DASU: Category changing from ${oldCategory} to ${newCategory}`
-    );
 
     // Update the category - this will trigger the _preUpdate method in the item document
     // which will handle cleaning up incompatible fields

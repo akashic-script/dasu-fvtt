@@ -25,7 +25,7 @@ export class DASUItem extends Item {
     // Ensure system object exists
     data.system = data.system || {};
 
-    // Set dsid based on the item's name if not already set
+    // Set dsid from name if not set
     if (!data.system.dsid && data.name) {
       data.system.dsid = slugify(data.name);
     }
@@ -40,7 +40,7 @@ export class DASUItem extends Item {
   async _preUpdate(changed, options, user) {
     await super._preUpdate(changed, options, user);
 
-    // Update dsid if the name changed and dsid is empty
+    // Update dsid if name changed and dsid is empty
     if (changed.name && (!this.system.dsid || this.system.dsid === '')) {
       changed.system = changed.system || {};
       changed.system.dsid = slugify(changed.name);
@@ -61,10 +61,6 @@ export class DASUItem extends Item {
     const newCategory = changed.system.category;
 
     if (oldCategory === newCategory) return;
-
-    console.log(
-      `DASU: Ability category changing from ${oldCategory} to ${newCategory}`
-    );
 
     // Define which fields are compatible between categories (shared across all ability types)
     const compatibleFields = ['damage', 'cost', 'toHit', 'effect'];
@@ -98,7 +94,6 @@ export class DASUItem extends Item {
       if (this.system[field] !== undefined && this.system[field] !== null) {
         updates[`system.${field}`] = null;
         removedFields.push(field);
-        console.log(`DASU: Removing incompatible field: ${field}`);
       }
     });
 

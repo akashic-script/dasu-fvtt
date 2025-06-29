@@ -397,10 +397,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       context.skillPoints = skillPointsData;
       context.skills = skills;
 
-      // Debug logging
-      console.log('Skill Points Data:', skillPointsData);
-      console.log('Skills:', skills);
-
       // Calculate skill costs for tooltips (cumulative: 0+1+2+3+4+5+6 = 21 SP for 6 ticks)
       const skillCosts = {};
       skillCosts[0] = 0; // 0 ticks cost 0 SP
@@ -672,6 +668,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     // Retrieve the configured document class for Item or ActiveEffect
     const docCls = getDocumentClass(target.dataset.documentClass);
     // Prepare the document creation data by initializing it a default name.
+    // As of v12, you can define custom Active Effect subtypes just like Item subtypes if you want
     const docData = {
       name: docCls.defaultName({
         // defaultName handles an undefined type gracefully
@@ -680,14 +677,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       }),
     };
 
-    // Debug: Log the dataset and raw attributes
-    console.log('DASU: _createDoc dataset:', target.dataset);
-    console.log('DASU: _createDoc dataset keys:', Object.keys(target.dataset));
-    console.log(
-      'DASU: Raw data-system-category attribute:',
-      target.getAttribute('data-system-category')
-    );
-
     // Loop through the dataset and add it to our docData
     for (const [dataKey, value] of Object.entries(target.dataset)) {
       // These data attributes are reserved for the action handling
@@ -695,7 +684,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
       // Handle special case for data-system-category
       if (dataKey === 'systemCategory') {
-        console.log('DASU: Found systemCategory:', value);
         docData.system = docData.system || {};
         docData.system.category = value;
         continue;
@@ -704,27 +692,16 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       // Nested properties require dot notation in the HTML, e.g. anything with `system`
       // An example exists in spells.hbs, with `data-system.spell-level`
       // which turns into the dataKey 'system.spellLevel'
-      console.log('DASU: Processing dataKey:', dataKey, 'value:', value);
       foundry.utils.setProperty(docData, dataKey, value);
     }
-
-    // Debug: Log the processed docData
-    console.log('DASU: _createDoc processed docData:', docData);
-    console.log('DASU: docData.system:', docData.system);
 
     // Set category for ability items since they require subcategorization
     if (target.dataset.type === 'ability') {
       docData.system = docData.system || {};
       // If a category was specified in the data attributes, use it
-      if (docData.system.category) {
-        console.log('DASU: Using specified category:', docData.system.category);
-      } else {
+      if (!docData.system.category) {
         // Otherwise use the first category from config
         docData.system.category = globalThis.DASU.ABILITY_CATEGORIES[0];
-        console.log(
-          'DASU: Set default category to:',
-          globalThis.DASU.ABILITY_CATEGORIES[0]
-        );
       }
     }
 
@@ -738,7 +715,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       docData.system.toLand = docData.system.toLand || 0;
       docData.system.cost = docData.system.cost || 0;
       docData.system.effect = docData.system.effect || '';
-      console.log('DASU: Set default values for tactic:', docData.system);
     }
 
     // Set default values for specials
@@ -749,16 +725,10 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       docData.system.duration = docData.system.duration || 0;
       docData.system.requirements = docData.system.requirements || '';
       docData.system.effect = docData.system.effect || '';
-      console.log('DASU: Set default values for special:', docData.system);
     }
 
     // Finally, create the embedded document!
     const createdDoc = await docCls.create(docData, { parent: this.actor });
-    console.log('DASU: Created document:', createdDoc);
-    console.log(
-      'DASU: Created document system.category:',
-      createdDoc.system.category
-    );
     return createdDoc;
   }
 

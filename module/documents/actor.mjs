@@ -114,9 +114,6 @@ export class DASUActor extends Actor {
         data.attributePoints.spent = totalAllocated;
         data.attributePoints.current = maxAP - totalAllocated;
       }
-
-      // Debug logging
-      console.log('Attribute Points Data:', data.attributePoints);
     } catch (error) {
       console.error('Error in prepareAttributeData:', error);
     }
