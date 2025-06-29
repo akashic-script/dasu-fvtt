@@ -13,8 +13,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   static DEFAULT_OPTIONS = {
     classes: ['dasu', 'actor'],
     position: {
-      width: 600,
-      height: 600,
+      width: 700,
+      height: 950,
     },
     actions: {
       onEditImage: this._onEditImage,
@@ -22,12 +22,15 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       createDoc: this._createDoc,
       deleteDoc: this._deleteDoc,
       toggleEffect: this._toggleEffect,
+      toggleSummoned: this._toggleSummoned,
+      removeFromStock: this._removeFromStock,
       roll: this._onRoll,
+      levelUp: this._levelUp,
     },
     // Custom property that's merged into `this.options`
     // dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
     form: {
-      submitOnChange: true,
+      submitOnChange: false,
     },
   };
 
@@ -40,20 +43,20 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       // Foundry-provided generic template
       template: 'templates/generic/tab-navigation.hbs',
     },
-    features: {
-      template: 'systems/dasu/templates/actor/features.hbs',
+    main: {
+      template: 'systems/dasu/templates/actor/main.hbs',
       scrollable: [''],
     },
     biography: {
       template: 'systems/dasu/templates/actor/biography.hbs',
       scrollable: [''],
     },
-    gear: {
-      template: 'systems/dasu/templates/actor/gear.hbs',
+    stocks: {
+      template: 'systems/dasu/templates/actor/stocks.hbs',
       scrollable: [''],
     },
-    spells: {
-      template: 'systems/dasu/templates/actor/spells.hbs',
+    items: {
+      template: 'systems/dasu/templates/actor/items.hbs',
       scrollable: [''],
     },
     effects: {
@@ -72,10 +75,10 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     // Control which parts show based on document subtype
     switch (this.document.type) {
       case 'summoner':
-        options.parts.push('features', 'gear', 'spells', 'effects');
+        options.parts.push('main', 'stocks', 'items', 'effects');
         break;
       case 'daemon':
-        options.parts.push('gear', 'effects');
+        options.parts.push('main', 'items', 'effects');
         break;
     }
   }
@@ -96,15 +99,17 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       system: this.actor.system,
       flags: this.actor.flags,
       // Adding a pointer to CONFIG.DASU
-      config: CONFIG.DASU,
+      config: globalThis.DASU,
       tabs: this._getTabs(options.parts),
       // Necessary for formInput and formFields helpers
       fields: this.document.schema.fields,
       systemFields: this.document.system.schema.fields,
+      // Edit mode state
+      isEditMode: this._isEditMode(),
     };
 
     // Offloading context prep to a helper function
-    this._prepareItems(context);
+    await this._prepareItems(context);
 
     return context;
   }
@@ -112,26 +117,27 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   /** @override */
   async _preparePartContext(partId, context) {
     switch (partId) {
-      case 'features':
-      case 'spells':
-      case 'gear':
+      case 'main':
+      case 'stocks':
+      case 'items':
         context.tab = context.tabs[partId];
         break;
       case 'biography':
         context.tab = context.tabs[partId];
         // Enrich biography info for display
         // Enrichment turns text like `[[/r 1d20]]` into buttons
-        context.enrichedBiography = await TextEditor.enrichHTML(
-          this.actor.system.biography,
-          {
-            // Whether to show secret blocks in the finished html
-            secrets: this.document.isOwner,
-            // Data to fill in for inline rolls
-            rollData: this.actor.getRollData(),
-            // Relative UUID resolution
-            relativeTo: this.actor,
-          }
-        );
+        context.enrichedBiography =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.actor.system.biography,
+            {
+              // Whether to show secret blocks in the finished html
+              secrets: this.document.isOwner,
+              // Data to fill in for inline rolls
+              rollData: this.actor.getRollData(),
+              // Relative UUID resolution
+              relativeTo: this.actor,
+            }
+          );
         break;
       case 'effects':
         context.tab = context.tabs[partId];
@@ -172,21 +178,21 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         case 'header':
         case 'tabs':
           return tabs;
+        case 'main':
+          tab.id = 'main';
+          tab.label += 'Main';
+          break;
+        case 'stocks':
+          tab.id = 'stocks';
+          tab.label += 'Stocks';
+          break;
         case 'biography':
           tab.id = 'biography';
           tab.label += 'Biography';
           break;
-        case 'features':
-          tab.id = 'features';
-          tab.label += 'Features';
-          break;
-        case 'gear':
-          tab.id = 'gear';
-          tab.label += 'Gear';
-          break;
-        case 'spells':
-          tab.id = 'spells';
-          tab.label += 'Spells';
+        case 'items':
+          tab.id = 'items';
+          tab.label += 'Items';
           break;
         case 'effects':
           tab.id = 'effects';
@@ -200,56 +206,213 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /**
+   * Get the header buttons for the actor sheet
+   * @returns {ApplicationHeaderButton[]}
+   * @protected
+   */
+  _getHeaderButtons() {
+    const buttons = super._getHeaderButtons();
+
+    // Only add edit mode toggle if the user can edit the document
+    if (this.isEditable) {
+      const isEditMode = this._isEditMode();
+
+      buttons.unshift({
+        label: isEditMode
+          ? 'DASU.Actor.EditMode.View'
+          : 'DASU.Actor.EditMode.Edit',
+        class: `toggle-edit-mode ${isEditMode ? 'active' : ''}`,
+        icon: isEditMode ? 'fas fa-eye' : 'fas fa-edit',
+        onclick: () => this._toggleEditMode(),
+      });
+    }
+
+    return buttons;
+  }
+
+  /**
+   * Toggle edit mode for the actor sheet
+   * @protected
+   */
+  async _toggleEditMode() {
+    const currentMode = this._isEditMode();
+    const newMode = !currentMode;
+
+    await this.document.setFlag('dasu', 'editMode', newMode);
+
+    // Re-render the sheet to update the UI
+    await this.render();
+  }
+
+  /**
+   * Check if the sheet is in edit mode
+   * @returns {boolean}
+   * @protected
+   */
+  _isEditMode() {
+    return this.document.getFlag('dasu', 'editMode') !== false;
+  }
+
+  /**
    * Organize and classify Items for Actor sheets.
    *
    * @param {object} context The context object to mutate
    */
-  _prepareItems(context) {
+  async _prepareItems(context) {
     // Initialize containers.
     // You can just use `this.document.itemTypes` instead
     // if you don't need to subdivide a given type like
     // this sheet does with spells
-    const gear = [];
-    const features = [];
-    const spells = {
-      0: [],
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-      6: [],
-      7: [],
-      8: [],
-      9: [],
-    };
+    const weapons = [];
+    const tags = [];
+    const techniques = [];
+    const spells = [];
+    const afflictions = [];
+    const restoratives = [];
+    const tactics = [];
+    const specials = [];
+    const scars = [];
 
     // Iterate through items, allocating to containers
     for (let i of this.document.items) {
-      // Append to gear.
-      if (i.type === 'gear') {
-        gear.push(i);
-      }
-      // Append to features.
-      else if (i.type === 'feature') {
-        features.push(i);
-      }
-      // Append to spells.
-      else if (i.type === 'spell') {
-        if (i.system.spellLevel != undefined) {
-          spells[i.system.spellLevel].push(i);
+      // Append to abilities.
+      if (i.type === 'ability') {
+        // Handle different ability categories
+        if (i.system.category === 'spell') {
+          // Spells are now abilities with category "spell"
+          spells.push(i);
+        } else if (i.system.category === 'affliction') {
+          afflictions.push(i);
+        } else if (i.system.category === 'restorative') {
+          restoratives.push(i);
+        } else if (i.system.category === 'technique') {
+          techniques.push(i);
         }
+        // Note: General abilities (no category) are not displayed in the items tab
+        // They would be shown in the main tab if needed
       }
-    }
-
-    for (const s of Object.values(spells)) {
-      s.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+      // Append to weapons.
+      else if (i.type === 'weapon') {
+        weapons.push(i);
+      }
+      // Append to tags.
+      else if (i.type === 'tag') {
+        tags.push(i);
+      }
+      // Append to techniques (legacy - now handled as abilities with category "technique").
+      else if (i.type === 'technique') {
+        techniques.push(i);
+      }
+      // Append to spells (legacy - now handled as abilities with category "spell").
+      else if (i.type === 'spell') {
+        spells.push(i);
+      }
+      // Append to afflictions (legacy - now handled as abilities with category "affliction").
+      else if (i.type === 'affliction') {
+        afflictions.push(i);
+      }
+      // Append to restoratives (legacy - now handled as abilities with category "restorative").
+      else if (i.type === 'restorative') {
+        restoratives.push(i);
+      }
+      // Append to tactics.
+      else if (i.type === 'tactic') {
+        tactics.push(i);
+      }
+      // Append to specials.
+      else if (i.type === 'special') {
+        specials.push(i);
+      }
+      // Append to scars.
+      else if (i.type === 'scar') {
+        scars.push(i);
+      }
     }
 
     // Sort then assign
-    context.gear = gear.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-    context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-    context.spells = spells;
+    context.weapons = weapons.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.tags = tags.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.techniques = techniques.sort(
+      (a, b) => (a.sort || 0) - (b.sort || 0)
+    );
+    context.spells = spells.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.afflictions = afflictions.sort(
+      (a, b) => (a.sort || 0) - (b.sort || 0)
+    );
+    context.restoratives = restoratives.sort(
+      (a, b) => (a.sort || 0) - (b.sort || 0)
+    );
+    context.tactics = tactics.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.specials = specials.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.scars = scars.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+
+    // Prepare daemons for summoners
+    if (this.document.type === 'summoner') {
+      // Get daemons from the stocks field
+      const stocks = this.document.system.stocks || [];
+      const daemons = [];
+
+      for (const stock of stocks) {
+        if (stock.references?.actor) {
+          const actor = game.actors.get(stock.references.actor);
+          if (actor && actor.type === 'daemon') {
+            daemons.push({
+              _id: actor.id,
+              name: actor.name,
+              img: actor.img,
+              type: actor.type,
+              isSummoned: stock.references.isSummoned || false,
+            });
+          }
+        }
+      }
+
+      context.daemons = daemons.sort((a, b) =>
+        (a.name || '').localeCompare(b.name || '')
+      );
+
+      // Prepare skills for summoners
+      let skills = this.document.system.skills || [];
+
+      // Initialize default skills if none exist or if they have empty names
+      if (
+        skills.length === 0 ||
+        skills.some((skill) => !skill.name || !skill.id)
+      ) {
+        const SummonerDataModel = CONFIG.Actor.dataModels.summoner;
+        const defaultSkills = SummonerDataModel.getDefaultSkills();
+        await this.document.update({ 'system.skills': defaultSkills });
+        skills = defaultSkills;
+      }
+
+      // Calculate skill points AFTER skills are initialized
+      const level = this.document.system.level || 1;
+      const SummonerDataModel = CONFIG.Actor.dataModels.summoner;
+      const skillPointsData = SummonerDataModel.getSkillPointsData(
+        level,
+        skills
+      );
+
+      // Add skill points data to context for template
+      context.skillPoints = skillPointsData;
+      context.skills = skills;
+
+      // Debug logging
+      console.log('Skill Points Data:', skillPointsData);
+      console.log('Skills:', skills);
+
+      // Calculate skill costs for tooltips (cumulative: 0+1+2+3+4+5+6 = 21 SP for 6 ticks)
+      const skillCosts = {};
+      skillCosts[0] = 0; // 0 ticks cost 0 SP
+      for (let i = 1; i <= 6; i++) {
+        // Calculate cumulative cost: 0+1+2+...+i
+        skillCosts[i] = (i * (i + 1)) / 2; // Sum of 1 to i
+      }
+      context.skillCosts = skillCosts;
+    } else {
+      context.daemons = [];
+      context.skills = [];
+    }
   }
 
   /**
@@ -263,9 +426,180 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   async _onRender(context, options) {
     await super._onRender(context, options);
     this.#disableOverrides();
-    // You may want to add other special handling here
-    // Foundry comes with a large number of utility classes, e.g. SearchFilter
-    // That you may want to implement yourself.
+
+    // Add click handlers for skill radio buttons
+    this.element.querySelectorAll('.skill-tick-radio').forEach((radio) => {
+      // Remove any existing listeners to prevent duplicates
+      radio.removeEventListener('click', this._handleSkillRadioClick);
+      radio.removeEventListener('change', this._handleSkillRadioChange);
+      radio.removeEventListener(
+        'contextmenu',
+        this._handleSkillRadioRightClick
+      );
+
+      // Add new listeners
+      radio.addEventListener('click', this._handleSkillRadioClick.bind(this));
+      radio.addEventListener('change', this._handleSkillRadioChange.bind(this));
+      radio.addEventListener(
+        'contextmenu',
+        this._handleSkillRadioRightClick.bind(this)
+      );
+    });
+
+    // Add change handlers for other form fields
+    this.element
+      .querySelectorAll('input[data-dtype], select[data-dtype]')
+      .forEach((input) => {
+        // Skip radio buttons as they're handled separately
+        if (input.type === 'radio') return;
+
+        // Remove any existing listeners to prevent duplicates
+        input.removeEventListener('change', this._handleManualSubmit);
+        input.removeEventListener('blur', this._handleManualSubmit);
+
+        // Add new listeners
+        input.addEventListener('change', this._handleManualSubmit.bind(this));
+        input.addEventListener('blur', this._handleManualSubmit.bind(this));
+      });
+
+    // Add form submit handler
+    const form = this.element.querySelector('form');
+    if (form) {
+      form.removeEventListener('submit', this._handleFormSubmit);
+      form.addEventListener('submit', this._handleFormSubmit.bind(this));
+    }
+  }
+
+  /**
+   * Handle skill radio button right-click events (reset to 0)
+   * @param {Event} event The contextmenu event
+   * @private
+   */
+  async _handleSkillRadioRightClick(event) {
+    // Prevent default context menu
+    event.preventDefault();
+    event.stopPropagation();
+
+    const skillIndex = parseInt(event.target.dataset.skillIndex);
+
+    try {
+      // Get current skills array
+      const currentSkills = [...this.actor.system.skills];
+
+      // Reset the specific skill to 0 ticks
+      if (currentSkills[skillIndex]) {
+        currentSkills[skillIndex] = {
+          ...currentSkills[skillIndex],
+          ticks: 0,
+        };
+      }
+
+      // Update the entire skills array
+      await this.actor.update({ 'system.skills': currentSkills });
+
+      // Force a re-render to show the updated values
+      this.render(true);
+    } catch (error) {
+      console.error('Error resetting skill ticks:', error);
+    }
+  }
+
+  /**
+   * Handle skill radio button click events
+   * @param {Event} event The click event
+   * @private
+   */
+  _handleSkillRadioClick(event) {
+    // Prevent any interference with the radio button selection
+    event.stopPropagation();
+    event.preventDefault();
+
+    // Force the radio button to be checked
+    event.target.checked = true;
+
+    // Manually trigger the change event
+    const changeEvent = new Event('change', { bubbles: true });
+    event.target.dispatchEvent(changeEvent);
+  }
+
+  /**
+   * Handle skill radio button change events
+   * @param {Event} event The change event
+   * @private
+   */
+  async _handleSkillRadioChange(event) {
+    // Prevent form submission
+    event.stopPropagation();
+    event.preventDefault();
+
+    // Only proceed if the radio is actually checked
+    if (!event.target.checked) {
+      return;
+    }
+
+    // Manually update the actor data
+    const skillIndex = parseInt(event.target.dataset.skillIndex);
+    const tickValue = parseInt(event.target.value);
+
+    try {
+      // Get current skills array
+      const currentSkills = [...this.actor.system.skills];
+
+      // Update the specific skill
+      if (currentSkills[skillIndex]) {
+        currentSkills[skillIndex] = {
+          ...currentSkills[skillIndex],
+          ticks: tickValue,
+        };
+      }
+
+      // Update the entire skills array
+      await this.actor.update({ 'system.skills': currentSkills });
+
+      // Force a re-render to show the updated values
+      this.render(true);
+    } catch (error) {
+      console.error('Error updating skill ticks:', error);
+    }
+  }
+
+  /**
+   * Handle form submission
+   * @param {SubmitEvent} event The form submit event
+   * @private
+   */
+  async _handleFormSubmit(event) {
+    // Prevent default form submission
+    event.preventDefault();
+
+    // Get form data
+    const formData = new FormData(event.target);
+    const submitData = {};
+
+    for (const [key, value] of formData.entries()) {
+      // Skip radio buttons as they're handled separately
+      if (key.includes('skill-tick-radio')) continue;
+
+      // Convert value based on data type
+      const input = event.target.querySelector(`[name="${key}"]`);
+      const fieldType = input?.dataset.dtype || 'String';
+
+      let processedValue = value;
+      if (fieldType === 'Number') {
+        processedValue = parseFloat(value) || 0;
+      } else if (fieldType === 'Boolean') {
+        processedValue = value === 'true';
+      }
+
+      submitData[key] = processedValue;
+    }
+
+    // Update the actor
+    try {
+      await this.actor.update(submitData);
+    } catch (error) {
+      console.error('Error updating form data:', error);
+    }
   }
 
   /**************
@@ -329,9 +663,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /**
-   * Handle creating a new Owned Item or ActiveEffect for the actor using initial data defined in the HTML dataset
-   *
-   * @this DASUActorSheet
+   * Create a new embedded Document within this parent Document
    * @param {PointerEvent} event   The originating click event
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @private
@@ -347,18 +679,137 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         parent: this.actor,
       }),
     };
+
+    // Debug: Log the dataset and raw attributes
+    console.log('DASU: _createDoc dataset:', target.dataset);
+    console.log('DASU: _createDoc dataset keys:', Object.keys(target.dataset));
+    console.log(
+      'DASU: Raw data-system-category attribute:',
+      target.getAttribute('data-system-category')
+    );
+
     // Loop through the dataset and add it to our docData
     for (const [dataKey, value] of Object.entries(target.dataset)) {
       // These data attributes are reserved for the action handling
       if (['action', 'documentClass'].includes(dataKey)) continue;
+
+      // Handle special case for data-system-category
+      if (dataKey === 'systemCategory') {
+        console.log('DASU: Found systemCategory:', value);
+        docData.system = docData.system || {};
+        docData.system.category = value;
+        continue;
+      }
+
       // Nested properties require dot notation in the HTML, e.g. anything with `system`
       // An example exists in spells.hbs, with `data-system.spell-level`
       // which turns into the dataKey 'system.spellLevel'
+      console.log('DASU: Processing dataKey:', dataKey, 'value:', value);
       foundry.utils.setProperty(docData, dataKey, value);
     }
 
+    // Debug: Log the processed docData
+    console.log('DASU: _createDoc processed docData:', docData);
+    console.log('DASU: docData.system:', docData.system);
+
+    // Set category for ability items since they require subcategorization
+    if (target.dataset.type === 'ability') {
+      docData.system = docData.system || {};
+      // If a category was specified in the data attributes, use it
+      if (docData.system.category) {
+        console.log('DASU: Using specified category:', docData.system.category);
+      } else {
+        // Otherwise use the first category from config
+        docData.system.category = globalThis.DASU.ABILITY_CATEGORIES[0];
+        console.log(
+          'DASU: Set default category to:',
+          globalThis.DASU.ABILITY_CATEGORIES[0]
+        );
+      }
+    }
+
+    // Set default values for tactics to fix validation errors
+    if (target.dataset.type === 'tactic') {
+      docData.system = docData.system || {};
+      docData.system.govern = docData.system.govern || 'pow';
+      docData.system.damage = docData.system.damage || {};
+      docData.system.damage.value = docData.system.damage.value || 0;
+      docData.system.damage.type = docData.system.damage.type || 'physical';
+      docData.system.toLand = docData.system.toLand || 0;
+      docData.system.cost = docData.system.cost || 0;
+      docData.system.effect = docData.system.effect || '';
+      console.log('DASU: Set default values for tactic:', docData.system);
+    }
+
+    // Set default values for specials
+    if (target.dataset.type === 'special') {
+      docData.system = docData.system || {};
+      docData.system.specialType = docData.system.specialType || 'ability';
+      docData.system.cost = docData.system.cost || 0;
+      docData.system.duration = docData.system.duration || 0;
+      docData.system.requirements = docData.system.requirements || '';
+      docData.system.effect = docData.system.effect || '';
+      console.log('DASU: Set default values for special:', docData.system);
+    }
+
     // Finally, create the embedded document!
-    await docCls.create(docData, { parent: this.actor });
+    const createdDoc = await docCls.create(docData, { parent: this.actor });
+    console.log('DASU: Created document:', createdDoc);
+    console.log(
+      'DASU: Created document system.category:',
+      createdDoc.system.category
+    );
+    return createdDoc;
+  }
+
+  /**
+   * Toggle the summoned status of a daemon in stocks
+   *
+   * @this DASUActorSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _toggleSummoned(event, target) {
+    const daemonId = target.closest('li[data-actor-id]').dataset.actorId;
+    const stocks = this.actor.system.stocks || [];
+    const stockIndex = stocks.findIndex(
+      (stock) => stock.references?.actor === daemonId
+    );
+
+    if (stockIndex === -1) return;
+
+    const currentStock = stocks[stockIndex];
+    const newIsSummoned = !currentStock.references.isSummoned;
+
+    const updatedStocks = [...stocks];
+    updatedStocks[stockIndex] = {
+      ...currentStock,
+      references: {
+        ...currentStock.references,
+        isSummoned: newIsSummoned,
+      },
+    };
+
+    await this.actor.update({ 'system.stocks': updatedStocks });
+  }
+
+  /**
+   * Remove a daemon from the summoner's stocks
+   *
+   * @this DASUActorSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _removeFromStock(event, target) {
+    const daemonId = target.closest('li[data-actor-id]').dataset.actorId;
+    const stocks = this.actor.system.stocks || [];
+    const updatedStocks = stocks.filter(
+      (stock) => stock.references?.actor !== daemonId
+    );
+
+    await this.actor.update({ 'system.stocks': updatedStocks });
   }
 
   /**
@@ -395,14 +846,57 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     // Handle rolls that supply the formula directly.
     if (dataset.roll) {
-      let label = dataset.label ? `[ability] ${dataset.label}` : '';
+      let label = dataset.label ? `${dataset.label}` : '';
       let roll = new Roll(dataset.roll, this.actor.getRollData());
-      await roll.toMessage({
-        speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-        flavor: label,
-        rollMode: game.settings.get('core', 'rollMode'),
-      });
-      return roll;
+
+      // For DASU success-based rolls
+      if (label.includes('Check')) {
+        // This is a DASU success-based roll
+        await roll.evaluate();
+        let successes = 0;
+        let rollResults = [];
+
+        // Count successes (4-6) from the roll results and collect all results
+        if (roll.dice && roll.dice.length > 0) {
+          for (const die of roll.dice) {
+            if (die.results) {
+              for (const result of die.results) {
+                rollResults.push(result.result);
+                if (result.result >= 4 && result.result <= 6) {
+                  successes++;
+                }
+              }
+            }
+          }
+        }
+
+        // Play roll sound
+        AudioHelper.play({ src: CONFIG.sounds.dice });
+
+        // Create a more detailed message with roll results
+        const successText = successes === 1 ? 'success' : 'successes';
+        const flavor = `${label}<br><strong>Roll: [${rollResults.join(
+          ', '
+        )}]</strong><br><strong>Result: ${successes} ${successText}</strong>`;
+
+        const messageData = {
+          speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+          flavor: flavor,
+          roll: roll,
+          rollMode: game.settings.get('core', 'rollMode'),
+        };
+
+        await ChatMessage.create(messageData);
+        return roll;
+      } else {
+        // Regular roll
+        await roll.toMessage({
+          speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+          flavor: label,
+          rollMode: game.settings.get('core', 'rollMode'),
+        });
+        return roll;
+      }
     }
   }
 
@@ -412,7 +906,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * Fetches the embedded document representing the containing HTML element
    *
    * @param {HTMLElement} target    The element subject to search
-   * @returns {Item | ActiveEffect} The embedded Item or ActiveEffect
+   * @returns {Item | ActiveEffect | Actor} The embedded Item, ActiveEffect, or Actor
    */
   _getEmbeddedDocument(target) {
     const docRow = target.closest('li[data-document-class]');
@@ -424,6 +918,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           ? this.actor
           : this.actor.items.get(docRow?.dataset.parentId);
       return parent.effects.get(docRow?.dataset.effectId);
+    } else if (docRow.dataset.documentClass === 'Actor') {
+      return game.actors.get(docRow.dataset.actorId);
     } else return console.warn('Could not find document class');
   }
 
@@ -519,6 +1015,41 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    */
   async _onDropActor(event, data) {
     if (!this.actor.isOwner) return false;
+
+    // Only allow dropping daemons onto summoners
+    if (this.actor.type !== 'summoner') return false;
+
+    const actor = await Actor.implementation.fromDropData(data);
+    if (!actor || actor.type !== 'daemon') return false;
+
+    // Check if daemon is already in stocks
+    const stocks = this.actor.system.stocks || [];
+    const existingStock = stocks.find(
+      (stock) => stock.references?.actor === actor.id
+    );
+
+    if (existingStock) {
+      ui.notifications.warn('This daemon is already in your stocks');
+      return false;
+    }
+
+    // Add daemon to stocks
+    const newStock = {
+      references: {
+        actor: actor.id,
+        isSummoned: false,
+      },
+    };
+
+    const updatedStocks = [...stocks, newStock];
+    await this.actor.update({ 'system.stocks': updatedStocks });
+
+    ui.notifications.info(`Added ${actor.name} to your stocks`);
+
+    // Refresh the sheet to show the new daemon
+    this.render(true);
+
+    return true;
   }
 
   /* -------------------------------------------- */
@@ -579,6 +1110,38 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /**
+   * Handle manual form submission for fields that need it
+   * @param {Event} event The input event
+   * @private
+   */
+  async _handleManualSubmit(event) {
+    // Only handle non-radio button inputs
+    if (event.target.classList.contains('skill-tick-radio')) {
+      return;
+    }
+
+    // Get the form data for this specific field
+    const fieldName = event.target.name;
+    const fieldValue = event.target.value;
+    const fieldType = event.target.dataset.dtype || 'String';
+
+    // Convert value based on data type
+    let processedValue = fieldValue;
+    if (fieldType === 'Number') {
+      processedValue = parseFloat(fieldValue) || 0;
+    } else if (fieldType === 'Boolean') {
+      processedValue = fieldValue === 'true';
+    }
+
+    // Update the actor
+    try {
+      await this.actor.update({ [fieldName]: processedValue });
+    } catch (error) {
+      console.error('Error updating field:', fieldName, error);
+    }
+  }
+
+  /**
    * Disables inputs subject to active effects
    */
   #disableOverrides() {
@@ -589,5 +1152,17 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         input.disabled = true;
       }
     }
+  }
+
+  /**
+   * Handle leveling up the actor
+   * @this DASUActorSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @protected
+   */
+  static async _levelUp(event, target) {
+    if (!['daemon', 'summoner'].includes(this.document.type)) return;
+    await this.document.levelUp();
   }
 }

@@ -1,0 +1,176 @@
+{{! Main Tab }}
+<section
+  class='tab main scrollable {{tab.cssClass}}'
+  data-group='primary'
+  data-tab='main'
+>
+  <section class='grid grid-3col'>
+    <aside class='sidebar'>
+      {{! The grid classes are defined in scss/global/_grid.scss. To use,
+          use both the "grid" and "grid-Ncol" class where "N" can be any number
+          from 1 to 12 and will create that number of columns.  }}
+      
+      {{#if (or (eq actor.type 'summoner') (eq actor.type 'daemon'))}}
+        {{! DASU Attributes for Daemons and Summoners }}
+        {{#if (eq actor.type 'daemon')}}
+          {{! Compact layout for Daemons }}
+          {{! Attribute Points Display - Header above grid }}
+          <div class='attribute-points flexrow'>
+            <label class='resource-label flex1'>{{localize 'DASU.Actor.Attributes.points.label'}}</label>
+            <span class='resource-value'>{{system.attributePoints.spent}} / {{system.attributePoints.max}}</span>
+          </div>
+          
+          <div class='skills-section attributes grid grid-2col'>
+            {{! Individual Attributes - 2 per row for compact daemon layout }}
+            {{#each system.attributes as |attribute key|}}
+              <div class='attribute flexcol flex-group-center'>
+                <label class='resource-label align-center attribute-key'> 
+                  {{localize (concat "DASU.Actor.Attributes." key)}}
+                </label>
+                <div class='attribute-labels flexrow'>
+                  <label class='attribute-label'>Base</label>
+                  <label class='attribute-label'>Tick</label>
+                </div>
+                <div class='attribute-values flexrow'>
+                  {{#if @root.isEditMode}}
+                    <input type='text' 
+                           name='system.attributes.{{key}}.base' 
+                           value='{{attribute.base}}' 
+                           class="attribute-base" 
+                           data-dtype='Number' 
+                           min='3' 
+                           max='30' />
+                  {{else}}
+                    <span class='attribute-base-label'>{{attribute.base}}</span>
+                  {{/if}}
+                  <span class='tick-button rollable' 
+                        data-action='roll' 
+                        data-roll='{{attribute.tick}}d6'
+                        data-label='{{localize (concat "DASU.Actor.Attributes." key)}} Check ({{attribute.tick}} dice)'>{{attribute.tick}}</span>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          {{! Standard layout for Summoners }}
+          {{! Attribute Points Display - Header above grid }}
+          <div class="attribute-points-display flexrow">
+            <label class="resource-label flex1">{{localize 'DASU.Actor.Attributes.points.label'}}</label>
+            <span class="tick-button-compact">
+              AP: {{system.attributePoints.spent}}/{{system.attributePoints.max}}
+            </span>
+          </div>
+          
+          <div class='skills-section attributes grid grid-2col'>
+            {{! Individual Attributes - 2 per row }}
+            {{#each system.attributes as |attribute key|}}
+              <div class='attribute flexcol flex-group-center'>
+                <label class='resource-label align-center attribute-key'> 
+                  {{localize (concat "DASU.Actor.Attributes." key)}}
+                </label>
+                <div class='attribute-labels flexrow'>
+                  <label class='attribute-label'>Base</label>
+                  <label class='attribute-label'>Tick</label>
+                </div>
+                <div class='attribute-values flexrow'>
+                  {{#if @root.isEditMode}}
+                    <input type='text' 
+                           name='system.attributes.{{key}}.base' 
+                           value='{{attribute.base}}' 
+                           class="attribute-base" 
+                           data-dtype='Number' 
+                           min='3' 
+                           max='30' />
+                  {{else}}
+                    <span class='attribute-base-label'>{{attribute.base}}</span>
+                  {{/if}}
+                  <span class='tick-button rollable' 
+                        data-action='roll' 
+                        data-roll='{{attribute.tick}}d6'
+                        data-label='{{localize (concat "DASU.Actor.Attributes." key)}} Check ({{attribute.tick}} dice)'>{{attribute.tick}}</span>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+
+          {{! Skills Section for Summoners }}
+          {{! Skill Points Display - Header above skills }}
+          <div class="skill-points-display flexrow">
+            <label class="resource-label flex1">{{localize 'DASU.Actor.Skills.skillPoints.label'}}</label>
+            <span class="tick-button-compact">
+              SP: {{skillPoints.spent}}/{{skillPoints.max}}
+            </span>
+          </div>
+          
+          <div class='skills-section'>
+            {{! Skills Grid }}
+            <div class='skills'>
+              {{#each skills as |skill index|}}
+                <div class='skill flexcol'>
+                  {{! Skill Name and Governing Attribute - Left Aligned }}
+                  <div class='skill-header flexrow flex-group-center'>
+                    <div class='skill-name'>{{skill.name}} ({{uppercase skill.govern}})</div>
+                    
+                    {{! Tick Number - Right Aligned }}
+                    <div class='tick-button rollable' 
+                         data-action='roll' 
+                         data-roll='{{skill.ticks}}d6 + {{lookup system.attributes skill.govern "tick"}}d6'
+                         data-label='{{skill.name}} Check ({{localize (concat "DASU.Actor.Attributes." skill.govern)}}: {{lookup system.attributes skill.govern "tick"}} tick | Skill: {{skill.ticks}} tick)'>
+                      {{skill.ticks}}
+                    </div>
+                  </div>
+                  
+                  {{! Gap }}
+                  <div class='skill-gap'></div>
+                  
+                  {{! Tick Boxes (1-6) - Only show in edit mode }}
+                  {{#if @root.isEditMode}}
+                    <div class='skill-ticks flexrow'>
+                      {{#each (range 1 6) as |tick|}}
+                        <input type='radio' 
+                               name='system.skills.{{index}}.ticks' 
+                               value='{{tick}}' 
+                               {{#if (eq skill.ticks tick)}}checked{{/if}}
+                               {{#if (lte tick skill.ticks)}}filled{{/if}}
+                               class='skill-tick-radio{{#if (lte tick skill.ticks)}} filled{{/if}}'
+                               data-tooltip='<div style="text-align: center;">{{tick}} Ticks<br>Cost {{subtract (lookup @root.skillCosts tick) (lookup @root.skillCosts skill.ticks)}} SP<br><small>Right-click to reset to 0</small></div>'
+                               data-skill-index='{{index}}'
+                               data-tick-value='{{tick}}' />
+                      {{/each}}
+                    </div>
+                  {{/if}}
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        {{/if}}
+      {{else}}
+        {{! Standard Abilities for other actor types }}
+        <div class='abilities flexcol'>
+          {{#each system.abilities as |ability key|}}
+            <div class='ability flexrow flex-group-center'>
+              <label class='resource-label flexlarge align-left'>{{localize (lookup @root.config.abilities key)}}</label>
+              {{#if @root.isEditMode}}
+                <input
+                  type='text'
+                  name='system.abilities.{{key}}.value'
+                  value='{{ability.value}}'
+                  class="ability-score"
+                  data-dtype='Number'
+                />
+              {{else}}
+                <span class="ability-score-label">{{ability.value}}</span>
+              {{/if}}
+              <span
+                class='ability-mod rollable'
+                data-action='roll'
+                data-roll='d20+@abilities.{{key}}.mod'
+                data-label='{{localize (lookup @root.config.abilities key)}}'
+              >{{numberFormat ability.mod decimals=0 sign=true}}</span>
+            </div>
+          {{/each}}
+        </div>
+      {{/if}}
+    </aside>
+  </section>
+</section>

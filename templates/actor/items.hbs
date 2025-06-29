@@ -1,0 +1,308 @@
+{{! Items Tab }}
+<section
+  class='tab items scrollable {{tab.cssClass}}'
+  data-group='primary'
+  data-tab='items'
+>
+  <ol class='items-list'>
+    {{! Weapons Section }}
+    <li class='item flexrow items-header'>
+      <div class='item-name'>{{localize 'TYPES.Item.weapon'}}</div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type='weapon'}}' data-action='createDoc' data-document-class='Item' data-type='weapon'>
+            <i class='fas fa-plus'></i> {{localize 'DOCUMENT.Create' type='weapon'}}
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    {{#each weapons as |item id|}}
+      <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item'>
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <a class='rollable' data-action='roll' data-roll-type='item'>
+              <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+            </a>
+          </div>
+          <h4>{{item.name}}</h4>
+        </div>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <div class='item-controls'>
+            <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Edit" type='weapon'}}' data-action='viewDoc'>
+              <i class='fas fa-edit'></i>
+            </a>
+            <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type='weapon'}}' data-action='deleteDoc'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+        {{/if}}
+      </li>
+    {{/each}}
+
+    {{! Tags Section }}
+    <li class='item flexrow items-header'>
+      <div class='item-name'>{{localize 'TYPES.Item.tag'}}</div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type='tag'}}' data-action='createDoc' data-document-class='Item' data-type='tag'>
+            <i class='fas fa-plus'></i> {{localize 'DOCUMENT.Create' type='tag'}}
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    {{#each tags as |item id|}}
+      <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item'>
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+          </div>
+          <h4>{{item.name}}</h4>
+        </div>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <div class='item-controls'>
+            <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Edit" type='tag'}}' data-action='viewDoc'>
+              <i class='fas fa-edit'></i>
+            </a>
+            <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type='tag'}}' data-action='deleteDoc'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+        {{/if}}
+      </li>
+    {{/each}}
+
+    {{! Techniques Section }}
+    <li class='item flexrow items-header'>
+      <div class='item-name'>{{localize 'TYPES.Item.technique'}}</div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type='ability'}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='technique'>
+            <i class='fas fa-plus'></i> {{localize 'DOCUMENT.Create' type='technique'}}
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    {{#each techniques as |item id|}}
+      <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item'>
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <a class='rollable' data-action='roll' data-roll-type='item'>
+              <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+            </a>
+          </div>
+          <h4>{{item.name}}</h4>
+        </div>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <div class='item-controls'>
+            <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Edit" type='technique'}}' data-action='viewDoc'>
+              <i class='fas fa-edit'></i>
+            </a>
+            <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type='technique'}}' data-action='deleteDoc'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+        {{/if}}
+      </li>
+    {{/each}}
+
+    {{! Spells Section }}
+    <li class='item flexrow items-header'>
+      <div class='item-name'>{{localize 'TYPES.Item.spell'}}</div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type='ability'}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='spell'>
+            <i class='fas fa-plus'></i> {{localize 'DOCUMENT.Create' type='spell'}}
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    {{#each spells as |item id|}}
+      <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item'>
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <a class='rollable' data-action='roll' data-roll-type='item'>
+              <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+            </a>
+          </div>
+          <h4>{{item.name}}</h4>
+        </div>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <div class='item-controls'>
+            <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Edit" type='spell'}}' data-action='viewDoc'>
+              <i class='fas fa-edit'></i>
+            </a>
+            <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type='spell'}}' data-action='deleteDoc'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+        {{/if}}
+      </li>
+    {{/each}}
+
+    {{! Afflictions Section }}
+    <li class='item flexrow items-header'>
+      <div class='item-name'>{{localize 'TYPES.Item.affliction'}}</div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type='ability'}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='affliction'>
+            <i class='fas fa-plus'></i> {{localize 'DOCUMENT.Create' type='affliction'}}
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    {{#each afflictions as |item id|}}
+      <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item'>
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <a class='rollable' data-action='roll' data-roll-type='item'>
+              <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+            </a>
+          </div>
+          <h4>{{item.name}}</h4>
+        </div>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <div class='item-controls'>
+            <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Edit" type='affliction'}}' data-action='viewDoc'>
+              <i class='fas fa-edit'></i>
+            </a>
+            <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type='affliction'}}' data-action='deleteDoc'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+        {{/if}}
+      </li>
+    {{/each}}
+
+    {{! Restoratives Section }}
+    <li class='item flexrow items-header'>
+      <div class='item-name'>{{localize 'TYPES.Item.restorative'}}</div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type='ability'}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='restorative'>
+            <i class='fas fa-plus'></i> {{localize 'DOCUMENT.Create' type='restorative'}}
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    {{#each restoratives as |item id|}}
+      <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item'>
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <a class='rollable' data-action='roll' data-roll-type='item'>
+              <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+            </a>
+          </div>
+          <h4>{{item.name}}</h4>
+        </div>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <div class='item-controls'>
+            <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Edit" type='restorative'}}' data-action='viewDoc'>
+              <i class='fas fa-edit'></i>
+            </a>
+            <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type='restorative'}}' data-action='deleteDoc'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+        {{/if}}
+      </li>
+    {{/each}}
+
+    {{! Tactics Section }}
+    <li class='item flexrow items-header'>
+      <div class='item-name'>{{localize 'TYPES.Item.tactic'}}</div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type='tactic'}}' data-action='createDoc' data-document-class='Item' data-type='tactic'>
+            <i class='fas fa-plus'></i> {{localize 'DOCUMENT.Create' type='tactic'}}
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    {{#each tactics as |item id|}}
+      <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item'>
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+          </div>
+          <h4>{{item.name}}</h4>
+        </div>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <div class='item-controls'>
+            <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Edit" type='tactic'}}' data-action='viewDoc'>
+              <i class='fas fa-edit'></i>
+            </a>
+            <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type='tactic'}}' data-action='deleteDoc'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+        {{/if}}
+      </li>
+    {{/each}}
+
+    {{! Specials Section (only for daemons) }}
+    {{#if (eq actor.type 'daemon')}}
+      <li class='item flexrow items-header'>
+        <div class='item-name'>{{localize 'TYPES.Item.special'}}</div>
+        <div class='item-controls'>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type='special'}}' data-action='createDoc' data-document-class='Item' data-type='special'>
+              <i class='fas fa-plus'></i> {{localize 'DOCUMENT.Create' type='special'}}
+            </a>
+          {{/if}}
+        </div>
+      </li>
+      {{#each specials as |item id|}}
+        <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item'>
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+            </div>
+            <h4>{{item.name}}</h4>
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Edit" type='special'}}' data-action='viewDoc'>
+                <i class='fas fa-edit'></i>
+              </a>
+              <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type='special'}}' data-action='deleteDoc'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    {{/if}}
+
+    {{! Scars Section }}
+    <li class='item flexrow items-header'>
+      <div class='item-name'>{{localize 'TYPES.Item.scar'}}</div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type='scar'}}' data-action='createDoc' data-document-class='Item' data-type='scar'>
+            <i class='fas fa-plus'></i> {{localize 'DOCUMENT.Create' type='scar'}}
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    {{#each scars as |item id|}}
+      <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item'>
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+          </div>
+          <h4>{{item.name}}</h4>
+        </div>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <div class='item-controls'>
+            <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Edit" type='scar'}}' data-action='viewDoc'>
+              <i class='fas fa-edit'></i>
+            </a>
+            <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type='scar'}}' data-action='deleteDoc'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+        {{/if}}
+      </li>
+    {{/each}}
+  </ol>
+</section> 

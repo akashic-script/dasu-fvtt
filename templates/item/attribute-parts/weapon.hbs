@@ -1,0 +1,51 @@
+{{! Weapon Attributes Tab }}
+<section class='tab attributes-weapon scrollable {{tab.cssClass}}' data-group='primary' data-tab='attributes'>
+  <div class='grid grid-3col'>
+    <div class='resource'>
+      <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.damage.value.label'}}</label>
+      <input
+        type='text'
+        name='system.damage.value'
+        value='{{system.damage.value}}'
+        data-dtype='Number'
+      />
+    </div>
+    <div class='resource'>
+      <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.cost.label'}}</label>
+      <input
+        type='text'
+        name='system.cost'
+        value='{{system.cost}}'
+        data-dtype='Number'
+      />
+    </div>
+    <div class='resource'>
+      <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.toHit.label'}}</label>
+      <input
+        type='text'
+        name='system.toHit'
+        value='{{system.toHit}}'
+        data-dtype='Number'
+      />
+    </div>
+  </div>
+  <div class='resource'>
+    <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.damage.type.label'}}</label>
+    <select name='system.damage.type' data-dtype='String'>
+      {{selectOptions damageTypes selected=system.damage.type}}
+    </select>
+  </div>
+
+  {{! ProseMirror Description Section }}
+  <div class='separator'></div>
+  <div class='field-header'>
+    <h4>{{localize 'DASU.Item.Ability.FIELDS.description.label'}}</h4>
+  </div>
+  {{#if editable}} 
+    <prose-mirror name="system.description" data-document-uuid="{{item.uuid}}" value="{{system.description}}" collaborate="true" toggled="true">
+      {{{enrichedDescription}}}
+    </prose-mirror>
+  {{else}} 
+    {{{enrichedDescription}}}
+  {{/if}}
+</section> 

@@ -11,6 +11,7 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   margin-bottom: 10px;
+  min-height: 120px; /* Ensure consistent header height */
 
   .profile-img {
     flex: 0 0 100px;
@@ -33,8 +34,9 @@
   height: 100%;
 }
 
-.tab {
-  max-height: 400px;
+/* Let ApplicationV2 handle tab height through scrollable property */
+.dasu .tab {
+  /* ApplicationV2 will handle height via scrollable property */
 }
 
 .tab.biography {
@@ -45,7 +47,161 @@
   }
 }
 
+/* Ensure main tab grid doesn't affect overall sheet layout */
+.dasu .tab.main .grid {
+  margin: 0; /* Override grid margin to prevent layout issues */
+}
+
 .tox {
+  .tox-editor-container {
+    background: var(--dasu-c-white);
+  }
+
+  .tox-edit-area {
+    padding: 0 8px;
+  }
+}
+
+/* DASU Form Styles - specific to sheets only */
+.dasu.actor .item-form,
+.dasu.item .item-form {
+  font-family: var(--font-primary);
+}
+
+.dasu.actor .sheet-header,
+.dasu.item .sheet-header {
+  flex: 0 auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+  min-height: 120px; /* Ensure consistent header height */
+
+  .profile-img {
+    flex: 0 0 100px;
+    height: 100px;
+    margin-right: 10px;
+  }
+
+  .header-fields {
+    flex: 1;
+  }
+}
+
+.dasu.actor .sheet-tabs,
+.dasu.item .sheet-tabs {
+  flex: 0;
+}
+
+.dasu.actor .sheet-body,
+.dasu.actor .sheet-body .tab,
+.dasu.actor .sheet-body .tab .editor,
+.dasu.item .sheet-body,
+.dasu.item .sheet-body .tab,
+.dasu.item .sheet-body .tab .editor {
+  height: 100%;
+}
+
+/* Let ApplicationV2 handle tab height through scrollable property */
+.dasu.actor .tab,
+.dasu.item .tab {
+  /* ApplicationV2 will handle height via scrollable property */
+}
+
+.dasu.actor .tab.biography,
+.dasu.item .tab.biography {
+  flex: 1;
+
+  .editor {
+    height: 100%;
+  }
+}
+
+/* Ensure main tab grid doesn't affect overall sheet layout */
+.dasu.actor .tab.main .grid,
+.dasu.item .tab.main .grid {
+  margin: 0; /* Override grid margin to prevent layout issues */
+}
+
+/* DASU Input Field Styling - specific to sheets only */
+.dasu.actor input[type="text"],
+.dasu.actor input[type="number"],
+.dasu.actor input[type="password"],
+.dasu.actor input[type="email"],
+.dasu.actor input[type="url"],
+.dasu.actor input[type="search"],
+.dasu.actor input[type="tel"],
+.dasu.actor textarea,
+.dasu.actor select,
+.dasu.item input[type="text"],
+.dasu.item input[type="number"],
+.dasu.item input[type="password"],
+.dasu.item input[type="email"],
+.dasu.item input[type="url"],
+.dasu.item input[type="search"],
+.dasu.item input[type="tel"],
+.dasu.item textarea,
+.dasu.item select {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0.25rem;
+  margin: 0;
+  box-shadow: none;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.dasu.actor input[type="text"]:focus,
+.dasu.actor input[type="number"]:focus,
+.dasu.actor input[type="password"]:focus,
+.dasu.actor input[type="email"]:focus,
+.dasu.actor input[type="url"]:focus,
+.dasu.actor input[type="search"]:focus,
+.dasu.actor input[type="tel"]:focus,
+.dasu.actor textarea:focus,
+.dasu.actor select:focus,
+.dasu.item input[type="text"]:focus,
+.dasu.item input[type="number"]:focus,
+.dasu.item input[type="password"]:focus,
+.dasu.item input[type="email"]:focus,
+.dasu.item input[type="url"]:focus,
+.dasu.item input[type="search"]:focus,
+.dasu.item input[type="tel"]:focus,
+.dasu.item textarea:focus,
+.dasu.item select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 3px var(--color-primary);
+}
+
+.dasu.actor input[type="text"]:hover,
+.dasu.actor input[type="number"]:hover,
+.dasu.actor input[type="password"]:hover,
+.dasu.actor input[type="email"]:hover,
+.dasu.actor input[type="url"]:hover,
+.dasu.actor input[type="search"]:hover,
+.dasu.actor input[type="tel"]:hover,
+.dasu.actor textarea:hover,
+.dasu.actor select:hover,
+.dasu.item input[type="text"]:hover,
+.dasu.item input[type="number"]:hover,
+.dasu.item input[type="password"]:hover,
+.dasu.item input[type="email"]:hover,
+.dasu.item input[type="url"]:hover,
+.dasu.item input[type="search"]:hover,
+.dasu.item input[type="tel"]:hover,
+.dasu.item textarea:hover,
+.dasu.item select:hover {
+  border-color: var(--color-primary);
+}
+
+.dasu.actor .tox,
+.dasu.item .tox {
   .tox-editor-container {
     background: var(--dasu-c-white);
   }

@@ -3,11 +3,544 @@
   font-weight: bold;
 }
 
-.ability {
-  margin-bottom: 2px;
-}
-
 .ability-score,
 .ability-mod {
   flex: 0 0 44px;
+}
+
+/* DASU Attributes */
+.attributes.grid {
+  gap: 0;
+}
+
+.section-header {
+  font-size: 1.1em;
+  font-weight: bold;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.25rem;
+}
+
+.attribute-points {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  min-height: 2rem;
+}
+
+.attribute-points .resource-label {
+  flex: 1;
+  text-align: left;
+  font-size: 0.9em;
+  margin-right: 0.5rem;
+}
+
+.attribute-points .resource-value {
+  font-weight: bold;
+  text-align: right;
+  font-size: 0.9em;
+  color: var(--color-text-highlight);
+  flex-shrink: 0;
+}
+
+.attribute {
+  padding: 0.25rem;
+  border: 1px solid var(--color-border);
+}
+
+.attribute-values {
+  flex: 1;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.attribute-labels {
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.attribute-base {
+  flex: 0 0 36px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.attribute-mod-label {
+  flex: 0 0 auto;
+  font-weight: bold;
+  margin: 0 0.25rem;
+}
+
+.attribute-key {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+/* ===== COMPACT DAEMON LAYOUT ===== */
+
+.attributes-compact {
+  margin-bottom: 0.5rem;
+}
+
+.attribute-points-compact,
+.skill-points-compact {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  min-height: 1.5rem;
+  font-size: 0.85em;
+}
+
+.attribute-points-compact .resource-label,
+.skill-points-compact .resource-label {
+  flex: 1;
+  text-align: left;
+  font-size: 0.85em;
+  margin-right: 0.25rem;
+}
+
+.attribute-points-compact .resource-value,
+.skill-points-compact .resource-value {
+  font-weight: bold;
+  text-align: right;
+  font-size: 0.85em;
+  color: var(--color-text-highlight);
+  flex-shrink: 0;
+}
+
+.attributes-grid-compact {
+  gap: 0.25rem;
+}
+
+.attributes-grid-compact.grid {
+  gap: 0;
+}
+
+.attribute-compact {
+  margin-bottom: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--color-border);
+}
+
+.attribute-key-compact {
+  font-size: 0.9em;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.attribute-values-compact {
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.attribute-labels-compact {
+  gap: 0.25rem;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.attribute-base-compact {
+  flex: 0 0 32px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9em;
+  padding: 0.1rem;
+}
+
+.attribute-label-compact,
+.attribute-label {
+  flex: 0 0 auto;
+  font-weight: bold;
+  margin: 0 0.25rem;
+  font-size: 0.9em;
+}
+
+.attribute-label {
+  font-size: 1em;
+}
+
+/* View mode label styles */
+.attribute-base-compact-label,
+.attribute-base-label,
+.ability-score-label {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  color: var(--color-text-primary);
+  font-weight: bold;
+  text-align: center;
+  padding: 0.25rem;
+  margin: 0;
+  min-width: 2rem;
+  min-height: 1.5rem;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.attribute-base-compact-label {
+  padding: 0.1rem;
+  min-width: 1.5rem;
+  min-height: 1.2rem;
+  font-size: 0.9em;
+}
+
+/* ===== SKILLS SECTION ===== */
+
+.skills-section {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+}
+
+.skill-points {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  min-height: 2rem;
+}
+
+.skill-points .resource-label {
+  flex: 1;
+  text-align: left;
+  font-size: 0.9em;
+  margin-right: 0.5rem;
+}
+
+.skill-points .resource-value {
+  font-weight: bold;
+  text-align: right;
+  font-size: 0.9em;
+  color: var(--color-text-highlight);
+  flex-shrink: 0;
+}
+
+.skills {
+  gap: 0.5rem;
+}
+
+.skill {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  min-height: auto;
+}
+
+.skill-header {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skill-name {
+  font-weight: bold;
+  font-size: 0.9em;
+  text-align: left;
+  flex: 1;
+  color: var(--color-text-primary);
+}
+
+.skill-gap {
+  height: 0.25rem;
+}
+
+.skill-ticks {
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+/* Custom radio button styling with box overlays */
+.skill-tick-radio {
+  position: relative !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  background: transparent !important;
+  border: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  cursor: pointer !important;
+  z-index: 2 !important;
+}
+
+.skill-tick-radio::before {
+  content: attr(data-tick-value) !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  line-height: 1.5rem !important;
+  background: black !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0 !important;
+  color: transparent !important;
+  font-weight: bold !important;
+  font-size: 0.8em !important;
+  text-align: center !important;
+  transition: all 0.3s ease !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Hover states - show numbers */
+.skill:hover .skill-tick-radio::before {
+  color: #fbbf24 !important;
+}
+
+.skill:hover .skill-tick-radio:checked::before {
+  color: white !important;
+}
+
+.skill:hover .skill-tick-radio.filled::before {
+  color: white !important;
+  opacity: 1 !important;
+}
+
+/* Individual radio hover effects */
+.skill-tick-radio:hover::before {
+  border-color: var(--color-primary) !important;
+  background: var(--color-bg-secondary) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Checked state */
+.skill-tick-radio:checked::before {
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 5px var(--color-primary) !important;
+}
+
+/* Filled state (before current selection) */
+.skill-tick-radio.filled::before {
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  opacity: 0.6 !important;
+}
+
+/* Right-click feedback */
+.skill-tick-radio:active::before {
+  transform: scale(0.95) !important;
+  box-shadow: 0 0 8px var(--color-primary) !important;
+}
+
+/* Add a subtle indicator that right-click is available */
+.skill-tick-radio::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -2px !important;
+  right: -2px !important;
+  width: 4px !important;
+  height: 4px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.skill-tick-radio:hover::after {
+  opacity: 1 !important;
+}
+
+/* ===== INPUT STYLES ===== */
+
+/* Override Foundry's input styles for DASU sheets only */
+.dasu.actor input[type="text"],
+.dasu.actor input[type="number"],
+.dasu.actor input[type="password"],
+.dasu.actor input[type="email"],
+.dasu.actor input[type="url"],
+.dasu.actor input[type="search"],
+.dasu.actor input[type="tel"],
+.dasu.actor textarea,
+.dasu.actor select,
+.dasu.item input[type="text"],
+.dasu.item input[type="number"],
+.dasu.item input[type="password"],
+.dasu.item input[type="email"],
+.dasu.item input[type="url"],
+.dasu.item input[type="search"],
+.dasu.item input[type="tel"],
+.dasu.item textarea,
+.dasu.item select {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0.25rem;
+  margin: 0;
+  box-shadow: none;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.dasu.actor input[type="text"]:focus,
+.dasu.actor input[type="number"]:focus,
+.dasu.actor input[type="password"]:focus,
+.dasu.actor input[type="email"]:focus,
+.dasu.actor input[type="url"]:focus,
+.dasu.actor input[type="search"]:focus,
+.dasu.actor input[type="tel"]:focus,
+.dasu.actor textarea:focus,
+.dasu.actor select:focus,
+.dasu.item input[type="text"]:focus,
+.dasu.item input[type="number"]:focus,
+.dasu.item input[type="password"]:focus,
+.dasu.item input[type="email"]:focus,
+.dasu.item input[type="url"]:focus,
+.dasu.item input[type="search"]:focus,
+.dasu.item input[type="tel"]:focus,
+.dasu.item textarea:focus,
+.dasu.item select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 3px var(--color-primary);
+}
+
+.dasu.actor input[type="text"]:hover,
+.dasu.actor input[type="number"]:hover,
+.dasu.actor input[type="password"]:hover,
+.dasu.actor input[type="email"]:hover,
+.dasu.actor input[type="url"]:hover,
+.dasu.actor input[type="search"]:hover,
+.dasu.actor input[type="tel"]:hover,
+.dasu.actor textarea:hover,
+.dasu.actor select:hover,
+.dasu.item input[type="text"]:hover,
+.dasu.item input[type="number"]:hover,
+.dasu.item input[type="password"]:hover,
+.dasu.item input[type="email"]:hover,
+.dasu.item input[type="url"]:hover,
+.dasu.item input[type="search"]:hover,
+.dasu.item input[type="tel"]:hover,
+.dasu.item textarea:hover,
+.dasu.item select:hover {
+  border-color: var(--color-primary);
+}
+
+/* Make input fields match label styling - specific to DASU sheets */
+.dasu.actor .attribute-base,
+.dasu.actor .attribute-base-compact,
+.dasu.item .attribute-base,
+.dasu.item .attribute-base-compact {
+  background: transparent !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0 !important;
+  color: var(--color-text-primary) !important;
+  font-weight: bold !important;
+  text-align: center !important;
+  padding: 0.25rem !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.dasu.actor .attribute-base:focus,
+.dasu.actor .attribute-base-compact:focus,
+.dasu.item .attribute-base:focus,
+.dasu.item .attribute-base-compact:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 3px var(--color-primary) !important;
+}
+
+.dasu.actor .attribute-base:hover,
+.dasu.actor .attribute-base-compact:hover,
+.dasu.item .attribute-base:hover,
+.dasu.item .attribute-base-compact:hover {
+  border-color: var(--color-primary) !important;
+}
+
+/* ===== TICK BUTTON STYLES ===== */
+
+/* Tick button variant with yellow-500-like text color */
+.tick-button {
+  display: inline-block;
+  flex: 0 0 32px;
+  height: var(--input-height, 1.5rem);
+  line-height: var(--input-height, 1.5rem);
+  padding: 0 0.25rem;
+  background: black;
+  border: 1px solid var(--input-border-color, var(--color-border));
+  border-radius: 0;
+  box-shadow: var(--input-box-shadow, none);
+  outline: 1px solid transparent;
+  font-family: inherit;
+  font-size: 0.9em;
+  color: #fbbf24;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  vertical-align: middle;
+  user-select: text;
+  transition: outline-color 0.5s;
+  cursor: pointer;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+.tick-button:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-secondary);
+}
+
+.tick-button[data-action] {
+  cursor: pointer;
+}
+
+.tick-button-compact {
+  display: inline-block;
+  flex: 0 0 auto;
+  height: 1.3rem;
+  line-height: 1.3rem;
+  padding: 0.1rem 0.3rem;
+  background: black;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: none;
+  outline: 1px solid transparent;
+  font-family: inherit;
+  font-size: 0.85em;
+  color: #fbbf24;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  vertical-align: middle;
+  user-select: text;
+  transition: outline-color 0.5s;
+  cursor: pointer;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+.tick-button-compact:hover {
+  border-color: var(--color-border);
+  background: var(--color-bg-secondary);
+}
+
+.tick-button-compact[data-action] {
+  cursor: pointer;
+}
+
+.attribute-points-display {
+  border: 1px solid var(--color-border);
+  padding: 0.25rem 0.5rem;
+  align-items: center;
+  min-height: 1.5rem;
+}
+
+.skill-points-display {
+  border: 1px solid var(--color-border);
+  padding: 0.25rem 0.5rem;
+  align-items: center;
+  min-height: 1.5rem;
 }

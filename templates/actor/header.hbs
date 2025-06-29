@@ -27,80 +27,67 @@
         and it will add a small amount of padding, a border, and will
         center all of its child elements content and text. }}
       <div class='resource flex-group-center'>
-        <label for='system.health.value' class='resource-label'>
-          {{localize 'DASU.Actor.base.FIELDS.health.value.label'}}
+        <label for='system.hp.current' class='resource-label'>
+          HP
         </label>
         <div class='resource-content flexrow flex-center flex-between'>
           <input
             type='text'
-            name='system.health.value'
-            value='{{system.health.value}}'
+            name='system.hp.current'
+            value='{{system.hp.current}}'
             data-dtype='Number'
           />
           <span> / </span>
           <input
             type='text'
-            name='system.health.max'
-            value='{{system.health.max}}'
+            name='system.hp.max'
+            value='{{system.hp.max}}'
             data-dtype='Number'
           />
         </div>
       </div>
 
       <div class='resource flex-group-center'>
-        <label for='system.power.value' class='resource-label'>
-          {{localize 'DASU.Actor.base.FIELDS.power.value.label'}}
+        <label for='system.wp.current' class='resource-label'>
+          WP
         </label>
         <div class='resource-content flexrow flex-center flex-between'>
           <input
             type='text'
-            name='system.power.value'
-            value='{{system.power.value}}'
+            name='system.wp.current'
+            value='{{system.wp.current}}'
             data-dtype='Number'
           />
           <span> / </span>
           <input
             type='text'
-            name='system.power.max'
-            value='{{system.power.max}}'
+            name='system.wp.max'
+            value='{{system.wp.max}}'
             data-dtype='Number'
           />
         </div>
       </div>
 
       <div class='resource flex-group-center'>
-        {{#if (eq actor.type 'summoner')}}
+        {{#if (or (eq actor.type 'summoner') (eq actor.type 'daemon'))}}
           <label class='resource-label'>
-            {{localize 'DASU.Actor.Summoner.FIELDS.attributes.level.value.label'}}
+            {{localize 'DASU.Actor.base.FIELDS.level.label'}}
           </label>
           <div class='resource-content flexrow flex-center flex-between'>
             <input
               type='text'
-              name='system.attributes.level.value'
-              value='{{system.attributes.level.value}}'
+              name='system.level'
+              value='{{system.level}}'
               data-dtype='Number'
             />
-          </div>
-        {{/if}}
-        {{#if (eq actor.type 'daemon')}}
-          <label class='resource-label'>
-            {{localize 'DASU.Actor.Daemon.FIELDS.cr.label'}} / {{localize 'DASU.Actor.Daemon.xp.label'}}
-          </label>
-          <div class='resource-content flexrow flex-center flex-between'>
-            <input
-              type='text'
-              name='system.cr'
-              value='{{system.cr}}'
-              data-dtype='Number'
-            />
-            <span></span>
-            <input
-              type='text'
-              disabled='true'
-              name='system.xp'
-              value='{{system.xp}}'
-              data-dtype='Number'
-            />
+            {{#if editable}}
+              <button type='button' 
+                      class='level-up-btn' 
+                      data-action='levelUp'
+                      data-tooltip='{{localize "DASU.Actor.levelUp.tooltip"}}'>
+                <i class='fas fa-arrow-up'></i>
+              </button>
+            {{/if}}
           </div>
         {{/if}}
       </div>

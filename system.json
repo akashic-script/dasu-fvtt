@@ -19,13 +19,25 @@
       }
     },
     "Item": {
-      "feature": {
+      "ability": {
         "htmlFields": ["description"]
       },
-      "gear": {
+      "item": {
         "htmlFields": ["description"]
       },
-      "spell": {
+      "weapon": {
+        "htmlFields": ["description"]
+      },
+      "tag": {
+        "htmlFields": ["description"]
+      },
+      "tactic": {
+        "htmlFields": ["description"]
+      },
+      "special": {
+        "htmlFields": ["description"]
+      },
+      "scar": {
         "htmlFields": ["description"]
       }
     }

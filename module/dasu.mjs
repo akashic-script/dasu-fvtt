@@ -4,10 +4,10 @@ import { DASUItem } from './documents/item.mjs';
 // Import sheet classes.
 import { DASUActorSheet } from './sheets/actor-sheet.mjs';
 import { DASUItemSheet } from './sheets/item-sheet.mjs';
-// Import helper/utility classes and constants.
-import { DASU } from './helpers/config.mjs';
 // Import DataModel classes
 import * as models from './data/_module.mjs';
+// Import config
+import DASUConfig from './helpers/config.mjs';
 
 const collections = foundry.documents.collections;
 const sheets = foundry.appv1.sheets;
@@ -31,11 +31,13 @@ globalThis.DASU = {
     rollItemMacro,
   },
   models,
+  // Include config from config.mjs
+  ...DASUConfig,
 };
 
 Hooks.once('init', function () {
   // Add custom constants for configuration.
-  CONFIG.DASU = DASU;
+  CONFIG.DASU = globalThis.DASU;
 
   /**
    * Set an initiative formula for the system
@@ -49,18 +51,22 @@ Hooks.once('init', function () {
   // Define custom Document and DataModel classes
   CONFIG.Actor.documentClass = DASUActor;
 
-  // Note that you don't need to declare a DataModel
-  // for the base actor/item classes - they are included
-  // with the Summoner/Daemon as part of super.defineSchema()
+  // Register Actor data models
   CONFIG.Actor.dataModels = {
-    summoner: models.DASUSummoner,
-    daemon: models.DASUDaemon,
+    daemon: models.DaemonDataModel,
+    summoner: models.SummonerDataModel,
   };
+
+  // Register Item data models
   CONFIG.Item.documentClass = DASUItem;
   CONFIG.Item.dataModels = {
-    gear: models.DASUGear,
-    feature: models.DASUFeature,
-    spell: models.DASUSpell,
+    item: models.ItemDataModel,
+    ability: models.AbilityDataModel,
+    weapon: models.WeaponDataModel,
+    tag: models.TagDataModel,
+    tactic: models.TacticDataModel,
+    special: models.SpecialDataModel,
+    scar: models.ScarDataModel,
   };
 
   // Active Effects are never copied to the Actor,
@@ -88,6 +94,25 @@ Hooks.once('init', function () {
 // If you need to add Handlebars helpers, here is a useful example:
 Handlebars.registerHelper('toLowerCase', function (str) {
   return str.toLowerCase();
+});
+
+// Uppercase helper for converting strings to uppercase
+Handlebars.registerHelper('uppercase', function (str) {
+  return str.toUpperCase();
+});
+
+// Range helper for creating arrays of numbers
+Handlebars.registerHelper('range', function (start, end) {
+  const result = [];
+  for (let i = start; i <= end; i++) {
+    result.push(i);
+  }
+  return result;
+});
+
+// Subtract helper for calculating differences
+Handlebars.registerHelper('subtract', function (a, b) {
+  return a - b;
 });
 
 /* -------------------------------------------- */

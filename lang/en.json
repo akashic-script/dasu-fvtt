@@ -15,14 +15,44 @@
     "Actor": {
       "Tabs": {
         "Biography": "Biography",
-        "Features": "Features",
-        "Gear": "Gear",
-        "Spells": "Spells",
+        "Main": "Main",
+        "Stocks": "Stocks",
+        "Items": "Items",
         "Effects": "Effects"
+      },
+      "Attributes": {
+        "label": "Attributes",
+        "points": {
+          "label": "Attribute Points"
+        },
+        "tick": {
+          "label": "Tick",
+          "tooltip": "Attribute Tick: 1 per 5 attribute points"
+        },
+        "effective": {
+          "tooltip": "Effective Attribute Value (Base + Allocated + Modifier)"
+        },
+        "base": {
+          "tooltip": "Base Attribute Value"
+        },
+        "mod": {
+          "tooltip": "Attribute Modifier"
+        },
+        "roll": {
+          "tooltip": "Roll Attribute Check"
+        },
+        "allocated": {
+          "tooltip": "Allocated Attribute Points"
+        },
+        "pow": "Power",
+        "dex": "Dexterity",
+        "will": "Will",
+        "sta": "Stamina"
       },
       "base": {
         "FIELDS": {
           "biography": { "label": "Biography" },
+          "level": { "label": "Level" },
           "health": {
             "value": { "label": "Health" },
             "max": { "label": "Maximum Health" }
@@ -38,11 +68,41 @@
           "attributes.level.value": { "label": "Level" }
         }
       },
+      "levelUp": {
+        "tooltip": "Level Up (Gain 2 Attribute Points)"
+      },
       "Daemon": {
         "FIELDS": {
           "cr": { "label": "CR" }
         },
         "xp": { "label": "XP" }
+      },
+      "Stocks": {
+        "Title": "Daemon Stocks",
+        "Add": "Add Daemon",
+        "DragInstructions": "Drag daemons here to add to stocks",
+        "Summoned": "Summoned",
+        "ToggleSummoned": "Toggle Summoned Status",
+        "RemoveFromStock": "Remove from Stocks"
+      },
+      "Skills": {
+        "label": "Skills",
+        "skillPoints": {
+          "label": "Skill Points"
+        },
+        "base": {
+          "tooltip": "Skill Base Value"
+        },
+        "mod": {
+          "tooltip": "Skill Modifier"
+        },
+        "ticks": {
+          "tooltip": "Skill Ticks (1-6)"
+        }
+      },
+      "EditMode": {
+        "Edit": "Edit Mode",
+        "View": "View Mode"
       }
     },
     "Item": {
@@ -51,22 +111,85 @@
         "Description": "Description",
         "Effects": "Effects"
       },
-      "Gear": {
+      "Ability": {
         "FIELDS": {
-          "rollFormula": { "label": "Roll Formula" },
-          "numDice": { "label": "Number of Dice" },
-          "dieSize": { "label": "Die Size" },
-          "rollMod": { "label": "Roll Modifier" },
-          "quantity": { "label": "Quantity" },
-          "weight": { "label": "Weight" }
+          "category": { "label": "Category" },
+          "damage": {
+            "value": { "label": "Damage Value" },
+            "type": { "label": "Damage Type" }
+          },
+          "cost": { "label": "Cost" },
+          "costType": { "label": "Cost Type" },
+          "toHit": { "label": "To Hit Bonus" },
+          "aptitudes": {
+            "type": { "label": "Aptitude Type" },
+            "value": { "label": "Aptitude Value" }
+          },
+          "healed": {
+            "value": { "label": "Heal Value" },
+            "type": { "label": "Heal Type" }
+          },
+          "isInfinity": { "label": "Guaranteed" },
+          "description": { "label": "Description" }
+        },
+        "categoryNote": "Change the category to see different fields specific to that ability type."
+      },
+      "Weapon": {
+        "FIELDS": {
+          "range": { "label": "Range" },
+          "damage": {
+            "value": { "label": "Damage Value" },
+            "type": { "label": "Damage Type" }
+          },
+          "toHit": { "label": "To Hit Bonus" },
+          "cost": { "label": "Cost" },
+          "maxTagSlots": { "label": "Maximum Tag Slots" }
         }
       },
       "Spell": {
         "FIELDS": {
-          "level": { "label": "Spell Level" }
-        },
-        "SpellLVL": "Level {level} Spells",
-        "AddLVL": "Add LVL {level}"
+          "aptitudes": {
+            "type": { "label": "Aptitude Type" },
+            "value": { "label": "Aptitude Value" }
+          }
+        }
+      },
+      "Tag": {
+        "FIELDS": {
+          "effect": { "label": "Effect" }
+        }
+      },
+      "Technique": {
+        "FIELDS": {
+          "effect": { "label": "Effect" }
+        }
+      },
+      "Affliction": {
+        "FIELDS": {
+          "effect": { "label": "Effect" }
+        }
+      },
+      "Restorative": {
+        "FIELDS": {
+          "healAmount": { "label": "Heal Amount" },
+          "healType": { "label": "Heal Type" },
+          "effect": { "label": "Effect" }
+        }
+      },
+      "Tactic": {
+        "FIELDS": {
+          "effect": { "label": "Effect" }
+        }
+      },
+      "Special": {
+        "FIELDS": {
+          "effect": { "label": "Effect" }
+        }
+      },
+      "Scar": {
+        "FIELDS": {
+          "effect": { "label": "Effect" }
+        }
       }
     },
     "Effect": {
@@ -75,6 +198,35 @@
       "Temporary": "Temporary Effects",
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects"
+    },
+    "damageTypes": {
+      "physical": "Physical",
+      "fire": "Fire",
+      "ice": "Ice",
+      "electric": "Electric",
+      "wind": "Wind",
+      "earth": "Earth",
+      "light": "Light",
+      "dark": "Dark",
+      "untyped": "Untyped"
+    },
+    "aptitudeTypes": {
+      "f": { "long": "Fire", "short": "F" },
+      "i": { "long": "Ice", "short": "I" },
+      "el": { "long": "Electric", "short": "EL" },
+      "w": { "long": "Wind", "short": "W" },
+      "ea": { "long": "Earth", "short": "EA" },
+      "l": { "long": "Light", "short": "L" },
+      "d": { "long": "Dark", "short": "D" },
+      "dp": { "long": "Debuff Physical", "short": "DP" },
+      "dm": { "long": "Debuff Mental", "short": "DM" },
+      "da": { "long": "Debuff Almighty", "short": "DA" },
+      "h": { "long": "Heal", "short": "H" },
+      "tb": { "long": "Technique Brutal", "short": "TB" },
+      "tt": { "long": "Technique Technical", "short": "TT" },
+      "tg": { "long": "Technique General", "short": "TG" },
+      "ta": { "long": "Technique Almighty", "short": "TA" },
+      "assist": { "long": "Assist", "short": "A" }
     }
   },
   "TYPES": {
@@ -83,9 +235,17 @@
       "daemon": "Daemon"
     },
     "Item": {
-      "gear": "Gear",
-      "feature": "Feature",
-      "spell": "Spell"
+      "ability": "Ability",
+      "item": "Item",
+      "weapon": "Weapon",
+      "tag": "Tag",
+      "tactic": "Tactic",
+      "special": "Special",
+      "scar": "Scar",
+      "technique": "Technique",
+      "spell": "Spell",
+      "affliction": "Affliction",
+      "restorative": "Restorative"
     }
   }
 }

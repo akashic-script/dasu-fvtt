@@ -3,11 +3,33 @@
   font-family: var(--font-primary);
 }
 
-.rollable {
-  &:hover,
-  &:focus {
-    color: var(--dasu-c-black);
-    text-shadow: 0 0 10px red;
-    cursor: pointer;
-  }
+.dasu.actor .window-content {
+  padding: 1rem;
+}
+
+.dasu.actor .sheet-header {
+  margin-bottom: 1rem;
+}
+
+.dasu.actor .tab {
+  padding: 0.5rem;
+}
+
+.dasu.item .window-content {
+  padding: 0.5rem;
+}
+
+.dasu.item .sheet-header {
+  margin-bottom: 0.5rem;
+}
+
+.dasu.item .tab {
+  padding: 0.25rem;
+}
+
+.rollable:hover,
+.rollable:focus {
+  color: var(--dasu-c-black);
+  text-shadow: 0 0 10px red;
+  cursor: pointer;
 }

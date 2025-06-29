@@ -8,18 +8,18 @@
   background: rgba(0, 0, 0, 0.05);
   border: var(--border-groove);
   font-weight: bold;
+}
 
-  > * {
-    font-size: 14px;
-    text-align: center;
-  }
+.items-header > * {
+  font-size: 14px;
+  text-align: center;
+}
 
-  .item-name {
-    font-weight: bold;
-    padding-left: 5px;
-    text-align: left;
-    display: flex;
-  }
+.items-header .item-name {
+  font-weight: bold;
+  padding-left: 5px;
+  text-align: left;
+  display: flex;
 }
 
 /* -----------------------------------------
@@ -33,99 +33,124 @@
   overflow-y: auto;
   scrollbar-width: thin;
   color: var(--dasu-c-tan);
+}
 
-  /* Child lists */
-  .item-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
+/* Child lists */
+.items-list .item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 
-  /* Item Name */
-  .item-name {
-    flex: 2;
-    margin: 0;
-    overflow: hidden;
-    font-size: 13px;
-    text-align: left;
-    align-items: center;
-    display: flex;
+/* Item Name */
+.items-list .item-name {
+  flex: 2;
+  margin: 0;
+  overflow: hidden;
+  font-size: 13px;
+  text-align: left;
+  align-items: center;
+  display: flex;
+}
 
-    h3,
-    h4 {
-      margin: 0;
-      white-space: nowrap;
-      overflow-x: hidden;
-    }
-  }
+.items-list .item-name h3,
+.items-list .item-name h4 {
+  margin: 0;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
 
-  /* Control Buttons */
-  .item-controls {
-    display: flex;
-    flex: 0 0 100px;
-    justify-content: flex-end;
+/* Control Buttons */
+.items-list .item-controls {
+  display: flex;
+  flex: 0 0 100px;
+  justify-content: flex-end;
+}
 
-    a {
-      font-size: 12px;
-      text-align: center;
-      margin: 0 6px;
-    }
-  }
+.items-list .item-controls a {
+  font-size: 12px;
+  text-align: center;
+  margin: 0 6px;
+}
 
-  /* Individual Item */
-  .item {
-    align-items: center;
-    padding: 0 2px; /* to align with the header border */
-    border-bottom: 1px solid var(--dasu-c-faint);
+/* Individual Item */
+.items-list .item {
+  align-items: center;
+  padding: 0 2px; /* to align with the header border */
+  border-bottom: 1px solid var(--color-border);
+}
 
-    &:last-child {
-      border-bottom: none;
-    }
+.items-list .item:last-child {
+  border-bottom: none;
+}
 
-    .item-name {
-      color: var(--dasu-c-dark);
+.items-list .item .item-name {
+  color: var(--dasu-c-dark);
+}
 
-      .item-image {
-        flex: 0 0 30px;
-        height: 30px;
-        background-size: 30px;
-        border: none;
-        margin-right: 5px;
-      }
-    }
-  }
+.items-list .item .item-name .item-image {
+  flex: 0 0 30px;
+  height: 30px;
+  background-size: 30px;
+  border: none;
+  margin-right: 5px;
+}
 
-  .item-prop {
-    text-align: center;
-    border-left: 1px solid #c9c7b8;
-    border-right: 1px solid #c9c7b8;
-    font-size: 12px;
-  }
+.items-list .item-prop {
+  text-align: center;
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  font-size: 12px;
+}
 
-  /* Section Header */
-  .items-header {
-    height: 28px;
-    margin: 2px 0;
-    padding: 0;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.05);
-    border: var(--border-groove);
-    font-weight: bold;
+/* Section Header */
+.items-list .items-header {
+  height: 28px;
+  margin: 2px 0;
+  padding: 0;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.05);
+  border: var(--border-groove);
+  font-weight: bold;
+}
 
-    > * {
-      font-size: 12px;
-      text-align: center;
-    }
+.items-list .items-header > * {
+  font-size: 12px;
+  text-align: center;
+}
 
-    .item-name {
-      padding-left: 5px;
-      text-align: left;
-    }
-  }
+.items-list .items-header .item-name {
+  padding-left: 5px;
+  text-align: left;
 }
 
 /* Example style for DASU (can be removed if not needed) */
 .item-formula {
   flex: 0 0 200px;
   padding: 0 8px;
+}
+
+/* Daemons Tab Styles */
+.daemons .drag-instructions {
+  font-size: 11px;
+  color: var(--dasu-c-faint);
+  font-style: italic;
+}
+
+.daemons .summoned-status {
+  font-size: 11px;
+  color: var(--dasu-c-success);
+  font-weight: bold;
+  margin-left: 8px;
+  padding: 2px 6px;
+  background: rgba(0, 255, 0, 0.1);
+  border-radius: 3px;
+}
+
+.daemons .toggle-summoned {
+  color: var(--dasu-c-primary);
+}
+
+.daemons .toggle-summoned:hover {
+  color: var(--dasu-c-success);
 }

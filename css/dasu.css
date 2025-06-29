@@ -1,5 +1,5 @@
 /* Add custom fonts by visiting and search https://fonts.google.com */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans+Narrow:wght@400;700&display=swap');
 
 @import 'utils/variables.css';
 @import 'utils/colors.css';
@@ -10,10 +10,19 @@
 @import 'global/grid.css';
 @import 'global/flex.css';
 
+@import 'components/forms.css';
+@import 'components/resource.css';
+@import 'components/items.css';
+@import 'components/effects.css';
+
 /* Styles limited to dasu sheets */
 .dasu {
-  @import 'components/forms.css';
-  @import 'components/resource.css';
-  @import 'components/items.css';
-  @import 'components/effects.css';
+  /* Additional dasu-specific styles can go here */
+  font-family: 'PT Sans Narrow', sans-serif;
+}
+
+/* Apply PT Sans Narrow only to DASU sheets */
+.dasu.actor,
+.dasu.item {
+  font-family: 'PT Sans Narrow', sans-serif;
 }

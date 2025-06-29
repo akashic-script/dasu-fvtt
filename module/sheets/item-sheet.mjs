@@ -17,6 +17,9 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ['dasu', 'item'],
+    position: {
+      width: 500,
+    },
     actions: {
       onEditImage: this._onEditImage,
       viewDoc: this._viewEffect,
@@ -25,13 +28,11 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       toggleEffect: this._toggleEffect,
     },
     form: {
-      submitOnChange: true,
+      submitOnChange: false,
     },
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
   };
-
-  /* -------------------------------------------- */
 
   /** @override */
   static PARTS = {
@@ -44,46 +45,87 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     },
     description: {
       template: 'systems/dasu/templates/item/description.hbs',
+      scrollable: [''],
     },
-    attributesFeature: {
-      template: 'systems/dasu/templates/item/attribute-parts/feature.hbs',
+    attributesAbility: {
+      template: 'systems/dasu/templates/item/attribute-parts/ability.hbs',
+      scrollable: [''],
     },
-    attributesGear: {
-      template: 'systems/dasu/templates/item/attribute-parts/gear.hbs',
+    attributesWeapon: {
+      template: 'systems/dasu/templates/item/attribute-parts/weapon.hbs',
+      scrollable: [''],
     },
-    attributesSpell: {
-      template: 'systems/dasu/templates/item/attribute-parts/spell.hbs',
+    attributesTag: {
+      template: 'systems/dasu/templates/item/attribute-parts/tag.hbs',
+      scrollable: [''],
+    },
+    attributesTactic: {
+      template: 'systems/dasu/templates/item/attribute-parts/tactic.hbs',
+      scrollable: [''],
+    },
+    attributesSpecial: {
+      template: 'systems/dasu/templates/item/attribute-parts/special.hbs',
+      scrollable: [''],
+    },
+    attributesScar: {
+      template: 'systems/dasu/templates/item/attribute-parts/scar.hbs',
+      scrollable: [''],
     },
     effects: {
       template: 'systems/dasu/templates/item/effects.hbs',
+      scrollable: [''],
     },
   };
+
+  /* -------------------------------------------- */
 
   /** @override */
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
     // Not all parts always render
-    options.parts = ['header', 'tabs', 'description'];
+    options.parts = ['header', 'tabs'];
     // Don't show the other tabs if only limited view
     if (this.document.limited) return;
     // Control which parts show based on document subtype
     switch (this.document.type) {
-      case 'feature':
-        options.parts.push('attributesFeature', 'effects');
+      case 'ability':
+        console.log('DASU: Rendering ability');
+        // Always use attributesAbility for all ability items
+        // Category-specific rendering is handled within the ability template
+        options.parts.push('attributesAbility', 'effects');
         break;
-      case 'gear':
-        options.parts.push('attributesGear');
+      case 'weapon':
+        console.log('DASU: Rendering weapon');
+        options.parts.push('attributesWeapon', 'effects');
         break;
-      case 'spell':
-        options.parts.push('attributesSpell');
+      case 'tag':
+        console.log('DASU: Rendering tag');
+        options.parts.push('attributesTag', 'description', 'effects');
+        break;
+      case 'tactic':
+        console.log('DASU: Rendering tactic');
+        options.parts.push('attributesTactic', 'effects');
+        break;
+      case 'special':
+        console.log('DASU: Rendering special');
+        options.parts.push('attributesSpecial', 'description', 'effects');
+        break;
+      case 'scar':
+        console.log('DASU: Rendering scar');
+        options.parts.push('attributesScar', 'description', 'effects');
         break;
     }
+    console.log('DASU: Final parts array:', options.parts);
   }
 
   /* -------------------------------------------- */
 
   /** @override */
   async _prepareContext(options) {
+    console.log(
+      'DASU: Preparing main context for item type:',
+      this.document.type
+    );
     const context = {
       // Validates both permissions and compendium status
       editable: this.isEditable,
@@ -95,47 +137,188 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       system: this.item.system,
       flags: this.item.flags,
       // Adding a pointer to CONFIG.DASU
-      config: CONFIG.DASU,
+      config: globalThis.DASU,
       // You can factor out context construction to helper functions
       tabs: this._getTabs(options.parts),
-      // Necessary for formInput and formFields helpers
-      fields: this.document.schema.fields,
-      systemFields: this.document.system.schema.fields,
     };
 
+    // Add shared context for header
+    if (this.document.type === 'ability') {
+      console.log('DASU: Adding ability-specific context');
+      // Use ABILITY_CATEGORIES from config instead of hardcoded options
+      context.itemCategories = {};
+      const abilityCategories = globalThis.DASU?.ABILITY_CATEGORIES || [
+        'spell',
+        'technique',
+        'affliction',
+        'restorative',
+      ];
+      abilityCategories.forEach((category) => {
+        context.itemCategories[category] = game.i18n.localize(
+          `TYPES.Item.${category}`
+        );
+      });
+    }
+
+    if (this.document.type === 'weapon') {
+      console.log('DASU: Adding weapon-specific context');
+      context.rangeTypes = {
+        melee: 'Melee',
+        ranged: 'Ranged',
+        thrown: 'Thrown',
+      };
+    }
+
+    console.log('DASU: Main context prepared, parts:', options.parts);
     return context;
   }
 
   /** @override */
   async _preparePartContext(partId, context) {
+    console.log('DASU: Preparing part context for:', partId);
     switch (partId) {
-      case 'attributesFeature':
-      case 'attributesGear':
-      case 'attributesSpell':
+      case 'attributesAbility':
+        console.log(
+          'DASU: Preparing ability context for category:',
+          this.item.system.category
+        );
+        // This is the unified ability partial that renders different content based on category
+        context.tab = context.tabs[partId];
+        // Add damage types for the select dropdowns (if needed by the category)
+        context.damageTypes = {
+          physical: game.i18n.localize('DASU.damageTypes.physical'),
+          fire: game.i18n.localize('DASU.damageTypes.fire'),
+          ice: game.i18n.localize('DASU.damageTypes.ice'),
+          electric: game.i18n.localize('DASU.damageTypes.electric'),
+          wind: game.i18n.localize('DASU.damageTypes.wind'),
+          earth: game.i18n.localize('DASU.damageTypes.earth'),
+          light: game.i18n.localize('DASU.damageTypes.light'),
+          dark: game.i18n.localize('DASU.damageTypes.dark'),
+          untyped: game.i18n.localize('DASU.damageTypes.untyped'),
+        };
+        // Add aptitude types for all ability categories
+        context.aptitudeTypes = {};
+        const aptitudeKeys = [
+          'f',
+          'i',
+          'el',
+          'w',
+          'ea',
+          'l',
+          'd',
+          'dp',
+          'dm',
+          'da',
+          'h',
+          'tb',
+          'tt',
+          'tg',
+          'ta',
+          'assist',
+        ];
+        aptitudeKeys.forEach((key) => {
+          const long = game.i18n.localize(`DASU.aptitudeTypes.${key}.long`);
+          const short = game.i18n.localize(`DASU.aptitudeTypes.${key}.short`);
+          context.aptitudeTypes[key] = `${long} (${short})`;
+        });
+        // Add item categories for the category dropdown using ABILITY_CATEGORIES
+        context.itemCategories = {};
+        const abilityCategories = globalThis.DASU?.ABILITY_CATEGORIES || [
+          'spell',
+          'technique',
+          'affliction',
+          'restorative',
+        ];
+        abilityCategories.forEach((category) => {
+          context.itemCategories[category] = game.i18n.localize(
+            `TYPES.Item.${category}`
+          );
+        });
+        // Add enriched description for ProseMirror
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              secrets: this.document.isOwner,
+              rollData: this.item.getRollData(),
+              relativeTo: this.item,
+            }
+          );
+        break;
+      case 'attributesTag':
+      case 'attributesScar':
+        console.log('DASU: Preparing simple context for:', partId);
         // Necessary for preserving active tab on re-render
         context.tab = context.tabs[partId];
         break;
+      case 'attributesWeapon':
+        console.log('DASU: Preparing weapon context');
+        // Necessary for preserving active tab on re-render
+        context.tab = context.tabs[partId];
+        // Add damage types for the select dropdowns
+        context.damageTypes = {
+          physical: game.i18n.localize('DASU.damageTypes.physical'),
+          fire: game.i18n.localize('DASU.damageTypes.fire'),
+          ice: game.i18n.localize('DASU.damageTypes.ice'),
+          electric: game.i18n.localize('DASU.damageTypes.electric'),
+          wind: game.i18n.localize('DASU.damageTypes.wind'),
+          earth: game.i18n.localize('DASU.damageTypes.earth'),
+          light: game.i18n.localize('DASU.damageTypes.light'),
+          dark: game.i18n.localize('DASU.damageTypes.dark'),
+          untyped: game.i18n.localize('DASU.damageTypes.untyped'),
+        };
+        // Add enriched description for ProseMirror
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              secrets: this.document.isOwner,
+              rollData: this.item.getRollData(),
+              relativeTo: this.item,
+            }
+          );
+        break;
+      case 'attributesTactic':
+        console.log('DASU: Preparing tactic context');
+        // Necessary for preserving active tab on re-render
+        context.tab = context.tabs[partId];
+        // Add enriched description for ProseMirror
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              secrets: this.document.isOwner,
+              rollData: this.item.getRollData(),
+              relativeTo: this.item,
+            }
+          );
+        break;
       case 'description':
+        console.log('DASU: Preparing description context');
         context.tab = context.tabs[partId];
         // Enrich description info for display
         // Enrichment turns text like `[[/r 1d20]]` into buttons
-        context.enrichedDescription = await TextEditor.enrichHTML(
-          this.item.system.description,
-          {
-            // Whether to show secret blocks in the finished html
-            secrets: this.document.isOwner,
-            // Data to fill in for inline rolls
-            rollData: this.item.getRollData(),
-            // Relative UUID resolution
-            relativeTo: this.item,
-          }
-        );
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              // Whether to show secret blocks in the finished html
+              secrets: this.document.isOwner,
+              // Data to fill in for inline rolls
+              rollData: this.item.getRollData(),
+              // Relative UUID resolution
+              relativeTo: this.item,
+            }
+          );
         break;
       case 'effects':
+        console.log('DASU: Preparing effects context');
         context.tab = context.tabs[partId];
         // Prepare active effects for easier access
         context.effects = prepareActiveEffectCategories(this.item.effects);
         break;
+      default:
+        console.log('DASU: No specific context preparation for:', partId);
     }
     return context;
   }
@@ -150,7 +333,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     // If you have sub-tabs this is necessary to change
     const tabGroup = 'primary';
     // Default tab for first time it's rendered this session
-    if (!this.tabGroups[tabGroup]) this.tabGroups[tabGroup] = 'description';
+    if (!this.tabGroups[tabGroup]) this.tabGroups[tabGroup] = 'attributes';
     return parts.reduce((tabs, partId) => {
       const tab = {
         cssClass: '',
@@ -170,9 +353,12 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
           tab.id = 'description';
           tab.label += 'Description';
           break;
-        case 'attributesFeature':
-        case 'attributesGear':
-        case 'attributesSpell':
+        case 'attributesAbility':
+        case 'attributesWeapon':
+        case 'attributesTag':
+        case 'attributesTactic':
+        case 'attributesSpecial':
+        case 'attributesScar':
           tab.id = 'attributes';
           tab.label += 'Attributes';
           break;
@@ -196,6 +382,60 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    */
   async _onRender(context, options) {
     await super._onRender(context, options);
+
+    // Add manual input change handlers to prevent array issues
+    this.element
+      .querySelectorAll('input[data-dtype="Number"]')
+      .forEach((input) => {
+        input.addEventListener('change', async (event) => {
+          const name = event.target.name;
+          const value = event.target.value;
+
+          // Only update if the value is not empty
+          if (value !== '' && value !== null && value !== undefined) {
+            await this.document.update({ [name]: parseInt(value) || 0 });
+          }
+        });
+      });
+
+    // Add manual text input change handlers
+    this.element
+      .querySelectorAll('input[data-dtype="String"], input[type="text"]')
+      .forEach((input) => {
+        input.addEventListener('change', async (event) => {
+          const name = event.target.name;
+          const value = event.target.value;
+
+          if (value !== null && value !== undefined) {
+            await this.document.update({ [name]: value });
+          }
+        });
+      });
+
+    // Add manual select change handlers
+    this.element.querySelectorAll('select').forEach((select) => {
+      select.addEventListener('change', async (event) => {
+        const name = event.target.name;
+        const value = event.target.value;
+
+        if (value !== '' && value !== null && value !== undefined) {
+          await this.document.update({ [name]: value });
+        }
+      });
+    });
+
+    // Add manual textarea change handlers
+    this.element.querySelectorAll('textarea').forEach((textarea) => {
+      textarea.addEventListener('change', async (event) => {
+        const name = event.target.name;
+        const value = event.target.value;
+
+        if (value !== null && value !== undefined) {
+          await this.document.update({ [name]: value });
+        }
+      });
+    });
+
     new DragDrop.implementation({
       dragSelector: '.draggable',
       dropSelector: null,
@@ -212,6 +452,95 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     // You may want to add other special handling here
     // Foundry comes with a large number of utility classes, e.g. SearchFilter
     // That you may want to implement yourself.
+
+    // Add change handler for category field on ability items (in header)
+    if (this.document.type === 'ability') {
+      const categorySelect = this.element.querySelector(
+        'select[name="system.category"]'
+      );
+      if (categorySelect) {
+        categorySelect.addEventListener(
+          'change',
+          this._onCategoryChange.bind(this)
+        );
+      }
+
+      // Add change handler for isInfinity checkbox
+      const infinityCheckbox = this.element.querySelector(
+        'input[name="system.isInfinity"]'
+      );
+      if (infinityCheckbox) {
+        infinityCheckbox.addEventListener(
+          'change',
+          this._onInfinityChange.bind(this)
+        );
+      }
+    }
+  }
+
+  /**
+   * Handle category change for ability items
+   * @param {Event} event The change event
+   * @private
+   */
+  async _onCategoryChange(event) {
+    const newCategory = event.target.value;
+    const oldCategory = this.document.system.category;
+
+    if (oldCategory === newCategory) return;
+
+    console.log(
+      `DASU: Category changing from ${oldCategory} to ${newCategory}`
+    );
+
+    // Update the category - this will trigger the _preUpdate method in the item document
+    // which will handle cleaning up incompatible fields
+    await this.document.update({ 'system.category': newCategory });
+
+    // Re-render the sheet to show the appropriate partial with cleaned data
+    this.render(true);
+  }
+
+  /**
+   * Handle infinity checkbox change for affliction abilities
+   * @param {Event} event The change event
+   * @private
+   */
+  async _onInfinityChange(event) {
+    const isInfinity = event.target.checked;
+
+    if (isInfinity) {
+      // Clear the toHit value when infinity is checked
+      await this.document.update({
+        'system.isInfinity': true,
+        'system.toHit': null,
+      });
+    } else {
+      // Just update the infinity state when unchecked
+      await this.document.update({
+        'system.isInfinity': false,
+      });
+    }
+
+    // Re-render to show the updated UI
+    this.render(true);
+  }
+
+  /** @override */
+  async _onSubmit(event, formData) {
+    // Process the form data to ensure proper data types and prevent array issues
+    const processedData = {};
+
+    for (const [key, value] of formData.entries()) {
+      // Skip empty values to prevent array issues
+      if (value === '' || value === null || value === undefined) continue;
+
+      // Handle nested properties like system.damage.value
+      foundry.utils.setProperty(processedData, key, value);
+    }
+
+    // Update the document with the processed data
+    await this.document.update(processedData);
   }
 
   /**************
