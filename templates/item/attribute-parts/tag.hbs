@@ -1,0 +1,80 @@
+{{! Tag Attributes Tab }}
+<section class='tab attributes-tag scrollable {{tab.cssClass}}' data-group='primary' data-tab='attributes'>
+  
+  <div class='section-header'>
+    <h3>Tag Properties</h3>
+    <p class='section-description'>Configure the basic properties and effects of this tag.</p>
+  </div>
+
+  <div class="tag-multiselect-row compact">
+    <div class="tags input-element-tags tag-types-row" style="justify-content: flex-start !important;">
+      <label class="resource-label" style="margin-bottom:0; white-space:nowrap; margin-right:0.5em;">Allowed Item Types</label>
+      {{#each system.slotType as |type|}}
+        <div class="tag" data-key="{{type}}">
+          <span>{{type}}</span>
+          <a class="remove fa-solid fa-times" data-action="removeTagType" data-type="{{type}}" data-tooltip="Remove Tag" aria-label="Remove Tag"></a>
+        </div>
+      {{/each}}
+      <select class="tag-type-select" data-action="addTagType" style="min-width:90px; margin-left:0.2em;">
+        <option value="">Add...</option>
+        {{#each allowedTypes as |type|}}
+          {{#if (or (eq type 'all') (not (includes ../system.slotType 'all')))}}
+            {{#unless (includes ../system.slotType type)}}
+              <option value="{{type}}">{{type}}</option>
+            {{/unless}}
+          {{/if}}
+        {{/each}}
+      </select>
+    </div>
+  </div>
+
+  {{#unless system.slotType.length}}
+    <div class="tag-warning" style="color: #b00; margin: 0.5em 0 0.5em 1.5em; font-weight: 600;">
+      No allowed item types selected. This tag cannot be slotted into any item.
+    </div>
+  {{/unless}}
+      <div class="tag-extra-fields" style="display: flex; gap: 1.5em; align-items: center; margin: 0.5em 0 0.5em 1.5em;">
+  </div>
+
+  <div class='grid grid-2col'>
+    <div class='resource'>
+      <label class='resource-label'>Current Rank</label>
+      <input
+        type='number'
+        name='system.rank.current'
+        value='{{system.rank.current}}'
+        data-dtype='Number'
+        min='1'
+        max='{{system.rank.max}}'
+      />
+    </div>
+    <div class='resource'>
+      <label class='resource-label'>Max Rank</label>
+      <input
+        type='number'
+        name='system.rank.max'
+        value='{{system.rank.max}}'
+        data-dtype='Number'
+        min='1'
+        max='10'
+      />
+    </div>
+    <div class='resource'>
+      <label class='resource-label'>Rarity</label>
+      <select name='system.rarity' data-dtype='String'>
+        {{selectOptions rarityOptions selected=system.rarity}}
+      </select>
+    </div>
+    <div class='resource'>
+      <label class='resource-label'>Price</label>
+      <input type='number' name='system.price' value='{{system.price}}' data-dtype='Number' min='0' style='width: 6em;' />
+    </div>
+  </div>
+  
+  <div class='separator'></div>
+
+  <div class='section-header'>
+    <h3>Description</h3>
+  </div>
+  <textarea name='system.description' rows='3'>{{system.description}}</textarea>
+</section> 

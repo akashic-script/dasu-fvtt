@@ -19,13 +19,31 @@
       }
     },
     "Item": {
+      "ability": {
+        "htmlFields": ["description"]
+      },
+      "item": {
+        "htmlFields": ["description"]
+      },
+      "weapon": {
+        "htmlFields": ["description"]
+      },
+      "tag": {
+        "htmlFields": ["description"]
+      },
+      "tactic": {
+        "htmlFields": ["description"]
+      },
+      "special": {
+        "htmlFields": ["description"]
+      },
+      "scar": {
+        "htmlFields": ["description"]
+      },
+      "schema": {
+        "htmlFields": ["description"]
+      },
       "feature": {
-        "htmlFields": ["description"]
-      },
-      "gear": {
-        "htmlFields": ["description"]
-      },
-      "spell": {
         "htmlFields": ["description"]
       }
     }
@@ -74,6 +92,6 @@
     "units": "ft",
     "diagonals": 0
   },
-  "primaryTokenAttribute": "hp",
-  "secondaryTokenAttribute": "wp"
+  "primaryTokenAttribute": "system.stats.hp",
+  "secondaryTokenAttribute": "system.stats.wp"
 }

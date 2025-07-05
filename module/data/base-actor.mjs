@@ -1,25 +1,38 @@
-export default class DASUActorBase extends foundry.abstract.TypeDataModel {
+import { SharedActorComponents } from './shared/components.mjs';
+
+export default class BaseActorDataModel extends foundry.abstract.TypeDataModel {
   static LOCALIZATION_PREFIXES = ['DASU.Actor.base'];
 
   static defineSchema() {
     const fields = foundry.data.fields;
-    const requiredInteger = { required: true, nullable: false, integer: true };
-    const schema = {};
-
-    schema.health = new fields.SchemaField({
-      value: new fields.NumberField({
-        ...requiredInteger,
-        initial: 10,
-        min: 0,
+    return {
+      dsid: new fields.StringField({
+        required: false,
+        blank: true,
+        initial: '',
       }),
-      max: new fields.NumberField({ ...requiredInteger, initial: 10 }),
-    });
-    schema.power = new fields.SchemaField({
-      value: new fields.NumberField({ ...requiredInteger, initial: 5, min: 0 }),
-      max: new fields.NumberField({ ...requiredInteger, initial: 5 }),
-    });
-    schema.biography = new fields.HTMLField();
-
-    return schema;
+      publishId: new fields.StringField({ required: false }),
+      level: new fields.NumberField({
+        required: true,
+        initial: 1,
+        min: 1,
+        max: 100,
+        integer: true,
+      }),
+      merit: new fields.NumberField({
+        required: true,
+        initial: 0,
+        min: 0,
+        integer: true,
+      }),
+      attributes: SharedActorComponents.getAttributesSchema(),
+      stats: SharedActorComponents.getStatsSchema(),
+      resistances: SharedActorComponents.getResistancesSchema(),
+      aptitudes: SharedActorComponents.getAptitudesSchema(),
+      biography: new fields.HTMLField({
+        required: false,
+        initial: '',
+      }),
+    };
   }
 }

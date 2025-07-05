@@ -1,6 +1,6 @@
-import DASUActorBase from './base-actor.mjs';
+import BaseActorDataModel from './base-actor.mjs';
 
-export default class DASUDaemon extends DASUActorBase {
+export default class DaemonDataModel extends BaseActorDataModel {
   static LOCALIZATION_PREFIXES = [
     ...super.LOCALIZATION_PREFIXES,
     'DASU.Actor.Daemon',
@@ -8,19 +8,50 @@ export default class DASUDaemon extends DASUActorBase {
 
   static defineSchema() {
     const fields = foundry.data.fields;
-    const requiredInteger = { required: true, nullable: false, integer: true };
-    const schema = super.defineSchema();
+    const baseSchema = super.defineSchema();
 
-    schema.cr = new fields.NumberField({
-      ...requiredInteger,
-      initial: 1,
-      min: 0,
-    });
+    const createStatSchema = () =>
+      new fields.SchemaField({
+        current: new fields.NumberField({ required: true, initial: 0, min: 0 }),
+        spent: new fields.NumberField({ required: true, initial: 0, min: 0 }),
+      });
 
-    return schema;
+    return {
+      ...baseSchema,
+      origin: new fields.ArrayField(new fields.StringField(), {
+        required: false,
+      }),
+      archetypes: new fields.SchemaField({
+        name: new fields.StringField({ required: false }),
+        description: new fields.StringField({ required: false }),
+        benefits: new fields.StringField({ required: false }),
+      }),
+      subtypes: new fields.SchemaField({
+        name: new fields.StringField({ required: false }),
+        description: new fields.StringField({ required: false }),
+        benefits: new fields.StringField({ required: false }),
+      }),
+      roles: new fields.ArrayField(
+        new fields.SchemaField({
+          name: new fields.StringField({ required: false }),
+          description: new fields.StringField({ required: false }),
+        })
+      ),
+      hp: createStatSchema(),
+      wp: createStatSchema(),
+    };
   }
 
-  prepareDerivedData() {
-    this.xp = this.cr * this.cr * 100;
+  prepareDerivedData() {}
+
+  /**
+   * Prepare daemon-specific data (placeholder)
+   * @param {Array} items - Actor's items for filtering
+   */
+  prepareDaemonData(items = []) {
+    // TODO: Implement daemon-specific data preparation logic here
+    // Example: filter items, calculate derived stats, etc.
+    // This is a placeholder for future daemon logic.
+    return {};
   }
 }

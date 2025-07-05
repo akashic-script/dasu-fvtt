@@ -1,0 +1,316 @@
+{{! Ability Attributes Tab }}
+<section class='tab attributes-ability scrollable {{tab.cssClass}}' data-group='primary' data-tab='attributes'>
+  {{!-- Only ability-specific fields and description below. No schema progression or level input. --}}
+  {{#if (eq system.category "spell")}}
+    {{! Spell Template }}
+    <div class='section-header'>
+      <h3>Spell Statistics</h3>
+      <p class='section-description'>Configure the magical properties and requirements of this spell.</p>
+    </div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.damage.value.label'}}</label>
+        <input
+          type='text'
+          name='system.damage.value'
+          value='{{system.damage.value}}'
+          data-dtype='Number'
+        />
+      </div>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.damage.type.label'}}</label>
+        <select name='system.damage.type' data-dtype='String'>
+          {{#each damageTypes as |label value|}}
+            <option value="{{value}}" {{#if (eq ../system.damage.type value)}}selected{{/if}}>{{localize label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+    
+    <div class='separator'></div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.cost.label'}}</label>
+        <input
+          type='text'
+          name='system.cost'
+          value='{{system.cost}}'
+          data-dtype='Number'
+        />
+      </div>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.costType.label'}}</label>
+        <select name='system.costType' data-dtype='String'>
+          {{selectOptions costTypeOptions selected=system.costType localize=true}}
+        </select>
+      </div>
+    </div>
+    
+    <div class='separator'></div>
+    
+    <div class='resource'>
+      <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.toHit.label'}}</label>
+      <input
+        type='text'
+        name='system.toHit'
+        value='{{system.toHit}}'
+        data-dtype='Number'
+        {{#if system.isInfinity}}disabled{{/if}}
+      />
+    </div>
+    
+    <div class='separator'></div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.aptitudes.type.label'}}</label>
+        <select name='system.aptitudes.type' data-dtype='String'>
+          {{selectOptions aptitudeTypes selected=system.aptitudes.type}}
+        </select>
+      </div>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.aptitudes.value.label'}}</label>
+        <input
+          type='text'
+          name='system.aptitudes.value'
+          value='{{system.aptitudes.value}}'
+          data-dtype='Number'
+        />
+      </div>
+    </div>
+  {{/if}}
+
+  {{#if (eq system.category "affliction")}}
+    {{! Affliction Template }}
+    <div class='section-header'>
+      <h3>Affliction Statistics</h3>
+      <p class='section-description'>Configure the debilitating effects and requirements of this affliction.</p>
+    </div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.cost.label'}}</label>
+        <input
+          type='text'
+          name='system.cost'
+          value='{{system.cost}}'
+          data-dtype='Number'
+        />
+      </div>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.costType.label'}}</label>
+        <select name='system.costType' data-dtype='String'>
+          {{selectOptions costTypeOptions selected=system.costType localize=true}}
+        </select>
+      </div>
+    </div>
+    
+    <div class='separator'></div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.toHit.label'}}</label>
+        <input
+          type='text'
+          name='system.toHit'
+          value='{{system.toHit}}'
+          data-dtype='Number'
+          {{#if system.isInfinity}}disabled{{/if}}
+        />
+      </div>
+      <div class='resource'>
+        <input
+          type='checkbox'
+          name='system.isInfinity'
+          {{#if system.isInfinity}}checked{{/if}}
+          data-dtype='Boolean'
+        />
+        <label for='system.isInfinity'>{{localize 'DASU.Item.Ability.FIELDS.isInfinity.label'}}</label>
+      </div>
+    </div>
+    
+    <div class='separator'></div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.aptitudes.type.label'}}</label>
+        <select name='system.aptitudes.type' data-dtype='String'>
+          {{selectOptions aptitudeTypes selected=system.aptitudes.type}}
+        </select>
+      </div>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.aptitudes.value.label'}}</label>
+        <input
+          type='text'
+          name='system.aptitudes.value'
+          value='{{system.aptitudes.value}}'
+          data-dtype='Number'
+        />
+      </div>
+    </div>
+  {{/if}}
+
+  {{#if (eq system.category "restorative")}}
+    {{! Restorative Template }}
+    <div class='section-header'>
+      <h3>Restorative Statistics</h3>
+      <p class='section-description'>Configure the healing properties and requirements of this restorative ability.</p>
+    </div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.healed.value.label'}}</label>
+        <input
+          type='text'
+          name='system.healed.value'
+          value='{{system.healed.value}}'
+          data-dtype='Number'
+        />
+      </div>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.healed.type.label'}}</label>
+        <select name='system.healed.type' data-dtype='String'>
+          {{selectOptions healTypeOptions selected=system.healed.type localize=true}}
+        </select>
+      </div>
+    </div>
+    
+    <div class='separator'></div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.cost.label'}}</label>
+        <input
+          type='text'
+          name='system.cost'
+          value='{{system.cost}}'
+          data-dtype='Number'
+        />
+      </div>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.costType.label'}}</label>
+        <select name='system.costType' data-dtype='String'>
+          {{selectOptions costTypeOptions selected=system.costType localize=true}}
+        </select>
+      </div>
+    </div>
+    
+    <div class='separator'></div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.aptitudes.type.label'}}</label>
+        <select name='system.aptitudes.type' data-dtype='String'>
+          {{selectOptions aptitudeTypes selected=system.aptitudes.type}}
+        </select>
+      </div>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.aptitudes.value.label'}}</label>
+        <input
+          type='text'
+          name='system.aptitudes.value'
+          value='{{system.aptitudes.value}}'
+          data-dtype='Number'
+        />
+      </div>
+    </div>
+  {{/if}}
+
+  {{#if (eq system.category "technique")}}
+    {{! Technique Template }}
+    <div class='section-header'>
+      <h3>Technique Statistics</h3>
+      <p class='section-description'>Configure the combat properties and requirements of this technique.</p>
+    </div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.damage.value.label'}}</label>
+        <input
+          type='text'
+          name='system.damage.value'
+          value='{{system.damage.value}}'
+          data-dtype='Number'
+        />
+      </div>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.damage.type.label'}}</label>
+        <select name='system.damage.type' data-dtype='String'>
+          {{#each damageTypes as |label value|}}
+            <option value="{{value}}" {{#if (eq ../system.damage.type value)}}selected{{/if}}>{{localize label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+    
+    <div class='separator'></div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.cost.label'}}</label>
+        <input
+          type='text'
+          name='system.cost'
+          value='{{system.cost}}'
+          data-dtype='Number'
+        />
+      </div>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.costType.label'}}</label>
+        <select name='system.costType' data-dtype='String'>
+          {{selectOptions costTypeOptions selected=system.costType localize=true}}
+        </select>
+      </div>
+    </div>
+    
+    <div class='separator'></div>
+    
+    <div class='resource'>
+      <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.toHit.label'}}</label>
+      <input
+        type='text'
+        name='system.toHit'
+        value='{{system.toHit}}'
+        data-dtype='Number'
+        {{#if system.isInfinity}}disabled{{/if}}
+      />
+    </div>
+    
+    <div class='separator'></div>
+    
+    <div class='grid grid-2col'>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.aptitudes.type.label'}}</label>
+        <select name='system.aptitudes.type' data-dtype='String'>
+          {{selectOptions aptitudeTypes selected=system.aptitudes.type}}
+        </select>
+      </div>
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.aptitudes.value.label'}}</label>
+        <input
+          type='text'
+          name='system.aptitudes.value'
+          value='{{system.aptitudes.value}}'
+          data-dtype='Number'
+        />
+      </div>
+    </div>
+  {{/if}}
+
+  {{! ProseMirror Description Section }}
+  <div class='separator'></div>
+  <div class='section-header'>
+    <h3>{{localize 'DASU.Item.Ability.FIELDS.description.label'}}</h3>
+    <p class='section-description'>Describe the ability's effects, requirements, or special properties.</p>
+  </div>
+  
+  {{#if editable}} 
+    <prose-mirror name="system.description" data-document-uuid="{{item.uuid}}" value="{{system.description}}" collaborate="true" toggled="true">
+      {{{enrichedDescription}}}
+    </prose-mirror>
+  {{else}} 
+    {{{enrichedDescription}}}
+  {{/if}}
+</section> 

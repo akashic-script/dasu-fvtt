@@ -1,0 +1,89 @@
+{{!-- Leveling Wizard Header Template --}}
+{{!-- Displays character info, current stats, and level-up controls --}}
+<div class="wizard-header">
+  <div class="character-info">
+    <div class="character-portrait">
+      <img src="{{actor.img}}" alt="{{actorName}}" />
+    </div>
+    <div class="character-details">
+      <h2>{{actorName}}</h2>
+      <div class="character-stats">
+        <div class="stat">
+          <label>Current Level:</label>
+          <span class="current-level">{{currentLevel}}</span>
+        </div>
+        <div class="stat">
+          <label>Max Level:</label>
+          <span>{{maxLevel}}</span>
+        </div>
+        <div class="stat">
+          <label>Current Merit:</label>
+          <span>{{actor.system.merit}}</span>
+        </div>
+        {{#if levels.[(toNumber currentLevel)]}}
+        <div class="stat">
+          <label>Total AP Earned:</label>
+          <span>{{levels.[(toNumber currentLevel)].totalAP}}</span>
+        </div>
+        <div class="stat">
+          <label>Total SP Earned:</label>
+          <span>{{levels.[(toNumber currentLevel)].totalSP}}</span>
+        </div>
+        {{/if}}
+        {{#if levels.[add currentLevel 1]}}
+        <div class="stat">
+          <label>Next Level Merit:</label>
+          <span>{{levels.[add currentLevel 1].meritRequired}}</span>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+  
+  <div class="wizard-controls">
+    <div class="control-group">
+      <button type="button" class="control-btn" data-action="scrollToCurrent">
+        <i class="fas fa-crosshairs"></i>
+        <span>Go to Current Level</span>
+      </button>
+    </div>
+    
+    <div class="progression-summary">
+
+      {{#if nextLevelData}}
+        <button
+          type="button"
+          class="summary-item level-up-summary-btn {{#if canLevelUp}}enabled{{else}}disabled{{/if}}"
+          data-action="levelUp"
+          data-tooltip="{{#if canLevelUp}}Level up to {{nextLevel}}{{else}}Need {{nextLevelData.meritRequired}} merit to level up{{/if}}"
+        >
+          <i class="fas fa-arrow-up"></i>
+          <span>
+            {{#if canLevelUp}}
+              Level Up to {{nextLevel}}
+            {{else}}
+              Need {{nextLevelData.meritRequired}} Merit
+            {{/if}}
+          </span>
+        </button>
+      {{else}}
+        <button
+          type="button"
+          class="summary-item level-up-summary-btn disabled"
+          data-action="levelUp"
+          data-tooltip="No next level available."
+          disabled
+        >
+          <i class="fas fa-arrow-up"></i>
+          <span>Max Level Reached</span>
+        </button>
+      {{/if}}
+
+      <div class="summary-item">
+        <i class="fas fa-list"></i>
+        <span>Total Levels: {{maxLevel}}</span>
+      </div>
+
+    </div>
+  </div>
+</div> 

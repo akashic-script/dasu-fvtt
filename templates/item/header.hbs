@@ -1,36 +1,37 @@
 <header class='sheet-header'>
-  <img
+<img
     class='profile-img'
     src='{{item.img}}'
     data-edit='img'
     data-action='onEditImage'
     data-tooltip='{{item.name}}'
+    height='100'
+    width='100'
   />
+
   <div class='header-fields'>
     <div class='document-name'>
       <input name='name' type='text' value='{{item.name}}' placeholder='Name' />
     </div>
-    {{! You may prefer to have a separate header file instead of this if statement}}
-    {{#if (eq item.type 'gear')}}
-      <div class='grid grid-2col'>
-        <div class='resource'>
-          <label class='resource-label'>{{localize 'DASU.Item.Gear.FIELDS.quantity.label'}}</label>
-          <input
-            type='text'
-            name='system.quantity'
-            value='{{system.quantity}}'
-            data-dtype='Number'
-          />
-        </div>
-        <div class='resource'>
-          <label class='resource-label'>{{localize 'DASU.Item.Gear.FIELDS.weight.label'}}</label>
-          <input
-            type='text'
-            name='system.weight'
-            value='{{system.weight}}'
-            data-dtype='Number'
-          />
-        </div>
+    
+    {{! Category field for abilities }}
+    {{#if (eq item.type 'ability')}}
+      <div class='resource'>
+        <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.category.label'}}</label>
+        <select name='system.category' data-dtype='String'>
+          {{selectOptions itemCategories selected=system.category}}
+        </select>
+      </div>
+    {{/if}}
+    </div>
+    
+    {{! Weapon-specific fields in header }}
+    {{#if (eq item.type 'weapon')}}
+      <div class='resource'>
+        {{!-- <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.range.label'}}</label> --}}
+        <select name='system.range' data-dtype='String'>
+          {{selectOptions rangeTypes selected=system.range}}
+        </select>
       </div>
     {{/if}}
   </div>

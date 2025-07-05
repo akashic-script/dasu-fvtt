@@ -1,0 +1,301 @@
+{{! Main Tab }}
+<section
+  class='tab main scrollable {{tab.cssClass}}'
+  data-group='primary'
+  data-tab='main'
+>
+  <section class='grid grid-3col'>
+    <aside class='sidebar grid-span-1'>
+      <div></div>
+      {{#if (or (eq actor.type 'summoner') (eq actor.type 'daemon'))}}
+        {{! DASU Attributes for Daemons and Summoners }}
+        {{#if (eq actor.type 'daemon')}}
+          {{! Compact layout for Daemons }}
+          {{! Attribute Points Display - Header above grid }}
+          <div class="attribute-points-display flexrow">
+            <label class="resource-label flex1">{{localize 'DASU.Actor.Attributes.points.label.label'}}</label>
+            <span class="tick-button-compact" data-tooltip="AP (Attribute Points): Used to buy attribute ticks. You gain AP at 1st level and every 5 levels, as set in game settings (default: 2). Each tick above 1 in any attribute costs 1 AP.">
+              AP: {{apSpent}} / {{apEarned}}
+            </span>
+          </div>
+          
+          <div class='skills-section attributes grid grid-2col'>
+            {{! Individual Attributes - 2 per row for compact daemon layout }}
+            {{#each system.attributes as |attribute key|}}
+              <div class='attribute flexcol flex-group-center'>
+                <div class='attribute-header flexrow flex-group-center'>
+                  <div class='attribute-name'>
+                    {{localize (concat "DASU.Actor.Attributes.list." key ".abbr")}}
+                  </div>
+                  <div class='tick-button rollable attribute-value'
+                       data-action='roll'
+                       data-roll='{{attribute.tick}}d6'
+                       data-label='{{localize (concat "DASU.Actor.Attributes.list." key ".label")}} Check ({{attribute.tick}} dice)'>
+                    {{attribute.tick}}
+                  </div>
+                </div>
+                {{#if @root.isEditMode}}
+                  <div class='attribute-controls flexrow'>
+                    <button type='button' 
+                            class='attribute-decrease' 
+                            data-action='decreaseAttribute' 
+                            data-attribute='{{key}}'
+                            {{#if (eq attribute.tick 1)}}disabled{{/if}}>
+                      <i class='fas fa-minus'></i>
+                    </button>
+                    <button type='button' 
+                            class='attribute-increase' 
+                            data-action='increaseAttribute' 
+                            data-attribute='{{key}}'
+                            {{#if (or (eq attribute.tick 6) (eq ../apUnspent 0))}}disabled{{/if}}>
+                      <i class='fas fa-plus'></i>
+                    </button>
+                  </div>
+                {{/if}}
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          {{! Standard layout for Summoners }}
+          {{! Attribute Points Display - Header above grid }}
+          <div class="attribute-points-display flexrow">
+            <label class="resource-label flex1">{{localize 'DASU.Actor.Attributes.points.label.label'}}</label>
+            <span class="tick-button-compact" data-tooltip="AP (Attribute Points): Used to buy attribute ticks. You gain AP at 1st level and every 5 levels, as set in game settings (default: 2). Each tick above 1 in any attribute costs 1 AP.">
+              AP: {{apSpent}} / {{apEarned}}
+            </span>
+          </div>
+          
+          <div class='skills-section attributes grid grid-2col'>
+            {{! Individual Attributes - 2 per row }}
+            {{#each system.attributes as |attribute key|}}
+              <div class='attribute flexcol flex-group-center'>
+                <div class='attribute-header flexrow flex-group-center'>
+                  <div class='attribute-name'>
+                    {{localize (concat "DASU.Actor.Attributes.list." key ".abbr")}}
+                  </div>
+                  <div class='tick-button rollable attribute-value'
+                       data-action='roll'
+                       data-roll='{{attribute.tick}}d6'
+                       data-label='{{localize (concat "DASU.Actor.Attributes.list." key ".label")}} Check ({{attribute.tick}} dice)'>
+                    {{attribute.tick}}
+                  </div>
+                </div>
+                {{#if @root.isEditMode}}
+                  <div class='attribute-controls flexrow'>
+                    <button type='button' 
+                            class='attribute-decrease' 
+                            data-action='decreaseAttribute' 
+                            data-attribute='{{key}}'
+                            {{#if (eq attribute.tick 1)}}disabled{{/if}}>
+                      <i class='fas fa-minus'></i>
+                    </button>
+                    <button type='button' 
+                            class='attribute-increase' 
+                            data-action='increaseAttribute' 
+                            data-attribute='{{key}}'
+                            {{#if (or (eq attribute.tick 6) (eq ../apUnspent 0))}}disabled{{/if}}>
+                      <i class='fas fa-plus'></i>
+                    </button>
+                  </div>
+                {{/if}}
+              </div>
+            {{/each}}
+          </div>
+
+          {{! Skills Section for Summoners }}
+          {{! Skill Points Display - Header above skills }}
+          <div class="skill-points-display flexrow">
+            <label class="resource-label flex1">{{localize 'DASU.Actor.Skills.skillPoints.label'}}</label>
+            <span class="tick-button-compact" data-tooltip="SP (Skill Points): Used to buy skill ticks. You gain SP as you level up. Each tick in a skill costs the cumulative value (1 for first, 2 for second, etc.).">
+              {{localize 'DASU.Actor.Skills.skillPoints.abbr'}}: {{skillPoints.spent}}/{{skillPoints.max}}
+            </span>
+          </div>
+          
+          <div class='skills-section'>
+            {{! Skills Grid }}
+            <div class='skills'>
+              {{#each skills as |skill index|}}
+                <div class='skill flexcol'>
+                  {{! Skill Name and Governing Attribute - Left Aligned }}
+                  <div class='skill-header flexrow flex-group-center'>
+                    <div class='skill-name'>{{skill.name}} ({{uppercase skill.govern}})</div>
+                    
+                    {{! Tick Number - Right Aligned }}
+                    <div class='tick-button rollable' 
+                         data-action='roll' 
+                         data-roll='{{skill.ticks}}d6 + {{lookup system.attributes skill.govern "tick"}}d6'
+                         data-label='{{skill.name}} Check ({{localize (concat "DASU.Actor.Attributes.list." skill.govern ".label")}}: {{lookup system.attributes skill.govern "tick"}} tick | Skill: {{skill.ticks}} tick)'>
+                      {{skill.ticks}}
+                    </div>
+                  </div>
+                  
+                  {{! Gap }}
+                  <div class='skill-gap'></div>
+                  
+                  {{! Tick Boxes (1-6) - Only show in edit mode }}
+                  {{#if @root.isEditMode}}
+                    <div class='skill-ticks flexrow'>
+                      {{#each (range 1 6) as |tick|}}
+                        <input type='radio' 
+                               value='{{tick}}' 
+                               {{#if (eq skill.ticks tick)}}checked{{/if}}
+                               {{#if (lte tick skill.ticks)}}filled{{/if}}
+                               class='skill-tick-radio{{#if (lte tick skill.ticks)}} filled{{/if}}'
+                               data-tooltip='<div style="text-align: center;">{{tick}} Ticks<br>Cost {{subtract (lookup @root.skillCosts tick) (lookup @root.skillCosts skill.ticks)}} SP<br><small>Right-click to reset to 0</small></div>'
+                               data-skill-index='{{index}}'
+                               data-tick-value='{{tick}}' />
+                      {{/each}}
+                    </div>
+                  {{/if}}
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        {{/if}}
+      {{else}}
+        {{! Standard Abilities for other actor types }}
+        <div class='abilities flexcol'>
+          {{#each system.abilities as |ability key|}}
+            <div class='ability flexrow flex-group-center'>
+              <label class='resource-label flexlarge align-left'>{{localize (lookup @root.config.abilities key)}}</label>
+              {{#if @root.isEditMode}}
+                <input
+                  type='text'
+                  name='system.abilities.{{key}}.value'
+                  value='{{ability.value}}'
+                  class="ability-score"
+                  data-dtype='Number'
+                />
+              {{else}}
+                <span class="ability-score-label">{{ability.value}}</span>
+              {{/if}}
+              <span
+                class='ability-mod rollable'
+                data-action='roll'
+                data-roll='d20+@abilities.{{key}}.mod'
+                data-label='{{localize (lookup @root.config.abilities key)}}'
+              >{{numberFormat ability.mod decimals=0 sign=true}}</span>
+            </div>
+          {{/each}}
+        </div>
+      {{/if}}
+    </aside>
+
+    <main class='main-content grid-span-2'>
+      {{! Summoned Daemons Section (only for summoners) }}
+      {{#if (eq actor.type 'summoner')}}
+        <aside class='summoned-daemons'>
+          <ol class='items-list'>
+            <li class='item flexrow items-header collapse-toggle' data-action='toggleSummonedDaemons'>
+              <div class='item-name gap-xs'>
+                <i class='fas {{#if summonedDaemonsCollapsed}}fa-chevron-down{{else}}fa-chevron-up{{/if}}'></i>
+                {{localize 'DASU.Actor.Main.SummonedDaemons'}}
+              </div>
+            </li>
+            {{#if summonedDaemonsCollapsed}}
+              {{#if summonedDaemons.length}}
+                <div class='item-list summoned-daemons-list'>
+                  {{#each summonedDaemons as |daemon id|}}
+                    <li class='item summoned-daemon flexrow' data-actor-id='{{daemon._id}}' data-document-class='Actor'>
+                      <div class='item-image daemon-image'>
+                        <a class='item-control' data-action='viewDoc' data-document-class='Actor' data-tooltip='{{localize "DOCUMENT.Update" type='daemon'}}'>
+                          <img src='{{daemon.img}}' data-tooltip='{{daemon.name}}' width='32' height='32'/>
+                        </a>
+                      </div>
+                      <div class='item-name daemon-info flexcol'>
+                        <div class='daemon-name'>{{daemon.name}}</div>
+                      </div>
+                      <div class='item-controls daemon-controls'>
+                        <a class='item-control daemon-control' 
+                           data-action='viewDoc'
+                           data-tooltip='{{localize "DOCUMENT.Update" type='daemon'}}'>
+                          <i class='fas fa-edit'></i>
+                        </a>
+                      </div>
+                    </li>
+                  {{/each}}
+                </div>
+              {{else}}
+                <li class='item flexrow no-summoned-daemons'>
+                  <div class='item-name'>
+                    {{localize 'DASU.Actor.Main.NoSummonedDaemons'}}
+                  </div>
+                </li>
+              {{/if}}
+            {{else}}
+              {{! Expanded: show the full stocks list, grouped and styled }}
+              <ol class='items-list'>
+                <li class='item flexrow items-header'>
+                  <div class='item-name'>{{localize 'DASU.Actor.Stocks.Title'}} — {{localize 'DASU.Actor.Stocks.Summoned'}}</div>
+                </li>
+                {{#each daemons as |daemon id|}}
+                  {{#if daemon.isSummoned}}
+                    <li class='item summoned-daemon flexrow' data-actor-id='{{daemon._id}}' data-document-class='Actor'>
+                      <div class='item-name flexrow'>
+                        <div class='item-image'>
+                          <a class='rollable' data-roll-type='actor' data-action='roll'>
+                            <img src='{{daemon.img}}' data-tooltip='{{daemon.name}}' width='24' height='24'/>
+                          </a>
+                        </div>
+                        <div>{{daemon.name}}</div>
+                      </div>
+                      <div class='item-actions'>
+                        <span class='summoned-status'>{{localize 'DASU.Actor.Stocks.Summoned'}}</span>
+                      </div>
+                      {{#if (and @root.editable @root.isEditMode)}}
+                        <div class='item-controls'>
+                          <a class='item-control toggle-summoned' data-tooltip='{{localize "DASU.Actor.Stocks.ToggleSummoned"}}' data-action='toggleSummoned'>
+                            <i class='fas fa-user-check'></i>
+                          </a>
+                          <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type='daemon'}}' data-action='viewDoc'>
+                            <i class='fas fa-edit'></i>
+                          </a>
+                          <a class='item-control item-delete' data-tooltip='{{localize "DASU.Actor.Stocks.RemoveFromStock"}}' data-action='removeFromStock'>
+                            <i class='fas fa-trash'></i>
+                          </a>
+                        </div>
+                      {{/if}}
+                    </li>
+                  {{/if}}
+                {{/each}}
+                <li class='item flexrow items-header'>
+                  <div class='item-name'>{{localize 'DASU.Actor.Stocks.Title'}} — {{localize 'DASU.Actor.Stocks.Unsummoned'}}</div>
+                </li>
+                {{#each daemons as |daemon id|}}
+                  {{#unless daemon.isSummoned}}
+                    <li class='item unsummoned-daemon flexrow' data-actor-id='{{daemon._id}}' data-document-class='Actor'>
+                      <div class='item-name flexrow'>
+                        <div class='item-image'>
+                          <a class='rollable' data-roll-type='actor' data-action='roll'>
+                            <img src='{{daemon.img}}' data-tooltip='{{daemon.name}}' width='24' height='24'/>
+                          </a>
+                        </div>
+                        <div>{{daemon.name}}</div>
+                      </div>
+                      <div class='item-actions'>
+                        <span class='unsummoned-status'>{{localize 'DASU.Actor.Stocks.Unsummoned'}}</span>
+                      </div>
+                      {{#if (and @root.editable @root.isEditMode)}}
+                        <div class='item-controls'>
+                          <a class='item-control toggle-summoned' data-tooltip='{{localize "DASU.Actor.Stocks.ToggleSummoned"}}' data-action='toggleSummoned'>
+                            <i class='fas fa-user-plus'></i>
+                          </a>
+                          <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type='daemon'}}' data-action='viewDoc'>
+                            <i class='fas fa-edit'></i>
+                          </a>
+                          <a class='item-control item-delete' data-tooltip='{{localize "DASU.Actor.Stocks.RemoveFromStock"}}' data-action='removeFromStock'>
+                            <i class='fas fa-trash'></i>
+                          </a>
+                        </div>
+                      {{/if}}
+                    </li>
+                  {{/unless}}
+                {{/each}}
+              </ol>
+            {{/if}}
+          </ol>
+        </aside>
+      {{/if}}
+    </main>
+  </section>
+</section>

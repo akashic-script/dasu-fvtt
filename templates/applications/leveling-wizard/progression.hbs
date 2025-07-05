@@ -1,0 +1,159 @@
+<div class="leveling-wizard-progression-root">
+{{!-- Leveling Wizard Progression Template --}}
+{{!-- Displays the complete level progression grid with slots for item planning --}}
+<div class="wizard-tabs">
+  <nav class="tab-nav">
+    <button class="tab-btn" data-tab="levelup" {{#if (eq activeTab 'levelup')}}aria-selected="true" class="active"{{/if}}>Level Up</button>
+    <button class="tab-btn" data-tab="config" {{#if (eq activeTab 'config')}}aria-selected="true" class="active"{{/if}}>Config</button>
+  </nav>
+</div>
+
+<div class="tab-content">
+  {{#if (eq activeTab 'levelup')}}
+    <div class="progression-content">
+      <div class="progression-header">
+        <h3>Level Progression</h3>
+        <div class="legend">
+          <div class="legend-item">
+            <span class="legend-color completed"></span>
+            <span>Completed</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color current"></span>
+            <span>Current</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color future"></span>
+            <span>Future</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="levels-container">
+        {{#each levels}}
+        <div class="level-row {{#if isCurrentLevel}}current{{else if isCompleted}}completed{{else}}future{{/if}}" 
+             data-level="{{level}}">
+          
+          <!-- Level Number and Requirements -->
+          <div class="level-info">
+            <div class="level-number">
+              <span class="level-label">Level {{level}}</span>
+              {{#if isCurrentLevel}}
+                <i class="fas fa-crosshairs current-indicator"></i>
+              {{/if}}
+            </div>
+            <div class="level-requirements">
+              <div class="requirement">
+                <span class="requirement-label">Merit:</span>
+                <span class="requirement-value">{{meritRequired}}</span>
+              </div>
+              <div class="requirement">
+                <span class="requirement-label">To Level:</span>
+                <span class="requirement-value">{{toLevelRequired}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level Bonuses -->
+          <div class="level-bonuses">
+            {{#each bonuses as |bonus|}}
+            <div class="bonus {{bonus.type}}-bonus" title="{{bonus.description}}">
+              <i class="{{bonus.icon}}"></i>
+              <span>{{bonus.text}}</span>
+            </div>
+            {{/each}}
+            {{#unless bonuses.length}}
+            <div class="no-bonus">
+              <span>No bonuses</span>
+            </div>
+            {{/unless}}
+          </div>
+
+          <!-- Level Slots -->
+          <div class="level-slots">
+            {{#if gainAbility}}
+            <div class="slot ability-slot {{#if assignedAbility}}has-item{{/if}}" 
+                 data-level="{{level}}" data-slot-type="ability"
+                 {{#if assignedAbility}}data-item-uuid="{{assignedAbility.uuid}}" data-item-name="{{assignedAbility.name}}"{{/if}}>
+              <div class="slot-label">Ability</div>
+              <div class="slot-content">
+                {{#if assignedAbility}}
+                  <div class="slot-item" data-item-uuid="{{assignedAbility.uuid}}">
+                    <span class="item-name">{{assignedAbility.name}}</span>
+                    <button class="remove-item" data-action="removeItem" data-item-uuid="{{assignedAbility.uuid}}">×</button>
+                  </div>
+                {{else}}
+                  <i class="fas fa-plus"></i>
+                {{/if}}
+              </div>
+            </div>
+            {{/if}}
+            {{#if gainSchema}}
+            <div class="slot schema-slot {{#if assignedSchema}}has-item{{/if}}" 
+                 data-level="{{level}}" data-slot-type="schema" data-schema-type="{{schemaType}}"
+                 {{#if assignedSchema}}data-item-uuid="{{assignedSchema.uuid}}" data-item-name="{{assignedSchema.name}}"{{/if}}>
+              <div class="slot-label">
+                {{#if (eq schemaType 'first')}}First Schema{{else if (eq schemaType 'second')}}Second Schema{{else}}Schema{{/if}} (Lvl 
+                {{#if (eq schemaType 'first')}}
+                  {{#if (eq level 1)}}1{{else if (eq level 5)}}2{{else if (eq level 15)}}3{{/if}}
+                {{else if (eq schemaType 'second')}}
+                  {{#if (eq level 10)}}1{{else if (eq level 20)}}2{{else if (eq level 25)}}3{{/if}}
+                {{else}}
+                  1
+                {{/if}})
+              </div>
+              <div class="slot-content">
+                {{#if assignedSchema}}
+                  <div class="slot-item" data-item-uuid="{{assignedSchema.uuid}}">
+                    <span class="item-name">{{assignedSchema.name}}</span>
+                    <button class="remove-item" data-action="removeItem" data-item-uuid="{{assignedSchema.uuid}}">×</button>
+                  </div>
+                {{else}}
+                  <i class="fas fa-plus"></i>
+                {{/if}}
+              </div>
+            </div>
+            {{/if}}
+            {{#if gainStrengthOfWill}}
+            <div class="slot strength-of-will-slot {{#if assignedStrengthOfWill}}has-item{{/if}}" 
+                 data-level="{{level}}" data-slot-type="strength-of-will"
+                 {{#if assignedStrengthOfWill}}data-item-uuid="{{assignedStrengthOfWill.uuid}}" data-item-name="{{assignedStrengthOfWill.name}}"{{/if}}>
+              <div class="slot-label">Strength of Will</div>
+              <div class="slot-content">
+                {{#if assignedStrengthOfWill}}
+                  <div class="slot-item" data-item-uuid="{{assignedStrengthOfWill.uuid}}">
+                    <span class="item-name">{{assignedStrengthOfWill.name}}</span>
+                    <button class="remove-item" data-action="removeItem" data-item-uuid="{{assignedStrengthOfWill.uuid}}">×</button>
+                  </div>
+                {{else}}
+                  <i class="fas fa-plus"></i>
+                {{/if}}
+              </div>
+            </div>
+            {{/if}}
+          </div>
+
+          <!-- Level Totals -->
+          <div class="level-totals">
+            <div class="total ap-total" title="Total AP at this level">
+              <span class="total-label">AP:</span>
+              <span class="total-value">{{totalAP}}</span>
+            </div>
+            <div class="total sp-total" title="Total SP at this level">
+              <span class="total-label">SP:</span>
+              <span class="total-value">{{totalSP}}</span>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  {{/if}}
+  {{#if (eq activeTab 'config')}}
+    <div class="config-content">
+      <h3>Config</h3>
+      <p>Configuration options will go here.</p>
+    </div>
+  {{/if}}
+</div>
+</div> 

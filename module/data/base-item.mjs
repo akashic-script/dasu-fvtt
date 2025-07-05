@@ -1,10 +1,34 @@
+import { ABILITY_CATEGORIES } from '../helpers/config.mjs';
+
 export default class DASUItemBase extends foundry.abstract.TypeDataModel {
+  static LOCALIZATION_PREFIXES = ['DASU.Item.base'];
+
   static defineSchema() {
     const fields = foundry.data.fields;
     const schema = {};
 
-    schema.description = new fields.HTMLField();
+    // DASU System fields
+    schema.dsid = new fields.StringField({ required: true, blank: false });
+    schema.category = new fields.StringField({
+      required: false,
+      choices: ABILITY_CATEGORIES,
+    });
+    schema.description = new fields.StringField({ required: false });
+    // Add traits array for all items
+    schema.traits = new fields.ArrayField(new fields.StringField(), {
+      required: false,
+      initial: [],
+    });
 
     return schema;
+  }
+
+  prepareDerivedData() {
+    super.prepareDerivedData();
+
+    // Ensure description is a single string, not an array
+    if (Array.isArray(this.description)) {
+      this.description = this.description[1] || '';
+    }
   }
 }

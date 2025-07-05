@@ -1,0 +1,687 @@
+{{! Items Tab }}
+<section
+  class='tab items scrollable {{tab.cssClass}}'
+  data-group='primary'
+  data-tab='items'
+>
+  <ol class='items-list'>
+    {{! Search and Filter Row }}
+    <li class='item flexrow items-search-row'>
+      <div class='search-container'>
+        <input 
+          type='text' 
+          class='items-search-input' 
+          placeholder='{{localize "DASU.SearchItems"}}'
+          data-tooltip='{{localize "DASU.SearchItemsTooltip"}}'
+        />
+        <button class='search-clear' data-tooltip='{{localize "DASU.ClearSearch"}}'>
+          <i class='fas fa-times'></i>
+        </button>
+      </div>
+      <div class='filter-container flex-row'>
+        <button class='items-sort-btn' data-tooltip='{{localize "DASU.Sort.Title"}}'>
+          <i class='fas fa-sort'></i>
+        </button>
+        <div class='items-sort-dropdown'>
+          <div class='sort-header'>{{localize "DASU.Sort.Title"}}</div>
+          <div class='sort-options'>
+            <button class='sort-option' data-sort="alpha-asc">{{localize "DASU.Sort.AlphabeticalAsc"}}</button>
+            <button class='sort-option' data-sort="alpha-desc">{{localize "DASU.Sort.AlphabeticalDesc"}}</button>
+            <div class='sort-separator'></div>
+            <button class='sort-option' data-sort="aptitude-asc">{{localize "DASU.Sort.AptitudeAsc"}}</button>
+            <button class='sort-option' data-sort="aptitude-desc">{{localize "DASU.Sort.AptitudeDesc"}}</button>
+            <div class='sort-separator'></div>
+            <button class='sort-option clear-sort' data-sort="clear">{{localize "DASU.Sort.ClearSort"}}</button>
+          </div>
+        </div>
+        <button class='items-filter-btn' data-tooltip='{{localize "DASU.SortAndFilter"}}'>
+          <i class='fas fa-filter'></i>
+        </button>
+        <div class='items-filter-dropdown'>
+          <div class='filter-header'>
+            <span>{{localize "DASU.Filter.Title"}}</span>
+            <button class='select-all-btn'>{{localize "DASU.Filter.SelectAll"}}</button>
+          </div>
+          <div class='filter-options'>
+            <label class='filter-option'>
+              <input type='checkbox' value='weapon' checked>
+              <i class='fas fa-sword'></i>
+              <span>{{localize "DASU.Filter.Weapons"}}</span>
+            </label>
+            <label class='filter-option'>
+              <input type='checkbox' value='tag' checked>
+              <i class='fas fa-tag'></i>
+              <span>{{localize "DASU.Filter.Tags"}}</span>
+            </label>
+            <label class='filter-option'>
+              <input type='checkbox' value='technique' checked>
+              <i class='fas fa-fist-raised'></i>
+              <span>{{localize "DASU.Filter.Techniques"}}</span>
+            </label>
+            <label class='filter-option'>
+              <input type='checkbox' value='spell' checked>
+              <i class='fas fa-magic'></i>
+              <span>{{localize "DASU.Filter.Spells"}}</span>
+            </label>
+            <label class='filter-option'>
+              <input type='checkbox' value='affliction' checked>
+              <i class='fas fa-skull'></i>
+              <span>{{localize "DASU.Filter.Afflictions"}}</span>
+            </label>
+            <label class='filter-option'>
+              <input type='checkbox' value='restorative' checked>
+              <i class='fas fa-heart'></i>
+              <span>{{localize "DASU.Filter.Restoratives"}}</span>
+            </label>
+            <label class='filter-option'>
+              <input type='checkbox' value='tactic' checked>
+              <i class='fas fa-chess'></i>
+              <span>{{localize "DASU.Filter.Tactics"}}</span>
+            </label>
+            {{#if (ne actor.type 'daemon')}}
+            <label class='filter-option'>
+              <input type='checkbox' value='special' checked>
+              <i class='fas fa-star'></i>
+              <span>{{localize "DASU.Filter.Specials"}}</span>
+            </label>
+            <label class='filter-option'>
+              <input type='checkbox' value='scar' checked>
+              <i class='fas fa-scar'></i>
+              <span>{{localize "DASU.Filter.Scars"}}</span>
+            </label>
+            {{/if}}
+            <label class='filter-option'>
+              <input type='checkbox' value='schema' checked>
+              <i class='fas fa-cube'></i>
+              <span>{{localize "DASU.Filter.Schemas"}}</span>
+            </label>
+            <label class='filter-option'>
+              <input type='checkbox' value='feature' checked>
+              <i class='fas fa-gem'></i>
+              <span>{{localize "DASU.Filter.Features"}}</span>
+            </label>
+          </div>
+          <div class='filter-actions'>
+            <button class='apply-filter-btn'>{{localize "DASU.Filter.Apply"}}</button>
+            <button class='clear-filter-btn'>{{localize "DASU.Filter.Clear"}}</button>
+          </div>
+        </div>
+      </div>
+    </li>
+
+    {{! Weapons Section }}
+    {{#if (or (eq itemFilterState null) (includes itemFilterState "weapon"))}}
+    <li class='item flexrow items-header' data-item-type='weapon' data-sortable="true" draggable="true">
+      <div class='item-name'>
+        <i class='fas fa-chevron-down collapse-toggle'></i>
+        {{localize 'DASU.TYPES.Item.weapon'}}
+      </div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="weapon"}}' data-action='createDoc' data-document-class='Item' data-type='weapon'>
+            <i class='fas fa-plus'></i>
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    <div class='item-list weapon-list'>
+      {{#each weapons as |item id|}}
+        <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <a class='rollable' data-action='roll' data-roll-type='item'>
+                <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+              </a>
+            </div>
+            {{item.name}}
+            {{#if (includes item.traits 'innate')}}
+              <span class="badge innate-badge" title="Level-granted">Innate</span>
+            {{/if}}
+          </div>
+          <div class='item-slots'>
+            {{#each item.system.tagSlots as |slot slotKey|}}
+              <div class='slot-indicator {{#if slot.tagId}}filled{{else}}empty{{/if}}' data-slot='{{slotKey}}' data-tooltip='{{#if slot.tagId}}{{#if item.slotTagData.[slotKey]}}{{item.slotTagData.[slotKey].name}}{{else}}{{slot.tagName}}{{/if}}{{else}}Empty slot{{/if}}'>
+                {{#if slot.tagId}}
+                  <i class='fas fa-tag'></i>
+                  <span class='slot-tag-name'>
+                    {{#if item.slotTagData.[slotKey]}}
+                      {{item.slotTagData.[slotKey].name}}
+                    {{else if slot.tagName}}
+                      {{slot.tagName}}
+                    {{else}}
+                      Empty
+                    {{/if}}
+                  </span>
+                  {{#if item.slotTagData.[slotKey].isInvalid}}
+                    <span class='invalid-tag-warning' data-tooltip='{{localize "DASU.Tag.InvalidTooltip"}}'>
+                      <i class='fas fa-exclamation-triangle'></i>
+                      <span>{{localize "DASU.Tag.Deleted"}}</span>
+                    </span>
+                  {{/if}}
+                {{else}}
+                  <i class='fas fa-plus'></i>
+                  <span class='slot-placeholder'>Empty Slot</span>
+                {{/if}}
+              </div>
+            {{/each}}
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="weapon"}}' data-action='viewDoc'>
+                <i class='fas fa-edit'></i>
+              </a>
+              <a class='item-control item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="weapon"}}' data-action='copyDoc'>
+                <i class='fas fa-copy'></i>
+              </a>
+              <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="weapon"}}' data-action='deleteDoc'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{! Tags Section }}
+    {{#if (or (eq itemFilterState null) (includes itemFilterState "tag"))}}
+    <li class='item flexrow items-header' data-item-type='tag' data-sortable="true" draggable="true">
+      <div class='item-name'>
+        <i class='fas fa-chevron-down collapse-toggle'></i>
+        {{localize 'DASU.TYPES.Item.tag'}}
+      </div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="tag"}}' data-action='createDoc' data-document-class='Item' data-type='tag'>
+            <i class='fas fa-plus'></i>
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    <div class='item-list tag-list'>
+      {{#each tags as |item id|}}
+        <li class='item flexrow{{#if (isTagEquipped item ../actor)}} equipped-tag{{/if}}' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-drag-type="tag">
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+            </div>
+            {{item.name}}
+            {{#if (includes item.traits 'innate')}}
+              <span class="badge innate-badge" title="Level-granted">Innate</span>
+            {{/if}}
+            {{#if (isTagEquipped item ../actor)}}
+              <span class='equipped-indicator' data-tooltip='Already equipped in a weapon'>
+                <i class='fas fa-link'></i>
+              </span>
+            {{/if}}
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="tag"}}' data-action='viewDoc'>
+                <i class='fas fa-edit'></i>
+              </a>
+              <a class='item-control item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="tag"}}' data-action='copyDoc'>
+                <i class='fas fa-copy'></i>
+              </a>
+              <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="tag"}}' data-action='deleteDoc'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{! Techniques Section }}
+    {{#if (or (eq itemFilterState null) (includes itemFilterState "technique"))}}
+    <li class='item flexrow items-header' data-item-type='technique' data-system-category='technique' data-sortable="true" draggable="true">
+      <div class='item-name'>
+        <i class='fas fa-chevron-down collapse-toggle'></i>
+        {{localize 'DASU.Item.Ability.CATEGORIES.technique'}}
+      </div>
+      <div class='item-actions'>
+        Aptitude
+      </div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="ability"}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='technique'>
+            <i class='fas fa-plus'></i>
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    <div class='item-list technique-list'>
+      {{#each techniques as |item id|}}
+        <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <a class='rollable' data-action='roll' data-roll-type='item'>
+                <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+              </a>
+            </div>
+            {{item.name}}
+            {{#if (includes item.traits 'innate')}}
+              <span class="badge innate-badge" title="Level-granted">Innate</span>
+            {{/if}}
+          </div>
+          <div class='item-actions'>
+            <span class='aptitude-value'>{{#if item.system.aptitudes.type}}{{uppercase item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="ability"}}' data-action='viewDoc'>
+                <i class='fas fa-edit'></i>
+              </a>
+              <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="ability"}}' data-action='deleteDoc'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{! Spells Section }}
+    {{#if (or (eq itemFilterState null) (includes itemFilterState "spell"))}}
+    <li class='item flexrow items-header' data-item-type='spell' data-system-category='spell' data-sortable="true" draggable="true">
+      <div class='item-name'>
+        <i class='fas fa-chevron-down collapse-toggle'></i>
+        {{localize 'DASU.Item.Ability.CATEGORIES.spell'}}
+      </div>
+      <div class='item-actions'>
+        Aptitude
+      </div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="ability"}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='spell'>
+            <i class='fas fa-plus'></i>
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    <div class='item-list spell-list'>
+      {{#each spells as |item id|}}
+        <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <a class='rollable' data-action='roll' data-roll-type='item'>
+                <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+              </a>
+            </div>
+            {{item.name}}
+            {{#if (includes item.traits 'innate')}}
+              <span class="badge innate-badge" title="Level-granted">Innate</span>
+            {{/if}}
+          </div>
+          <div class='item-actions'>
+            <span class='aptitude-value'>{{#if item.system.aptitudes.type}}{{uppercase item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="ability"}}' data-action='viewDoc'>
+                <i class='fas fa-edit'></i>
+              </a>
+              <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="ability"}}' data-action='deleteDoc'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{! Afflictions Section }}
+    {{#if (or (eq itemFilterState null) (includes itemFilterState "affliction"))}}
+    <li class='item flexrow items-header' data-item-type='affliction' data-system-category='affliction' data-sortable="true" draggable="true">
+      <div class='item-name'>
+        <i class='fas fa-chevron-down collapse-toggle'></i>
+        {{localize 'DASU.Item.Ability.CATEGORIES.affliction'}}
+      </div>
+      <div class='item-actions'>
+        Aptitude
+      </div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="ability"}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='affliction'>
+            <i class='fas fa-plus'></i>
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    <div class='item-list affliction-list'>
+      {{#each afflictions as |item id|}}
+        <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <a class='rollable' data-action='roll' data-roll-type='item'>
+                <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+              </a>
+            </div>
+            {{item.name}}
+            {{#if (includes item.traits 'innate')}}
+              <span class="badge innate-badge" title="Level-granted">Innate</span>
+            {{/if}}
+          </div>
+          <div class='item-actions'>
+            <span class='aptitude-value'>{{#if item.system.aptitudes.type}}{{uppercase item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="ability"}}' data-action='viewDoc'>
+                <i class='fas fa-edit'></i>
+              </a>
+              <a class='item-control item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="ability"}}' data-action='copyDoc'>
+                <i class='fas fa-copy'></i>
+              </a>
+              <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="ability"}}' data-action='deleteDoc'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{! Restoratives Section }}
+    {{#if (or (eq itemFilterState null) (includes itemFilterState "restorative"))}}
+    <li class='item flexrow items-header' data-item-type='restorative' data-system-category='restorative' data-sortable="true" draggable="true">
+      <div class='item-name'>
+        <i class='fas fa-chevron-down collapse-toggle'></i>
+        {{localize 'DASU.Item.Ability.CATEGORIES.restorative'}}
+      </div>
+      <div class='item-actions'>
+        Aptitude
+      </div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="ability"}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='restorative'>
+            <i class='fas fa-plus'></i>
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    <div class='item-list restorative-list'>
+      {{#each restoratives as |item id|}}
+        <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <a class='rollable' data-action='roll' data-roll-type='item'>
+                <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+              </a>
+            </div>
+            {{item.name}}
+            {{#if (includes item.traits 'innate')}}
+              <span class="badge innate-badge" title="Level-granted">Innate</span>
+            {{/if}}
+          </div>
+          <div class='item-actions'>
+            <span class='aptitude-value'>{{#if item.system.aptitudes.type}}{{uppercase item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="ability"}}' data-action='viewDoc'>
+                <i class='fas fa-edit'></i>
+              </a>
+              <a class='item-control item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="ability"}}' data-action='copyDoc'>
+                <i class='fas fa-copy'></i>
+              </a>
+              <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="ability"}}' data-action='deleteDoc'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{! Tactics Section }}
+    {{#if (or (eq itemFilterState null) (includes itemFilterState "tactic"))}}
+    <li class='item flexrow items-header' data-item-type='tactic' data-sortable="true" draggable="true">
+      <div class='item-name'>
+        <i class='fas fa-chevron-down collapse-toggle'></i>
+        {{localize 'DASU.TYPES.Item.tactic'}}
+      </div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="tactic"}}' data-action='createDoc' data-document-class='Item' data-type='tactic'>
+            <i class='fas fa-plus'></i>
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    <div class='item-list tactic-list'>
+      {{#each tactics as |item id|}}
+        <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <a class='rollable' data-action='roll' data-roll-type='item'>
+                <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+              </a>
+            </div>
+            {{item.name}}
+            {{#if (includes item.traits 'innate')}}
+              <span class="badge innate-badge" title="Level-granted">Innate</span>
+            {{/if}}
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="tactic"}}' data-action='viewDoc'>
+                <i class='fas fa-edit'></i>
+              </a>
+              <a class='item-control item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="tactic"}}' data-action='copyDoc'>
+                <i class='fas fa-copy'></i>
+              </a>
+              <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="tactic"}}' data-action='deleteDoc'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{! Specials Section - Only for Summoners }}
+    {{#if (and (ne actor.type 'daemon') (or (eq itemFilterState null) (includes itemFilterState "special")))}}
+    <li class='item flexrow items-header' data-item-type='special' data-sortable="true" draggable="true">
+      <div class='item-name'>
+        <i class='fas fa-chevron-down collapse-toggle'></i>
+        {{localize 'DASU.TYPES.Item.special'}}
+      </div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="special"}}' data-action='createDoc' data-document-class='Item' data-type='special'>
+            <i class='fas fa-plus'></i>
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    <div class='item-list special-list'>
+      {{#each specials as |item id|}}
+        <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <a class='rollable' data-action='roll' data-roll-type='item'>
+                <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+              </a>
+            </div>
+            {{item.name}}
+            {{#if (includes item.traits 'innate')}}
+              <span class="badge innate-badge" title="Level-granted">Innate</span>
+            {{/if}}
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="special"}}' data-action='viewDoc'>
+                <i class='fas fa-edit'></i>
+              </a>
+              <a class='item-control item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="special"}}' data-action='copyDoc'>
+                <i class='fas fa-copy'></i>
+              </a>
+              <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="special"}}' data-action='deleteDoc'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{! Scars Section - Only for Summoners }}
+    {{#if (and (ne actor.type 'daemon') (or (eq itemFilterState null) (includes itemFilterState "scar")))}}
+    <li class='item flexrow items-header' data-item-type='scar' data-sortable="true" draggable="true">
+      <div class='item-name'>
+        <i class='fas fa-chevron-down collapse-toggle'></i>
+        {{localize 'DASU.TYPES.Item.scar'}}
+      </div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="scar"}}' data-action='createDoc' data-document-class='Item' data-type='scar'>
+            <i class='fas fa-plus'></i>
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    <div class='item-list scar-list'>
+      {{#each scars as |item id|}}
+        <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <a class='rollable' data-action='roll' data-roll-type='item'>
+                <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+              </a>
+            </div>
+            {{item.name}}
+            {{#if (includes item.traits 'innate')}}
+              <span class="badge innate-badge" title="Level-granted">Innate</span>
+            {{/if}}
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="scar"}}' data-action='viewDoc'>
+                <i class='fas fa-edit'></i>
+              </a>
+              <a class='item-control item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="scar"}}' data-action='copyDoc'>
+                <i class='fas fa-copy'></i>
+              </a>
+              <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="scar"}}' data-action='deleteDoc'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{! Schemas Section }}
+    {{#if (or (eq itemFilterState null) (includes itemFilterState "schema"))}}
+    <li class='item flexrow items-header' data-item-type='schema' data-sortable="true" draggable="true">
+      <div class='item-name'>
+        <i class='fas fa-chevron-down collapse-toggle'></i>
+        {{localize 'DASU.TYPES.Item.schema'}}
+      </div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="schema"}}' data-action='createDoc' data-document-class='Item' data-type='schema'>
+            <i class='fas fa-plus'></i>
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    <div class='item-list schema-list'>
+      {{#each schemas as |item id|}}
+        <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <a class='rollable' data-action='roll' data-roll-type='item'>
+                <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+              </a>
+            </div>
+            {{item.name}}
+            {{#if (includes item.traits 'innate')}}
+              <span class="badge innate-badge" title="Level-granted">Innate</span>
+            {{/if}}
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              {{#if (eq item.system.level 3)}}
+                <span class="item-level-label">Lvl: {{item.system.level}} / 3</span>
+              {{/if}}
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="schema"}}' data-action='viewDoc'>
+                <i class='fas fa-eye'></i>
+              </a>
+              <a class='item-control item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="schema"}}' data-action='copyDoc'>
+                <i class='fas fa-copy'></i>
+              </a>
+              {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate'))}}
+                <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="schema"}}' data-action='deleteDoc'>
+                  <i class='fas fa-trash'></i>
+                </a>
+              {{/unless}}
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{! Features Section }}
+    {{#if (or (eq itemFilterState null) (includes itemFilterState "feature"))}}
+    <li class='item flexrow items-header' data-item-type='feature' data-sortable="true" draggable="true">
+      <div class='item-name'>
+        <i class='fas fa-chevron-down collapse-toggle'></i>
+        {{localize 'DASU.TYPES.Item.feature'}}
+      </div>
+      <div class='item-controls'>
+        {{#if (and @root.editable @root.isEditMode)}}
+          <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="feature"}}' data-action='createDoc' data-document-class='Item' data-type='feature'>
+            <i class='fas fa-plus'></i>
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    <div class='item-list feature-list'>
+      {{#each features as |item id|}}
+        <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+          <div class='item-name flexrow'>
+            <div class='item-image'>
+              <a class='rollable' data-action='roll' data-roll-type='item'>
+                <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+              </a>
+            </div>
+            {{item.name}}
+            {{#if (includes item.traits 'innate')}}
+              <span class="badge innate-badge" title="Level-granted">Innate</span>
+            {{/if}}
+          </div>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <div class='item-controls'>
+              {{#if (eq item.system.level 3)}}
+                <span class="item-level-label">Lvl: {{item.system.level}} / 3</span>
+              {{/if}}
+              <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="feature"}}' data-action='viewDoc'>
+                <i class='fas fa-eye'></i>
+              </a>
+              <a class='item-control item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="feature"}}' data-action='copyDoc'>
+                <i class='fas fa-copy'></i>
+              </a>
+              {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate'))}}
+                <a class='item-control item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="feature"}}' data-action='deleteDoc'>
+                  <i class='fas fa-trash'></i>
+                </a>
+              {{/unless}}
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </div>
+    {{/if}}
+  </ol>
+</section> 

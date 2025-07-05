@@ -1,26 +1,42 @@
-/* Form Styles */
+/* =========================
+   Form Styles
+   ========================= */
 .item-form {
   font-family: var(--font-primary);
 }
 
+/* Settings Form Scrolling */
+#game-rules-settings .standard-form {
+  max-height: 100%;
+  overflow-y: auto;
+}
+
 .sheet-header {
-  flex: 0 auto;
-  overflow: hidden;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  margin-bottom: 10px;
+  align-items: center;
+  gap: 1.5rem;
+  border: 0;
+  border-radius: 0;
+}
 
-  .profile-img {
-    flex: 0 0 100px;
-    height: 100px;
-    margin-right: 10px;
-  }
+.sheet-header-left .profile-img {
+  border-radius: 0;
+  box-shadow: 0 2px 8px #000a;
+}
 
-  .header-fields {
-    flex: 1;
-  }
+.sheet-header-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 0;
+  border-radius: 0;
+}
+
+.sheet-header-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .sheet-tabs {
@@ -31,10 +47,6 @@
 .sheet-body .tab,
 .sheet-body .tab .editor {
   height: 100%;
-}
-
-.tab {
-  max-height: 400px;
 }
 
 .tab.biography {
@@ -53,4 +65,219 @@
   .tox-edit-area {
     padding: 0 8px;
   }
+}
+
+/* =========================
+   Form Styles (Sheet Specific)
+   ========================= */
+.dasu.actor .item-form,
+.dasu.item .item-form {
+  font-family: var(--font-primary);
+}
+
+.dasu.actor .sheet-header,
+.dasu.item .sheet-header {
+  flex: 0 auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+  min-height: 120px;
+
+  .profile-img {
+    flex: 0 0 100px;
+    height: 100px;
+    margin-right: 10px;
+  }
+
+  .header-fields {
+    flex: 1;
+  }
+}
+
+.dasu.actor .sheet-tabs,
+.dasu.item .sheet-tabs {
+  flex: 0;
+}
+
+.dasu.actor .sheet-body,
+.dasu.actor .sheet-body .tab,
+.dasu.actor .sheet-body .tab .editor,
+.dasu.item .sheet-body,
+.dasu.item .sheet-body .tab,
+.dasu.item .sheet-body .tab .editor {
+  height: 100%;
+}
+
+.dasu.actor .tab.biography,
+.dasu.item .tab.biography {
+  flex: 1;
+
+  .editor {
+    height: 100%;
+  }
+}
+
+/* =========================
+   Input Field Styling (Sheet specific)
+   ========================= */
+.dasu.actor input[type='text'],
+.dasu.actor input[type='number'],
+.dasu.actor input[type='password'],
+.dasu.actor input[type='email'],
+.dasu.actor input[type='url'],
+.dasu.actor input[type='search'],
+.dasu.actor input[type='tel'],
+.dasu.actor textarea,
+.dasu.actor select,
+.dasu.item input[type='text'],
+.dasu.item input[type='number'],
+.dasu.item input[type='password'],
+.dasu.item input[type='email'],
+.dasu.item input[type='url'],
+.dasu.item input[type='search'],
+.dasu.item input[type='tel'],
+.dasu.item textarea,
+.dasu.item select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.dasu.actor input[type='text']:focus,
+.dasu.actor input[type='number']:focus,
+.dasu.actor input[type='password']:focus,
+.dasu.actor input[type='email']:focus,
+.dasu.actor input[type='url']:focus,
+.dasu.actor input[type='search']:focus,
+.dasu.actor input[type='tel']:focus,
+.dasu.actor textarea:focus,
+.dasu.actor select:focus,
+.dasu.item input[type='text']:focus,
+.dasu.item input[type='number']:focus,
+.dasu.item input[type='password']:focus,
+.dasu.item input[type='email']:focus,
+.dasu.item input[type='url']:focus,
+.dasu.item input[type='search']:focus,
+.dasu.item input[type='tel']:focus,
+.dasu.item textarea:focus,
+.dasu.item select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 3px var(--color-primary);
+  background: var(--color-bg-secondary);
+}
+
+.dasu.actor input[type='text']:hover,
+.dasu.actor input[type='number']:hover,
+.dasu.actor input[type='password']:hover,
+.dasu.actor input[type='email']:hover,
+.dasu.actor input[type='url']:hover,
+.dasu.actor input[type='search']:hover,
+.dasu.actor input[type='tel']:hover,
+.dasu.actor textarea:hover,
+.dasu.actor select:hover,
+.dasu.item input[type='text']:hover,
+.dasu.item input[type='number']:hover,
+.dasu.item input[type='password']:hover,
+.dasu.item input[type='email']:hover,
+.dasu.item input[type='url']:hover,
+.dasu.item input[type='search']:hover,
+.dasu.item input[type='tel']:hover,
+.dasu.item textarea:hover,
+.dasu.item select:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-secondary);
+}
+
+.dasu.actor .tox,
+.dasu.item .tox {
+  .tox-editor-container {
+    background: var(--dasu-c-white);
+  }
+
+  .tox-edit-area {
+    padding: 0 8px;
+  }
+}
+
+.dasu.tags.input-element-tags {
+  justify-content: flex-start !important;
+}
+
+/* =========================
+   Sheet Tab Navigation
+   ========================= */
+.sheet-tabs.tabs {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 0.25rem;
+  width: 100%;
+  min-height: 2.1rem;
+  padding: 0 0.5rem;
+  margin-bottom: 0.25rem;
+  background: var(--color-bg-secondary);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.sheet-tabs.tabs .tab-nav {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.25rem 1rem 0 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sheet-tabs.tabs a,
+.sheet-tabs.tabs .tab-btn {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.18rem 0.7rem;
+  margin: 0;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.sheet-tabs.tabs a.active,
+.sheet-tabs.tabs .tab-btn.active,
+.sheet-tabs.tabs a[aria-selected='true'],
+.sheet-tabs.tabs .tab-btn[aria-selected='true'] {
+  background: var(--color-bg-primary);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.12);
+  z-index: 2;
+}
+
+.sheet-tabs.tabs a:not(.active):hover,
+.sheet-tabs.tabs .tab-btn:not(.active):hover {
+  background: var(--color-bg-primary);
+  color: #fff;
+}
+
+.sheet-tabs.tabs a:focus,
+.sheet-tabs.tabs .tab-btn:focus {
+  outline: 2px solid var(--color-bg-primary);
+  outline-offset: 2px;
 }

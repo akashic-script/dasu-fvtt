@@ -1,13 +1,560 @@
-/* Resource Styles */
+/* =========================
+   Resource Styles
+   ========================= */
 .resource-label {
   font-weight: bold;
-}
-
-.ability {
-  margin-bottom: 2px;
 }
 
 .ability-score,
 .ability-mod {
   flex: 0 0 44px;
+}
+
+/* =========================
+   Attributes
+   ========================= */
+.attributes.grid {
+  gap: 0;
+}
+
+.section-header {
+  font-size: 1.1em;
+  font-weight: bold;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.25rem;
+}
+
+.attribute-points {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  min-height: 2rem;
+}
+
+.attribute-points .resource-label {
+  flex: 1;
+  text-align: left;
+  font-size: 0.9em;
+  margin-right: 0.5rem;
+}
+
+.attribute-points .resource-value {
+  font-weight: bold;
+  text-align: right;
+  font-size: 0.9em;
+  color: var(--color-text-highlight);
+  flex-shrink: 0;
+}
+
+.attribute {
+  padding: 0 0.15rem;
+  border: 1px solid var(--color-border);
+}
+
+.attribute-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  min-width: 0;
+  gap: 1em;
+}
+
+.attribute-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+
+.attribute-abbr {
+  font-size: 0.9em;
+  font-weight: normal;
+  color: var(--color-text-secondary);
+  margin-left: 0.25em;
+}
+
+.attribute-value {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.attribute-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.attribute-key {
+  flex: 0 0 auto;
+  text-align: left;
+}
+
+.attribute-values {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.attribute-mod-label {
+  flex: 0 0 auto;
+  font-weight: bold;
+  margin: 0 0.25rem;
+}
+
+/* =========================
+   Compact Daemon Layout
+   ========================= */
+.attributes-compact {
+  margin-bottom: 0.5rem;
+}
+
+.attribute-points-compact,
+.skill-points-compact {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  min-height: 1.5rem;
+  font-size: 0.85em;
+}
+
+.attribute-points-compact .resource-label,
+.skill-points-compact .resource-label {
+  flex: 1;
+  text-align: left;
+  font-size: 0.85em;
+  margin-right: 0.25rem;
+}
+
+.attribute-points-compact .resource-value,
+.skill-points-compact .resource-value {
+  font-weight: bold;
+  text-align: right;
+  font-size: 0.85em;
+  color: var(--color-text-highlight);
+  flex-shrink: 0;
+}
+
+.attributes-grid-compact {
+  gap: 0.25rem;
+}
+
+.attributes-grid-compact.grid {
+  gap: 0;
+}
+
+.attribute-compact {
+  margin-bottom: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--color-border);
+}
+
+.attribute-key-compact {
+  font-size: 0.9em;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.attribute-values-compact {
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
+}
+
+/* View mode label styles */
+.ability-score-label {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-primary);
+  font-weight: bold;
+  text-align: center;
+  padding: 0.25rem;
+  margin: 0;
+  min-width: 2rem;
+  min-height: 1.5rem;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* =========================
+   Skill Section
+   ========================= */
+.skills-section {
+  border: 1px solid var(--color-border);
+}
+
+.skill-points {
+  padding: 0.35rem;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  min-height: 1.75rem;
+}
+
+.skill-points .resource-label {
+  flex: 1;
+  text-align: left;
+  font-size: 0.9em;
+  margin-right: 0.5rem;
+}
+
+.skill-points .resource-value {
+  font-weight: bold;
+  text-align: right;
+  font-size: 0.9em;
+  color: var(--color-text-highlight);
+  flex-shrink: 0;
+}
+
+.skills {
+  gap: 0.35rem;
+}
+
+.skill {
+  padding: 0.35rem;
+  border: 1px solid var(--color-border);
+  min-height: auto;
+}
+
+.skill-header {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skill-name {
+  font-weight: bold;
+  font-size: 0.9em;
+  text-align: left;
+  flex: 1;
+  color: var(--color-text-primary);
+}
+
+.skill-gap {
+  height: 0.1rem;
+  background: var(--dasu-c-faint);
+  border-radius: 0;
+  margin: 0.35rem 0;
+}
+
+.skill-ticks {
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+/* =========================
+   Skill Radio
+   ========================= */
+.skill-tick-radio {
+  position: relative !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  background: transparent !important;
+  border: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  cursor: pointer !important;
+  z-index: 2 !important;
+}
+
+.skill-tick-radio::before {
+  content: attr(data-tick-value) !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  line-height: 1.5rem !important;
+  background: black !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0 !important;
+  color: transparent !important;
+  font-weight: bold !important;
+  font-size: 0.8em !important;
+  text-align: center !important;
+  transition: all 0.3s ease !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Hover states - show numbers */
+.skill:hover .skill-tick-radio::before {
+  color: #fbbf24 !important;
+}
+
+.skill:hover .skill-tick-radio:checked::before {
+  color: white !important;
+}
+
+.skill:hover .skill-tick-radio.filled::before {
+  color: white !important;
+  opacity: 1 !important;
+}
+
+/* Individual radio hover effects */
+.skill-tick-radio:hover::before {
+  border-color: var(--color-primary) !important;
+  background: var(--color-bg-secondary) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Checked state */
+.skill-tick-radio:checked::before {
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 5px var(--color-primary) !important;
+}
+
+/* Filled state (before current selection) */
+.skill-tick-radio.filled::before {
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  opacity: 0.6 !important;
+}
+
+/* Right-click feedback */
+.skill-tick-radio:active::before {
+  transform: scale(0.95) !important;
+  box-shadow: 0 0 8px var(--color-primary) !important;
+}
+
+/* Add a subtle indicator that right-click is available */
+.skill-tick-radio::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -2px !important;
+  right: -2px !important;
+  width: 4px !important;
+  height: 4px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.skill-tick-radio:hover::after {
+  opacity: 1 !important;
+}
+
+/* =========================
+   Tick Button Styles
+   ========================= */
+.tick-button {
+  display: inline-block;
+  flex: 0 0 32px;
+  height: var(--input-height, 1.5rem);
+  line-height: var(--input-height, 1.5rem);
+  padding: 0 0.25rem;
+  background: black;
+  border: 1px solid var(--input-border-color, var(--color-border));
+  border-radius: 0;
+  box-shadow: var(--input-box-shadow, none);
+  outline: 1px solid transparent;
+  font-family: inherit;
+  font-size: 0.9em;
+  color: #fbbf24;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  vertical-align: middle;
+  user-select: text;
+  transition: outline-color 0.5s;
+  cursor: pointer;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+.tick-button:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-secondary);
+}
+
+.tick-button[data-action] {
+  cursor: pointer;
+}
+
+.tick-button-compact {
+  display: inline-block;
+  flex: 0 0 auto;
+  height: 1.3rem;
+  line-height: 1.3rem;
+  padding: 0.1rem 0.3rem;
+  background: black;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: none;
+  outline: 1px solid transparent;
+  font-family: inherit;
+  font-size: 0.85em;
+  color: #fbbf24;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  vertical-align: middle;
+  user-select: text;
+  transition: outline-color 0.5s;
+  cursor: pointer;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+.tick-button-compact:hover {
+  border-color: var(--color-border);
+  background: var(--color-bg-secondary);
+}
+
+.tick-button-compact[data-action] {
+  cursor: pointer;
+}
+
+.attribute-points-display {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  padding: 0.2rem 0.4rem;
+  align-items: center;
+  min-height: 1.4rem;
+}
+
+.skill-points-display {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  padding: 0.2rem 0.4rem;
+  align-items: center;
+  min-height: 1.4rem;
+}
+
+/* =========================
+   Attribute Controls
+   ========================= */
+.attribute-controls {
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.attribute-decrease,
+.attribute-increase {
+  flex: 0 0 24px;
+  height: 24px;
+  padding: 0;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-primary);
+  font-size: 0.8em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.attribute-decrease:hover:not(:disabled),
+.attribute-increase:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.attribute-decrease:disabled,
+.attribute-increase:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+}
+
+.attribute-cost-info {
+  flex: 1;
+  text-align: center;
+  font-size: 0.75em;
+  color: var(--color-text-secondary);
+  font-weight: normal;
+  padding: 0 0.3rem;
+}
+
+/* =========================
+   Level Up Button
+   ========================= */
+.leveling-wizard-btn {
+  flex: 0 0 24px;
+  height: 24px;
+  padding: 0;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-primary);
+  font-size: 0.8em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin-left: 0.25rem;
+}
+
+.leveling-wizard-btn:hover {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.attribute-abbr-block {
+  display: block;
+  font-size: 0.75em;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  margin-top: 0.1em;
+  letter-spacing: 0.04em;
+  text-align: left;
+}
+
+.attribute-separator {
+  flex: 1 1 auto;
+  width: auto;
+  height: 0px;
+  background: var(--color-primary, #7c3aed);
+  border: none;
+  margin: 0 0.25em;
+  align-self: center;
+}
+
+.profile-img {
+  cursor: pointer;
+  border: 3px solid var(--dasu-c-faint);
+  box-shadow: 0 0 0 4px var(--color-bg-secondary), 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  background: var(--color-bg-primary);
+  padding: 2px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.profile-img:hover {
+  border-color: var(--dasu-c-beige);
+  box-shadow: 0 0 0 6px var(--color-bg-secondary),
+    0 4px 16px rgba(0, 0, 0, 0.18);
 }

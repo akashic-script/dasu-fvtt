@@ -1,5 +1,6 @@
 /* Add custom fonts by visiting and search https://fonts.google.com */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans+Narrow:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;700&display=swap');
 
 @import 'utils/variables.css';
 @import 'utils/colors.css';
@@ -10,10 +11,64 @@
 @import 'global/grid.css';
 @import 'global/flex.css';
 
+@import 'components/forms.css';
+@import 'components/resource.css';
+@import 'components/items.css';
+@import 'components/effects.css';
+@import 'components/barmeter.css';
+@import 'applications/leveling-wizard.css';
+
 /* Styles limited to dasu sheets */
 .dasu {
-  @import 'components/forms.css';
-  @import 'components/resource.css';
-  @import 'components/items.css';
-  @import 'components/effects.css';
+  /* Additional dasu-specific styles can go here */
+  font-family: 'PT Sans Narrow', sans-serif;
+}
+
+/* Apply PT Sans Narrow only to DASU sheets */
+.dasu.actor,
+.dasu.item {
+  font-family: 'PT Sans Narrow', sans-serif;
+}
+
+/* Actor Sheet Tab Navigation - Consistent with Leveling Wizard */
+.dasu.actor .tab-nav {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.25rem 1rem 0 1rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  margin-bottom: 0.5rem;
+}
+.dasu.actor .tab-btn {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  margin: 0;
+  border-radius: 0.25rem 0.25rem 0 0;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.dasu.actor .tab-btn.active,
+.dasu.actor .tab-btn[aria-selected='true'] {
+  background: var(--color-bg-primary);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15);
+  z-index: 2;
+}
+.dasu.actor .tab-btn:not(.active):hover {
+  background: var(--color-bg-primary);
+  color: #fff;
+}
+.dasu.actor .tab-btn:focus {
+  outline: 2px solid var(--color-bg-primary);
+  outline-offset: 2px;
 }

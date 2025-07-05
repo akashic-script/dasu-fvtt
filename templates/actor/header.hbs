@@ -1,109 +1,74 @@
-{{! Sheet Header }}
-<header class='sheet-header'>
-  <img
-    class='profile-img'
-    src='{{actor.img}}'
-    data-edit='img'
-    data-action='onEditImage'
-    data-tooltip='{{actor.name}}'
-    height='100'
-    width='100'
-  />
-  <div class='header-fields'>
-    <div class='document-name'>
-      <input
-        name='name'
-        type='text'
-        value='{{actor.name}}'
-        placeholder='Name'
-      />
+{{! =========================
+    Sheet Header
+    ========================= }}
+<header class="sheet-header">
+  {{! -- Portrait -- }}
+  <div class="sheet-header-left">
+    <img class="profile-img" src="{{actor.img}}" data-edit="img" data-action="editImage" data-tooltip="{{actor.name}}" height="100" width="100"/>
+  </div>
+
+  {{! -- Name and Bars -- }}
+  <div class="sheet-header-center">
+    <div class="document-name">
+      <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
     </div>
-    {{! The grid classes are defined in scss/global/_grid.scss. To use,
-      use both the "grid" and "grid-Ncol" class where "N" can be any number
-      from 1 to 12 and will create that number of columns.  }}
-    <div class='resources grid grid-3col'>
-
-      {{! "flex-group-center" is also defined in the _grid.scss file
-        and it will add a small amount of padding, a border, and will
-        center all of its child elements content and text. }}
-      <div class='resource flex-group-center'>
-        <label for='system.health.value' class='resource-label'>
-          {{localize 'DASU.Actor.base.FIELDS.health.value.label'}}
-        </label>
-        <div class='resource-content flexrow flex-center flex-between'>
-          <input
-            type='text'
-            name='system.health.value'
-            value='{{system.health.value}}'
-            data-dtype='Number'
-          />
-          <span> / </span>
-          <input
-            type='text'
-            name='system.health.max'
-            value='{{system.health.max}}'
-            data-dtype='Number'
-          />
+    <div class="sheet-header-bars">
+      {{!-- HP Bar --}}
+      <div class="bar-meter hp-bar">
+        <span class="bar-label">HP</span>
+        <div class="bar-outer">
+          <div class="bar-inner" style="width: {{percent system.stats.hp.current system.stats.hp.max}}%;"></div>
         </div>
+        <span class="bar-value">
+          <input type="text" name="system.stats.hp.current" value="{{system.stats.hp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.hp.max}}
+        </span>
       </div>
-
-      <div class='resource flex-group-center'>
-        <label for='system.power.value' class='resource-label'>
-          {{localize 'DASU.Actor.base.FIELDS.power.value.label'}}
-        </label>
-        <div class='resource-content flexrow flex-center flex-between'>
-          <input
-            type='text'
-            name='system.power.value'
-            value='{{system.power.value}}'
-            data-dtype='Number'
-          />
-          <span> / </span>
-          <input
-            type='text'
-            name='system.power.max'
-            value='{{system.power.max}}'
-            data-dtype='Number'
-          />
+      {{!-- WP Bar --}}
+      <div class="bar-meter wp-bar">
+        <span class="bar-label">WP</span>
+        <div class="bar-outer">
+          <div class="bar-inner" style="width: {{percent system.stats.wp.current system.stats.wp.max}}%;"></div>
         </div>
-      </div>
-
-      <div class='resource flex-group-center'>
-        {{#if (eq actor.type 'summoner')}}
-          <label class='resource-label'>
-            {{localize 'DASU.Actor.Summoner.FIELDS.attributes.level.value.label'}}
-          </label>
-          <div class='resource-content flexrow flex-center flex-between'>
-            <input
-              type='text'
-              name='system.attributes.level.value'
-              value='{{system.attributes.level.value}}'
-              data-dtype='Number'
-            />
-          </div>
-        {{/if}}
-        {{#if (eq actor.type 'daemon')}}
-          <label class='resource-label'>
-            {{localize 'DASU.Actor.Daemon.FIELDS.cr.label'}} / {{localize 'DASU.Actor.Daemon.xp.label'}}
-          </label>
-          <div class='resource-content flexrow flex-center flex-between'>
-            <input
-              type='text'
-              name='system.cr'
-              value='{{system.cr}}'
-              data-dtype='Number'
-            />
-            <span></span>
-            <input
-              type='text'
-              disabled='true'
-              name='system.xp'
-              value='{{system.xp}}'
-              data-dtype='Number'
-            />
-          </div>
-        {{/if}}
+        <span class="bar-value">
+          <input type="text" name="system.stats.wp.current" value="{{system.stats.wp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.wp.max}}
+        </span>
       </div>
     </div>
+  </div>
+
+  {{! -- Level and Merit -- }}
+  <div class="sheet-header-right">
+    <div class="level-box">
+      <div class="level-row">
+        <span class="level-label">Level</span>
+        {{#if (and actor.type (eq actor.type 'summoner'))}}
+          {{!-- Summoner: Show level as text with leveling wizard button --}}
+          <span class="level-value">{{system.level}}</span>
+          {{#if editable}}
+            <button type="button" class="leveling-wizard-btn" data-action="openLevelingWizard" data-tooltip="{{localize 'DASU.Actor.levelingWizard.tooltip'}}">
+              <i class="fas fa-level-up-alt"></i>
+            </button>
+          {{/if}}
+        {{else if (and actor.type (eq actor.type 'daemon'))}}
+          {{!-- Daemon: Show level as editable input field --}}
+          <input type="number" name="system.level" value="{{system.level}}" data-dtype="Number" class="level-input" min="1" max="30" />
+        {{else}}
+          {{!-- Fallback for other actor types --}}
+          <span class="level-value">{{system.level}}</span>
+        {{/if}}
+      </div>
+      <div class="merit-row">
+        <span class="merit-label">Merit</span>
+        <input type="text" name="system.merit" value="{{system.merit}}" data-dtype="Number" class="merit-input" />
+      </div>
+    </div>
+    {{#if (or (eq actor.type 'summoner') (eq actor.type 'daemon'))}}
+      <div class="initiative-box">
+        <button type="button" class="initiative-btn" data-action="rollInitiative" data-tooltip="Roll Initiative (2d6 + DEX tick d6, count successes)">
+          <i class="fas fa-dice-d6"></i>
+          <span>Initiative</span>
+        </button>
+      </div>
+    {{/if}}
   </div>
 </header>

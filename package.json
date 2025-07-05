@@ -30,6 +30,7 @@
     "conventional-changelog-cli": "^4.1.0",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.57.1",
+    "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
     "husky": "^8.0.3",
     "js-yaml": "^4.1.0",
     "lint-staged": "^13.3.0",
@@ -44,5 +45,8 @@
     "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "conventional-changelog-angular": "^8.0.0"
   }
 }

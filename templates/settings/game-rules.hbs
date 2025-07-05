@@ -1,0 +1,64 @@
+<div class="standard-form" data-application-part="form">
+  <fieldset>
+    <legend>{{localize "DASU.Settings.gameRules.legendLevel"}}</legend>
+    <div class="form-group">
+      <label for="maxLevel">{{localize "DASU.Settings.gameRules.maxLevel.name"}}</label>
+      <div class="form-fields">
+        <range-picker name="maxLevel" value="{{settings.maxLevel}}" min="{{ranges.maxLevel.min}}" max="30" step="{{ranges.maxLevel.step}}">
+          <input type="range" min="{{ranges.maxLevel.min}}" max="30" step="{{ranges.maxLevel.step}}" data-action="rangeInput">
+          <input type="number" min="{{ranges.maxLevel.min}}" max="30" step="{{ranges.maxLevel.step}}">
+        </range-picker>
+      </div>
+      <p class="hint">{{localize "DASU.Settings.gameRules.maxLevel.hint"}}</p>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>{{localize "DASU.Settings.gameRules.legendAP"}}</legend>
+    <div class="form-group">
+      <label for="startingAP">{{localize "DASU.Settings.gameRules.startingAP.name"}}</label>
+      <div class="form-fields">
+        <input type="number" id="startingAP" name="startingAP" value="{{settings.startingAP}}" min="0" />
+      </div>
+      <p class="hint">{{localize "DASU.Settings.gameRules.startingAP.hint"}}</p>
+    </div>
+    
+    <div class="form-group">
+      <label for="apFormula">{{localize "DASU.Settings.gameRules.apFormula.name"}}</label>
+      <div class="form-fields">
+        <select id="apFormula" name="apFormula">
+          <option value="odd:1-29" {{#if (eq settings.apFormula "odd:1-29")}}selected{{/if}}>
+            {{localize "DASU.Settings.gameRules.apFormula.odd129"}}
+          </option>
+        </select>
+      </div>
+      <p class="hint">{{localize "DASU.Settings.gameRules.apFormula.hint"}}</p>
+    </div>
+
+    <div class="form-group">
+      <label for="spFormula">{{localize "DASU.Settings.gameRules.spFormula.name"}}</label>
+      <div class="form-fields">
+        <select id="spFormula" name="spFormula">
+          <option value="2*level" {{#if (eq settings.spFormula "2*level")}}selected{{/if}}>
+            {{localize "DASU.Settings.gameRules.spFormula.2xlevel"}}
+          </option>
+          <option value="level" {{#if (eq settings.spFormula "level")}}selected{{/if}}>
+            {{localize "DASU.Settings.gameRules.spFormula.level"}}
+          </option>
+        </select>
+      </div>
+      <p class="hint">{{localize "DASU.Settings.gameRules.spFormula.hint"}}</p>
+    </div>
+  </fieldset>
+
+  <footer class="form-footer" data-application-part="footer">
+    <button type="button" data-action="resetDefaults">
+      <i class="fa-solid fa-arrow-rotate-left"></i>
+      <span>{{localize "DASU.Settings.gameRules.resetDefaults"}}</span>
+    </button>
+    <button type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+      <span>{{localize "DASU.Settings.gameRules.saveChanges"}}</span>
+    </button>
+  </footer>
+</div> 

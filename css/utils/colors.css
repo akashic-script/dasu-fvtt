@@ -7,6 +7,31 @@
   --dasu-c-white: #ffffff;
   --dasu-c-black: #000000;
   --dasu-c-groove: #eeede0;
+  --dasu-c-primary: #eab308;
+  --dasu-c-success: #10b981;
+
+  /* Component color variables */
+  --color-primary: #eab308;
+  --color-primary-highlight: #ca8a04;
+  --color-secondary: #8b5cf6;
+  --color-secondary-highlight: #7c3aed;
+  --color-bg-primary: #2d1b69;
+  --color-bg-secondary: #1a103f;
+  --color-text-primary: #212529;
+  --color-text-secondary: #6c757d;
+  --color-text-highlight: #007bff;
+  --color-white: #ffffff;
+  --color-border: #ffffff;
+  --color-hp: #e11d48;
+  --color-wp: #2563eb;
+  --color-secondary-bg: #3b3b6d;
+  --color-bg-dim: #111c;
+  --color-success: #10b981;
+
+  /* Legend colors */
+  --color-legend-completed: #4caf50;
+  --color-legend-current: #4a90e2;
+  --color-legend-future: #666;
 }
 
 .theme-dark {
@@ -17,4 +42,28 @@
   --dasu-c-white: #000000;
   --dasu-c-black: #ffffff;
   --dasu-c-groove: #11121f;
+  --dasu-c-primary: #eab308;
+  --dasu-c-success: #10b981;
+
+  /* Component color variables for dark theme */
+  --color-primary: #eab308;
+  --color-primary-highlight: #ca8a04;
+  --color-secondary: #8b5cf6;
+  --color-secondary-highlight: #7c3aed;
+  --color-bg-primary: #1a103f;
+  --color-bg-secondary: #0f0a26;
+  --color-text-primary: #f7fafc;
+  --color-text-secondary: #a0aec0;
+  --color-text-highlight: #63b3ed;
+  --color-white: #ffffff;
+  --color-border: #ffffff;
+  --color-hp: #e11d48;
+  --color-wp: #2563eb;
+  --color-secondary-bg: #3b3b6d;
+  --color-success: #10b981;
+
+  /* Legend colors for dark theme */
+  --color-legend-completed: #4caf50;
+  --color-legend-current: #4a90e2;
+  --color-legend-future: #666;
 }

@@ -61,6 +61,14 @@ Hotfix:           ●────●────●────●────�
    git checkout dev
    git checkout -b feature/your-feature-name
    ```
+
+- **Update your feature branch** with latest `dev` changes (if dev has been updated since you created your branch):
+  ```bash
+  git fetch origin
+  git rebase origin/dev
+  ```
+  _(This keeps your feature branch history clean and ensures you're working with the latest code.)_
+
 2. **Write code** and commit using:
    ```bash
    npm run commit
@@ -97,6 +105,19 @@ Hotfix:           ●────●────●────●────�
    git rebase main
    git push origin dev --force-with-lease
    ```
+
+## Release Workflow
+
+## Release Workflow
+
+### Automated Release Process
+
+1. **Version Bump**: Automatically increments version in `package.json`
+2. **Changelog Generation**: Creates/updates `CHANGELOG.md` from conventional commits
+3. **GitHub Release**: Creates release with changelog and assets
+4. **Tag Creation**: Tags the release commit
+
+### Release Commands
 
 ## Tooling & Automation
 

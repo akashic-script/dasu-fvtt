@@ -1,91 +1,391 @@
 {
   "DASU": {
-    "Ability": {
-      "Str": { "long": "Strength", "abbr": "str" },
-      "Con": { "long": "Constitution", "abbr": "con" },
-      "Dex": { "long": "Dexterity", "abbr": "dex" },
-      "Int": { "long": "Intelligence", "abbr": "int" },
-      "Wis": { "long": "Wisdom", "abbr": "wis" },
-      "Cha": { "long": "Charisma", "abbr": "cha" }
-    },
     "SheetLabels": {
       "Actor": "DASU Actor Sheet",
       "Item": "DASU Item Sheet"
     },
     "Actor": {
-      "Tabs": {
-        "Biography": "Biography",
-        "Features": "Features",
-        "Gear": "Gear",
-        "Spells": "Spells",
-        "Effects": "Effects"
+      "Attributes": {
+        "label": "Attributes",
+        "list": {
+          "pow": { "label": "Power", "abbr": "PWR" },
+          "dex": { "label": "Dexterity", "abbr": "DEX" },
+          "will": { "label": "Willpower", "abbr": "WILL" },
+          "sta": { "label": "Stamina", "abbr": "STA" }
+        },
+        "points": {
+          "label": { "label": "Attribute Points", "abbr": "AP" }
+        },
+        "tick": {
+          "label": "Tick",
+          "tooltip": "Attribute Tick: 1 per 5 attribute points"
+        },
+        "effective": {
+          "tooltip": "Effective Attribute Value (Allocated + Modifier)"
+        },
+        "mod": {
+          "tooltip": "Attribute Tick Modifier"
+        },
+        "roll": {
+          "tooltip": "Roll Attribute Check"
+        },
+        "allocated": {
+          "tooltip": "Allocated Attribute Points"
+        },
+        "controls": {
+          "increase": "Increase tick level",
+          "decrease": "Decrease tick level",
+          "cost": "Cost",
+          "free": "Free",
+          "nextLevel": "Next level cost"
+        }
       },
       "base": {
         "FIELDS": {
           "biography": { "label": "Biography" },
-          "health": {
-            "value": { "label": "Health" },
-            "max": { "label": "Maximum Health" }
-          },
-          "power": {
-            "value": { "label": "Power" },
-            "max": { "label": "Maximum Power" }
-          }
+          "level": { "label": "Level" }
         }
+      },
+      "Daemon": {
+        "FIELDS": {},
+        "xp": { "label": "XP" }
+      },
+      "EditMode": {
+        "Edit": "Edit Mode",
+        "View": "View Mode"
+      },
+      "levelingWizard": {
+        "tooltip": "Open Leveling Wizard"
+      },
+      "Main": {
+        "SummonedDaemons": "Summoned Daemons",
+        "NoSummonedDaemons": "No daemons currently summoned"
+      },
+      "Skills": {
+        "label": "Skills",
+        "skillPoints": {
+          "label": "Skill Points",
+          "abbr": "SP"
+        },
+        "base": {
+          "tooltip": "Skill Base Value"
+        },
+        "mod": {
+          "tooltip": "Skill Modifier"
+        },
+        "ticks": {
+          "tooltip": "Skill Ticks (1-6)"
+        }
+      },
+      "Stocks": {
+        "Title": "Daemon Stocks",
+        "Add": "Add Daemon",
+        "Actions": "Actions",
+        "State": "State",
+        "DragInstructions": "Drag daemons here to add to stocks",
+        "NoDaemons": "No daemons in stocks",
+        "Summoned": "Summoned",
+        "Unsummoned": "Unsummoned",
+        "ToggleSummoned": "Toggle Summoned Status",
+        "RemoveFromStock": "Remove from Stocks"
       },
       "Summoner": {
         "FIELDS": {
           "attributes.level.value": { "label": "Level" }
         }
       },
-      "Daemon": {
-        "FIELDS": {
-          "cr": { "label": "CR" }
-        },
-        "xp": { "label": "XP" }
+      "Tabs": {
+        "Biography": "Biography",
+        "Effects": "Effects",
+        "Items": "Items",
+        "Main": "Main",
+        "Stocks": "Stocks"
       }
     },
+    "Effect": {
+      "Duration": "Duration",
+      "Inactive": "Inactive Effects",
+      "Passive": "Passive Effects",
+      "Source": "Source",
+      "Temporary": "Temporary Effects",
+      "Toggle": "Toggle Effect",
+      "TransferredFromItem": "Transferred from Item"
+    },
+    "Filter": {
+      "Afflictions": "Afflictions",
+      "Apply": "Apply",
+      "Clear": "Clear",
+      "DeselectAll": "Deselect All",
+      "Restoratives": "Restoratives",
+      "Scars": "Scars",
+      "SelectAll": "Select All",
+      "Specials": "Specials",
+      "Spells": "Spells",
+      "Tactics": "Tactics",
+      "Tags": "Tags",
+      "Techniques": "Techniques",
+      "Title": "Filter by Type",
+      "Weapons": "Weapons",
+      "Schemas": "Schemas",
+      "Features": "Features"
+    },
     "Item": {
+      "Ability": {
+        "FIELDS": {
+          "aptitudes": {
+            "type": { "label": "Aptitude Type" },
+            "value": { "label": "Aptitude Value" }
+          },
+          "category": { "label": "Category" },
+          "cost": { "label": "Cost" },
+          "costType": { "label": "Cost Type" },
+          "damage": {
+            "type": { "label": "Damage Type" },
+            "value": { "label": "Damage Value" }
+          },
+          "description": { "label": "Description" },
+          "healed": {
+            "type": { "label": "Heal Type" },
+            "value": { "label": "Heal Value" }
+          },
+          "isInfinity": { "label": "Guaranteed" },
+          "toHit": { "label": "To Hit Bonus" }
+        },
+        "CATEGORIES": {
+          "affliction": "Affliction",
+          "restorative": "Restorative",
+          "spell": "Spell",
+          "technique": "Technique"
+        },
+        "categoryNote": "Change the category to see different fields specific to that ability type."
+      },
+      "General": {
+        "FIELDS": {
+          "maxTagSlots": { "label": "Maximum Tag Slots" }
+        },
+        "Tags": {
+          "TagSlotsDescription": "Equip tags to enhance your item's capabilities.",
+          "TagSlotsHeader": "Tag Slots"
+        }
+      },
+      "Scar": {
+        "FIELDS": {
+          "effect": { "label": "Effect" }
+        }
+      },
+      "Special": {
+        "FIELDS": {
+          "effect": { "label": "Effect" }
+        }
+      },
+      "Tag": {
+        "Deleted": "Deleted Tag",
+        "FIELDS": {
+          "effect": { "label": "Effect" }
+        },
+        "InvalidTooltip": "This tag has been deleted or is no longer available"
+      },
       "Tabs": {
         "Attributes": "Attributes",
         "Description": "Description",
         "Effects": "Effects"
       },
-      "Gear": {
+      "Tactic": {
         "FIELDS": {
-          "rollFormula": { "label": "Roll Formula" },
-          "numDice": { "label": "Number of Dice" },
-          "dieSize": { "label": "Die Size" },
-          "rollMod": { "label": "Roll Modifier" },
-          "quantity": { "label": "Quantity" },
-          "weight": { "label": "Weight" }
+          "effect": { "label": "Effect" }
         }
       },
-      "Spell": {
+      "Weapon": {
         "FIELDS": {
-          "level": { "label": "Spell Level" }
+          "cost": { "label": "Cost" },
+          "damage": {
+            "type": { "label": "Damage Type" },
+            "value": { "label": "Damage Value" }
+          },
+          "range": { "label": "Range" },
+          "toHit": { "label": "To Hit Bonus" }
         },
-        "SpellLVL": "Level {level} Spells",
-        "AddLVL": "Add LVL {level}"
+        "Settings": {}
       }
     },
-    "Effect": {
-      "Source": "Source",
-      "Toggle": "Toggle Effect",
-      "Temporary": "Temporary Effects",
-      "Passive": "Passive Effects",
-      "Inactive": "Inactive Effects"
+    "SearchItems": "Search items...",
+    "SearchItemsTooltip": "Search through all items by name",
+    "Sort": {
+      "AlphabeticalAsc": "Alphabetical (A-Z)",
+      "AlphabeticalDesc": "Alphabetical (Z-A)",
+      "AptitudeAsc": "Aptitude Value (Ascending)",
+      "AptitudeDesc": "Aptitude Value (Descending)",
+      "ClearSort": "Clear Sort (Manual Order)",
+      "Title": "Sort by"
+    },
+    "SortAndFilter": "Sort and Filter Items",
+    "TYPES": {
+      "Actor": {
+        "daemon": "Daemon",
+        "summoner": "Summoner"
+      },
+      "Item": {
+        "ability": "Ability",
+        "item": "Item",
+        "scar": "Scar",
+        "special": "Special",
+        "tag": "Tag",
+        "tactic": "Tactic",
+        "weapon": "Weapon",
+        "schema": "Schema",
+        "feature": "Feature"
+      }
+    },
+    "aptitudeTypes": {
+      "d": { "long": "Dark", "short": "D" },
+      "da": { "long": "Debuff Almighty", "short": "DA" },
+      "dm": { "long": "Debuff Mental", "short": "DM" },
+      "dp": { "long": "Debuff Physical", "short": "DP" },
+      "ea": { "long": "Earth", "short": "EA" },
+      "el": { "long": "Electric", "short": "EL" },
+      "f": { "long": "Fire", "short": "F" },
+      "h": { "long": "Heal", "short": "H" },
+      "i": { "long": "Ice", "short": "I" },
+      "l": { "long": "Light", "short": "L" },
+      "ta": { "long": "Technique Almighty", "short": "TA" },
+      "tb": { "long": "Technique Brutal", "short": "TB" },
+      "tg": { "long": "Technique General", "short": "TG" },
+      "tt": { "long": "Technique Technical", "short": "TT" },
+      "w": { "long": "Wind", "short": "W" }
+    },
+    "damageTypes": {
+      "dark": "Dark",
+      "earth": "Earth",
+      "electric": "Electric",
+      "fire": "Fire",
+      "ice": "Ice",
+      "light": "Light",
+      "physical": "Physical",
+      "untyped": "Untyped",
+      "wind": "Wind"
+    },
+    "CostType": {
+      "wp": "WP",
+      "hp": "HP"
+    },
+    "HealType": {
+      "hp": "HP",
+      "wp": "WP",
+      "both": "Both",
+      "status": "Status"
+    },
+    "Status": {
+      "Bleeding": "Bleeding",
+      "Charmed": "Charmed",
+      "Cursed": "Cursed",
+      "Dazed": "Dazed",
+      "Despair": "Despair",
+      "Empowered": "Empowered",
+      "Focused": "Focused",
+      "Infected": "Infected",
+      "Invisible": "Invisible",
+      "Rage": "Rage",
+      "Restrained": "Restrained",
+      "Silenced": "Silenced",
+      "Sleep": "Sleep",
+      "Stunned": "Stunned",
+      "Unraveled": "Unraveled",
+      "Guarded": "Guarded",
+      "Unguarded": "Unguarded",
+      "Description": {
+        "Bleeding": "Character is bleeding and taking damage over time",
+        "Charmed": "Character is charmed and under magical influence",
+        "Cursed": "Character is under a curse effect",
+        "Dazed": "Character is dazed and confused, actions impaired",
+        "Despair": "Character is in despair, morale and abilities reduced",
+        "Empowered": "Character has enhanced abilities and power",
+        "Focused": "Character is focused, improved accuracy and concentration",
+        "Infected": "Character is infected with a disease",
+        "Invisible": "Character is invisible to others",
+        "Rage": "Character is in a berserk rage, enhanced combat abilities",
+        "Restrained": "Character is bound or restrained, movement restricted",
+        "Silenced": "Character cannot speak or cast verbal spells",
+        "Sleep": "Character is asleep and unconscious",
+        "Stunned": "Character is stunned and cannot take actions",
+        "Unraveled": "Character's magical essence is unraveling, unstable",
+        "Guarded": "Character is in a defensive stance, improved protection",
+        "Unguarded": "Character is vulnerable and exposed to attacks"
+      }
+    },
+    "Settings": {
+      "maxLevel": {
+        "name": "Maximum Level",
+        "hint": "The maximum level actors can reach."
+      },
+      "attributeProgressionType": {
+        "name": "Attribute Progression Type",
+        "hint": "Choose the progression formula for attribute point (AP) costs."
+      },
+      "gameRules": {
+        "title": "Game Rules Settings",
+        "legendLevel": "Level and Progression",
+        "legendAP": "Attribute Points (AP)",
+        "maxLevel": {
+          "name": "Max Level",
+          "hint": "Maximum level actors can reach (30-60, in steps of 5)"
+        },
+        "startingAP": {
+          "name": "Starting AP",
+          "hint": "How many AP characters start with at level 1"
+        },
+
+        "apFormula": {
+          "name": "AP Progression Formula",
+          "hint": "Formula for calculating AP gained from levels",
+          "odd129": "1 AP at odd levels 1-29"
+        },
+        "spFormula": {
+          "name": "SP Progression Formula",
+          "hint": "Formula for calculating SP gained from levels",
+          "2xlevel": "2 SP per level",
+          "level": "1 SP per level"
+        },
+        "resetDefaults": "Reset to Defaults",
+        "saveChanges": "Save Changes"
+      }
+    },
+    "Notifications": {
+      "levelUp": {
+        "success": "Leveled up to {level}! Gained 2 attribute points.",
+        "maxLevelReached": "Cannot level up beyond level {maxLevel}."
+      },
+      "attributes": {
+        "targetLevelHigher": "Target tick level must be higher than current level",
+        "notEnoughPoints": "Not enough attribute points. Need {cost} AP, have {available} AP",
+        "cannotAllocateNegative": "Cannot allocate negative points",
+        "increased": "{attribute} increased to {tick} ticks (Cost: {cost} AP)",
+        "targetLevelLower": "Target tick level must be lower than current level",
+        "cannotGoBelowMinimum": "Cannot go below minimum attribute value",
+        "decreased": "{attribute} decreased to {tick} ticks (Refund: {refund} AP)"
+      }
+    },
+    "Labels": {
+      "attributePoints": "AP",
+      "skillPoints": "SP",
+      "healthPoints": "HP",
+      "willPoints": "WP"
     }
   },
   "TYPES": {
     "Actor": {
-      "summoner": "Summoner",
-      "daemon": "Daemon"
+      "daemon": "Daemon",
+      "summoner": "Summoner"
     },
     "Item": {
-      "gear": "Gear",
-      "feature": "Feature",
-      "spell": "Spell"
+      "ability": "Ability",
+      "item": "Item",
+      "scar": "Scar",
+      "special": "Special",
+      "tag": "Tag",
+      "tactic": "Tactic",
+      "weapon": "Weapon",
+      "schema": "Schema",
+      "feature": "Feature"
     }
   }
 }
