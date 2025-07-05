@@ -10,10 +10,15 @@ export default class DASUItemBase extends foundry.abstract.TypeDataModel {
     // DASU System fields
     schema.dsid = new fields.StringField({ required: true, blank: false });
     schema.category = new fields.StringField({
-      required: false, // Optional since not all item types need categories
+      required: false,
       choices: ABILITY_CATEGORIES,
     });
     schema.description = new fields.StringField({ required: false });
+    // Add traits array for all items
+    schema.traits = new fields.ArrayField(new fields.StringField(), {
+      required: false,
+      initial: [],
+    });
 
     return schema;
   }

@@ -1,4 +1,4 @@
-/* Utility Classes (replaces SASS mixins) */
+/* Element invisible utility class */
 .element-invisible {
   position: absolute;
   width: 1px;
@@ -10,6 +10,28 @@
   overflow: hidden;
 }
 
+/* Hide utility class */
 .hide {
   display: none;
+}
+
+/* Gap utility classes */
+.gap-xs {
+  gap: 0.25rem !important;
+}
+
+.gap-sm {
+  gap: 0.5rem !important;
+}
+
+.gap-md {
+  gap: 1rem !important;
+}
+
+.gap-lg {
+  gap: 1.5rem !important;
+}
+
+.gap-xl {
+  gap: 2rem !important;
 }

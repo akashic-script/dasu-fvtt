@@ -13,7 +13,6 @@ export default class DaemonDataModel extends BaseActorDataModel {
     const createStatSchema = () =>
       new fields.SchemaField({
         current: new fields.NumberField({ required: true, initial: 0, min: 0 }),
-        max: new fields.NumberField({ required: true, initial: 0, min: 0 }),
         spent: new fields.NumberField({ required: true, initial: 0, min: 0 }),
       });
 
@@ -23,46 +22,36 @@ export default class DaemonDataModel extends BaseActorDataModel {
         required: false,
       }),
       archetypes: new fields.SchemaField({
-        id: new fields.StringField({ required: false }),
         name: new fields.StringField({ required: false }),
-        category: new fields.StringField({ required: false }),
         description: new fields.StringField({ required: false }),
         benefits: new fields.StringField({ required: false }),
       }),
       subtypes: new fields.SchemaField({
-        id: new fields.StringField({ required: false }),
         name: new fields.StringField({ required: false }),
-        category: new fields.StringField({ required: false }),
         description: new fields.StringField({ required: false }),
         benefits: new fields.StringField({ required: false }),
       }),
       roles: new fields.ArrayField(
         new fields.SchemaField({
-          id: new fields.StringField({ required: false }),
           name: new fields.StringField({ required: false }),
-          category: new fields.StringField({ required: false }),
           description: new fields.StringField({ required: false }),
         })
-      ),
-      statuses: new fields.SchemaField(
-        {
-          id: new fields.StringField({ required: true }),
-          name: new fields.StringField({ required: true }),
-          category: new fields.StringField({ required: true }),
-          description: new fields.StringField({ required: false }),
-          isNegotiation: new fields.BooleanField({
-            required: false,
-            initial: false,
-          }),
-        },
-        { required: false }
       ),
       hp: createStatSchema(),
       wp: createStatSchema(),
     };
   }
 
-  prepareDerivedData() {
-    this.xp = this.cr * this.cr * 100;
+  prepareDerivedData() {}
+
+  /**
+   * Prepare daemon-specific data (placeholder)
+   * @param {Array} items - Actor's items for filtering
+   */
+  prepareDaemonData(items = []) {
+    // TODO: Implement daemon-specific data preparation logic here
+    // Example: filter items, calculate derived stats, etc.
+    // This is a placeholder for future daemon logic.
+    return {};
   }
 }

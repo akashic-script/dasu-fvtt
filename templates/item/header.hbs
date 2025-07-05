@@ -27,22 +27,11 @@
     
     {{! Weapon-specific fields in header }}
     {{#if (eq item.type 'weapon')}}
-      <div class='grid grid-2col'>
-        <div class='resource'>
-          <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.maxTagSlots.label'}}</label>
-          <input
-            type='text'
-            name='system.maxTagSlots'
-            value='{{system.maxTagSlots}}'
-            data-dtype='Number'
-          />
-        </div>
-        <div class='resource'>
-          <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.range.label'}}</label>
-          <select name='system.range' data-dtype='String'>
-            {{selectOptions rangeTypes selected=system.range}}
-          </select>
-        </div>
+      <div class='resource'>
+        {{!-- <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.range.label'}}</label> --}}
+        <select name='system.range' data-dtype='String'>
+          {{selectOptions rangeTypes selected=system.range}}
+        </select>
       </div>
     {{/if}}
   </div>

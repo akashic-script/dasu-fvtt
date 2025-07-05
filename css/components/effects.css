@@ -1,5 +1,10 @@
-/* Effects Styles */
-/* Section Header */
+/* =========================
+   Effect Styles
+   ========================= */
+
+/* =========================
+   Section Header
+   ========================= */
 .effects-header {
   height: 28px;
   margin: 2px 0;
@@ -22,10 +27,9 @@
   display: flex;
 }
 
-/* -----------------------------------------
-   Effects Lists
-   ----------------------------------------- */
-
+/* =========================
+   Effects List
+   ========================= */
 .effects-list {
   list-style: none;
   margin: 0;
@@ -60,7 +64,9 @@
   overflow-x: hidden;
 }
 
-/* Control Buttons */
+/* =========================
+   Control Buttons
+   ========================= */
 .effects-list .effect-controls {
   display: flex;
   flex: 0 0 100px;
@@ -73,7 +79,9 @@
   margin: 0 6px;
 }
 
-/* Individual Effect */
+/* =========================
+   Individual Effect
+   ========================= */
 .effects-list .effect {
   align-items: center;
   padding: 0 2px; /* to align with the header border */
@@ -103,7 +111,9 @@
   font-size: 12px;
 }
 
-/* Section Header */
+/* =========================
+   Section Header
+   ========================= */
 .effects-list .effects-header {
   height: 28px;
   margin: 2px 0;
@@ -122,12 +132,6 @@
 .effects-list .effects-header .effect-name {
   padding-left: 5px;
   text-align: left;
-}
-
-/* Example style for DASU (can be removed if not needed) */
-.effect-formula {
-  flex: 0 0 200px;
-  padding: 0 8px;
 }
 
 .effects .item .effect-source,

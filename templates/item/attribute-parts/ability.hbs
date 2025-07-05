@@ -1,8 +1,13 @@
 {{! Ability Attributes Tab }}
 <section class='tab attributes-ability scrollable {{tab.cssClass}}' data-group='primary' data-tab='attributes'>
-  
+  {{!-- Only ability-specific fields and description below. No schema progression or level input. --}}
   {{#if (eq system.category "spell")}}
     {{! Spell Template }}
+    <div class='section-header'>
+      <h3>Spell Statistics</h3>
+      <p class='section-description'>Configure the magical properties and requirements of this spell.</p>
+    </div>
+    
     <div class='grid grid-2col'>
       <div class='resource'>
         <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.damage.value.label'}}</label>
@@ -16,7 +21,9 @@
       <div class='resource'>
         <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.damage.type.label'}}</label>
         <select name='system.damage.type' data-dtype='String'>
-          {{selectOptions damageTypes selected=system.damage.type}}
+          {{#each damageTypes as |label value|}}
+            <option value="{{value}}" {{#if (eq ../system.damage.type value)}}selected{{/if}}>{{localize label}}</option>
+          {{/each}}
         </select>
       </div>
     </div>
@@ -36,8 +43,7 @@
       <div class='resource'>
         <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.costType.label'}}</label>
         <select name='system.costType' data-dtype='String'>
-          <option value='wp' {{#if (eq system.costType "wp")}}selected{{/if}}>WP</option>
-          <option value='hp' {{#if (eq system.costType "hp")}}selected{{/if}}>HP</option>
+          {{selectOptions costTypeOptions selected=system.costType localize=true}}
         </select>
       </div>
     </div>
@@ -78,6 +84,11 @@
 
   {{#if (eq system.category "affliction")}}
     {{! Affliction Template }}
+    <div class='section-header'>
+      <h3>Affliction Statistics</h3>
+      <p class='section-description'>Configure the debilitating effects and requirements of this affliction.</p>
+    </div>
+    
     <div class='grid grid-2col'>
       <div class='resource'>
         <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.cost.label'}}</label>
@@ -91,8 +102,7 @@
       <div class='resource'>
         <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.costType.label'}}</label>
         <select name='system.costType' data-dtype='String'>
-          <option value='wp' {{#if (eq system.costType "wp")}}selected{{/if}}>WP</option>
-          <option value='hp' {{#if (eq system.costType "hp")}}selected{{/if}}>HP</option>
+          {{selectOptions costTypeOptions selected=system.costType localize=true}}
         </select>
       </div>
     </div>
@@ -144,6 +154,11 @@
 
   {{#if (eq system.category "restorative")}}
     {{! Restorative Template }}
+    <div class='section-header'>
+      <h3>Restorative Statistics</h3>
+      <p class='section-description'>Configure the healing properties and requirements of this restorative ability.</p>
+    </div>
+    
     <div class='grid grid-2col'>
       <div class='resource'>
         <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.healed.value.label'}}</label>
@@ -157,10 +172,7 @@
       <div class='resource'>
         <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.healed.type.label'}}</label>
         <select name='system.healed.type' data-dtype='String'>
-          <option value='hp' {{#if (eq system.healed.type "hp")}}selected{{/if}}>HP</option>
-          <option value='wp' {{#if (eq system.healed.type "wp")}}selected{{/if}}>WP</option>
-          <option value='both' {{#if (eq system.healed.type "both")}}selected{{/if}}>Both</option>
-          <option value='status' {{#if (eq system.healed.type "status")}}selected{{/if}}>Status</option>
+          {{selectOptions healTypeOptions selected=system.healed.type localize=true}}
         </select>
       </div>
     </div>
@@ -180,8 +192,7 @@
       <div class='resource'>
         <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.costType.label'}}</label>
         <select name='system.costType' data-dtype='String'>
-          <option value='wp' {{#if (eq system.costType "wp")}}selected{{/if}}>WP</option>
-          <option value='hp' {{#if (eq system.costType "hp")}}selected{{/if}}>HP</option>
+          {{selectOptions costTypeOptions selected=system.costType localize=true}}
         </select>
       </div>
     </div>
@@ -209,6 +220,11 @@
 
   {{#if (eq system.category "technique")}}
     {{! Technique Template }}
+    <div class='section-header'>
+      <h3>Technique Statistics</h3>
+      <p class='section-description'>Configure the combat properties and requirements of this technique.</p>
+    </div>
+    
     <div class='grid grid-2col'>
       <div class='resource'>
         <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.damage.value.label'}}</label>
@@ -222,7 +238,9 @@
       <div class='resource'>
         <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.damage.type.label'}}</label>
         <select name='system.damage.type' data-dtype='String'>
-          {{selectOptions damageTypes selected=system.damage.type}}
+          {{#each damageTypes as |label value|}}
+            <option value="{{value}}" {{#if (eq ../system.damage.type value)}}selected{{/if}}>{{localize label}}</option>
+          {{/each}}
         </select>
       </div>
     </div>
@@ -242,8 +260,7 @@
       <div class='resource'>
         <label class='resource-label'>{{localize 'DASU.Item.Ability.FIELDS.costType.label'}}</label>
         <select name='system.costType' data-dtype='String'>
-          <option value='wp' {{#if (eq system.costType "wp")}}selected{{/if}}>WP</option>
-          <option value='hp' {{#if (eq system.costType "hp")}}selected{{/if}}>HP</option>
+          {{selectOptions costTypeOptions selected=system.costType localize=true}}
         </select>
       </div>
     </div>
@@ -284,9 +301,11 @@
 
   {{! ProseMirror Description Section }}
   <div class='separator'></div>
-  <div class='field-header'>
-    <h4>{{localize 'DASU.Item.Ability.FIELDS.description.label'}}</h4>
+  <div class='section-header'>
+    <h3>{{localize 'DASU.Item.Ability.FIELDS.description.label'}}</h3>
+    <p class='section-description'>Describe the ability's effects, requirements, or special properties.</p>
   </div>
+  
   {{#if editable}} 
     <prose-mirror name="system.description" data-document-uuid="{{item.uuid}}" value="{{system.description}}" collaborate="true" toggled="true">
       {{{enrichedDescription}}}

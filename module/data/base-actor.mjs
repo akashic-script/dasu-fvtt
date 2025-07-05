@@ -29,7 +29,10 @@ export default class BaseActorDataModel extends foundry.abstract.TypeDataModel {
       stats: SharedActorComponents.getStatsSchema(),
       resistances: SharedActorComponents.getResistancesSchema(),
       aptitudes: SharedActorComponents.getAptitudesSchema(),
-      attributePoints: SharedActorComponents.getAttributePointsSchema(),
+      biography: new fields.HTMLField({
+        required: false,
+        initial: '',
+      }),
     };
   }
 }

@@ -4,22 +4,22 @@
   data-group='primary'
   data-tab='effects'
 >
-  <ol class='effects-list'>
+  <ol class='items-list'>
     {{#each effects as |section sid|}}
       <li
-        class='effects-header flexrow draggable'
+        class='item flexrow items-header'
         data-effect-type='{{section.type}}'
       >
-        <div class='effect-name flexrow'>
+        <div class='item-name flexrow'>
           {{localize section.label}}
         </div>
         <div class='effect-source'>
           {{localize 'DASU.Effect.Source'}}
         </div>
-        <div class='effect-source'>{{localize 'EFFECT.TABS.duration'}}</div>
-        <div class='effect-controls flexrow'>
+        <div class='effect-source'>{{localize 'DASU.Effect.Duration'}}</div>
+        <div class='item-controls flexrow'>
           <a
-            class='effect-control'
+            class='item-control effect-control'
             data-action='createDoc'
             data-document-class='ActiveEffect'
             data-origin="{{@root.actor.uuid}}"
@@ -29,32 +29,37 @@
             {{else if (eq section.type "temporary")}}
               data-duration.rounds="1"
             {{/if}}
-            data-tooltip='{{localize "DOCUMENT.Create" type='Effect'}}'
+            data-tooltip='{{localize "DOCUMENT.Create" type="Effect"}}'
           >
             <i class='fas fa-plus'></i>
-            {{localize 'DOCUMENT.New' type='Effect'}}
+            {{localize 'DOCUMENT.New' type="Effect"}}
           </a>
         </div>
       </li>
-
-      <ol class='effect-list'>
+      <div class='item-list effect-list'>
         {{#each section.effects as |effect|}}
+          {{!-- Hide tag self-transfer effects: if effect is transfer:true, parent is tag, and actor owns the tag, skip --}}
+          {{#unless (and effect.transfer (eq effect.parent.type "tag") (eq effect.parent.actor.id @root.actor.id))}}
           <li
-            class='effect effect flexrow draggable'
+            class='item effect flexrow draggable'
             data-effect-id='{{effect.id}}'
             data-parent-id='{{effect.parent.id}}'
             data-document-class='ActiveEffect'
           >
-            <div class='effect-name flexrow'>
+            <div class='item-name flexrow'>
               <img class='effect-image' src='{{effect.img}}' height="24" width="24"/>
-              <div>{{effect.name}}</div>
+              <div>{{effect.name}}
+                {{#if effect.transfer}}
+                  <i class="fas fa-share-square" style="color:#a3f" data-tooltip="{{localize 'DASU.Effect.TransferredFromItem'}}"></i>
+                {{/if}}
+              </div>
             </div>
             <div class='effect-source'>{{effect.sourceName}}</div>
             <div class='effect-duration'>{{effect.duration.label}}</div>
-            <div class='effect-controls flexrow'>
+            <div class='item-controls flexrow'>
               {{#if @root.editable}}
               <a
-                class='effect-control'
+                class='item-control effect-control'
                 data-action='toggleEffect'
                 data-tooltip='{{localize "DASU.Effect.Toggle"}}'
               >
@@ -62,25 +67,26 @@
               </a>
               {{/if}}
               <a
-                class='effect-control'
+                class='item-control effect-control'
                 data-action='viewDoc'
-                data-tooltip='{{localize "DOCUMENT.Update" type='Effect'}}'
+                data-tooltip='{{localize "DOCUMENT.Update" type="Effect"}}'
               >
                 <i class='fas fa-edit'></i>
               </a>
               {{#if @root.editable}}
               <a
-                class='effect-control'
+                class='item-control effect-control'
                 data-action='deleteDoc'
-                data-tooltip='{{localize "DOCUMENT.Delete" type='Effect'}}'
+                data-tooltip='{{localize "DOCUMENT.Delete" type="Effect"}}'
               >
                 <i class='fas fa-trash'></i>
               </a>
               {{/if}}
             </div>
           </li>
+          {{/unless}}
         {{/each}}
-      </ol>
+      </div>
     {{/each}}
   </ol>
 </section>

@@ -1,4 +1,6 @@
-/* Resource Styles */
+/* =========================
+   Resource Styles
+   ========================= */
 .resource-label {
   font-weight: bold;
 }
@@ -8,7 +10,9 @@
   flex: 0 0 44px;
 }
 
-/* DASU Attributes */
+/* =========================
+   Attributes
+   ========================= */
 .attributes.grid {
   gap: 0;
 }
@@ -45,26 +49,63 @@
 }
 
 .attribute {
-  padding: 0.25rem;
+  padding: 0 0.15rem;
   border: 1px solid var(--color-border);
 }
 
-.attribute-values {
-  flex: 1;
-  gap: 0.5rem;
+.attribute-header {
+  display: flex;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  min-width: 0;
+  gap: 1em;
 }
 
-.attribute-labels {
-  gap: 0.5rem;
-  align-items: center;
-  margin-bottom: 0.25rem;
-}
-
-.attribute-base {
-  flex: 0 0 36px;
-  text-align: center;
+.attribute-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
   font-weight: bold;
+}
+
+.attribute-abbr {
+  font-size: 0.9em;
+  font-weight: normal;
+  color: var(--color-text-secondary);
+  margin-left: 0.25em;
+}
+
+.attribute-value {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.attribute-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.attribute-key {
+  flex: 0 0 auto;
+  text-align: left;
+}
+
+.attribute-values {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .attribute-mod-label {
@@ -73,13 +114,9 @@
   margin: 0 0.25rem;
 }
 
-.attribute-key {
-  font-size: 1.1em;
-  font-weight: bold;
-}
-
-/* ===== COMPACT DAEMON LAYOUT ===== */
-
+/* =========================
+   Compact Daemon Layout
+   ========================= */
 .attributes-compact {
   margin-bottom: 0.5rem;
 }
@@ -138,40 +175,12 @@
   justify-content: center;
 }
 
-.attribute-labels-compact {
-  gap: 0.25rem;
-  align-items: center;
-  margin-bottom: 0.25rem;
-}
-
-.attribute-base-compact {
-  flex: 0 0 32px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 0.9em;
-  padding: 0.1rem;
-}
-
-.attribute-label-compact,
-.attribute-label {
-  flex: 0 0 auto;
-  font-weight: bold;
-  margin: 0 0.25rem;
-  font-size: 0.9em;
-}
-
-.attribute-label {
-  font-size: 1em;
-}
-
 /* View mode label styles */
-.attribute-base-compact-label,
-.attribute-base-label,
 .ability-score-label {
   display: inline-block;
   background: transparent;
   border: 1px solid var(--color-border);
-  border-radius: 3px;
+  border-radius: 0;
   color: var(--color-text-primary);
   font-weight: bold;
   text-align: center;
@@ -183,27 +192,20 @@
   vertical-align: middle;
 }
 
-.attribute-base-compact-label {
-  padding: 0.1rem;
-  min-width: 1.5rem;
-  min-height: 1.2rem;
-  font-size: 0.9em;
-}
-
-/* ===== SKILLS SECTION ===== */
-
+/* =========================
+   Skill Section
+   ========================= */
 .skills-section {
-  padding: 0.5rem;
   border: 1px solid var(--color-border);
 }
 
 .skill-points {
-  padding: 0.5rem;
+  padding: 0.35rem;
   border: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   white-space: nowrap;
-  min-height: 2rem;
+  min-height: 1.75rem;
 }
 
 .skill-points .resource-label {
@@ -222,11 +224,11 @@
 }
 
 .skills {
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
 .skill {
-  padding: 0.5rem;
+  padding: 0.35rem;
   border: 1px solid var(--color-border);
   min-height: auto;
 }
@@ -245,7 +247,10 @@
 }
 
 .skill-gap {
-  height: 0.25rem;
+  height: 0.1rem;
+  background: var(--dasu-c-faint);
+  border-radius: 0;
+  margin: 0.35rem 0;
 }
 
 .skill-ticks {
@@ -253,7 +258,9 @@
   gap: 0.25rem;
 }
 
-/* Custom radio button styling with box overlays */
+/* =========================
+   Skill Radio
+   ========================= */
 .skill-tick-radio {
   position: relative !important;
   width: 1.5rem !important;
@@ -352,119 +359,9 @@
   opacity: 1 !important;
 }
 
-/* ===== INPUT STYLES ===== */
-
-/* Override Foundry's input styles for DASU sheets only */
-.dasu.actor input[type='text'],
-.dasu.actor input[type='number'],
-.dasu.actor input[type='password'],
-.dasu.actor input[type='email'],
-.dasu.actor input[type='url'],
-.dasu.actor input[type='search'],
-.dasu.actor input[type='tel'],
-.dasu.actor textarea,
-.dasu.actor select,
-.dasu.item input[type='text'],
-.dasu.item input[type='number'],
-.dasu.item input[type='password'],
-.dasu.item input[type='email'],
-.dasu.item input[type='url'],
-.dasu.item input[type='search'],
-.dasu.item input[type='tel'],
-.dasu.item textarea,
-.dasu.item select {
-  background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: 0;
-  color: var(--color-text-primary);
-  font-family: inherit;
-  font-size: inherit;
-  padding: 0.25rem;
-  margin: 0;
-  box-shadow: none;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.dasu.actor input[type='text']:focus,
-.dasu.actor input[type='number']:focus,
-.dasu.actor input[type='password']:focus,
-.dasu.actor input[type='email']:focus,
-.dasu.actor input[type='url']:focus,
-.dasu.actor input[type='search']:focus,
-.dasu.actor input[type='tel']:focus,
-.dasu.actor textarea:focus,
-.dasu.actor select:focus,
-.dasu.item input[type='text']:focus,
-.dasu.item input[type='number']:focus,
-.dasu.item input[type='password']:focus,
-.dasu.item input[type='email']:focus,
-.dasu.item input[type='url']:focus,
-.dasu.item input[type='search']:focus,
-.dasu.item input[type='tel']:focus,
-.dasu.item textarea:focus,
-.dasu.item select:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 3px var(--color-primary);
-}
-
-.dasu.actor input[type='text']:hover,
-.dasu.actor input[type='number']:hover,
-.dasu.actor input[type='password']:hover,
-.dasu.actor input[type='email']:hover,
-.dasu.actor input[type='url']:hover,
-.dasu.actor input[type='search']:hover,
-.dasu.actor input[type='tel']:hover,
-.dasu.actor textarea:hover,
-.dasu.actor select:hover,
-.dasu.item input[type='text']:hover,
-.dasu.item input[type='number']:hover,
-.dasu.item input[type='password']:hover,
-.dasu.item input[type='email']:hover,
-.dasu.item input[type='url']:hover,
-.dasu.item input[type='search']:hover,
-.dasu.item input[type='tel']:hover,
-.dasu.item textarea:hover,
-.dasu.item select:hover {
-  border-color: var(--color-primary);
-}
-
-/* Make input fields match label styling - specific to DASU sheets */
-.dasu.actor .attribute-base,
-.dasu.actor .attribute-base-compact,
-.dasu.item .attribute-base,
-.dasu.item .attribute-base-compact {
-  background: transparent !important;
-  border: 1px solid var(--color-border) !important;
-  border-radius: 0 !important;
-  color: var(--color-text-primary) !important;
-  font-weight: bold !important;
-  text-align: center !important;
-  padding: 0.25rem !important;
-  margin: 0 !important;
-  box-shadow: none !important;
-  outline: none !important;
-  transition: border-color 0.2s ease !important;
-}
-
-.dasu.actor .attribute-base:focus,
-.dasu.actor .attribute-base-compact:focus,
-.dasu.item .attribute-base:focus,
-.dasu.item .attribute-base-compact:focus {
-  border-color: var(--color-primary) !important;
-  box-shadow: 0 0 3px var(--color-primary) !important;
-}
-
-.dasu.actor .attribute-base:hover,
-.dasu.actor .attribute-base-compact:hover,
-.dasu.item .attribute-base:hover,
-.dasu.item .attribute-base-compact:hover {
-  border-color: var(--color-primary) !important;
-}
-
-/* ===== TICK BUTTON STYLES ===== */
-
-/* Tick button variant with yellow-500-like text color */
+/* =========================
+   Tick Button Styles
+   ========================= */
 .tick-button {
   display: inline-block;
   flex: 0 0 32px;
@@ -532,15 +429,132 @@
 }
 
 .attribute-points-display {
+  background: var(--color-bg-primary);
   border: 1px solid var(--color-border);
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.4rem;
   align-items: center;
-  min-height: 1.5rem;
+  min-height: 1.4rem;
 }
 
 .skill-points-display {
+  background: var(--color-bg-primary);
   border: 1px solid var(--color-border);
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.4rem;
   align-items: center;
-  min-height: 1.5rem;
+  min-height: 1.4rem;
+}
+
+/* =========================
+   Attribute Controls
+   ========================= */
+.attribute-controls {
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.attribute-decrease,
+.attribute-increase {
+  flex: 0 0 24px;
+  height: 24px;
+  padding: 0;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-primary);
+  font-size: 0.8em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.attribute-decrease:hover:not(:disabled),
+.attribute-increase:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.attribute-decrease:disabled,
+.attribute-increase:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+}
+
+.attribute-cost-info {
+  flex: 1;
+  text-align: center;
+  font-size: 0.75em;
+  color: var(--color-text-secondary);
+  font-weight: normal;
+  padding: 0 0.3rem;
+}
+
+/* =========================
+   Level Up Button
+   ========================= */
+.leveling-wizard-btn {
+  flex: 0 0 24px;
+  height: 24px;
+  padding: 0;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-primary);
+  font-size: 0.8em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin-left: 0.25rem;
+}
+
+.leveling-wizard-btn:hover {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.attribute-abbr-block {
+  display: block;
+  font-size: 0.75em;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  margin-top: 0.1em;
+  letter-spacing: 0.04em;
+  text-align: left;
+}
+
+.attribute-separator {
+  flex: 1 1 auto;
+  width: auto;
+  height: 0px;
+  background: var(--color-primary, #7c3aed);
+  border: none;
+  margin: 0 0.25em;
+  align-self: center;
+}
+
+.profile-img {
+  cursor: pointer;
+  border: 3px solid var(--dasu-c-faint);
+  box-shadow: 0 0 0 4px var(--color-bg-secondary), 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  background: var(--color-bg-primary);
+  padding: 2px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.profile-img:hover {
+  border-color: var(--dasu-c-beige);
+  box-shadow: 0 0 0 6px var(--color-bg-secondary),
+    0 4px 16px rgba(0, 0, 0, 0.18);
 }

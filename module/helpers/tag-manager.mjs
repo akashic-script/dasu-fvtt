@@ -8,9 +8,10 @@ export class TagManager {
       name: data.name,
       type: 'tag',
       system: {
-        maxRank: data.maxRank || 1,
         description: data.description || '',
-        effects: data.effects || [],
+        rank: data.rank || 1,
+        maxRank: data.maxRank || 1,
+        price: data.price || 0,
       },
     };
     return await Item.create(tagData);

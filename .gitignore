@@ -119,4 +119,7 @@ Logs/
 *.sqlite3
 *.db-journal
 *.db-wal
-*.db-shm 
+*.db-shm
+
+# Future DASU Documentation
+docs/

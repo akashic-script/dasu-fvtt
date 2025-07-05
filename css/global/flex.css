@@ -7,6 +7,8 @@
   text-align: center;
 }
 
+/* UNUSED: Flex group utilities - not used in templates */
+/*
 .flex-group-left {
   justify-content: flex-start;
   text-align: left;
@@ -16,10 +18,14 @@
   justify-content: flex-end;
   text-align: right;
 }
+*/
 
+/* UNUSED: Flex shrink utility - not used in templates */
+/*
 .flexshrink {
   flex: 0;
 }
+*/
 
 .flex-between {
   justify-content: space-between;
@@ -35,10 +41,13 @@
   text-align: left;
 }
 
+/* UNUSED: Align right utility - not used in templates */
+/*
 .align-right {
   justify-content: flex-end;
   text-align: right;
 }
+*/
 
 .align-center {
   justify-content: center;

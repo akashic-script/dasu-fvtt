@@ -39,6 +39,12 @@
       },
       "scar": {
         "htmlFields": ["description"]
+      },
+      "schema": {
+        "htmlFields": ["description"]
+      },
+      "feature": {
+        "htmlFields": ["description"]
       }
     }
   },
@@ -86,6 +92,6 @@
     "units": "ft",
     "diagonals": 0
   },
-  "primaryTokenAttribute": "hp",
-  "secondaryTokenAttribute": "wp"
+  "primaryTokenAttribute": "system.stats.hp",
+  "secondaryTokenAttribute": "system.stats.wp"
 }

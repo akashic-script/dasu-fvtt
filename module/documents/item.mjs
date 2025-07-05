@@ -5,6 +5,15 @@ import { slugify } from '../utils/slugify.mjs';
  * @extends {Item}
  */
 export class DASUItem extends Item {
+  constructor(data, context) {
+    super(data, context);
+
+    // Ensure tag slots exist for weapons
+    if (this.type === 'weapon') {
+      this._initializeTagSlots();
+    }
+  }
+
   /**
    * Augment the basic Item data model with additional dynamic data.
    */
@@ -14,7 +23,7 @@ export class DASUItem extends Item {
     super.prepareData();
 
     if (this.type === 'weapon') {
-      this._ensureTagSlots();
+      this._initializeTagSlots();
     }
   }
 
@@ -32,7 +41,13 @@ export class DASUItem extends Item {
 
     // Set category for ability items since they require subcategorization
     if (data.type === 'ability' && !data.system.category) {
-      data.system.category = globalThis.DASU.ABILITY_CATEGORIES[0]; // Use first category from config
+      const abilityCategories = globalThis.DASU?.ABILITY_CATEGORIES || [
+        'spell',
+        'affliction',
+        'restorative',
+        'technique',
+      ];
+      data.system.category = abilityCategories[0]; // Use first category from config
     }
   }
 
@@ -47,7 +62,7 @@ export class DASUItem extends Item {
     }
 
     // Handle ability category changes
-    if (this.type === 'ability' && changed.system?.category) {
+    if (changed.system?.category !== undefined) {
       await this._handleAbilityCategoryChange(changed);
     }
   }
@@ -63,14 +78,14 @@ export class DASUItem extends Item {
     if (oldCategory === newCategory) return;
 
     // Define which fields are compatible between categories (shared across all ability types)
-    const compatibleFields = ['damage', 'cost', 'toHit', 'effect'];
+    const compatibleFields = ['damage', 'cost', 'toHit', 'aptitudes'];
 
     // Define category-specific fields that should be removed when switching away from that category
     const categorySpecificFields = {
-      technique: ['effect'], // effect is shared, so won't be removed
-      spell: ['aptitudes'],
-      affliction: ['effect'], // effect is shared, so won't be removed
-      restorative: ['healAmount', 'healType', 'effect'], // effect is shared, so won't be removed
+      technique: [],
+      spell: [],
+      affliction: [],
+      restorative: ['healAmount', 'healType'],
     };
 
     // Get fields that should be removed for the new category
@@ -123,107 +138,201 @@ export class DASUItem extends Item {
     }
   }
 
-  _ensureTagSlots() {
-    const slots = this.system.tagSlots || {};
-    const maxSlots = this.system.maxTagSlots;
-    const currentSlots = Object.keys(slots).length;
-
-    if (currentSlots < maxSlots) {
-      const updates = {};
-      for (let i = currentSlots; i < maxSlots; i++) {
-        updates[`system.tagSlots.slot${i + 1}`] = { tagId: null, rank: 1 };
+  _initializeTagSlots() {
+    const maxSlots = this.system.maxTagSlots ?? 2;
+    if (!this.system.tagSlots || typeof this.system.tagSlots !== 'object') {
+      this.system.tagSlots = {};
+    }
+    // Add missing slots
+    for (let i = 1; i <= maxSlots; i++) {
+      const key = `slot${i}`;
+      if (!this.system.tagSlots[key]) {
+        this.system.tagSlots[key] = {
+          tagId: null,
+          tagName: null,
+          tagUuid: null,
+          rank: { current: 1, max: 1 },
+        };
       }
-      if (Object.keys(updates).length > 0 && this.id) {
-        this.update(updates, { diff: false });
+    }
+    // Remove extra slots
+    for (const key of Object.keys(this.system.tagSlots)) {
+      if (
+        !/^slot\d+$/.test(key) ||
+        parseInt(key.replace('slot', '')) > maxSlots
+      ) {
+        delete this.system.tagSlots[key];
       }
     }
   }
 
-  async addTag(tagId, rank = 1) {
-    const tag = game.items.get(tagId);
+  async addTag(tagId) {
+    const tag = this.actor ? this.actor.items.get(tagId) : null;
     if (!tag || tag.type !== 'tag') {
-      ui.notifications.error('Invalid tag');
+      ui.notifications.error(
+        'Invalid tag or tag not found in character inventory'
+      );
       return false;
     }
-
     const availableSlot = this.getAvailableSlot();
     if (!availableSlot) {
       ui.notifications.error('No available slots');
       return false;
     }
-
-    const validRank = Math.max(1, Math.min(tag.system.maxRank, rank));
     await this.update({
       [`system.tagSlots.${availableSlot}.tagId`]: tagId,
-      [`system.tagSlots.${availableSlot}.rank`]: validRank,
     });
-
     ui.notifications.info(`Added ${tag.name} to weapon`);
     return true;
   }
 
-  async removeTag(slotKey) {
+  async addTagToSlot(tagId, slotKey) {
+    const tag = this.actor ? this.actor.items.get(tagId) : null;
+    if (!tag || tag.type !== 'tag') {
+      ui.notifications.error(
+        'Invalid tag or tag not found in character inventory'
+      );
+      return false;
+    }
+    const slot = this.system.tagSlots?.[slotKey];
+    if (!slot) {
+      ui.notifications.error('Invalid slot');
+      return false;
+    }
+    if (slot.tagId) {
+      ui.notifications.error('Slot is already occupied');
+      return false;
+    }
+    // Prevent equipping the same tag in multiple slots
+    const tagSlots = this.system.tagSlots || {};
+    const isAlreadyEquipped = Object.entries(tagSlots).some(
+      ([key, slotData]) => key !== slotKey && slotData.tagId === tagId
+    );
+    if (isAlreadyEquipped) {
+      ui.notifications.error('This tag is already equipped in another slot');
+      return false;
+    }
+    // Pull rank info from tag
+    const tagRank = tag.system.rank || { current: 1, max: 1 };
     await this.update({
-      [`system.tagSlots.${slotKey}.tagId`]: null,
-      [`system.tagSlots.${slotKey}.rank`]: 1,
+      [`system.tagSlots.${slotKey}.tagId`]: tagId,
+      [`system.tagSlots.${slotKey}.tagUuid`]: tag.uuid,
+      [`system.tagSlots.${slotKey}.tagName`]: tag.name,
+      [`system.tagSlots.${slotKey}.rank`]: {
+        current: tagRank.current,
+        max: tagRank.max,
+      },
     });
-    ui.notifications.info('Tag removed');
+    // Apply tag's Active Effects
+    await this._applyTagActiveEffects(tagId);
+    if (this.actor) {
+      this.actor.sheet?.render(false);
+      Object.values(ui.windows).forEach((app) => {
+        if (
+          app.actor &&
+          app.actor.id === this.actor.id &&
+          app.document?.type === 'Actor'
+        ) {
+          app.render(false);
+        }
+      });
+    }
+    ui.notifications.info(
+      `Added ${tag.name} to slot ${slotKey.replace('slot', '')}`
+    );
     return true;
   }
 
-  async updateTagRank(slotKey, newRank) {
-    const slot = this.system.tagSlots[slotKey];
-    if (!slot?.tagId) return false;
-
-    const tag = game.items.get(slot.tagId);
-    const validRank = Math.max(1, Math.min(tag.system.maxRank, newRank));
-
+  async removeTag(slotKey) {
+    const slot = this.system.tagSlots?.[slotKey];
+    const tagId = slot?.tagId;
+    const tagName = slot?.tagName || 'Unknown Tag';
     await this.update({
-      [`system.tagSlots.${slotKey}.rank`]: validRank,
+      [`system.tagSlots.${slotKey}.tagId`]: null,
+      [`system.tagSlots.${slotKey}.tagName`]: null,
+      [`system.tagSlots.${slotKey}.tagUuid`]: null,
+      [`system.tagSlots.${slotKey}.rank`]: { current: 1, max: 1 },
     });
+    // Remove tag's Active Effects
+    if (tagId) await this._removeTagActiveEffects(tagId);
+    if (this.actor) {
+      this.actor.sheet?.render(false);
+      Object.values(ui.windows).forEach((app) => {
+        if (
+          app.actor &&
+          app.actor.id === this.actor.id &&
+          app.document?.type === 'Actor'
+        ) {
+          app.render(false);
+        }
+      });
+    }
+    ui.notifications.info(
+      `Removed ${tagName} from slot ${slotKey.replace('slot', '')}`
+    );
+    return true;
+  }
+
+  // Apply all Active Effects from the tag item to the weapon only
+  async _applyTagActiveEffects(tagId) {
+    const tag = this.actor ? this.actor.items.get(tagId) : null;
+    if (!tag) return;
+    for (const effect of tag.effects.contents) {
+      const effectData = effect.toObject();
+      effectData.flags = effectData.flags || {};
+      effectData.flags.dasu = {
+        ...(effectData.flags.dasu || {}),
+        sourceTag: tag.id,
+      };
+      // Always create on the weapon only; Foundry will handle transfer
+      await this.createEmbeddedDocuments('ActiveEffect', [effectData]);
+    }
+  }
+
+  // Remove all Active Effects from the weapon that originated from the tag
+  async _removeTagActiveEffects(tagId) {
+    // Remove effects from item only
+    const itemEffects = this.effects.filter(
+      (e) => e.flags?.dasu?.sourceTag === tagId
+    );
+    for (const effect of itemEffects) await effect.delete();
+  }
+
+  async updateTagRank(slotKey, newRank) {
+    const slot = this.system.tagSlots?.[slotKey];
+    if (!slot || !slot.tagId) return false;
+    const tag = this.actor ? this.actor.items.get(slot.tagId) : null;
+    if (!tag) return false;
+    const maxRank = tag.system.rank?.max || 1;
+    const rank = Math.max(1, Math.min(newRank, maxRank));
+    await this.update({ [`system.tagSlots.${slotKey}.rank.current`]: rank });
+    // TODO: Re-apply tag effects for new rank
     return true;
   }
 
   getAvailableSlot() {
     const slots = this.system.tagSlots || {};
-    return Object.keys(slots).find((key) => !slots[key].tagId) || null;
+    // Dynamically find the first open slot
+    for (const [slotKey, slot] of Object.entries(slots)) {
+      if (!slot.tagId) {
+        return slotKey;
+      }
+    }
+    return null;
   }
 
   getEquippedTags() {
     const slots = this.system.tagSlots || {};
     const tags = [];
-
     for (const [slotKey, slot] of Object.entries(slots)) {
       if (slot.tagId) {
-        const tag = game.items.get(slot.tagId);
+        const tag = this.actor ? this.actor.items.get(slot.tagId) : null;
         if (tag) {
-          tags.push({
-            slotKey,
-            tag,
-            rank: slot.rank,
-            effects: this._calculateTagEffects(tag, slot.rank),
-          });
+          tags.push({ slotKey, tag, rank: slot.rank });
         }
       }
     }
     return tags;
-  }
-
-  _calculateTagEffects(tag, rank) {
-    return tag.system.effects.map((effect) => ({
-      ...effect,
-      calculatedValue: this._scaleEffectValue(effect.value, rank),
-    }));
-  }
-
-  _scaleEffectValue(value, rank) {
-    const match = value.match(/([+-])(\d+)/);
-    if (match) {
-      const sign = match[1];
-      const base = parseInt(match[2]);
-      return `${sign}${base * rank}`;
-    }
-    return value;
   }
 
   getCalculatedStats() {
@@ -231,21 +340,7 @@ export class DASUItem extends Item {
       damage: this.system.damage,
       toHit: this.system.toHit,
     };
-
-    const tags = this.getEquippedTags();
-
-    for (const tagData of tags) {
-      for (const effect of tagData.effects) {
-        if (effect.type === 'damage_bonus') {
-          base.damage +=
-            parseInt(effect.calculatedValue.replace(/[+-]/, '')) || 0;
-        }
-        if (effect.type === 'accuracy_bonus') {
-          base.toHit +=
-            parseInt(effect.calculatedValue.replace(/[+-]/, '')) || 0;
-        }
-      }
-    }
+    // No tag effects to apply
     return base;
   }
 
@@ -305,4 +400,98 @@ export class DASUItem extends Item {
       return roll;
     }
   }
+
+  async clearInvalidTags() {
+    const tagSlots = this.system.tagSlots || {};
+    const updates = {};
+    let clearedCount = 0;
+    for (const [slotKey, slot] of Object.entries(tagSlots)) {
+      if (slot.tagId) {
+        const tag = this.actor ? this.actor.items.get(slot.tagId) : null;
+        if (!tag || tag.type !== 'tag') {
+          updates[`system.tagSlots.${slotKey}.tagId`] = null;
+          updates[`system.tagSlots.${slotKey}.tagName`] = null;
+          updates[`system.tagSlots.${slotKey}.tagUuid`] = null;
+          updates[`system.tagSlots.${slotKey}.rank`] = { current: 1, max: 1 };
+          clearedCount++;
+        }
+      }
+    }
+    if (Object.keys(updates).length > 0) {
+      await this.update(updates, { diff: false });
+    }
+    return clearedCount;
+  }
+
+  /**
+   * Re-sync all tag effects for each slotted tag, removing and re-applying only enabled effects.
+   */
+  async resyncTagEffects() {
+    if (!this.system?.tagSlots) return;
+    for (const [slotKey, slot] of Object.entries(this.system.tagSlots)) {
+      if (!slot.tagId) continue;
+      // Remove all effects from this tag (on weapon only)
+      await this._removeTagActiveEffects(slot.tagId);
+      // Get the tag item
+      const tag = this.actor ? this.actor.items.get(slot.tagId) : null;
+      if (!tag) continue;
+      // Only apply enabled effects
+      for (const effect of tag.effects.contents) {
+        if (effect.disabled) continue;
+        const effectData = effect.toObject();
+        effectData.flags = effectData.flags || {};
+        effectData.flags.dasu = {
+          ...(effectData.flags.dasu || {}),
+          sourceTag: tag.id,
+        };
+        await this.createEmbeddedDocuments('ActiveEffect', [effectData]);
+      }
+    }
+  }
+
+  async delete(options = {}) {
+    // If this is a tag and has a parent actor, remove it from all weapon slots and clean up effects
+    if (this.type === 'tag' && this.actor) {
+      // Find all weapons on the actor
+      const weapons = this.actor.items.filter((i) => i.type === 'weapon');
+      for (const weapon of weapons) {
+        const tagSlots = weapon.system.tagSlots || {};
+        for (const [slotKey, slot] of Object.entries(tagSlots)) {
+          if (slot.tagId === this.id) {
+            await weapon.removeTag(slotKey);
+          }
+        }
+      }
+    }
+    // Proceed with normal deletion
+    return super.delete(options);
+  }
 }
+
+// --- Deletion Protection for Innate Items ---
+Hooks.on('preDeleteItem', (item, options, userId) => {
+  console.log('[preDeleteItem] Attempting to delete item:', {
+    id: item.id,
+    name: item.name,
+    traits: item.traits,
+    flags: item.flags,
+    options,
+    userId,
+  });
+  if (
+    (item.traits?.includes('innate') ||
+      item.getFlag('dasu', 'grantedByLeveling')) &&
+    !options.fromLevelingWizard
+  ) {
+    console.warn(
+      '[preDeleteItem] Blocked deletion of level-granted item:',
+      item.name,
+      item.id
+    );
+    ui.notifications.warn(
+      'This item is granted by leveling and must be removed via the Leveling Wizard.'
+    );
+    return false;
+  }
+  return true;
+});
