@@ -1,6 +1,6 @@
 {
   "name": "dasu",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Daemon System for Foundry VTT",
   "scripts": {
     "createSymlinks": "node src/create-symlinks.mjs",
