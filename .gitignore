@@ -111,7 +111,9 @@ foundrydata/
 foundryvtt/
 foundry/
 /data/
-/packs/
+/packs/**/*
+!/packs/**/*/
+!/packs/**/*.json
 userdata/
 Config/
 Logs/
