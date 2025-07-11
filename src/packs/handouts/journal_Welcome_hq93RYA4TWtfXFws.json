@@ -1,0 +1,65 @@
+{
+  "name": "Welcome",
+  "_id": "hq93RYA4TWtfXFws",
+  "pages": [
+    {
+      "sort": 100000,
+      "name": "This is a test",
+      "type": "text",
+      "_id": "DcefiU9RWFcwV8bn",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>This is a test description.</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "UYTW1tdxsSQbSjs0": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "dasu",
+        "systemVersion": "{{VERSION}}",
+        "createdTime": 1752198345774,
+        "modifiedTime": 1752198366983,
+        "lastModifiedBy": "UYTW1tdxsSQbSjs0"
+      },
+      "_key": "!journal.pages!hq93RYA4TWtfXFws.DcefiU9RWFcwV8bn"
+    }
+  ],
+  "folder": null,
+  "categories": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "UYTW1tdxsSQbSjs0": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "dasu",
+    "systemVersion": "{{VERSION}}",
+    "createdTime": 1752198321607,
+    "modifiedTime": 1752198335965,
+    "lastModifiedBy": "UYTW1tdxsSQbSjs0"
+  },
+  "_key": "!journal!hq93RYA4TWtfXFws"
+}

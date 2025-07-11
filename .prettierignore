@@ -8,6 +8,7 @@ package-lock.json
 node_modules/
 dist/
 build/
+packs/
 
 # FoundryVTT specific
 foundryconfig.json 

@@ -110,7 +110,8 @@ foundryconfig.yml
 foundrydata/
 foundryvtt/
 foundry/
-data/
+/data/
+/packs/
 userdata/
 Config/
 Logs/

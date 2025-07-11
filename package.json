@@ -14,7 +14,9 @@
     "release:patch": "release-it patch",
     "release:minor": "release-it minor",
     "release:major": "release-it major",
-    "release:dry": "release-it --dry-run"
+    "release:dry": "release-it --dry-run",
+    "unpack": "node ./tools/pushLDBtoYML.mjs",
+    "pack": "node ./tools/pullYMLtoLDB.mjs"
   },
   "browserslist": [
     "last 3 versions"
@@ -23,6 +25,7 @@
   "license": "Apache-2.0",
   "private": true,
   "devDependencies": {
+    "@foundryvtt/foundryvtt-cli": "^1.1.0",
     "@commitlint/cli": "^17.8.1",
     "@commitlint/config-conventional": "^17.8.1",
     "@release-it/conventional-changelog": "^10.0.1",

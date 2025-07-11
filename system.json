@@ -80,7 +80,19 @@
       "path": "lang/en.json"
     }
   ],
-  "packs": [],
+  "packs": [
+    {
+      "label": "Handouts",
+      "type": "JournalEntry",
+      "name": "handouts",
+      "path": "packs/handouts",
+      "system": "dasu",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ],
   "packFolders": [],
   "socket": false,
   "manifest": "{{MANIFEST}}",
