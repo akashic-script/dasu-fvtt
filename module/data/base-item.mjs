@@ -1,5 +1,3 @@
-import { ABILITY_CATEGORIES } from '../helpers/config.mjs';
-
 export default class DASUItemBase extends foundry.abstract.TypeDataModel {
   static LOCALIZATION_PREFIXES = ['DASU.Item.base'];
 
@@ -11,7 +9,8 @@ export default class DASUItemBase extends foundry.abstract.TypeDataModel {
     schema.dsid = new fields.StringField({ required: true, blank: false });
     schema.category = new fields.StringField({
       required: false,
-      choices: ABILITY_CATEGORIES,
+      choices:
+        foundry.utils.getProperty(globalThis, 'DASU.ABILITY_CATEGORIES') || [],
     });
     schema.description = new fields.StringField({ required: false });
     // Add traits array for all items

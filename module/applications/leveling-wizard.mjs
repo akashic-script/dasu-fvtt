@@ -59,7 +59,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     this._actorUpdateHook = Hooks.on(
       'updateActor',
       (actor, data, options, userId) => {
-        if (actor.id === this.actor.id) {
+        if (actor.id === this.actor.id && this.rendered) {
           this.refresh();
           this._checkAndGrantLevelItems(data);
         }
@@ -554,10 +554,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
   async close(options = {}) {
     // Clean up event listeners to prevent memory leaks
     if (this.actor && this.actor.levelingWizards) {
-      const index = this.actor.levelingWizards.indexOf(this);
-      if (index > -1) {
-        this.actor.levelingWizards.splice(index, 1);
-      }
+      this.actor.levelingWizards.delete(this);
     }
 
     // Remove any bound event listeners

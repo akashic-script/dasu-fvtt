@@ -1,3 +1,14 @@
+/* Leveling Wizard Button Styles */
+.leveling-wizard-btn {
+  /* Default styles for the button */
+}
+
+.leveling-wizard-btn.can-level-up {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  border-color: #4caf50;
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 /* ========================================
    DASU Leveling Wizard Styles
    ======================================== */
@@ -199,18 +210,13 @@
    PROGRESSION CONTENT
    ======================================== */
 
-.dasu-leveling-wizard {
-  display: flex;
-  flex-direction: column;
-}
-
 .dasu-leveling-wizard .tab-content {
   display: flex;
   flex-direction: column;
 }
 
 .dasu-leveling-wizard .progression-content {
-  max-height: 60vh;
+  max-height: 70vh;
   overflow-y: auto;
   flex: 1 1 auto;
   min-height: 0;
@@ -824,4 +830,24 @@
 .dasu-leveling-wizard .tab-btn:focus {
   outline: 2px solid var(--color-bg-primary);
   outline-offset: 2px;
+}
+
+.leveling-wizard-btn {
+  background: #6c757d;
+  border: 1px solid #6c757d;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: bold;
+}
+
+.leveling-wizard-btn.can-level-up {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  border-color: #4caf50;
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
 }

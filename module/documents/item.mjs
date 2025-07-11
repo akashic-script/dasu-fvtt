@@ -6,6 +6,14 @@ import { slugify } from '../utils/slugify.mjs';
  */
 export class DASUItem extends Item {
   constructor(data, context) {
+    // Ensure data.system exists
+    data.system = data.system || {};
+
+    // Ensure dsid is set with a random ID if not already present
+    if (!data.system.dsid) {
+      data.system.dsid = foundry.utils.randomID(16);
+    }
+
     super(data, context);
 
     // Ensure tag slots exist for weapons
@@ -34,9 +42,11 @@ export class DASUItem extends Item {
     // Ensure system object exists
     data.system = data.system || {};
 
-    // Set dsid from name if not set
-    if (!data.system.dsid && data.name) {
-      data.system.dsid = slugify(data.name);
+    // Set dsid from name if not set or blank
+    if (!data.system.dsid || data.system.dsid === '') {
+      data.system.dsid = data.name
+        ? slugify(data.name)
+        : foundry.utils.randomID(16);
     }
 
     // Set category for ability items since they require subcategorization

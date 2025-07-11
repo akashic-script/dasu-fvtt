@@ -266,7 +266,7 @@
             {{/if}}
           </div>
           <div class='item-actions'>
-            <span class='aptitude-value'>{{#if item.system.aptitudes.type}}{{uppercase item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
+            <span class='aptitude-value' data-tooltip="{{localizeAptitudeTypeLong item.system.aptitudes.type}}<br>Lv {{item.system.aptitudes.value}}">{{#if item.system.aptitudes.type}}{{localizeAptitudeTypeShort item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
           </div>
           {{#if (and @root.editable @root.isEditMode)}}
             <div class='item-controls'>
@@ -316,7 +316,7 @@
             {{/if}}
           </div>
           <div class='item-actions'>
-            <span class='aptitude-value'>{{#if item.system.aptitudes.type}}{{uppercase item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
+            <span class='aptitude-value' data-tooltip="{{localizeAptitudeTypeLong item.system.aptitudes.type}}<br>Lv {{item.system.aptitudes.value}}">{{#if item.system.aptitudes.type}}{{localizeAptitudeTypeShort item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
           </div>
           {{#if (and @root.editable @root.isEditMode)}}
             <div class='item-controls'>
@@ -366,7 +366,7 @@
             {{/if}}
           </div>
           <div class='item-actions'>
-            <span class='aptitude-value'>{{#if item.system.aptitudes.type}}{{uppercase item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
+            <span class='aptitude-value' data-tooltip="{{localizeAptitudeTypeLong item.system.aptitudes.type}}<br>Lv {{item.system.aptitudes.value}}">{{#if item.system.aptitudes.type}}{{localizeAptitudeTypeShort item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
           </div>
           {{#if (and @root.editable @root.isEditMode)}}
             <div class='item-controls'>
@@ -419,7 +419,7 @@
             {{/if}}
           </div>
           <div class='item-actions'>
-            <span class='aptitude-value'>{{#if item.system.aptitudes.type}}{{uppercase item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
+            <span class='aptitude-value' data-tooltip="{{localizeAptitudeTypeLong item.system.aptitudes.type}}<br>Lv {{item.system.aptitudes.value}}">{{#if item.system.aptitudes.type}}{{localizeAptitudeTypeShort item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}</span>
           </div>
           {{#if (and @root.editable @root.isEditMode)}}
             <div class='item-controls'>

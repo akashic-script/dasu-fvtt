@@ -75,4 +75,16 @@ export function registerHandlebarsHelpers() {
     }
     return result;
   });
+
+  // Localize aptitude type to short form
+  Handlebars.registerHelper('localizeAptitudeTypeShort', function (type) {
+    if (!type) return '';
+    return game.i18n.localize(`DASU.aptitudeTypes.${type}.short`);
+  });
+
+  // Localize aptitude type to long form
+  Handlebars.registerHelper('localizeAptitudeTypeLong', function (type) {
+    if (!type) return '';
+    return game.i18n.localize(`DASU.aptitudeTypes.${type}.long`);
+  });
 }

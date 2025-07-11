@@ -155,6 +155,20 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     context.apUnspent = apUnspent;
     context.totalTicks = totalTicks;
 
+    // Calculate canLevelUp for the leveling wizard button
+    const maxLevel = DASUSettings.getMaxLevel();
+    const nextLevel = level + 1;
+    const levelingWizard = new LevelingWizard(this.actor); // Create a temporary instance to access _calculateLevelProgression
+    const levelsData = await levelingWizard._calculateLevelProgression(
+      maxLevel
+    );
+    const nextLevelData = levelsData.find((l) => l.level === nextLevel);
+
+    context.canLevelUp =
+      nextLevelData &&
+      (context.system.merit || 0) >= nextLevelData.meritRequired &&
+      level < maxLevel;
+
     await this._prepareItems(context);
     return context;
   }

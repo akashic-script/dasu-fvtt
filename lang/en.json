@@ -251,7 +251,8 @@
       "tb": { "long": "Technique Brutal", "short": "TB" },
       "tg": { "long": "Technique General", "short": "TG" },
       "tt": { "long": "Technique Technical", "short": "TT" },
-      "w": { "long": "Wind", "short": "W" }
+      "w": { "long": "Wind", "short": "W" },
+      "assist": { "long": "Assist", "short": "AST" }
     },
     "damageTypes": {
       "dark": "Dark",

@@ -44,8 +44,9 @@
         {{#if (and actor.type (eq actor.type 'summoner'))}}
           {{!-- Summoner: Show level as text with leveling wizard button --}}
           <span class="level-value">{{system.level}}</span>
+          {{!-- Debug canLevelUp: {{canLevelUp}} --}}
           {{#if editable}}
-            <button type="button" class="leveling-wizard-btn" data-action="openLevelingWizard" data-tooltip="{{localize 'DASU.Actor.levelingWizard.tooltip'}}">
+            <button type="button" class="leveling-wizard-btn {{#if canLevelUp}}can-level-up{{/if}}" data-action="openLevelingWizard" data-tooltip="{{localize 'DASU.Actor.levelingWizard.tooltip'}}">
               <i class="fas fa-level-up-alt"></i>
             </button>
           {{/if}}
