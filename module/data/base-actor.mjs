@@ -16,7 +16,9 @@ export default class BaseActorDataModel extends foundry.abstract.TypeDataModel {
         required: true,
         initial: 1,
         min: 1,
-        max: 100,
+        get max() {
+          return game.settings.get('dasu', 'maxLevel') || 30;
+        },
         integer: true,
       }),
       merit: new fields.NumberField({

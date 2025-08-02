@@ -123,9 +123,10 @@ export class SharedActorComponents {
 
   static prepareDerivedResources(system) {
     // Defensive: ensure all required fields exist
-    const sta = system.attributes?.sta?.tick ?? 0;
     const pow = system.attributes?.pow?.tick ?? 0;
+    const dex = system.attributes?.dex?.tick ?? 0;
     const will = system.attributes?.will?.tick ?? 0;
+    const sta = system.attributes?.sta?.tick ?? 0;
     const hpMod = system.stats?.hp?.mod ?? 0;
     const wpMod = system.stats?.wp?.mod ?? 0;
 
@@ -146,7 +147,7 @@ export class SharedActorComponents {
       configurable: true,
       enumerable: true,
       get() {
-        return (will + sta) * 10 + wpMod;
+        return (dex + will) * 10 + wpMod;
       },
     });
   }

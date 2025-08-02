@@ -39,10 +39,38 @@ DASU.CORE_SKILLS = [
   { id: 'outdoorsmanship', name: 'Outdoorsmanship', govern: 'sta' },
 ];
 
-// Specific to summoner actor type
 // Formula-based system for AP progression (1 AP at odd levels 1-29)
-// gainAP (number), adds 1 at odd levels: 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29
-// gainSP (number), adds 2 every level
+// gain AP, adds 1 at odd levels: 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29
+
+// Specific to summoner actor type
+// gain SP, adds 2 every level
+
+// Refactor attributes, remove base in each attribute (this includes the field in editor and ui),
+// ticks remain a derived, you still have to buy it, meaning 1AP = 1Tick
+
+// Helper functions to calculate progression
+DASU.calculateAP = function (level, formula = 'odd:1-29') {
+  if (formula.startsWith('odd:')) {
+    const range = formula.split(':')[1]; // '1-29'
+    const [start, end] = range.split('-').map(Number);
+    let ap = 0;
+    for (let i = start; i <= Math.min(end, level); i++) {
+      if (i % 2 === 1) ap += 1; // Odd levels
+    }
+    return ap;
+  }
+  return 0;
+};
+
+DASU.calculateSP = function (level, formula = '2*level') {
+  if (formula === '2*level') {
+    return level * 2;
+  } else if (formula === 'level') {
+    return level;
+  }
+  return 0;
+};
+
 // gainAbility (boolean), when true allows prompts user to add new ability
 // gainAptitude (boolean), when true allows to increase any aptitude by 1
 // gainFirstSchema (number), adds 1 to the first schema
