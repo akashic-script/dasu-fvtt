@@ -24,6 +24,7 @@ export function registerHandlebarsHelpers() {
   Handlebars.registerHelper('gt', (a, b) => a > b);
   Handlebars.registerHelper('lt', (a, b) => a < b);
   Handlebars.registerHelper('eq', (a, b) => a === b);
+  Handlebars.registerHelper('neq', (a, b) => a !== b);
   Handlebars.registerHelper('gte', (a, b) => a >= b);
   Handlebars.registerHelper('lte', (a, b) => a <= b);
   Handlebars.registerHelper('decrement', (a) => a - 1);
@@ -86,5 +87,28 @@ export function registerHandlebarsHelpers() {
   Handlebars.registerHelper('localizeAptitudeTypeLong', function (type) {
     if (!type) return '';
     return game.i18n.localize(`DASU.aptitudeTypes.${type}.long`);
+  });
+
+  // Alias for uppercase for template compatibility
+  Handlebars.registerHelper('upper', function (str) {
+    if (!str) return '';
+    return str.toUpperCase();
+  });
+
+  // Lowercase helper
+  Handlebars.registerHelper('lower', function (str) {
+    if (!str) return '';
+    return str.toLowerCase();
+  });
+
+  // Format timestamp for display
+  Handlebars.registerHelper('formatTime', function (timestamp) {
+    if (!timestamp) return '';
+    try {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString();
+    } catch (e) {
+      return '';
+    }
   });
 }

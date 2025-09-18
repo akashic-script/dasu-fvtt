@@ -13,6 +13,10 @@ import { DASUSettings } from './settings.mjs';
 // Import status conditions
 import { registerStatusConditions } from './data/status-conditions.mjs';
 import { registerHandlebarsHelpers } from './helpers/helpers.mjs';
+// Import roll system
+import { DASUAccuracyRollV1 } from './helpers/dasu-accuracy-check.mjs';
+import { DASUAttributeCheckV1 } from './helpers/dasu-attribute-check.mjs';
+import { DASURollDialog } from './applications/roll-dialog.mjs';
 
 const collections = foundry.documents.collections;
 const sheets = foundry.appv1.sheets;
@@ -31,9 +35,12 @@ globalThis.DASU = {
   applications: {
     DASUActorSheet,
     DASUItemSheet,
+    DASURollDialog,
   },
   utils: {
     rollItemMacro,
+    DASUAccuracyRollV1,
+    DASUAttributeCheckV1,
   },
   settings: DASUSettings,
   models,
@@ -63,7 +70,7 @@ Hooks.once('init', function () {
       return;
     }
 
-    const combatant = combat.combatants.find((c) => c.actor.id === actor.id);
+    const combatant = combat.combatants.find((c) => c.actor?.id === actor.id);
     if (!combatant) {
       ui.notifications.warn(
         'This character is not in the current combat encounter.'
@@ -127,31 +134,39 @@ Hooks.once('init', function () {
     // Update combatant initiative
     await combatant.update({ initiative: successes });
 
-    // Send chat message
-    const successText = successes === 1 ? 'success' : 'successes';
-    const flavor = `Initiative Roll (${tickSource}: ${initiativeTicks} ticks)<br><strong>Roll: [${rollResults.join(
-      ', '
-    )}]</strong><br><strong>Result: ${successes} ${successText}</strong>`;
+    // Send chat message with initiative card
+    const templateData = {
+      tickSource: tickSource,
+      initiativeTicks: initiativeTicks,
+      diceMod: 0,
+      initiativeResult:
+        successes + (successes === 1 ? ' success' : ' successes'),
+    };
+
+    const content = await renderTemplate(
+      'systems/dasu/templates/chat/initiative-card.hbs',
+      templateData
+    );
 
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: combatant.actor }),
-      flavor: flavor,
+      content: content,
       roll: roll,
       rollMode: game.settings.get('core', 'rollMode'),
     });
   });
 
-  // Hook to handle skill-based initiative rolls
+  // Hook to handle skill-based initiative rolls (supports both legacy and new dialog formats)
   Hooks.on(
     'dasu.rollInitiativeWithSkill',
-    async (actor, skillName, skillTicks) => {
+    async (actor, skillNameOrOptions, skillTicks) => {
       const combat = game.combat;
       if (!combat) {
         ui.notifications.warn('No active combat encounter found.');
         return;
       }
 
-      const combatant = combat.combatants.find((c) => c.actor.id === actor.id);
+      const combatant = combat.combatants.find((c) => c.actor?.id === actor.id);
       if (!combatant) {
         ui.notifications.warn(
           'This character is not in the current combat encounter.'
@@ -159,39 +174,101 @@ Hooks.once('init', function () {
         return;
       }
 
-      // Roll initiative using the specified skill ticks
-      const roll = new Roll(`2d6 + ${skillTicks}d6`, actor.getRollData());
+      let initiativeTicks = 0;
+      let tickSource = '';
+      let diceMod = 0;
+      let customLabel = 'Initiative Roll';
+
+      // Check if this is the new dialog format (object) or legacy format (string)
+      if (typeof skillNameOrOptions === 'object') {
+        // New dialog format
+        const rollOptions = skillNameOrOptions;
+
+        if (rollOptions.initiativeType === 'dex') {
+          initiativeTicks = actor.system.attributes?.dex?.tick || 1;
+          tickSource = 'DEX';
+        } else if (rollOptions.initiativeType.startsWith('skill:')) {
+          const skillName = rollOptions.initiativeType.substring(6); // Remove 'skill:' prefix
+          const skills = actor.system.skills || [];
+          const skill = skills.find((s) => s.name === skillName);
+
+          if (skill) {
+            initiativeTicks = skill.ticks || 0;
+            tickSource = skillName;
+          } else {
+            ui.notifications.error(`Skill "${skillName}" not found.`);
+            return;
+          }
+        }
+
+        diceMod = rollOptions.diceMod || 0;
+        customLabel = rollOptions.label || 'Initiative Roll';
+      } else {
+        // Legacy format
+        const skillName = skillNameOrOptions;
+        initiativeTicks = skillTicks || 0;
+        tickSource = skillName;
+      }
+
+      // Roll initiative: 2d6 (sum) + initiative ticks + mod
+      const flatMod = initiativeTicks + diceMod;
+      const roll = new Roll(`2d6 + ${flatMod}`, actor.getRollData());
       await roll.evaluate();
 
-      let successes = 0;
-      let rollResults = [];
+      const initiativeResult = roll.total;
 
-      // Count successes (4-6) from the roll results
-      if (roll.dice && roll.dice.length > 0) {
-        for (const die of roll.dice) {
-          if (die.results) {
-            for (const result of die.results) {
-              rollResults.push(result.result);
-              if (result.result >= 4 && result.result <= 6) {
-                successes++;
-              }
-            }
+      // Get dice results for crit detection
+      let rollResults = [];
+      let critThreshold = actor.system.stats?.crit?.value ?? 7;
+      let hasCrit = false;
+
+      for (const term of roll.terms) {
+        if (term instanceof foundry.dice.terms.Die) {
+          for (const result of term.results) {
+            rollResults.push(result.result);
+          }
+        }
+      }
+
+      // Check for crit: any two dice of the same value that are both at or above the crit threshold
+      if (rollResults.length >= 2) {
+        const diceAtOrAboveThreshold = rollResults.filter(
+          (result) => result >= critThreshold
+        );
+        // Count occurrences of each die value at or above threshold
+        const valueCounts = {};
+        for (const die of diceAtOrAboveThreshold) {
+          valueCounts[die] = (valueCounts[die] || 0) + 1;
+          // If we have two or more dice of the same value at/above threshold, it's a crit
+          if (valueCounts[die] >= 2) {
+            hasCrit = true;
+            break;
           }
         }
       }
 
       // Update combatant initiative
-      await combatant.update({ initiative: successes });
+      await combatant.update({ initiative: initiativeResult });
 
-      // Send chat message
-      const successText = successes === 1 ? 'success' : 'successes';
-      const flavor = `Initiative Roll (${skillName}: ${skillTicks} ticks)<br><strong>Roll: [${rollResults.join(
-        ', '
-      )}]</strong><br><strong>Result: ${successes} ${successText}</strong>`;
+      // Send chat message with initiative card
+      const templateData = {
+        tickSource: tickSource,
+        initiativeTicks: initiativeTicks,
+        diceMod: diceMod,
+        initiativeResult: initiativeResult,
+        rollResults: rollResults,
+        hasCrit: hasCrit,
+        critThreshold: critThreshold,
+      };
+
+      const content = await renderTemplate(
+        'systems/dasu/templates/chat/initiative-card.hbs',
+        templateData
+      );
 
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor: combatant.actor }),
-        flavor: flavor,
+        content: content,
         roll: roll,
         rollMode: game.settings.get('core', 'rollMode'),
       });

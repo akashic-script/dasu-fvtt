@@ -1,0 +1,67 @@
+<div class="dasu recruit-dialog combat-themed">
+  <!-- Combat Header -->
+  <div class="dialog-header recruit-header">
+    <div class="header-background"></div>
+    <div class="recruit-info">
+      <div class="recruit-portrait-frame">
+        <img src="{{daemon.img}}" alt="{{daemonName}}" class="recruit-portrait">
+        <div class="portrait-overlay"></div>
+      </div>
+      <div>
+        <h2 class="recruit-title">{{localize "DASU.Actor.Recruit.Title"}}</h2>
+        <div class="recruit-subtitle">
+          <i class="fas fa-user-plus"></i>
+          {{localize "DASU.Actor.Recruit.Description" daemonName=daemonName}}
+        </div>
+      </div>
+    </div>
+    <div class="header-accent"></div>
+  </div>
+
+  <form>
+    {{#if hasSummoners}}
+      <!-- Form Configuration -->
+      <div class="recruit-form">
+        <div class="form-group">
+          <label for="selectedActor">{{localize "DASU.Actor.Recruit.SelectActor"}}:</label>
+          <select name="selectedActor" id="selectedActor" required>
+            <option value="">{{localize "DASU.Actor.Recruit.ChooseActor"}}</option>
+            {{#each summoners as |summoner|}}
+              <option value="{{summoner.id}}">
+                {{summoner.name}} ({{localize "DASU.Level"}} {{summoner.level}})
+              </option>
+            {{/each}}
+          </select>
+        </div>
+      </div>
+
+      <!-- Combat Footer -->
+      <div class="dialog-footer recruit-footer">
+        <div class="action-buttons">
+          <button type="submit" data-action="recruit" class="recruit-button combat-action">
+            <div class="button-content">
+              <i class="fas fa-user-plus"></i>
+              <span class="button-text">{{localize "DASU.Actor.Recruit.Confirm"}}</span>
+            </div>
+          </button>
+          <button type="button" data-action="cancel" class="cancel-button combat-cancel">
+            <i class="fas fa-times"></i>
+            {{localize "DASU.Cancel"}}
+          </button>
+        </div>
+      </div>
+    {{else}}
+      <!-- No Targets -->
+      <div class="no-targets">
+        <i class="fas fa-users-slash"></i>
+        <p class="no-targets-message">{{localize "DASU.Actor.Recruit.NoSummoners"}}</p>
+        <div class="action-buttons">
+          <button type="button" data-action="cancel" class="cancel-button combat-cancel">
+            <i class="fas fa-times"></i>
+            {{localize "DASU.Close"}}
+          </button>
+        </div>
+      </div>
+    {{/if}}
+  </form>
+</div>

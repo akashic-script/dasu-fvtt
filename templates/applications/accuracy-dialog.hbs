@@ -1,0 +1,134 @@
+{{!-- DASU Accuracy Dialog Template --}}
+<form class="dasu accuracy-dialog combat-themed">
+  
+  {{!-- Header with Item Info --}}
+  <header class="dialog-header combat-header">
+    <div class="header-background"></div>
+    <div class="item-info">
+      <div class="portrait-frame">
+        <img src="{{item.img}}" alt="{{item.name}}" class="item-portrait" />
+        <div class="portrait-overlay"></div>
+      </div>
+      <div class="item-details">
+        <h3 class="item-name">{{item.name}}</h3>
+        <div class="roll-indicator">
+          <i class="fas fa-crosshairs"></i>
+          <span class="roll-type-label">{{rollTypeLabel}}</span>
+        </div>
+        <div class="actor-info">
+          <span class="actor-label">{{actor.name}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-accent"></div>
+  </header>
+
+  {{!-- Roll Configuration --}}
+  <div class="roll-config">
+    
+    {{!-- Base Bonus Display --}}
+    <div class="base-bonus-info">
+      <div class="bonus-display">
+        <span class="bonus-label">{{bonusLabel}}:</span>
+        <span class="bonus-value">{{#if (gt baseBonus 0)}}+{{/if}}{{baseBonus}}</span>
+      </div>
+    </div>
+
+    {{!-- Advantage/Disadvantage Toggle --}}
+    <div class="form-group">
+      <label for="rollType">Roll Type:</label>
+      <div class="roll-type-toggle">
+        <button type="button" 
+                class="toggle-btn {{#if (eq rollData.rollType 'disadvantage')}}active{{/if}}" 
+                data-roll-type="disadvantage">
+          <i class="fas fa-arrow-down"></i>
+          <span>Disadvantage</span>
+        </button>
+        <button type="button" 
+                class="toggle-btn {{#if (or (eq rollData.rollType 'normal') (not rollData.rollType))}}active{{/if}}" 
+                data-roll-type="normal">
+          <i class="fas fa-equals"></i>
+          <span>Normal</span>
+        </button>
+        <button type="button" 
+                class="toggle-btn {{#if (eq rollData.rollType 'advantage')}}active{{/if}}" 
+                data-roll-type="advantage">
+          <i class="fas fa-arrow-up"></i>
+          <span>Advantage</span>
+        </button>
+      </div>
+      <input type="hidden" name="rollType" id="rollType" value="{{rollData.rollType}}" />
+      <span class="modifier-hint">
+        <strong>Normal:</strong> 2d6 | 
+        <strong>Advantage:</strong> 3d6 drop lowest (crit on 2+ doubles) | 
+        <strong>Disadvantage:</strong> 3d6 drop highest
+      </span>
+    </div>
+
+    {{!-- Bonus Modifier --}}
+    <div class="form-group">
+      <label for="bonusMod">Additional Bonus:</label>
+      <input type="number" 
+             name="bonusMod" 
+             id="bonusMod" 
+             value="{{rollData.bonusMod}}" 
+             min="-20" 
+             max="20" 
+             step="1" />
+      <span class="modifier-hint">Extra bonus to add/subtract</span>
+    </div>
+
+    {{!-- Custom Label --}}
+    <div class="form-group">
+      <label for="label">Custom Label (optional):</label>
+      <input type="text" 
+             name="label" 
+             id="label" 
+             value="{{rollData.label}}" 
+             placeholder="Custom description for this roll" />
+    </div>
+
+  </div>
+
+  {{!-- Roll Summary --}}
+  <div class="roll-summary combat-summary">
+    <div class="formula-display">
+      <div class="formula-container">
+        <span class="formula-label">Formula:</span>
+        <span class="roll-formula">{{formula}}</span>
+      </div>
+      <div class="roll-description">
+        <small>
+          {{#if (eq rollData.rollType "advantage")}}
+            Roll 3d6, drop lowest, and add the total bonus
+          {{else if (eq rollData.rollType "disadvantage")}}
+            Roll 3d6, drop highest, and add the total bonus  
+          {{else}}
+            Roll 2d6 and add the total bonus
+          {{/if}}
+        </small>
+      </div>
+    </div>   
+  </div>
+
+  {{!-- Action Buttons --}}
+  <footer class="dialog-footer combat-footer">
+    <div class="action-buttons">
+      <button type="button" 
+              class="roll-button combat-roll" 
+              data-action="roll" 
+              {{#unless canRoll}}disabled{{/unless}}>
+        <div class="button-content">
+          <i class="fas fa-crosshairs"></i>
+          <span class="button-text">Roll</span>
+          <span class="dice-display">{{formula}}</span>
+        </div>
+      </button>
+      <button type="button" class="cancel-button combat-cancel" data-action="cancel">
+        <i class="fas fa-times"></i>
+        {{localize "DASU.Close"}}
+      </button>
+    </div>
+  </footer>
+
+</form>

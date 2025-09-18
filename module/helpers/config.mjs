@@ -214,6 +214,7 @@ DASU.abilityAbbreviations = {
 };
 
 DASU.damageTypes = {
+  untyped: 'DASU.damageTypes.untyped',
   physical: 'DASU.damageTypes.physical',
   fire: 'DASU.damageTypes.fire',
   ice: 'DASU.damageTypes.ice',
@@ -222,7 +223,6 @@ DASU.damageTypes = {
   earth: 'DASU.damageTypes.earth',
   light: 'DASU.damageTypes.light',
   dark: 'DASU.damageTypes.dark',
-  untyped: 'DASU.damageTypes.untyped',
 };
 
 DASU.spellAffinities = {

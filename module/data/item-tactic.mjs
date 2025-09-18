@@ -25,6 +25,7 @@ export default class TacticDataModel extends BaseItemDataModel {
             'dark',
             'untyped',
           ],
+          initial: 'untyped',
         }),
       }),
       toLand: new fields.NumberField({ required: true, initial: 0 }),

@@ -1,0 +1,177 @@
+/* Initiative Card Styling - matches roll-card structure */
+.dasu.initiative-card {
+  background: var(--color-bg-secondary);
+  /* border: 1px solid var(--color-border); */
+  border-radius: 0;
+  /* padding: 6px; */
+  margin: 2px 0;
+  font-family: var(--font-primary);
+  font-size: 0.9em;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Initiative Header - matches roll-header */
+.initiative-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  background: var(--color-bg-primary);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+  padding: 4px 8px;
+  /* border: 1px solid var(--dasu-c-primary); */
+  min-height: 28px;
+}
+
+.initiative-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.initiative-title h3 {
+  margin: 0;
+  color: var(--dasu-c-primary);
+  font-weight: 600;
+  font-size: 1em;
+  line-height: 1.1;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.initiative-title i {
+  color: var(--dasu-c-primary);
+  font-size: 1em;
+}
+
+.initiative-source {
+  font-size: 0.8em;
+  color: var(--dasu-c-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+/* Initiative Formula Display - matches formula-breakdown */
+.initiative-formula {
+  text-align: center;
+  font-size: 0.9em;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: var(--color-bg-primary);
+  padding: 4px 8px;
+  /* border: 1px solid var(--dasu-c-primary); */
+  color: var(--color-text-primary);
+  font-weight: 400;
+  margin: 4px 0;
+}
+
+.initiative-formula .formula-display {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--dasu-c-primary);
+}
+
+/* Initiative Result - matches outcome-compact */
+.initiative-outcome {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 6px;
+  margin-top: 4px;
+  background: var(--color-bg-primary);
+  /* border: 1px solid var(--dasu-c-primary); */
+}
+
+/* Crit Indicator */
+.crit-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #ffd700;
+  border: 1px solid #ffb800;
+  border-radius: 0;
+  color: #8b4513;
+  font-weight: 700;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  animation: crit-pulse 2s infinite;
+}
+
+.crit-icon {
+  font-size: 1.1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crit-text {
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes crit-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 4px rgba(255, 215, 0, 0);
+  }
+}
+
+.initiative-result-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 0;
+  font-size: 0.8em;
+  font-weight: 700;
+  border: 1px solid var(--dasu-c-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  position: relative;
+  overflow: hidden;
+  min-height: 22px;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--dasu-c-primary);
+  color: var(--color-text-primary);
+}
+
+.initiative-result-badge .result-value {
+  font-weight: 900;
+  font-size: 1.3em;
+  line-height: 1;
+}
+
+.initiative-result-badge .result-icon {
+  font-size: 0.9em;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+/* Initiative Card Border Color */
+.dasu.initiative-card {
+  border-color: var(--dasu-c-primary);
+}

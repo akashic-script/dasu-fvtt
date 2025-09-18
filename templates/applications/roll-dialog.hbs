@@ -1,0 +1,199 @@
+{{!-- DASU Roll Dialog Template - Combat-Themed Form --}}
+<form class="dasu roll-dialog combat-themed">
+  
+  {{!-- Header with Combat Styling --}}
+  <header class="dialog-header combat-header">
+    <div class="header-background"></div>
+    <div class="actor-info">
+      <div class="portrait-frame">
+        <img src="{{actor.img}}" alt="{{actor.name}}" class="actor-portrait" />
+        <div class="portrait-overlay"></div>
+      </div>
+      <div class="actor-details">
+        <h3 class="actor-name">{{actor.name}}</h3>
+        <div class="combat-indicator">
+          <i class="fas fa-crosshairs"></i>
+          <span class="roll-type-label">
+            {{#if (eq rollData.rollType "skill")}}{{localize 'DASU.SkillCheck'}}{{else if (eq rollData.rollType "initiative")}}{{localize 'DASU.InitiativeCheck'}}{{else}}{{localize 'DASU.AttributeCheck'}}{{/if}}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="header-accent"></div>
+  </header>
+
+  {{!-- Combat Type Selection --}}
+  <div class="roll-type-selection combat-tabs">
+    <div class="type-tabs">
+      <button type="button" 
+              class="type-tab combat-tab {{#if (eq rollData.rollType 'attribute')}}active{{/if}}"
+              data-action="switchType" 
+              data-type="attribute">
+        <span class="tab-label">{{localize 'DASU.Attribute'}}</span>
+      </button>
+      {{#unless isDaemon}}
+      <button type="button"
+              class="type-tab combat-tab {{#if (eq rollData.rollType 'skill')}}active{{/if}}"
+              data-action="switchType"
+              data-type="skill">
+        <span class="tab-label">{{localize 'DASU.Skill'}}</span>
+      </button>
+      {{/unless}}
+      <button type="button"
+              class="type-tab combat-tab {{#if (eq rollData.rollType 'initiative')}}active{{/if}} {{#unless isInEncounter}}disabled{{/unless}}"
+              data-action="switchType"
+              data-type="initiative"
+              {{#unless isInEncounter}}disabled{{/unless}}
+              {{#unless isInEncounter}}data-tooltip="{{localize 'DASU.MustBeInEncounter'}}"{{/unless}}>
+        <span class="tab-label">{{localize 'DASU.Initiative'}}</span>
+      </button>
+    </div>
+  </div>
+
+  {{!-- Roll Configuration --}}
+  <div class="roll-config">
+    
+    <input type="hidden" name="rollType" value="{{rollData.rollType}}" />
+    
+    {{#if (eq rollData.rollType "skill")}}
+      {{!-- Skill + Governing Attribute Selection --}}
+      <div class="skill-attribute-selection">
+        <div class="form-group">
+          <label for="selectedSkill">{{localize 'DASU.Skill'}}:</label>
+          <select name="selectedSkill" id="selectedSkill" required>
+            <option value="">{{localize 'DASU.ChooseSkill'}}</option>
+            {{#each skills}}
+              <option value="{{name}}" {{#if (eq ../rollData.selectedSkill name)}}selected{{/if}}>
+                {{name}} ({{ticks}} {{localize 'DASU.Ticks'}})
+              </option>
+            {{/each}}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="governingAttribute">{{localize 'DASU.Attribute'}}:</label>
+          <select name="governingAttribute" id="governingAttribute" required>
+            <option value="">{{localize 'DASU.ChooseAttribute'}}</option>
+            {{#each attributes}}
+              <option value="{{@key}}" {{#if (eq ../rollData.governingAttribute @key)}}selected{{/if}}>
+                {{label}} ({{tick}} {{localize 'DASU.Ticks'}})
+              </option>
+            {{/each}}
+          </select>
+        </div>
+      </div>
+    {{else if (eq rollData.rollType "initiative")}}
+      {{!-- Initiative: Choose between DEX tick or any skill tick --}}
+      <div class="initiative-selection">
+        <div class="form-group">
+          <label for="initiativeType">{{localize 'DASU.InitiativeType'}}:</label>
+          <select name="initiativeType" id="initiativeType" required>
+            <option value="dex" {{#if (eq rollData.initiativeType "dex")}}selected{{/if}}>
+              {{localize 'DASU.Actor.Attributes.list.dex.abbr'}} ({{attributes.dex.tick}} {{localize 'DASU.Ticks'}})
+            </option>
+            {{#each skills}}
+              <option value="skill:{{name}}" {{#if (eq ../rollData.initiativeType (concat "skill:" name))}}selected{{/if}}>
+                {{name}} ({{ticks}} {{localize 'DASU.Ticks'}})
+              </option>
+            {{/each}}
+          </select>
+        </div>
+        <div class="initiative-help">
+          <small>{{localize 'DASU.InitiativeInfo'}}</small>
+        </div>
+      </div>
+    {{else}}
+      {{!-- Dual Attribute Selection --}}
+      <div class="dual-attributes two-column">
+        <div class="attribute-column">
+          <div class="form-group">
+            <label for="primaryAttribute">{{localize 'DASU.PrimaryAttribute'}}:</label>
+            <select name="primaryAttribute" id="primaryAttribute" required>
+              <option value="">{{localize 'DASU.ChoosePrimary'}}</option>
+              {{#each attributes}}
+                <option value="{{@key}}" {{#if (eq ../rollData.primaryAttribute @key)}}selected{{/if}}>
+                  {{label}} ({{tick}} {{localize 'DASU.Ticks'}})
+                </option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+        
+        <div class="attribute-column">
+          <div class="form-group">
+            <label for="secondaryAttribute">{{localize 'DASU.SecondaryAttribute'}}:</label>
+            <select name="secondaryAttribute" id="secondaryAttribute" required>
+              <option value="">{{localize 'DASU.ChooseSecondary'}}</option>
+              {{#each attributes}}
+                <option value="{{@key}}" {{#if (eq ../rollData.secondaryAttribute @key)}}selected{{/if}}>
+                  {{label}} ({{tick}} {{localize 'DASU.Ticks'}})
+                </option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+      </div>
+    {{/if}}
+
+    {{!-- Dice Modifier --}}
+    <div class="form-group">
+      <label for="diceMod">{{localize 'DASU.DiceModifier'}}:</label>
+      <input type="number" 
+             name="diceMod" 
+             id="diceMod" 
+             value="{{rollData.diceMod}}" 
+             min="-10" 
+             max="10" 
+             step="1" />
+      <span class="modifier-hint">{{localize 'DASU.ModifierHint'}}</span>
+    </div>
+
+    {{!-- Custom Label --}}
+    <div class="form-group">
+      <label for="label">{{localize 'DASU.CustomLabel'}}:</label>
+      <input type="text" 
+             name="label" 
+             id="label" 
+             value="{{rollData.label}}" 
+             placeholder="{{localize 'DASU.CustomLabelPlaceholder'}}" />
+    </div>
+
+  </div>
+
+  {{!-- Combat Roll Summary --}}
+  <div class="roll-summary combat-summary">
+    <div class="dice-arsenal">
+      <div class="pool-display">
+        <div class="dice-counter">
+          <span class="pool-count">{{totalDice}}</span>
+          <span class="dice-icon">⚅</span>
+        </div>
+        <div class="pool-meta">
+          <span class="pool-label">{{localize 'DASU.CombatDice'}}</span>
+        </div>
+      </div>
+      <div class="pool-breakdown">{{breakdown}}</div>
+    </div>   
+  </div>
+
+  {{!-- Combat Action Buttons --}}
+  <footer class="dialog-footer combat-footer">
+    <div class="action-buttons">
+      <button type="button"
+              class="roll-button combat-roll"
+              data-action="roll"
+              {{#unless (and canRoll (or (ne rollData.rollType 'initiative') isInEncounter))}}disabled{{/unless}}>
+        <div class="button-content">
+          <i class="fas fa-dice-d6"></i>
+          <span class="button-text">{{localize 'DASU.Roll'}}</span>
+          <span class="dice-display">{{totalDice}}d6</span>
+        </div>
+      </button>
+      <button type="button" class="cancel-button combat-cancel" data-action="cancel">
+        <i class="fas fa-times"></i>
+        {{localize "DASU.Close"}}
+      </button>
+    </div>
+  </footer>
+
+</form>

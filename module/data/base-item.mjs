@@ -18,6 +18,11 @@ export default class DASUItemBase extends foundry.abstract.TypeDataModel {
       required: false,
       initial: [],
     });
+    // Add favorite field for all items
+    schema.favorite = new fields.BooleanField({
+      required: false,
+      initial: false,
+    });
 
     return schema;
   }

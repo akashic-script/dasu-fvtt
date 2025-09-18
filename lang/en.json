@@ -4,6 +4,12 @@
       "Actor": "DASU Actor Sheet",
       "Item": "DASU Item Sheet"
     },
+    "Attributes": {
+      "pow": { "label": "Power" },
+      "dex": { "label": "Dexterity" },
+      "will": { "label": "Willpower" },
+      "sta": { "label": "Stamina" }
+    },
     "Actor": {
       "Attributes": {
         "label": "Attributes",
@@ -39,6 +45,12 @@
           "free": "Free",
           "nextLevel": "Next level cost"
         }
+      },
+      "Stats": {
+        "hp": { "label": "HP", "tooltip": "Health Points" },
+        "wp": { "label": "WP", "tooltip": "Willpower Points" },
+        "avoid": { "label": "AVD", "tooltip": "Avoid (Dexterity + Stamina)" },
+        "def": { "label": "DEF", "tooltip": "Defense (Power + Willpower)" }
       },
       "base": {
         "FIELDS": {
@@ -89,6 +101,20 @@
         "ToggleSummoned": "Toggle Summoned Status",
         "RemoveFromStock": "Remove from Stocks"
       },
+      "Recruit": {
+        "Title": "Join Summoner",
+        "Description": "Select a summoner for {daemonName} to join.",
+        "SelectActor": "Select Summoner to Join",
+        "ChooseActor": "-- Choose a Summoner --",
+        "Confirm": "Join",
+        "NoSummoners": "No available summoners to join.",
+        "NoSelection": "Please select a summoner to join.",
+        "ActorNotFound": "Selected actor could not be found.",
+        "NotSummoner": "Selected actor is not a summoner.",
+        "OnlyDaemonsCanBeRecruited": "Only daemons can be recruited to summoners.",
+        "Success": "{daemonName} has joined {summonerName}'s stock.",
+        "Error": "An error occurred while joining the summoner."
+      },
       "Summoner": {
         "FIELDS": {
           "attributes.level.value": { "label": "Level" }
@@ -119,6 +145,8 @@
       "Restoratives": "Restoratives",
       "Scars": "Scars",
       "SelectAll": "Select All",
+      "ShowAll": "Show All Items",
+      "ShowFavorites": "Show Only Favorites",
       "Specials": "Specials",
       "Spells": "Spells",
       "Tactics": "Tactics",
@@ -183,7 +211,11 @@
         "FIELDS": {
           "effect": { "label": "Effect" }
         },
-        "InvalidTooltip": "This tag has been deleted or is no longer available"
+        "InvalidTooltip": "This tag has been deleted or is no longer available",
+        "AlreadyEquipped": "Already equipped in a weapon"
+      },
+      "Slot": {
+        "Empty": "Empty Slot"
       },
       "Tabs": {
         "Attributes": "Attributes",
@@ -192,7 +224,16 @@
       },
       "Tactic": {
         "FIELDS": {
-          "effect": { "label": "Effect" }
+          "cost": { "label": "Cost" },
+          "damage": {
+            "type": { "label": "Damage Type" },
+            "value": { "label": "Damage Value" }
+          },
+          "description": { "label": "Description" },
+          "effect": { "label": "Effect" },
+          "govern": { "label": "Governing Attribute" },
+          "isInfinity": { "label": "Guaranteed" },
+          "toLand": { "label": "To Land Bonus" }
         }
       },
       "Weapon": {
@@ -206,7 +247,12 @@
           "toHit": { "label": "To Hit Bonus" }
         },
         "Settings": {}
-      }
+      },
+      "Aptitude": "Aptitude",
+      "Innate": "Innate",
+      "AddToFavorites": "Add to favorites",
+      "RemoveFromFavorites": "Remove from favorites",
+      "MoreActions": "More actions"
     },
     "SearchItems": "Search items...",
     "SearchItemsTooltip": "Search through all items by name",
@@ -369,8 +415,71 @@
       "attributePoints": "AP",
       "skillPoints": "SP",
       "healthPoints": "HP",
-      "willPoints": "WP"
+      "willPoints": "WP",
+      "level": "LVL"
+    },
+    "Cancel": "Cancel",
+    "Close": "Close",
+    "Level": "Level",
+    "ManualCleanup": "Manual Cleanup",
+    "Initiative": "Initiative",
+    "InitiativeRoll": "Initiative Roll",
+    "InitiativeCheck": "Initiative Check",
+    "SkillCheck": "Skill Check",
+    "AttributeCheck": "Attribute Check",
+    "AccuracyCheck": "Accuracy Check",
+    "AbilityCheck": "Ability Check",
+    "TacticCheck": "Tactic Check",
+    "RollCheck": "Roll Check",
+    "ToHit": "To Hit",
+    "ToLand": "To Land",
+    "Bonus": "Bonus",
+    "InitiativeType": "Initiative Type",
+    "Crit": "CRIT!",
+    "Modifier": "mod",
+    "ModifierHint": "Extra dice to add/subtract",
+    "BonusModifierHint": "Extra bonus to add/subtract",
+    "DiceModifier": "Dice Modifier",
+    "CustomLabel": "Custom Label (optional)",
+    "CustomLabelPlaceholder": "Custom description for this roll",
+    "CombatDice": "Combat Dice",
+    "Roll": "Roll",
+    "Attribute": "Attribute",
+    "Skill": "Skill",
+    "Ticks": "ticks",
+    "ChooseSkill": "-- Choose Skill --",
+    "ChooseAttribute": "-- Choose Attribute --",
+    "PrimaryAttribute": "Primary Attribute",
+    "ChoosePrimary": "-- Choose Primary --",
+    "SecondaryAttribute": "Secondary Attribute",
+    "ChooseSecondary": "-- Choose Secondary --",
+    "MustBeInEncounter": "Must be in an active encounter to roll initiative",
+    "Successes": "successes",
+    "Success": "success",
+    "CriticalThreshold": "Critical Threshold",
+    "CriticalThresholdTooltip": "Critical Threshold ({value}): Lower values make crits easier to achieve. Base is 7, reduced by crit mod and certain schemas.",
+    "CriticalThresholdTooltipDaemon": "Critical Threshold ({value}): Lower values make crits easier to achieve. Base is 7, reduced by dejections (crit mod).",
+    "InitiativeTooltip": "Roll Initiative (2d6 + DEX tick d6, count successes)",
+    "InitiativeInfo": "Initiative is 2d6 + chosen ticks. Choose DEX or any skill.",
+    "NoActiveCombat": "No active combat encounter found. Initiative rolls are only available during combat.",
+    "NoPermissionToModify": "You do not have permission to modify this character.",
+    "MessageTypes": {
+      "public": "Public Roll",
+      "gmroll": "Private GM Roll",
+      "blindroll": "Blind GM Roll",
+      "selfroll": "Self Roll"
+    },
+    "RollCard": {
+      "Cost": "Cost",
+      "Damage": "Damage",
+      "Effect": "Effect",
+      "Restores": "Restores",
+      "vsDefense": "vs Defense",
+      "vsAvoid": "vs Avoid"
     }
+  },
+  "DOCUMENT": {
+    "Copy": "Copy"
   },
   "TYPES": {
     "Actor": {

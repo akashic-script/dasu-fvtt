@@ -1,0 +1,32 @@
+{{! Initiative Roll Card Template - matches roll-card structure }}
+<div class="dasu initiative-card">
+  <div class="initiative-header">
+    <div class="initiative-title">
+      <i class="fas fa-dice-d6"></i>
+      <h3>{{localize 'DASU.InitiativeRoll'}}</h3>
+    </div>
+    <div class="initiative-source">
+      {{tickSource}}: {{initiativeTicks}} ticks
+      {{#if diceMod}}
+        {{#if (gt diceMod 0)}}+{{/if}}{{diceMod}} {{localize 'DASU.Modifier'}}
+      {{/if}}
+    </div>
+  </div>
+  
+  <div class="initiative-formula">
+    <span class="formula-display">2d6 + {{initiativeTicks}}{{#if diceMod}}{{#if (gt diceMod 0)}} + {{else}} {{/if}}{{diceMod}}{{/if}}</span>
+  </div>
+  
+  <div class="initiative-outcome">
+    <div class="initiative-result-badge">
+      <span class="result-value">{{initiativeResult}}</span>
+      <i class="result-icon fas fa-bolt"></i>
+    </div>
+    {{#if hasCrit}}
+      <div class="crit-indicator">
+        <span class="crit-icon"><i class="fas fa-star"></i></span>
+        <span class="crit-text">{{localize 'DASU.Crit'}}</span>
+      </div>
+    {{/if}}
+  </div>
+</div>

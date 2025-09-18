@@ -872,9 +872,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
 
       // Validate actor exists and is owned
       if (!actor || !actor.isOwner) {
-        ui.notifications.warn(
-          'You do not have permission to level up this character.'
-        );
+        ui.notifications.warn(game.i18n.localize('DASU.NoPermissionToModify'));
         return;
       }
 
@@ -936,9 +934,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
 
       // Validate actor ownership
       if (!this.actor || !this.actor.isOwner) {
-        ui.notifications.error(
-          'You do not have permission to modify this character.'
-        );
+        ui.notifications.error(game.i18n.localize('DASU.NoPermissionToModify'));
         return;
       }
 

@@ -13,25 +13,46 @@
       <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
     </div>
     <div class="sheet-header-bars">
-      {{!-- HP Bar --}}
-      <div class="bar-meter hp-bar">
-        <span class="bar-label">HP</span>
-        <div class="bar-outer">
-          <div class="bar-inner" style="width: {{percent system.stats.hp.current system.stats.hp.max}}%;"></div>
+      {{!-- Resource Bars --}}
+      <div class="bars-container">
+        {{!-- HP Bar --}}
+        <div class="bar-meter hp-bar">
+          <span class="bar-label">HP</span>
+          <div class="bar-outer">
+            <div class="bar-inner" style="width: {{percent system.stats.hp.current system.stats.hp.max}}%;"></div>
+          </div>
+          <span class="bar-value">
+            <input type="text" name="system.stats.hp.current" value="{{system.stats.hp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.hp.max}}
+          </span>
         </div>
-        <span class="bar-value">
-          <input type="text" name="system.stats.hp.current" value="{{system.stats.hp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.hp.max}}
-        </span>
+        {{!-- WP Bar --}}
+        <div class="bar-meter wp-bar">
+          <span class="bar-label">WP</span>
+          <div class="bar-outer">
+            <div class="bar-inner" style="width: {{percent system.stats.wp.current system.stats.wp.max}}%;"></div>
+          </div>
+          <span class="bar-value">
+            <input type="text" name="system.stats.wp.current" value="{{system.stats.wp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.wp.max}}
+          </span>
+        </div>
       </div>
-      {{!-- WP Bar --}}
-      <div class="bar-meter wp-bar">
-        <span class="bar-label">WP</span>
-        <div class="bar-outer">
-          <div class="bar-inner" style="width: {{percent system.stats.wp.current system.stats.wp.max}}%;"></div>
+      {{!-- Defense Stats --}}
+      <div class="stats-container">
+        {{!-- Avoid Stat --}}
+        <div class="stat-display">
+          <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stats.avoid.tooltip'}}">{{localize 'DASU.Actor.Stats.avoid.label'}}</span>
+          <span class="stat-value">{{system.stats.avoid.value}}</span>
         </div>
-        <span class="bar-value">
-          <input type="text" name="system.stats.wp.current" value="{{system.stats.wp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.wp.max}}
-        </span>
+        {{!-- Defense Stat --}}
+        <div class="stat-display">
+          <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stats.def.tooltip'}}">{{localize 'DASU.Actor.Stats.def.label'}}</span>
+          <span class="stat-value">{{system.stats.def.value}}</span>
+        </div>
+        {{!-- Crit Threshold Stat --}}
+        {{!-- <div class="stat-display">
+          <span class="stat-label" data-tooltip="Critical Threshold: Need to roll double dice at or above this number to achieve a critical hit. Lower is better.">CRIT</span>
+          <span class="stat-value">{{system.stats.crit.value}}</span>
+        </div> --}}
       </div>
     </div>
   </div>
@@ -65,9 +86,9 @@
     </div>
     {{#if (or (eq actor.type 'summoner') (eq actor.type 'daemon'))}}
       <div class="initiative-box">
-        <button type="button" class="initiative-btn" data-action="rollInitiative" data-tooltip="Roll Initiative (2d6 + DEX tick d6, count successes)">
+        <button type="button" class="initiative-btn" data-action="rollInitiative" data-tooltip="{{localize 'DASU.InitiativeTooltip'}}">
           <i class="fas fa-dice-d6"></i>
-          <span>Initiative</span>
+          <span>{{localize 'DASU.Initiative'}}</span>
         </button>
       </div>
     {{/if}}

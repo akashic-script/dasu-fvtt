@@ -1,0 +1,171 @@
+/* =========================
+   Daemon Chat Card Styles - Compact like roll-card
+   ========================= */
+
+/* Compact Daemon Card - matching roll-card style */
+.dasu.daemon-card {
+  background: var(--color-bg-secondary);
+  /* border: 1px solid var(--color-border); */
+  border-radius: 0;
+  /* padding: 6px; */
+  margin: 2px 0;
+  font-family: var(--font-primary);
+  font-size: 0.9em;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Header - compact like roll-card */
+.daemon-card .daemon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  background: var(--color-bg-primary);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+  padding: 4px 8px;
+  /* border: 1px solid var(--dasu-c-primary); */
+  min-height: 28px;
+}
+
+.daemon-card .daemon-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.daemon-card .daemon-image {
+  width: 20px;
+  height: auto;
+  border-radius: 0;
+  border: 1px solid var(--dasu-c-primary);
+  position: relative;
+}
+
+.daemon-card .title-info h3.daemon-name {
+  margin: 0;
+  color: var(--dasu-c-primary);
+  font-weight: 600;
+  font-size: 1em;
+  line-height: 1.1;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* Level Display - compact in header */
+.daemon-card .daemon-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-bg-secondary);
+  /* border: 1px solid var(--color-border); */
+  border-radius: 0;
+  padding: 3px 6px;
+}
+
+.daemon-card .daemon-status-indicator .stat-label {
+  font-weight: 600;
+  color: var(--color-text-highlight);
+  text-transform: uppercase;
+  font-size: 0.7em;
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
+.daemon-card .daemon-status-indicator .stat-value {
+  font-weight: 700;
+  /* color: var(--color-text-primary); */
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8em;
+  line-height: 1;
+}
+
+/* Compact Stats Display */
+.daemon-card .daemon-stats-compact {
+  /* margin: 6px 0; */
+  background: var(--color-bg-secondary);
+  /* padding: 8px 10px; */
+  /* border: 1px solid var(--color-border); */
+  /* border-radius: 0; */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.daemon-card .stat-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.daemon-card .stat-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-primary);
+  /* border: 1px solid var(--color-border); */
+  border-radius: 0;
+  padding: 4px 8px;
+  font-size: 1.2em;
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  transition: all 0.2s ease;
+  gap: 4px;
+}
+
+.daemon-card .stat-item:hover {
+  background: var(--color-bg-secondary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.daemon-card .stat-label {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  font-size: 0.8em;
+  letter-spacing: 0.3px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.daemon-card .stat-value {
+  font-weight: 700;
+  /* color: var(--color-text-primary); */
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  font-size: 0.8em;
+  line-height: 1;
+}
+
+/* Color-coded stat labels */
+.daemon-card .stat-group:first-child .stat-item:first-child .stat-label {
+  color: var(--color-hp);
+}
+
+.daemon-card .stat-group:first-child .stat-item:last-child .stat-label {
+  color: var(--color-wp);
+}
+
+.daemon-card .stat-group:last-child .stat-item:first-child .stat-label {
+  color: var(--color-avoid);
+}
+
+.daemon-card .stat-group:last-child .stat-item:last-child .stat-label {
+  color: var(--color-defense);
+}

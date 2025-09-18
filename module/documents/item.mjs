@@ -1,4 +1,6 @@
 import { slugify } from '../utils/slugify.mjs';
+import { DASUAccuracyRollV1 } from '../helpers/dasu-accuracy-check.mjs';
+import { DASUAccuracyDialog } from '../applications/accuracy-dialog.mjs';
 
 /**
  * Extend the base Item document by defining a custom roll data structure which is ideal for the Simple system.
@@ -379,7 +381,22 @@ export class DASUItem extends Item {
   async roll(event) {
     const item = this;
 
-    // Initialize chat data.
+    // For rollable items (weapons, abilities, tactics), open accuracy dialog
+    if (['weapon', 'ability', 'tactic'].includes(item.type)) {
+      try {
+        // Open the accuracy dialog instead of rolling immediately
+        await DASUAccuracyDialog.openForItem(item, item.actor);
+        return null; // Dialog handles the roll
+      } catch (error) {
+        console.error('DASU | Error opening accuracy dialog:', error);
+        ui.notifications.error(
+          `Failed to open accuracy dialog for ${item.name}: ${error.message}`
+        );
+        return null;
+      }
+    }
+
+    // Fallback to legacy roll system for other item types
     const speaker = ChatMessage.getSpeaker({ actor: this.actor });
     const rollMode = game.settings.get('core', 'rollMode');
     const label = `[${item.type}] ${item.name}`;

@@ -1,0 +1,46 @@
+{{!-- DASU Daemon Chat Card Template --}}
+<div class="dasu daemon-card" data-actor-id="{{actor.id}}">
+
+  {{!-- Header - compact like roll-card --}}
+  <header class="daemon-header">
+    <div class="daemon-title">
+      <img class="daemon-image" src="{{actor.img}}" alt="{{actor.name}}" />
+      <div class="title-info">
+        <h3 class="daemon-name">{{actor.name}}</h3>
+      </div>
+    </div>
+    <div class="daemon-status-indicator">
+      <span class="stat-label">{{localize "DASU.Labels.level"}}</span>
+      <span class="stat-value">{{actor.system.level}}</span>
+    </div>
+  </header>
+
+  {{!-- Compact Stats Display --}}
+  <div class="daemon-stats-compact">
+    <div class="stat-group">
+      <span class="stat-item">
+        <span class="stat-label">{{localize "DASU.Actor.Stats.hp.label"}}</span>
+        <span class="stat-value">{{actor.system.stats.hp.current}}/{{actor.system.stats.hp.max}}</span>
+      </span>
+      <span class="stat-item">
+        <span class="stat-label">{{localize "DASU.Actor.Stats.wp.label"}}</span>
+        <span class="stat-value">{{actor.system.stats.wp.current}}/{{actor.system.stats.wp.max}}</span>
+      </span>
+    </div>
+    <div class="stat-group">
+      <span class="stat-item">
+        <span class="stat-label">{{localize "DASU.Actor.Stats.avoid.label"}}</span>
+        <span class="stat-value">{{actor.system.stats.avoid.value}}</span>
+      </span>
+      <span class="stat-item">
+        <span class="stat-label">{{localize "DASU.Actor.Stats.def.label"}}</span>
+        <span class="stat-value">{{actor.system.stats.def.value}}</span>
+      </span>
+      {{!-- <span class="stat-item">
+        <span class="stat-label">LVL</span>
+        <span class="stat-value">{{actor.system.level}}</span>
+      </span> --}}
+    </div>
+  </div>
+
+</div>

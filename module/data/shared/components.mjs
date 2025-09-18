@@ -55,6 +55,18 @@ export class SharedActorComponents {
         current: new fields.NumberField({ required: true, initial: 0, min: 0 }),
       });
 
+    // Create a function for crit with specific mod range
+    const createCritStatSchema = () =>
+      new fields.SchemaField({
+        mod: new fields.NumberField({
+          required: true,
+          initial: 0,
+          min: 0,
+          max: 6,
+        }),
+        multiplier: new fields.NumberField({ required: true, initial: 1 }),
+      });
+
     return new fields.SchemaField({
       hp: createResourceStatSchema(),
       wp: createResourceStatSchema(),
@@ -63,6 +75,7 @@ export class SharedActorComponents {
       toHit: createStatSchema(),
       toLand: createStatSchema(),
       willStrain: createStatSchema(),
+      crit: createCritStatSchema(),
     });
   }
 
@@ -129,6 +142,9 @@ export class SharedActorComponents {
     const sta = system.attributes?.sta?.tick ?? 0;
     const hpMod = system.stats?.hp?.mod ?? 0;
     const wpMod = system.stats?.wp?.mod ?? 0;
+    const avoidMod = system.stats?.avoid?.mod ?? 0;
+    const defMod = system.stats?.def?.mod ?? 0;
+    const critMod = system.stats?.crit?.mod ?? 0;
 
     // HP: (Stamina + Power) * 10 + HP mod
     system.stats = system.stats || {};
@@ -141,13 +157,43 @@ export class SharedActorComponents {
       },
     });
 
-    // WP: (Willpower + Stamina) * 10 + WP mod
+    // WP: (Dexterity + Willpower) * 10 + WP mod
     system.stats.wp = system.stats.wp || {};
     Object.defineProperty(system.stats.wp, 'max', {
       configurable: true,
       enumerable: true,
       get() {
         return (dex + will) * 10 + wpMod;
+      },
+    });
+
+    // Avoid (AVD): 7 + ([DEX + STA] / 2) + Avoid mod
+    system.stats.avoid = system.stats.avoid || {};
+    Object.defineProperty(system.stats.avoid, 'value', {
+      configurable: true,
+      enumerable: true,
+      get() {
+        return 7 + Math.floor((dex + sta) / 2) + avoidMod;
+      },
+    });
+
+    // Defense (DEF): 7 + ([POW + WILL] / 2) + Defense mod
+    system.stats.def = system.stats.def || {};
+    Object.defineProperty(system.stats.def, 'value', {
+      configurable: true,
+      enumerable: true,
+      get() {
+        return 7 + Math.floor((pow + will) / 2) + defMod;
+      },
+    });
+
+    // Crit: Threshold starts at 7, reduced by crit mod (dejections), min 2, max 7
+    system.stats.crit = system.stats.crit || {};
+    Object.defineProperty(system.stats.crit, 'value', {
+      configurable: true,
+      enumerable: true,
+      get() {
+        return Math.max(2, Math.min(7, 7 - critMod));
       },
     });
   }

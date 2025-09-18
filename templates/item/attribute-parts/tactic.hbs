@@ -1,5 +1,79 @@
 {{! Tactic Attributes Tab }}
 <section class='tab attributes-tactic scrollable {{tab.cssClass}}' data-group='primary' data-tab='attributes'>
+  {{! Tactic Template }}
+  <div class='section-header'>
+    <h3>Tactic Statistics</h3>
+    <p class='section-description'>Configure the tactical properties and requirements of this tactic.</p>
+  </div>
+  
+  <div class='grid grid-2col'>
+    <div class='resource'>
+      <label class='resource-label'>{{localize 'DASU.Item.Tactic.FIELDS.damage.value.label'}}</label>
+      <input
+        type='text'
+        name='system.damage.value'
+        value='{{system.damage.value}}'
+        data-dtype='Number'
+      />
+    </div>
+    <div class='resource'>
+      <label class='resource-label'>{{localize 'DASU.Item.Tactic.FIELDS.damage.type.label'}}</label>
+      <select name='system.damage.type' data-dtype='String'>
+        {{selectOptions damageTypes selected=system.damage.type localize=true}}
+      </select>
+    </div>
+  </div>
+  
+  <div class='separator'></div>
+  
+  <div class='resource'>
+    <label class='resource-label'>{{localize 'DASU.Item.Tactic.FIELDS.cost.label'}}</label>
+    <input
+      type='text'
+      name='system.cost'
+      value='{{system.cost}}'
+      data-dtype='Number'
+    />
+  </div>
+  
+  <div class='separator'></div>
+  
+  <div class='grid grid-2col'>
+    <div class='resource'>
+      <label class='resource-label'>{{localize 'DASU.Item.Tactic.FIELDS.toLand.label'}}</label>
+      <input
+        type='text'
+        name='system.toLand'
+        value='{{system.toLand}}'
+        data-dtype='Number'
+        {{#if system.isInfinity}}disabled{{/if}}
+      />
+    </div>
+    <div class='resource'>
+      <input
+        type='checkbox'
+        name='system.isInfinity'
+        {{#if system.isInfinity}}checked{{/if}}
+        data-dtype='Boolean'
+      />
+      <label for='system.isInfinity'>{{localize 'DASU.Item.Tactic.FIELDS.isInfinity.label'}}</label>
+    </div>
+  </div>
+  
+  <div class='separator'></div>
+  
+  <div class='resource'>
+    <label class='resource-label'>{{localize 'DASU.Item.Tactic.FIELDS.govern.label'}}</label>
+    <select name='system.govern' data-dtype='String'>
+      <option value="pow" {{#if (eq system.govern "pow")}}selected{{/if}}>{{localize 'DASU.Attributes.pow.label'}}</option>
+      <option value="dex" {{#if (eq system.govern "dex")}}selected{{/if}}>{{localize 'DASU.Attributes.dex.label'}}</option>
+      <option value="will" {{#if (eq system.govern "will")}}selected{{/if}}>{{localize 'DASU.Attributes.will.label'}}</option>
+      <option value="sta" {{#if (eq system.govern "sta")}}selected{{/if}}>{{localize 'DASU.Attributes.sta.label'}}</option>
+    </select>
+  </div>
+
+  <div class='separator'></div>
+
   <div class='resource'>
     <label class='resource-label'>{{localize 'DASU.Item.Tactic.FIELDS.effect.label'}}</label>
     <textarea name='system.effect' rows='3'>{{system.effect}}</textarea>
@@ -7,9 +81,11 @@
 
   {{! ProseMirror Description Section }}
   <div class='separator'></div>
-  <div class='field-header'>
-    <h4>{{localize 'DASU.Item.Ability.FIELDS.description.label'}}</h4>
+  <div class='section-header'>
+    <h3>{{localize 'DASU.Item.Tactic.FIELDS.description.label'}}</h3>
+    <p class='section-description'>Describe the tactic's effects, requirements, or special properties.</p>
   </div>
+  
   {{#if editable}} 
     <prose-mirror name="system.description" data-document-uuid="{{item.uuid}}" value="{{system.description}}" collaborate="true" toggled="true">
       {{{enrichedDescription}}}
@@ -17,4 +93,4 @@
   {{else}} 
     {{{enrichedDescription}}}
   {{/if}}
-</section> 
+</section>

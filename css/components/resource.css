@@ -547,7 +547,7 @@
   cursor: pointer;
   border: 3px solid var(--dasu-c-faint);
   box-shadow: 0 0 0 4px var(--color-bg-secondary), 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 16px;
+  border-radius: 0;
   background: var(--color-bg-primary);
   padding: 2px;
   transition: box-shadow 0.2s, border-color 0.2s;
@@ -557,4 +557,76 @@
   border-color: var(--dasu-c-beige);
   box-shadow: 0 0 0 6px var(--color-bg-secondary),
     0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+/* =========================
+   Critical Modifier Section
+   ========================= */
+.crit-section {
+  border: 1px solid var(--color-border);
+  margin-bottom: 0.5rem;
+}
+
+.crit-header {
+  background: var(--color-bg-primary);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.2rem 0.4rem;
+  align-items: center;
+  min-height: 1.4rem;
+}
+
+.crit-threshold-display {
+  font-size: 0.8em;
+  color: var(--color-text-highlight);
+  font-weight: 600;
+  background: var(--color-bg-secondary);
+  padding: 0.15rem 0.3rem;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+}
+
+.crit-controls {
+  padding: 0.35rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.crit-display {
+  padding: 0.35rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.crit-label {
+  font-weight: bold;
+  font-size: 0.9em;
+  color: var(--color-text-primary);
+  flex-shrink: 0;
+}
+
+.crit-mod-input {
+  width: 60px;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.crit-mod-input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.crit-value {
+  font-weight: bold;
+  color: var(--color-text-highlight);
+  font-size: 0.9em;
+  padding: 0.2rem 0.4rem;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  min-width: 30px;
+  text-align: center;
 }

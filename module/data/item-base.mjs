@@ -8,6 +8,11 @@ export default class BaseItemDataModel extends foundry.abstract.TypeDataModel {
         initial: '',
       }),
       description: new fields.StringField({ required: false, initial: '' }),
+      // Add favorite field for all items
+      favorite: new fields.BooleanField({
+        required: false,
+        initial: false,
+      }),
     };
   }
 }

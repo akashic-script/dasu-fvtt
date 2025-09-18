@@ -1,0 +1,273 @@
+/* Recruit Dialog - Combat Themed */
+.dasu.recruit-dialog.combat-themed {
+  padding: 0;
+  font-family: var(--font-primary);
+  min-width: 380px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+/* Header */
+.dialog-header.recruit-header {
+  background: var(--color-bg-primary);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.recruit-header .header-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+  opacity: 0.3;
+}
+
+.recruit-header .header-accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-primary);
+}
+
+.recruit-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.recruit-portrait-frame {
+  position: relative;
+  padding: 2px;
+  background: linear-gradient(45deg, #cd853f, #ffd700);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.recruit-portrait {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #2f1b14;
+  display: block;
+}
+
+.recruit-portrait-frame .portrait-overlay {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(255, 215, 0, 0.2) 100%
+  );
+  pointer-events: none;
+}
+
+.recruit-title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 1em;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.recruit-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  color: var(--color-text-secondary);
+  font-size: 0.8em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.recruit-subtitle i {
+  color: var(--color-primary);
+}
+
+/* Form */
+.recruit-form {
+  padding: 16px;
+  background: var(--color-bg-secondary);
+}
+
+.recruit-form .form-group {
+  margin-bottom: 12px;
+}
+
+.recruit-form .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.recruit-form label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.recruit-form select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 0.85em;
+  line-height: 1.3;
+  min-height: 36px;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.recruit-form select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 3px rgba(234, 179, 8, 0.3);
+}
+
+.recruit-form select option {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  padding: 6px 10px;
+}
+
+/* No Targets State */
+.no-targets {
+  text-align: center;
+  padding: 24px 16px;
+  background: var(--color-bg-primary);
+  border-top: 1px solid var(--color-border);
+}
+
+.no-targets i {
+  color: var(--color-text-secondary);
+  font-size: 2em;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+.no-targets-message {
+  margin: 0 0 16px 0;
+  color: var(--color-text-secondary);
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+/* Footer */
+.dialog-footer.recruit-footer {
+  padding: 12px;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+}
+
+.recruit-footer .action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+/* Buttons */
+.recruit-button.combat-action {
+  flex: 2;
+  padding: 0;
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 40px;
+}
+
+.recruit-button .button-content {
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.recruit-button .button-content i {
+  color: var(--color-text-primary);
+  font-size: 1em;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recruit-button .button-text {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.recruit-button.combat-action:disabled {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.recruit-button.combat-action:disabled .button-text,
+.recruit-button.combat-action:disabled i {
+  color: var(--color-text-secondary);
+}
+
+.cancel-button.combat-cancel {
+  flex: 1;
+  padding: 10px 16px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.8em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  min-height: 40px;
+}
+
+.cancel-button.combat-cancel:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-bg-secondary);
+}
+
+.cancel-button.combat-cancel i {
+  font-size: 1.1em;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -2,6 +2,8 @@ import { prepareActiveEffectCategories } from '../helpers/effects.mjs';
 import { DASUSettings } from '../settings.mjs';
 import { registerHandlebarsHelpers } from '../helpers/helpers.mjs';
 import { LevelingWizard } from '../applications/leveling-wizard.mjs';
+import { DASURollDialog } from '../applications/roll-dialog.mjs';
+import { DASURecruitDialog } from '../applications/recruit-dialog.mjs';
 
 registerHandlebarsHelpers();
 
@@ -18,6 +20,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   constructor(...args) {
     super(...args);
     this._typeFilterState = null;
+    this._isSorting = false;
+    this._favoriteFilterActive = false;
   }
 
   /** @override */
@@ -36,12 +40,17 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       toggleEffect: this._toggleEffect,
       toggleSummoned: this._toggleSummoned,
       removeFromStock: this._removeFromStock,
+      toggleFavorite: this._toggleFavorite,
+      toggleFavoriteFilter: this._toggleFavoriteFilter,
+      toggleDescription: this._toggleDescription,
+      toggleContextMenu: this._toggleContextMenu,
       roll: this._onRoll,
       levelUp: this._levelUp,
       increaseAttribute: this._increaseAttribute,
       decreaseAttribute: this._decreaseAttribute,
       openLevelingWizard: this._openLevelingWizard,
       rollInitiative: this._rollInitiative,
+      recruit: this._onRecruit,
     },
     // Custom property that's merged into `this.options`
     // dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
@@ -53,6 +62,23 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   /** @override */
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, this.DEFAULT_OPTIONS);
+  }
+
+  /** @override */
+  _getHeaderControls() {
+    const controls = super._getHeaderControls();
+
+    // Add "Recruit" button for daemon
+    if (this.document.type === 'daemon' && this.isEditable) {
+      controls.unshift({
+        action: 'recruit',
+        icon: 'fas fa-user-plus',
+        label: 'Recruit',
+        tooltip: 'Recruit new daemon',
+      });
+    }
+
+    return controls;
   }
 
   /** @override */
@@ -177,6 +203,13 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   async _preparePartContext(partId, context) {
     switch (partId) {
       case 'main':
+        context.tab = context.tabs[partId];
+        // Add filter state to context for conditional rendering in main tab
+        context.itemFilterState =
+          this.actor.getFlag('dasu', 'itemFilterState') || null;
+        context.favoriteFilterActive =
+          this.actor.getFlag('dasu', 'favoriteFilterActive') || false;
+        break;
       case 'stocks':
         context.tab = context.tabs[partId];
         break;
@@ -185,6 +218,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         // Add filter state to context for conditional rendering
         context.itemFilterState =
           this.actor.getFlag('dasu', 'itemFilterState') || null;
+        context.favoriteFilterActive =
+          this.actor.getFlag('dasu', 'favoriteFilterActive') || false;
         break;
       case 'biography':
         context.tab = context.tabs[partId];
@@ -288,7 +323,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       });
       // Add Manual Cleanup button
       buttons.unshift({
-        label: 'Manual Cleanup',
+        label: game.i18n.localize('DASU.ManualCleanup'),
         class: 'manual-cleanup',
         icon: 'fas fa-broom',
         onclick: () => this._manualCleanup(),
@@ -440,6 +475,43 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     context.schemas = schemas.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
+    // Add summoned daemon items to collections (for summoners only)
+    if (this.document.type === 'summoner') {
+      const daemonItems = this._getSummonedDaemonItems();
+
+      // Add daemon items to respective collections with special marking
+      weapons.push(...daemonItems.weapons);
+      tags.push(...daemonItems.tags);
+      techniques.push(...daemonItems.techniques);
+      spells.push(...daemonItems.spells);
+      afflictions.push(...daemonItems.afflictions);
+      restoratives.push(...daemonItems.restoratives);
+      tactics.push(...daemonItems.tactics);
+      specials.push(...daemonItems.specials);
+      scars.push(...daemonItems.scars);
+      schemas.push(...daemonItems.schemas);
+      features.push(...daemonItems.features);
+    }
+
+    // Sort again after adding daemon items
+    context.weapons = weapons.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.tags = tags.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.techniques = techniques.sort(
+      (a, b) => (a.sort || 0) - (b.sort || 0)
+    );
+    context.spells = spells.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.afflictions = afflictions.sort(
+      (a, b) => (a.sort || 0) - (b.sort || 0)
+    );
+    context.restoratives = restoratives.sort(
+      (a, b) => (a.sort || 0) - (b.sort || 0)
+    );
+    context.tactics = tactics.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.specials = specials.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.scars = scars.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.schemas = schemas.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+
     // Prepare daemons for summoners
     if (this.document.type === 'summoner') {
       // Get daemons from the stocks field
@@ -455,6 +527,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
               name: actor.name,
               img: actor.img,
               type: actor.type,
+              system: actor.system,
               isSummoned: stock.references.isSummoned || false,
             });
           }
@@ -603,6 +676,12 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           this._handleSummonedDaemonsHeaderClick.bind(this)
         );
       });
+
+    // Classify items for special border styling (fallback for browsers without :has() support)
+    this._classifyItemsForStyling();
+
+    // Set up hook listeners for daemon item updates
+    this._setupDaemonItemHooks();
 
     // Set up items event listeners (search, filter, dropdown, etc.)
     this._setupItemsEventListeners();
@@ -754,7 +833,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     }
 
     const header = event.currentTarget;
-    const itemType = header.dataset.itemType;
     const itemList = header.nextElementSibling;
 
     if (itemList && itemList.classList.contains('item-list')) {
@@ -765,65 +843,34 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /**
-   * Handle filter button click
-   * @param {Event} event The click event
-   * @private
-   */
-  _handleFilterBtnClick(event) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    const dropdown = this.element.querySelector('.items-filter-dropdown');
-    const filterBtn = event.currentTarget;
-
-    // Toggle dropdown visibility
-    const isVisible = dropdown.classList.contains('visible');
-
-    if (isVisible) {
-      dropdown.classList.remove('visible');
-      filterBtn.classList.remove('active');
-    } else {
-      // Position dropdown
-      const rect = filterBtn.getBoundingClientRect();
-      dropdown.style.top = `${rect.bottom + 5}px`;
-      dropdown.style.right = `${window.innerWidth - rect.right}px`;
-
-      // Show dropdown
-      dropdown.classList.add('visible');
-      filterBtn.classList.add('active');
-
-      // Sync checkbox states with current filter state
-      this._syncCheckboxStates();
-    }
-  }
-
-  /**
    * Handle sort option click
    * @param {string} sortType The sort type (alpha-asc, alpha-desc, aptitude-asc, aptitude-desc)
    * @private
    */
-  _handleSortOption(sortType) {
-    // Get the items tab content section specifically
-    const itemsTab = this.element.querySelector('section[data-tab="items"]');
-    if (!itemsTab) {
-      return;
-    }
+  async _handleSortOption(sortType) {
+    // Since we're now updating the actor documents, we don't need tab-specific sorting
+    // The sort will apply to all items and be reflected in both tabs
+    await this._applySortToTab(sortType);
+    this._saveSortState(sortType);
+  }
 
-    // Get all item lists within the items tab
-    const itemLists = itemsTab.querySelectorAll('.item-list');
+  /**
+   * Apply sorting using Foundry's Document sorting
+   * @param {string} sortType The sort type
+   * @private
+   */
+  async _applySortToTab(sortType) {
+    // Set flag to prevent mutation observer from interfering
+    this._isSorting = true;
 
-    itemLists.forEach((itemList) => {
-      const items = Array.from(itemList.querySelectorAll('.item'));
+    try {
+      // Get all items from the actor
+      const allItems = Array.from(this.actor.items);
 
       // Sort items based on sort type
-      items.sort((a, b) => {
-        // Get the item name from the .item-name div, excluding any child elements
-        const aNameElement = a.querySelector('.item-name');
-        const bNameElement = b.querySelector('.item-name');
-
-        // Get text content excluding child elements (badges, indicators, etc.)
-        const aName = this._getItemNameText(aNameElement)?.toLowerCase() || '';
-        const bName = this._getItemNameText(bNameElement)?.toLowerCase() || '';
+      allItems.sort((a, b) => {
+        const aName = a.name?.toLowerCase() || '';
+        const bName = b.name?.toLowerCase() || '';
 
         if (sortType === 'alpha-asc') {
           return aName.localeCompare(bName);
@@ -833,36 +880,73 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           sortType === 'aptitude-asc' ||
           sortType === 'aptitude-desc'
         ) {
-          // Apply aptitude sorting to all item types
-          // Get aptitude values from the aptitude-value span
-          const aAptitudeElement = a.querySelector('.aptitude-value');
-          const bAptitudeElement = b.querySelector('.aptitude-value');
-
-          const aAptitude = aAptitudeElement?.textContent || '';
-          const bAptitude = bAptitudeElement?.textContent || '';
-
-          // Parse aptitude values (e.g., "F-3" -> {govern: "F", value: 3})
-          const aParsed = this._parseAptitudeValue(aAptitude);
-          const bParsed = this._parseAptitudeValue(bAptitude);
+          // Get aptitude values from item system data
+          const aAptitude = this._getItemAptitudeValue(a);
+          const bAptitude = this._getItemAptitudeValue(b);
 
           if (sortType === 'aptitude-asc') {
-            // Sort by aptitude value ascending (0 to 4)
-            return aParsed.value - bParsed.value;
+            return aAptitude.value - bAptitude.value;
           } else {
-            // Sort by aptitude value descending (4 to 0)
-            return bParsed.value - aParsed.value;
+            return bAptitude.value - aAptitude.value;
           }
         }
 
         return 0;
       });
 
-      // Reorder items in the DOM
-      items.forEach((item) => {
-        itemList.appendChild(item);
-      });
-    });
+      // Update sort values for all items
+      const updates = allItems.map((item, index) => ({
+        _id: item.id,
+        sort: index * 100000, // Use large increments to allow for future insertions
+      }));
 
+      // Perform the update
+      await this.actor.updateEmbeddedDocuments('Item', updates);
+    } catch (error) {
+      console.error('Error applying sort:', error);
+    } finally {
+      // Clear sorting flag after a brief delay to allow DOM updates to complete
+      setTimeout(() => {
+        this._isSorting = false;
+      }, 100);
+    }
+  }
+
+  /**
+   * Get aptitude value for an item from its system data
+   * @param {Item} item The item to get aptitude for
+   * @returns {Object} Parsed aptitude object {govern: string, value: number}
+   * @private
+   */
+  _getItemAptitudeValue(item) {
+    // Handle different item types and their aptitude storage patterns
+    if (item.system?.aptitudes) {
+      // Abilities use aptitudes.type and aptitudes.value
+      const aptitudeStr = `${item.system.aptitudes.type.toUpperCase()}-${
+        item.system.aptitudes.value
+      }`;
+      return this._parseAptitudeValue(aptitudeStr);
+    } else if (item.system?.govern) {
+      // Tactics use govern field (no numeric value, so we'll use govern name and set value to 0)
+      return {
+        govern: item.system.govern.toLowerCase(),
+        value: 0,
+      };
+    } else {
+      // Items without aptitude values (weapons, etc.) sort at the bottom
+      return {
+        govern: '',
+        value: -1,
+      };
+    }
+  }
+
+  /**
+   * Save sort state and update button appearance
+   * @param {string} sortType The sort type to save
+   * @private
+   */
+  _saveSortState(sortType) {
     // Store sort preference
     this.actor
       .update({
@@ -882,34 +966,38 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @private
    */
   _updateSortButtonState(sortType) {
-    const sortBtn = this.element.querySelector('.items-sort-btn');
-    if (!sortBtn) return;
+    // Update both sort buttons (main tab and items tab)
+    const sortButtons = this.element.querySelectorAll(
+      '.items-sort-btn, .items-tab-sort-btn'
+    );
 
-    const icon = sortBtn.querySelector('i');
-    if (!icon) return;
+    sortButtons.forEach((sortBtn) => {
+      const icon = sortBtn.querySelector('i');
+      if (!icon) return;
 
-    // Reset to default sort icon
-    icon.className = 'fas fa-sort';
+      // Reset to default sort icon
+      icon.className = 'fas fa-sort';
 
-    // Update icon based on sort type
-    if (sortType) {
-      switch (sortType) {
-        case 'alpha-asc':
-          icon.className = 'fas fa-sort-alpha-down';
-          break;
-        case 'alpha-desc':
-          icon.className = 'fas fa-sort-alpha-up';
-          break;
-        case 'aptitude-asc':
-          icon.className = 'fas fa-sort-numeric-down';
-          break;
-        case 'aptitude-desc':
-          icon.className = 'fas fa-sort-numeric-up';
-          break;
-        default:
-          icon.className = 'fas fa-sort';
+      // Update icon based on sort type
+      if (sortType) {
+        switch (sortType) {
+          case 'alpha-asc':
+            icon.className = 'fas fa-sort-alpha-down';
+            break;
+          case 'alpha-desc':
+            icon.className = 'fas fa-sort-alpha-up';
+            break;
+          case 'aptitude-asc':
+            icon.className = 'fas fa-sort-numeric-down';
+            break;
+          case 'aptitude-desc':
+            icon.className = 'fas fa-sort-numeric-up';
+            break;
+          default:
+            icon.className = 'fas fa-sort';
+        }
       }
-    }
+    });
   }
 
   /**
@@ -954,60 +1042,38 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /**
-   * Extract the item name text from an item name element, excluding child elements
-   * @param {HTMLElement} nameElement The .item-name element
-   * @returns {string} The clean item name text
-   * @private
-   */
-  _getItemNameText(nameElement) {
-    if (!nameElement) return '';
-
-    // Get all text nodes directly from the element
-    const textNodes = [];
-    const walker = document.createTreeWalker(
-      nameElement,
-      NodeFilter.SHOW_TEXT,
-      null,
-      false
-    );
-
-    let node;
-    while ((node = walker.nextNode())) {
-      const text = node.textContent.trim();
-      if (text) {
-        textNodes.push(text);
-      }
-    }
-
-    // Join all text nodes and clean up
-    return textNodes.join(' ').trim();
-  }
-
-  /**
    * Sync checkbox states with current filter state
    * @private
    */
   _syncCheckboxStates() {
-    const dropdown = this.element.querySelector('.items-filter-dropdown');
-    const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
-    const selectAllBtn = dropdown.querySelector('.select-all-btn');
+    // Sync both main and items tab filter dropdowns
+    const dropdowns = this.element.querySelectorAll(
+      '.items-filter-dropdown, .items-tab-filter-dropdown'
+    );
 
-    if (this._typeFilterState === null) {
-      // No filter applied, all checkboxes should be checked
-      checkboxes.forEach((cb) => (cb.checked = true));
-      selectAllBtn.textContent = game.i18n.localize('DASU.Filter.SelectAll');
-    } else {
-      // Apply current filter state to checkboxes
-      checkboxes.forEach((cb) => {
-        cb.checked = this._typeFilterState.includes(cb.value);
-      });
+    dropdowns.forEach((dropdown) => {
+      if (!dropdown) return;
 
-      // Update select all button text
-      const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
-      selectAllBtn.textContent = allChecked
-        ? game.i18n.localize('DASU.Filter.SelectAll')
-        : game.i18n.localize('DASU.Filter.DeselectAll');
-    }
+      const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+      const selectAllBtn = dropdown.querySelector('.select-all-btn');
+
+      if (this._typeFilterState === null) {
+        // No filter applied, all checkboxes should be checked
+        checkboxes.forEach((cb) => (cb.checked = true));
+        selectAllBtn.textContent = game.i18n.localize('DASU.Filter.SelectAll');
+      } else {
+        // Apply current filter state to checkboxes
+        checkboxes.forEach((cb) => {
+          cb.checked = this._typeFilterState.includes(cb.value);
+        });
+
+        // Update select all button text
+        const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
+        selectAllBtn.textContent = allChecked
+          ? game.i18n.localize('DASU.Filter.SelectAll')
+          : game.i18n.localize('DASU.Filter.DeselectAll');
+      }
+    });
   }
 
   /**
@@ -1017,20 +1083,27 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    */
   _handleSearchInput(event) {
     const searchTerm = event.target.value.toLowerCase().trim();
-    const searchClear = this.element.querySelector('.search-clear');
 
-    // Get the items tab specifically
-    const itemsTab = this.element.querySelector('[data-tab="items"]');
-    if (!itemsTab) {
-      return;
+    // Find which tab contains this search input to get the correct clear button
+    const searchContainer = event.target.closest('.search-container');
+    const searchClear = searchContainer?.querySelector('.search-clear');
+
+    // Find the current active tab or the tab containing this search input
+    const currentTab =
+      event.target.closest('[data-tab]') ||
+      this.element.querySelector('[data-tab].active') ||
+      this.element.querySelector('[data-tab="main"]');
+
+    if (!currentTab) return;
+
+    const items = currentTab.querySelectorAll('.item-list .item');
+
+    // Show/hide clear button in the current search container
+    if (searchClear) {
+      searchClear.style.display = searchTerm ? 'block' : 'none';
     }
 
-    const items = itemsTab.querySelectorAll('.item-list .item');
-
-    // Show/hide clear button
-    searchClear.style.display = searchTerm ? 'block' : 'none';
-
-    // Filter items within the items tab only
+    // Filter items within the current tab
     items.forEach((item) => {
       const itemName =
         item.querySelector('.item-name')?.textContent?.toLowerCase() || '';
@@ -1048,16 +1121,20 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   _handleSearchClear(event) {
     event.stopPropagation();
 
-    const searchInput = this.element.querySelector('.items-search-input');
-    const searchClear = this.element.querySelector('.search-clear');
+    // Find the search container and input in the same container as the clear button
+    const searchContainer = event.target.closest('.search-container');
+    const searchInput = searchContainer?.querySelector('.items-search-input');
+    const searchClear = event.target;
 
-    // Get the items tab specifically
-    const itemsTab = this.element.querySelector('[data-tab="items"]');
-    if (!itemsTab) {
-      return;
-    }
+    // Find the tab containing this search container
+    const currentTab =
+      searchContainer?.closest('[data-tab]') ||
+      this.element.querySelector('[data-tab].active') ||
+      this.element.querySelector('[data-tab="main"]');
 
-    const items = itemsTab.querySelectorAll('.item-list .item');
+    if (!currentTab || !searchInput) return;
+
+    const items = currentTab.querySelectorAll('.item-list .item');
 
     // Clear search input
     searchInput.value = '';
@@ -1065,7 +1142,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     // Hide clear button
     searchClear.style.display = 'none';
 
-    // Show all items within the items tab only
+    // Show all items within the current tab
     items.forEach((item) => {
       item.style.display = '';
     });
@@ -1082,27 +1159,72 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       return;
     }
 
-    // Only handle if we have a dropdown
-    const dropdown = this.element.querySelector('.items-filter-dropdown');
-    if (!dropdown || !dropdown.classList.contains('visible')) {
-      return;
-    }
-
     // Don't close if we just cleared the filter
     if (this._preventDropdownClose) {
       return;
     }
 
-    // Check if click is outside the dropdown and filter button
-    const filterBtn = this.element.querySelector('.items-filter-btn');
     const clickedElement = event.target;
 
+    // Handle main tab filter dropdown
+    const dropdown = this.element.querySelector('.items-filter-dropdown');
+    const filterBtn = this.element.querySelector('.items-filter-btn');
+    if (dropdown && dropdown.classList.contains('visible')) {
+      if (
+        !dropdown.contains(clickedElement) &&
+        !filterBtn.contains(clickedElement)
+      ) {
+        dropdown.classList.remove('visible');
+        filterBtn.classList.remove('active');
+      }
+    }
+
+    // Handle items tab filter dropdown
+    const itemsTabDropdown = this.element.querySelector(
+      '.items-tab-filter-dropdown'
+    );
+    const itemsTabFilterBtn = this.element.querySelector(
+      '.items-tab-filter-btn'
+    );
+    if (itemsTabDropdown && itemsTabDropdown.classList.contains('visible')) {
+      if (
+        !itemsTabDropdown.contains(clickedElement) &&
+        !itemsTabFilterBtn.contains(clickedElement)
+      ) {
+        itemsTabDropdown.classList.remove('visible');
+        itemsTabFilterBtn.classList.remove('active');
+      }
+    }
+
+    // Handle main tab sort dropdown
+    const sortDropdown = this.element.querySelector('.items-sort-dropdown');
+    const sortBtn = this.element.querySelector('.items-sort-btn');
+    if (sortDropdown && sortDropdown.classList.contains('visible')) {
+      if (
+        !sortDropdown.contains(clickedElement) &&
+        !sortBtn.contains(clickedElement)
+      ) {
+        sortDropdown.classList.remove('visible');
+        sortBtn.classList.remove('active');
+      }
+    }
+
+    // Handle items tab sort dropdown
+    const itemsTabSortDropdown = this.element.querySelector(
+      '.items-tab-sort-dropdown'
+    );
+    const itemsTabSortBtn = this.element.querySelector('.items-tab-sort-btn');
     if (
-      !dropdown.contains(clickedElement) &&
-      !filterBtn.contains(clickedElement)
+      itemsTabSortDropdown &&
+      itemsTabSortDropdown.classList.contains('visible')
     ) {
-      dropdown.classList.remove('visible');
-      filterBtn.classList.remove('active');
+      if (
+        !itemsTabSortDropdown.contains(clickedElement) &&
+        !itemsTabSortBtn.contains(clickedElement)
+      ) {
+        itemsTabSortDropdown.classList.remove('visible');
+        itemsTabSortBtn.classList.remove('active');
+      }
     }
   }
 
@@ -1181,6 +1303,92 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /**
+   * Toggle the favorite filter state
+   * @param {Event} _event The originating event
+   * @param {HTMLElement} target The target element
+   * @private
+   */
+  static async _toggleFavoriteFilter(_event, target) {
+    // Get the current favorite filter state
+    const currentState =
+      this.actor.getFlag('dasu', 'favoriteFilterActive') || false;
+    const newState = !currentState;
+
+    // Save the state to actor data for persistence
+    try {
+      await this.actor.update({
+        'flags.dasu.favoriteFilterActive': newState,
+      });
+
+      // Re-render the sheet to apply the filter and update button appearance
+      this.render(false);
+    } catch (error) {
+      console.error('Error saving favorite filter state:', error);
+    }
+  }
+
+  /**
+   * Apply favorite filtering to all items
+   * @private
+   */
+  _applyFavoriteFilter() {
+    // Get both items tab and main tab to handle items in both locations
+    const itemsTab = this.element.querySelector('section[data-tab="items"]');
+    const mainTab = this.element.querySelector('section[data-tab="main"]');
+
+    // Create array of sections to process
+    const sectionsToProcess = [];
+    if (itemsTab) sectionsToProcess.push(itemsTab);
+    if (mainTab) sectionsToProcess.push(mainTab);
+
+    sectionsToProcess.forEach((section) => {
+      const itemLists = section.querySelectorAll('.item-list');
+
+      itemLists.forEach((itemList) => {
+        const items = itemList.querySelectorAll('.item');
+
+        items.forEach((itemElement) => {
+          const itemId = itemElement.dataset.itemId;
+          if (!itemId) return;
+
+          let item = this.actor.items.get(itemId);
+          let isFavorite = false;
+
+          // Handle derived daemon items
+          if (!item && itemId.startsWith('daemon-')) {
+            // Extract original item ID from daemon item ID: daemon-{daemonId}-{originalItemId}
+            const parts = itemId.split('-');
+            if (parts.length >= 3) {
+              const originalItemId = parts.slice(2).join('-'); // Handle IDs that contain dashes
+              const originalItem = this.actor.items.get(originalItemId);
+              if (originalItem) {
+                isFavorite = originalItem.system.favorite || false;
+              }
+            }
+          } else if (item) {
+            isFavorite = item.system.favorite || false;
+          } else {
+            return; // Item not found, skip
+          }
+
+          // Show/hide item based on favorite filter state and item's favorite status
+          if (this._favoriteFilterActive) {
+            // Only show favorited items
+            if (isFavorite) {
+              itemElement.style.display = '';
+            } else {
+              itemElement.style.display = 'none';
+            }
+          } else {
+            // Show all items
+            itemElement.style.display = '';
+          }
+        });
+      });
+    });
+  }
+
+  /**
    * Filter items by type
    * @param {string[]} selectedTypes Array of selected item types
    * @private
@@ -1188,56 +1396,87 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   _filterItemsByType(selectedTypes) {
     // Use requestAnimationFrame to ensure DOM is ready
     requestAnimationFrame(() => {
-      // Get the items tab specifically
+      // Get both items tab and main tab to handle items in both locations
       const itemsTab = this.element.querySelector('section[data-tab="items"]');
-      if (!itemsTab) {
+      const mainTab = this.element.querySelector('section[data-tab="main"]');
+
+      // Create array of sections to process
+      const sectionsToProcess = [];
+      if (itemsTab) sectionsToProcess.push(itemsTab);
+      if (mainTab) sectionsToProcess.push(mainTab);
+
+      if (sectionsToProcess.length === 0) {
         return;
       }
 
-      // Get all item lists within the items tab only
-      const itemLists = itemsTab.querySelectorAll('.item-list');
+      // Process each section
+      sectionsToProcess.forEach((section) => {
+        // Get all item lists within this section
+        const itemLists = section.querySelectorAll('.item-list');
 
-      if (itemLists.length === 0) {
-        return;
-      }
-
-      itemLists.forEach((itemList) => {
-        const itemType = itemList.classList[1]?.replace('-list', '');
-
-        if (selectedTypes.includes(itemType)) {
-          // Show this type
-          itemList.classList.remove('filtered-out');
-          itemList.style.setProperty('display', '', 'important');
-        } else {
-          // Hide this type
-          itemList.classList.add('filtered-out');
-          itemList.style.setProperty('display', 'none', 'important');
+        if (itemLists.length === 0) {
+          return;
         }
-      });
 
-      // Show/hide headers based on visible item lists (within items tab only)
-      const headers = itemsTab.querySelectorAll('.items-header');
+        itemLists.forEach((itemList) => {
+          const itemListClass = itemList.classList[1]?.replace('-list', '');
 
-      headers.forEach((header) => {
-        const itemType = header.dataset.itemType;
-        const itemList = header.nextElementSibling;
+          // Map item list class to filter type
+          // For ability subcategories, the filter uses the subcategory name
+          let filterType = itemListClass;
 
-        if (itemList && itemList.classList.contains('item-list')) {
-          if (selectedTypes.includes(itemType)) {
-            header.classList.remove('filtered-out');
-            header.style.setProperty('display', '', 'important');
-          } else {
-            header.classList.add('filtered-out');
-            header.style.setProperty('display', 'none', 'important');
+          // Special handling for ability subcategories
+          if (
+            ['technique', 'spell', 'affliction', 'restorative'].includes(
+              itemListClass
+            )
+          ) {
+            filterType = itemListClass; // These match directly with filter values
           }
-        }
+
+          if (selectedTypes.includes(filterType)) {
+            // Show this type
+            itemList.classList.remove('filtered-out');
+            itemList.style.setProperty('display', '', 'important');
+          } else {
+            // Hide this type
+            itemList.classList.add('filtered-out');
+            itemList.style.setProperty('display', 'none', 'important');
+          }
+        });
+
+        // Show/hide headers based on visible item lists within this section
+        const headers = section.querySelectorAll('.items-header');
+
+        headers.forEach((header) => {
+          const itemType = header.dataset.itemType;
+          const systemCategory = header.dataset.systemCategory;
+          const itemList = header.nextElementSibling;
+
+          if (itemList && itemList.classList.contains('item-list')) {
+            // For ability subcategories, use the system category
+            // For other types, use the item type
+            let filterType = itemType;
+            if (itemType === 'ability' && systemCategory) {
+              filterType = systemCategory;
+            }
+
+            if (selectedTypes.includes(filterType)) {
+              header.classList.remove('filtered-out');
+              header.style.setProperty('display', '', 'important');
+            } else {
+              header.classList.add('filtered-out');
+              header.style.setProperty('display', 'none', 'important');
+            }
+          }
+        });
       });
 
       // Reapply sort state after filtering
       const persistedSortState = this.actor.getFlag('dasu', 'itemSortState');
       if (persistedSortState && typeof persistedSortState === 'string') {
-        setTimeout(() => {
-          this._handleSortOption(persistedSortState);
+        setTimeout(async () => {
+          await this._handleSortOption(persistedSortState);
         }, 10);
       }
 
@@ -1285,7 +1524,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @returns {Promise}
    * @protected
    */
-  static async _onEditImage(event, target) {
+  static async _onEditImage(_event, target) {
     const attr = target.dataset.edit;
     const current = foundry.utils.getProperty(this.document, attr);
     const { img } =
@@ -1312,7 +1551,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @protected
    */
-  static async _viewDoc(event, target) {
+  static async _viewDoc(_event, target) {
     const doc = this._getEmbeddedDocument(target);
     doc.sheet.render(true);
   }
@@ -1325,7 +1564,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @protected
    */
-  static async _deleteDoc(event, target) {
+  static async _deleteDoc(_event, target) {
     const doc = this._getEmbeddedDocument(target);
     await doc.delete();
   }
@@ -1336,15 +1575,12 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @private
    */
-  static async _createDoc(event, target) {
+  static async _createDoc(_event, target) {
     // Retrieve the configured document class for Item or ActiveEffect
     const docCls = getDocumentClass(target.dataset.documentClass);
 
-    // Prepare the document creation data by initializing it a default name.
-    // As of v12, you can define custom Active Effect subtypes just like Item subtypes if you want
     const docData = {
       name: docCls.defaultName({
-        // defaultName handles an undefined type gracefully
         type: target.dataset.type,
         parent: this.actor,
       }),
@@ -1427,36 +1663,25 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @private
    */
-  static async _copyDoc(event, target) {
+  static async _copyDoc(_event, target) {
     const item = this._getEmbeddedDocument(target);
     if (!item) return;
 
-    // Create a copy of the item data
     const itemData = item.toObject();
-
-    // Remove the _id to create a new item
     delete itemData._id;
-
-    // Update the name to indicate it's a copy
     itemData.name = `${itemData.name} (Copy)`;
 
-    // Remove any flags that shouldn't be copied (like leveling flags)
+    // Clean up flags and system data
     if (itemData.flags?.dasu) {
       delete itemData.flags.dasu.grantedByLeveling;
       delete itemData.flags.dasu.levelingSource;
     }
-
-    // Remove category field for non-ability items (like tactics)
     if (itemData.type !== 'ability' && itemData.system?.category) {
       delete itemData.system.category;
     }
 
-    // Create the new item
     const newItem = await Item.create(itemData, { parent: this.actor });
-
-    // Show a notification
     ui.notifications.info(`Copied ${item.name} to ${newItem.name}`);
-
     return newItem;
   }
 
@@ -1468,7 +1693,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @private
    */
-  static async _toggleSummoned(event, target) {
+  static async _toggleSummoned(_event, target) {
     const daemonId = target.closest('li[data-actor-id]').dataset.actorId;
     const stocks = this.actor.system.stocks || [];
     const stockIndex = stocks.findIndex(
@@ -1500,7 +1725,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @private
    */
-  static async _removeFromStock(event, target) {
+  static async _removeFromStock(_event, target) {
     const daemonId = target.closest('li[data-actor-id]').dataset.actorId;
     const stocks = this.actor.system.stocks || [];
     const updatedStocks = stocks.filter(
@@ -1518,9 +1743,122 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @private
    */
-  static async _toggleEffect(event, target) {
+  static async _toggleEffect(_event, target) {
     const effect = this._getEmbeddedDocument(target);
     await effect.update({ disabled: !effect.disabled });
+  }
+
+  /**
+   * Toggle the favorite status of an item
+   *
+   * @this DASUActorSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _toggleFavorite(_event, target) {
+    const item = this._getEmbeddedDocument(target);
+    if (!item) return;
+
+    const currentFavorite = item.system.favorite || false;
+    await item.update({ 'system.favorite': !currentFavorite });
+  }
+
+  /**
+   * Toggle the description row for an item
+   * @param {Event} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _toggleDescription(event, target) {
+    // Don't interfere with rollable elements, their children, or item controls
+    if (
+      event.target.closest('.rollable') ||
+      event.target.classList.contains('rollable') ||
+      event.target.closest('.item-controls') ||
+      event.target.closest('.item-image')
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Find the item row
+    const itemElement = target.closest('li.item');
+    if (!itemElement) return;
+
+    // Find the description row
+    const descriptionRow = itemElement.querySelector('.item-description-row');
+    if (!descriptionRow) return;
+
+    // Toggle the display
+    const isVisible = descriptionRow.style.display !== 'none';
+    descriptionRow.style.display = isVisible ? 'none' : 'block';
+
+    // Find the toggle icon (if it exists) and toggle its class
+    const toggleIcon = itemElement.querySelector('.description-toggle-icon');
+    if (toggleIcon) {
+      toggleIcon.classList.toggle('expanded', !isVisible);
+    }
+  }
+
+  /**
+   * Toggle the context menu dropdown for an item
+   * @param {Event} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _toggleContextMenu(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Close other open menus
+    document.querySelectorAll('.context-menu-dropdown').forEach((menu) => {
+      if (menu.style.display === 'block') menu.style.display = 'none';
+    });
+
+    const contextMenu = target.closest('.item-context-menu');
+    const dropdown = contextMenu?.querySelector('.context-menu-dropdown');
+    if (!dropdown) return;
+
+    const isVisible = dropdown.style.display === 'block';
+    if (isVisible) {
+      dropdown.style.display = 'none';
+    } else {
+      const rect = target.getBoundingClientRect();
+      const dropdownWidth = 180;
+
+      // Measure actual height
+      dropdown.style.cssText = 'display: block; visibility: hidden;';
+      const dropdownHeight = dropdown.offsetHeight;
+      dropdown.style.visibility = '';
+
+      // Calculate position
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+
+      const top =
+        spaceBelow < dropdownHeight && spaceAbove > spaceBelow
+          ? rect.top - dropdownHeight
+          : rect.bottom;
+      const left = Math.max(0, rect.right - dropdownWidth);
+
+      Object.assign(dropdown.style, {
+        top: `${top}px`,
+        left: `${left}px`,
+        display: 'block',
+      });
+
+      // Add click outside listener to close the menu
+      const closeMenu = (e) => {
+        if (!contextMenu.contains(e.target)) {
+          dropdown.style.display = 'none';
+          document.removeEventListener('click', closeMenu);
+        }
+      };
+      setTimeout(() => document.addEventListener('click', closeMenu), 0);
+    }
   }
 
   /**
@@ -1541,7 +1879,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       const combat = game.combat;
       if (combat) {
         const combatant = combat.combatants.find(
-          (c) => c.actor.id === this.actor.id
+          (c) => c.actor?.id === this.actor.id
         );
         // Only treat as initiative if actor is in combat and hasn't rolled initiative yet
         if (combatant && combatant.initiative === null) {
@@ -1573,6 +1911,44 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       case 'item':
         const item = this._getEmbeddedDocument(target);
         if (item) return item.roll();
+        break;
+      case 'actor':
+        // Get the daemon actor ID from the target element
+        const daemonId = target.closest('[data-actor-id]')?.dataset.actorId;
+        if (daemonId) {
+          const daemon = game.actors.get(daemonId);
+          if (daemon) {
+            return this._sendDaemonToChat(daemon);
+          }
+        }
+        break;
+      case 'daemon-attribute':
+        // Handle daemon attribute checks
+        const daemonActorId = dataset.actorId;
+        const attribute = dataset.attribute;
+        if (daemonActorId && attribute) {
+          const daemon = game.actors.get(daemonActorId);
+          if (daemon) {
+            // Create a dataset for the daemon's attribute check
+            const daemonDataset = {
+              roll: dataset.roll,
+              label: dataset.label,
+              attribute: attribute,
+              isDaemon: true, // Flag to indicate this is a daemon roll
+            };
+            // Open the roll dialog with the daemon as the actor
+            try {
+              await DASURollDialog.openFromDataset(daemon, daemonDataset);
+              return null;
+            } catch (error) {
+              console.error(
+                'DASU | Error opening daemon attribute roll dialog:',
+                error
+              );
+            }
+          }
+        }
+        break;
     }
 
     // Handle rolls that supply the formula directly.
@@ -1580,45 +1956,22 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       let label = dataset.label ? `${dataset.label}` : '';
       let roll = new Roll(dataset.roll, this.actor.getRollData());
 
-      // For DASU success-based rolls
+      // For DASU success-based rolls (attribute and skill checks) - open dialog
       if (label.includes('Check')) {
-        // This is a DASU success-based roll
-        await roll.evaluate();
-        let successes = 0;
-        let rollResults = [];
-
-        // Count successes (4-6) from the roll results and collect all results
-        if (roll.dice && roll.dice.length > 0) {
-          for (const die of roll.dice) {
-            if (die.results) {
-              for (const result of die.results) {
-                rollResults.push(result.result);
-                if (result.result >= 4 && result.result <= 6) {
-                  successes++;
-                }
-              }
-            }
-          }
+        try {
+          // Open the roll dialog instead of rolling immediately
+          await DASURollDialog.openFromDataset(this.actor, dataset);
+          return null; // Dialog handles the roll
+        } catch (error) {
+          console.error('DASU | Error opening roll dialog:', error);
+          // Fall back to legacy roll system
+          await roll.toMessage({
+            speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+            flavor: label,
+            rollMode: game.settings.get('core', 'rollMode'),
+          });
+          return roll;
         }
-
-        // Play roll sound
-        foundry.audio.AudioHelper.play({ src: CONFIG.sounds.dice });
-
-        // Create a more detailed message with roll results
-        const successText = successes === 1 ? 'success' : 'successes';
-        const flavor = `${label}<br><strong>Roll: [${rollResults.join(
-          ', '
-        )}]</strong><br><strong>Result: ${successes} ${successText}</strong>`;
-
-        const messageData = {
-          speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-          flavor: flavor,
-          roll: roll,
-          rollMode: game.settings.get('core', 'rollMode'),
-        };
-
-        await ChatMessage.create(messageData);
-        return roll;
       } else {
         // Regular roll
         await roll.toMessage({
@@ -1634,6 +1987,49 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   /** Helper Functions */
 
   /**
+   * Send a daemon actor to chat as a message card
+   * @param {Actor} daemon - The daemon actor to send to chat
+   * @returns {Promise<ChatMessage>} The created chat message
+   */
+  async _sendDaemonToChat(daemon) {
+    // Get the daemon's summoned status from the summoner's daemons array
+    const isSummoned =
+      this.actor.system.daemons?.some(
+        (d) => d._id === daemon.id && d.isSummoned
+      ) || false;
+
+    // Prepare template data
+    const templateData = {
+      actor: daemon,
+      isSummoned: isSummoned,
+      timestamp: Date.now(),
+    };
+
+    // Render the daemon card template
+    const content = await foundry.applications.handlebars.renderTemplate(
+      'systems/dasu/templates/chat/daemon-card.hbs',
+      templateData
+    );
+
+    // Create the chat message
+    const chatData = {
+      user: game.user.id,
+      speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+      content: content,
+      style: foundry.CONST.CHAT_MESSAGE_STYLES.OTHER,
+      flags: {
+        dasu: {
+          type: 'daemon-card',
+          daemonId: daemon.id,
+          summonerId: this.actor.id,
+        },
+      },
+    };
+
+    return ChatMessage.create(chatData);
+  }
+
+  /**
    * Fetches the embedded document representing the containing HTML element
    *
    * @param {HTMLElement} target    The element subject to search
@@ -1642,7 +2038,14 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   _getEmbeddedDocument(target) {
     const docRow = target.closest('li[data-document-class]');
     if (docRow.dataset.documentClass === 'Item') {
-      return this.actor.items.get(docRow.dataset.itemId);
+      const itemId = docRow.dataset.itemId;
+
+      // Check if this is a daemon-derived item
+      if (itemId && itemId.startsWith('daemon-')) {
+        return this._getDaemonDerivedItem(itemId);
+      }
+
+      return this.actor.items.get(itemId);
     } else if (docRow.dataset.documentClass === 'ActiveEffect') {
       const parent =
         docRow.dataset.parentId === this.actor.id
@@ -1744,7 +2147,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    *                                     not permitted.
    * @protected
    */
-  async _onDropActor(event, data) {
+  async _onDropActor(_event, data) {
     if (!this.actor.isOwner) return false;
 
     // Only allow dropping daemons onto summoners
@@ -1814,7 +2217,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @returns {Promise<Item[]>}
    * @private
    */
-  async _onDropItemCreate(itemData, event) {
+  async _onDropItemCreate(itemData, _event) {
     itemData = itemData instanceof Array ? itemData : [itemData];
     return this.actor.createEmbeddedDocuments('Item', itemData);
   }
@@ -1834,7 +2237,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @protected
    * @override
    */
-  async _processSubmitData(event, form, submitData) {
+  async _processSubmitData(_event, _form, submitData) {
     const overrides = foundry.utils.flattenObject(this.actor.overrides);
     for (let k of Object.keys(overrides)) delete submitData[k];
     await this.document.update(submitData);
@@ -1903,7 +2306,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @protected
    */
-  static async _increaseAttribute(event, target) {
+  static async _increaseAttribute(_event, target) {
     if (!['daemon', 'summoner'].includes(this.document.type)) return;
 
     const attribute = target.dataset.attribute;
@@ -1925,7 +2328,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @protected
    */
-  static async _decreaseAttribute(event, target) {
+  static async _decreaseAttribute(_event, target) {
     if (!['daemon', 'summoner'].includes(this.document.type)) return;
 
     const attribute = target.dataset.attribute;
@@ -1951,6 +2354,9 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       this._mutationObserver = null;
     }
 
+    // Clean up daemon item hook listeners
+    this._cleanupDaemonItemHooks();
+
     // Reset filter state loaded flag so it loads again on next open
     this._filterStateLoaded = false;
 
@@ -1966,7 +2372,12 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     event.stopPropagation();
     event.preventDefault();
 
-    const dropdown = this.element.querySelector('.items-filter-dropdown');
+    // Find the dropdown that contains the clicked button
+    const dropdown = event.target.closest(
+      '.items-filter-dropdown, .items-tab-filter-dropdown'
+    );
+    if (!dropdown) return;
+
     const selectAllBtn = dropdown.querySelector('.select-all-btn');
     const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
     const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
@@ -1988,7 +2399,12 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   _handleApplyFilter(event) {
     event.stopPropagation();
 
-    const dropdown = this.element.querySelector('.items-filter-dropdown');
+    // Find the dropdown that contains the clicked button
+    const dropdown = event.target.closest(
+      '.items-filter-dropdown, .items-tab-filter-dropdown'
+    );
+    if (!dropdown) return;
+
     this._applyTypeFilter(dropdown);
   }
 
@@ -2000,7 +2416,12 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   _handleClearFilter(event) {
     event.stopPropagation();
 
-    const dropdown = this.element.querySelector('.items-filter-dropdown');
+    // Find the dropdown that contains the clicked button
+    const dropdown = event.target.closest(
+      '.items-filter-dropdown, .items-tab-filter-dropdown'
+    );
+    if (!dropdown) return;
+
     this._clearTypeFilter(dropdown);
   }
 
@@ -2034,8 +2455,9 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     if (persistedSortState && typeof persistedSortState === 'string') {
       // Apply sort after a short delay to ensure DOM is ready
-      setTimeout(() => {
-        this._handleSortOption(persistedSortState);
+      setTimeout(async () => {
+        // Apply sort to both tabs since the sort state is global
+        await this._handleSortOption(persistedSortState);
       }, 50);
     }
   }
@@ -2073,6 +2495,9 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     }
 
     this._mutationObserver = new MutationObserver(() => {
+      // Don't trigger filtering during sorting operations
+      if (this._isSorting) return;
+
       if (this._typeFilterState) {
         setTimeout(() => {
           this._filterItemsByType(this._typeFilterState);
@@ -2109,6 +2534,180 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         this._filterItemsByType(persistedState);
       }, 50);
     }
+
+    // Initialize favorite filter state
+    const persistedFavoriteState = this.actor.getFlag(
+      'dasu',
+      'favoriteFilterActive'
+    );
+    if (persistedFavoriteState) {
+      this._favoriteFilterActive = persistedFavoriteState;
+
+      setTimeout(() => {
+        this._applyFavoriteFilter();
+      }, 60);
+    }
+  }
+
+  /**
+   * Setup sort button and dropdown functionality
+   * @param {string} btnSelector CSS selector for the sort button
+   * @param {string} dropdownSelector CSS selector for the sort dropdown
+   * @param {string} filterBtnSelector CSS selector for the filter button
+   * @param {string} filterDropdownSelector CSS selector for the filter dropdown
+   * @private
+   */
+  _setupSortButton(
+    btnSelector,
+    dropdownSelector,
+    filterBtnSelector,
+    filterDropdownSelector
+  ) {
+    const sortBtn = this.element.querySelector(btnSelector);
+    const sortDropdown = this.element.querySelector(dropdownSelector);
+    const filterBtn = this.element.querySelector(filterBtnSelector);
+    const filterDropdown = this.element.querySelector(filterDropdownSelector);
+
+    if (!sortBtn || !sortDropdown) return;
+
+    // Sort button click handler
+    sortBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+
+      // Close filter dropdown if open
+      if (filterDropdown && filterDropdown.classList.contains('visible')) {
+        filterDropdown.classList.remove('visible');
+        filterBtn?.classList.remove('active');
+      }
+
+      // Toggle sort dropdown
+      const isVisible = sortDropdown.classList.contains('visible');
+      if (isVisible) {
+        sortDropdown.classList.remove('visible');
+        sortBtn.classList.remove('active');
+      } else {
+        // Position dropdown
+        const rect = sortBtn.getBoundingClientRect();
+        sortDropdown.style.top = `${rect.bottom + 5}px`;
+        sortDropdown.style.right = `${window.innerWidth - rect.right}px`;
+        sortDropdown.classList.add('visible');
+        sortBtn.classList.add('active');
+      }
+    });
+
+    // Sort option clicks
+    sortDropdown.addEventListener('click', (event) => {
+      const sortOption = event.target.closest('.sort-option');
+      if (sortOption) {
+        const sortType = sortOption.dataset.sort;
+        if (sortType) {
+          if (sortType === 'clear') {
+            this._clearSortState();
+          } else {
+            this._handleSortOption(sortType);
+          }
+          // Close dropdown
+          sortDropdown.classList.remove('visible');
+          sortBtn.classList.remove('active');
+        }
+      }
+    });
+  }
+
+  /**
+   * Setup filter button functionality
+   * @param {string} btnSelector CSS selector for the filter button
+   * @param {string} dropdownSelector CSS selector for the filter dropdown
+   * @param {string} sortBtnSelector CSS selector for the sort button
+   * @param {string} sortDropdownSelector CSS selector for the sort dropdown
+   * @private
+   */
+  _setupFilterButton(
+    btnSelector,
+    dropdownSelector,
+    sortBtnSelector,
+    sortDropdownSelector
+  ) {
+    const filterBtn = this.element.querySelector(btnSelector);
+    const filterDropdown = this.element.querySelector(dropdownSelector);
+    const sortBtn = this.element.querySelector(sortBtnSelector);
+    const sortDropdown = this.element.querySelector(sortDropdownSelector);
+
+    if (!filterBtn || !filterDropdown) return;
+
+    filterBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+
+      // Close sort dropdown if open
+      if (sortDropdown && sortDropdown.classList.contains('visible')) {
+        sortDropdown.classList.remove('visible');
+        sortBtn?.classList.remove('active');
+      }
+
+      // Toggle filter dropdown
+      const isVisible = filterDropdown.classList.contains('visible');
+      if (isVisible) {
+        filterDropdown.classList.remove('visible');
+        filterBtn.classList.remove('active');
+      } else {
+        // Position dropdown
+        const rect = filterBtn.getBoundingClientRect();
+        filterDropdown.style.top = `${rect.bottom + 5}px`;
+        filterDropdown.style.right = `${window.innerWidth - rect.right}px`;
+        filterDropdown.classList.add('visible');
+        filterBtn.classList.add('active');
+
+        // Sync checkbox states with current filter state
+        this._syncCheckboxStates();
+      }
+    });
+  }
+
+  /**
+   * Setup event listeners for a filter dropdown
+   * @param {string} selector CSS selector for the dropdown
+   * @private
+   */
+  _setupFilterDropdown(selector) {
+    const dropdown = this.element.querySelector(selector);
+    if (!dropdown) return;
+
+    // Prevent dropdown clicks from closing it
+    dropdown.addEventListener('click', (event) => {
+      event.stopPropagation();
+
+      // Handle button clicks with event delegation
+      const currentBtn = event.currentTarget;
+
+      if (currentBtn.classList.contains('select-all-btn')) {
+        this._handleSelectAll(event);
+      } else if (currentBtn.classList.contains('apply-filter-btn')) {
+        this._handleApplyFilter(event);
+      } else if (currentBtn.classList.contains('clear-filter-btn')) {
+        this._handleClearFilter(event);
+      }
+    });
+
+    // Also add individual listeners as backup
+    const selectAllBtn = dropdown.querySelector('.select-all-btn');
+    if (selectAllBtn) {
+      selectAllBtn.removeEventListener('click', this._boundHandleSelectAll);
+      selectAllBtn.addEventListener('click', this._boundHandleSelectAll);
+    }
+
+    const applyBtn = dropdown.querySelector('.apply-filter-btn');
+    if (applyBtn) {
+      applyBtn.removeEventListener('click', this._boundHandleApplyFilter);
+      applyBtn.addEventListener('click', this._boundHandleApplyFilter);
+    }
+
+    const clearBtn = dropdown.querySelector('.clear-filter-btn');
+    if (clearBtn) {
+      clearBtn.removeEventListener('click', this._boundHandleClearFilter);
+      clearBtn.addEventListener('click', this._boundHandleClearFilter);
+    }
   }
 
   /**
@@ -2123,7 +2722,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     this._boundHandleSearchInput = this._handleSearchInput.bind(this);
     this._boundHandleSearchClear = this._handleSearchClear.bind(this);
     this._boundHandleItemHeaderClick = this._handleItemHeaderClick.bind(this);
-    // this._boundHandleFilterBtnClick = this._handleFilterBtnClick.bind(this); // Removed - using inline handler
     this._boundHandleDocumentClick = this._handleDocumentClick.bind(this);
     this._boundHandleDragStart = this._handleDragStart.bind(this);
     this._boundHandleSortStart = this._handleSortStart.bind(this);
@@ -2184,7 +2782,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         this._isDragging = true;
         if (this._boundHandleSortStart) this._boundHandleSortStart(event);
       });
-      item.addEventListener('dragend', (event) => {
+      item.addEventListener('dragend', (_event) => {
         this._isDragging = false;
         // Clean up drag-over/dragging classes
         item.classList.remove(
@@ -2220,149 +2818,40 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       });
     });
 
-    // Filter dropdown
-    const dropdown = this.element.querySelector('.items-filter-dropdown');
-    if (dropdown) {
-      // Prevent dropdown clicks from closing it
-      dropdown.addEventListener('click', (event) => {
-        event.stopPropagation();
+    // Setup filter dropdowns
+    this._setupFilterDropdown('.items-filter-dropdown');
+    this._setupFilterDropdown('.items-tab-filter-dropdown');
 
-        // Handle button clicks with event delegation
-        const currentBtn = event.currentTarget;
-
-        if (currentBtn.classList.contains('select-all-btn')) {
-          this._handleSelectAll(event);
-        } else if (currentBtn.classList.contains('apply-filter-btn')) {
-          this._handleApplyFilter(event);
-        } else if (currentBtn.classList.contains('clear-filter-btn')) {
-          this._handleClearFilter(event);
-        }
-      });
-
-      // Also add individual listeners as backup
-      const selectAllBtn = dropdown.querySelector('.select-all-btn');
-      if (selectAllBtn) {
-        selectAllBtn.removeEventListener('click', this._boundHandleSelectAll);
-        selectAllBtn.addEventListener('click', this._boundHandleSelectAll);
-      }
-
-      const applyBtn = dropdown.querySelector('.apply-filter-btn');
-      if (applyBtn) {
-        applyBtn.removeEventListener('click', this._boundHandleApplyFilter);
-        applyBtn.addEventListener('click', this._boundHandleApplyFilter);
-      }
-
-      const clearBtn = dropdown.querySelector('.clear-filter-btn');
-      if (clearBtn) {
-        clearBtn.removeEventListener('click', this._boundHandleClearFilter);
-        clearBtn.addEventListener('click', this._boundHandleClearFilter);
-      }
-    }
+    // Setup sort and filter buttons
+    this._setupSortButton(
+      '.items-sort-btn',
+      '.items-sort-dropdown',
+      '.items-filter-btn',
+      '.items-filter-dropdown'
+    );
+    this._setupFilterButton(
+      '.items-filter-btn',
+      '.items-filter-dropdown',
+      '.items-sort-btn',
+      '.items-sort-dropdown'
+    );
+    this._setupSortButton(
+      '.items-tab-sort-btn',
+      '.items-tab-sort-dropdown',
+      '.items-tab-filter-btn',
+      '.items-tab-filter-dropdown'
+    );
+    this._setupFilterButton(
+      '.items-tab-filter-btn',
+      '.items-tab-filter-dropdown',
+      '.items-tab-sort-btn',
+      '.items-tab-sort-dropdown'
+    );
 
     // Set up mutation observer to watch for DOM changes
     if (!this._mutationObserver) {
       this._setupMutationObserver();
     }
-
-    // At the top of _setupItemsEventListeners:
-    const sortBtn = this.element.querySelector('.items-sort-btn');
-    const sortDropdown = this.element.querySelector('.items-sort-dropdown');
-    const filterBtn = this.element.querySelector('.items-filter-btn');
-    const filterDropdown = this.element.querySelector('.items-filter-dropdown');
-
-    // Sort button logic
-    if (sortBtn) {
-      sortBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        event.preventDefault();
-        // Close filter dropdown if open
-        if (filterDropdown && filterDropdown.classList.contains('visible')) {
-          filterDropdown.classList.remove('visible');
-          filterBtn.classList.remove('active');
-        }
-        // Toggle sort dropdown
-        const isVisible = sortDropdown.classList.contains('visible');
-        if (isVisible) {
-          sortDropdown.classList.remove('visible');
-          sortBtn.classList.remove('active');
-        } else {
-          // Position dropdown
-          const rect = sortBtn.getBoundingClientRect();
-          sortDropdown.style.top = `${rect.bottom + 5}px`;
-          sortDropdown.style.right = `${window.innerWidth - rect.right}px`;
-          sortDropdown.classList.add('visible');
-          sortBtn.classList.add('active');
-        }
-      });
-    }
-
-    // Sort option clicks
-    if (sortDropdown) {
-      sortDropdown.addEventListener('click', (event) => {
-        const sortOption = event.target.closest('.sort-option');
-        if (sortOption) {
-          const sortType = sortOption.dataset.sort;
-          if (sortType) {
-            if (sortType === 'clear') {
-              this._clearSortState();
-            } else {
-              this._handleSortOption(sortType);
-            }
-            // Close dropdown
-            sortDropdown.classList.remove('visible');
-            sortBtn.classList.remove('active');
-          }
-        }
-      });
-    }
-    // Filter button logic
-    if (filterBtn) {
-      filterBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        event.preventDefault();
-        // Close sort dropdown if open
-        if (sortDropdown && sortDropdown.classList.contains('visible')) {
-          sortDropdown.classList.remove('visible');
-          sortBtn.classList.remove('active');
-        }
-        // Toggle filter dropdown
-        const isVisible = filterDropdown.classList.contains('visible');
-        if (isVisible) {
-          filterDropdown.classList.remove('visible');
-          filterBtn.classList.remove('active');
-        } else {
-          // Position dropdown
-          const rect = filterBtn.getBoundingClientRect();
-          filterDropdown.style.top = `${rect.bottom + 5}px`;
-          filterDropdown.style.right = `${window.innerWidth - rect.right}px`;
-          filterDropdown.classList.add('visible');
-          filterBtn.classList.add('active');
-
-          // Sync checkbox states with current filter state
-          this._syncCheckboxStates();
-        }
-      });
-    }
-
-    // Sort option event listeners
-    const sortOptions = this.element.querySelectorAll('.sort-option');
-    sortOptions.forEach((option) => {
-      option.addEventListener('click', (event) => {
-        event.stopPropagation();
-        const sortType = option.dataset.sort;
-        this._handleSortOption(sortType);
-
-        // Close dropdown
-        const sortDropdown = this.element.querySelector('.items-sort-dropdown');
-        const sortBtn = this.element.querySelector('.items-sort-btn');
-        if (sortDropdown) {
-          sortDropdown.classList.remove('visible');
-        }
-        if (sortBtn) {
-          sortBtn.classList.remove('active');
-        }
-      });
-    });
   }
 
   /**
@@ -3142,7 +3631,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {Event} event - Button click event
    * @param {HTMLButtonElement} target - Button element
    */
-  static async _openLevelingWizard(event, target) {
+  static async _openLevelingWizard(_event, _target) {
     try {
       // In ApplicationV2, static methods are bound to the instance
       // so 'this' refers to the current application instance
@@ -3183,9 +3672,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
       // Validate actor ownership
       if (!this.actor.isOwner) {
-        ui.notifications.warn(
-          'You do not have permission to access the leveling wizard for this character.'
-        );
+        ui.notifications.warn(game.i18n.localize('DASU.NoPermissionToModify'));
         return;
       }
 
@@ -3212,24 +3699,59 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /**
+   * Open initiative roll dialog
+   */
+  async openInitiativeDialog() {
+    // Create initiative-specific dialog data
+    const initialData = {
+      rollType: 'initiative',
+      primaryAttribute: 'dex',
+      initiativeType: 'dex',
+      diceMod: 0,
+      label: game.i18n.localize('DASU.InitiativeRoll'),
+    };
+
+    const dialog = new DASURollDialog(this.actor, initialData);
+    return dialog.render(true);
+  }
+
+  /**
+   * Handle recruit button click
+   * @param {Event} event - Button click event
+   */
+  static async _onRecruit(event) {
+    event.preventDefault();
+
+    const actor = this.actor;
+
+    // Only daemons can be recruited
+    if (actor.type !== 'daemon') {
+      ui.notifications.warn(
+        game.i18n.localize('DASU.Actor.Recruit.OnlyDaemonsCanBeRecruited')
+      );
+      return;
+    }
+
+    // Open the recruit dialog
+    new DASURecruitDialog(actor).render(true);
+  }
+
+  /**
    * Handle initiative roll button click
    * @param {Event} event - Button click event
-   * @param {HTMLButtonElement} target - Button element
    */
-  static async _rollInitiative(event, target) {
+  static async _rollInitiative(event) {
     event.preventDefault();
 
     try {
       const combat = game.combat;
       if (!combat) {
-        ui.notifications.warn(
-          'No active combat encounter found. Initiative rolls are only available during combat.'
-        );
+        ui.notifications.warn(game.i18n.localize('DASU.NoActiveCombat'));
         return;
       }
 
       const combatant = combat.combatants.find(
-        (c) => c.actor.id === this.actor.id
+        (c) => c.actor?.id === this.actor.id
       );
       if (!combatant) {
         ui.notifications.warn(
@@ -3238,12 +3760,249 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         return;
       }
 
-      await Hooks.callAll('dasu.rollInitiative', this.actor);
+      // Open initiative dialog instead of auto-rolling
+      await this.openInitiativeDialog();
     } catch (error) {
       console.error('Error rolling initiative:', error);
       ui.notifications.error(
         'Failed to roll initiative. Check console for details.'
       );
     }
+  }
+
+  /**
+   * Get items from summoned daemons
+   * @returns {Object} Categorized daemon items
+   * @private
+   */
+  _getSummonedDaemonItems() {
+    const daemonItems = {
+      weapons: [],
+      tags: [],
+      techniques: [],
+      spells: [],
+      afflictions: [],
+      restoratives: [],
+      tactics: [],
+      specials: [],
+      scars: [],
+      schemas: [],
+      features: [],
+    };
+
+    if (this.document.type !== 'summoner') return daemonItems;
+
+    // Get summoned daemons from stocks
+    const stocks = this.document.system.stocks || [];
+
+    for (const stock of stocks) {
+      // Only include items from summoned daemons
+      if (stock.references?.actor && stock.references?.isSummoned) {
+        const daemonActor = game.actors.get(stock.references.actor);
+        if (daemonActor && daemonActor.type === 'daemon') {
+          // Process each item from the daemon
+          for (const item of daemonActor.items) {
+            const daemonItem = this._createDaemonDerivedItem(item, daemonActor);
+
+            // Categorize the daemon item
+            if (item.type === 'ability') {
+              if (item.system.category === 'spell') {
+                daemonItems.spells.push(daemonItem);
+              } else if (item.system.category === 'affliction') {
+                daemonItems.afflictions.push(daemonItem);
+              } else if (item.system.category === 'restorative') {
+                daemonItems.restoratives.push(daemonItem);
+              } else if (item.system.category === 'technique') {
+                daemonItems.techniques.push(daemonItem);
+              }
+            } else if (item.type === 'weapon') {
+              daemonItems.weapons.push(daemonItem);
+            } else if (item.type === 'tag') {
+              daemonItems.tags.push(daemonItem);
+            } else if (item.type === 'tactic') {
+              daemonItems.tactics.push(daemonItem);
+            } else if (item.type === 'special') {
+              daemonItems.specials.push(daemonItem);
+            } else if (item.type === 'scar') {
+              daemonItems.scars.push(daemonItem);
+            } else if (item.type === 'schema') {
+              daemonItems.schemas.push(daemonItem);
+            } else if (item.type === 'feature') {
+              daemonItems.features.push(daemonItem);
+            }
+          }
+        }
+      }
+    }
+
+    return daemonItems;
+  }
+
+  /**
+   * Create a daemon-derived item proxy with special properties
+   * @param {Item} originalItem - The original daemon item
+   * @param {Actor} daemonActor - The daemon actor that owns the item
+   * @returns {Object} Daemon-derived item proxy
+   * @private
+   */
+  _createDaemonDerivedItem(originalItem, daemonActor) {
+    // Create a proxy object that behaves like an item but has special properties
+    const daemonItem = {
+      ...originalItem,
+      _id: `daemon-${daemonActor.id}-${originalItem.id}`, // Unique ID for daemon items
+      name: originalItem.name,
+      img: originalItem.img,
+      type: originalItem.type,
+      system: originalItem.system,
+      flags: {
+        ...originalItem.flags,
+        dasu: {
+          ...originalItem.flags?.dasu,
+          isDaemonDerived: true,
+          sourceDaemon: {
+            id: daemonActor.id,
+            name: daemonActor.name,
+            img: daemonActor.img,
+          },
+        },
+      },
+      sort: (originalItem.sort || 0) + 10000, // Sort daemon items after regular items
+
+      // Add special properties for template usage
+      isDaemonDerived: true,
+      sourceDaemonName: daemonActor.name,
+      sourceDaemonImg: daemonActor.img,
+
+      // Override traits to mark as daemon-derived
+      traits: [...(originalItem.traits || []), 'daemon-derived'],
+    };
+
+    return daemonItem;
+  }
+
+  /**
+   * Get a daemon-derived item by its virtual ID
+   * @param {string} virtualItemId - The virtual item ID (daemon-{daemonId}-{itemId})
+   * @returns {Item|null} The actual daemon item or null if not found
+   * @private
+   */
+  _getDaemonDerivedItem(virtualItemId) {
+    // Parse the virtual ID: daemon-{daemonId}-{itemId}
+    const match = virtualItemId.match(/^daemon-(.+)-(.+)$/);
+    if (!match) return null;
+
+    const [, daemonId, originalItemId] = match;
+
+    // Get the daemon actor
+    const daemonActor = game.actors.get(daemonId);
+    if (!daemonActor) return null;
+
+    // Get the original item from the daemon
+    const originalItem = daemonActor.items.get(originalItemId);
+    if (!originalItem) return null;
+
+    // Verify the daemon is actually summoned by this summoner
+    const stocks = this.document.system.stocks || [];
+    const daemonStock = stocks.find(
+      (stock) =>
+        stock.references?.actor === daemonId && stock.references?.isSummoned
+    );
+
+    if (!daemonStock) return null;
+
+    return originalItem;
+  }
+
+  /**
+   * Set up hook listeners for daemon item updates
+   * @private
+   */
+  _setupDaemonItemHooks() {
+    // Remove any existing hook listeners for this sheet
+    this._cleanupDaemonItemHooks();
+
+    // Only set up hooks for summoners
+    if (this.document.type !== 'summoner') return;
+
+    // Get all daemon IDs that this summoner has summoned
+    const summonedDaemonIds = this._getSummonedDaemonIds();
+
+    if (summonedDaemonIds.length === 0) return;
+
+    // Listen for item updates on daemon actors
+    this._itemUpdateHook = Hooks.on('updateItem', (item) => {
+      // Check if the updated item belongs to one of our summoned daemons
+      if (summonedDaemonIds.includes(item.parent?.id)) {
+        // Refresh this sheet to show the updated daemon-derived item
+        this.render();
+      }
+    });
+  }
+
+  /**
+   * Clean up daemon item hook listeners
+   * @private
+   */
+  _cleanupDaemonItemHooks() {
+    if (this._itemUpdateHook) {
+      Hooks.off('updateItem', this._itemUpdateHook);
+      this._itemUpdateHook = null;
+    }
+  }
+
+  /**
+   * Get IDs of all summoned daemons for this summoner
+   * @returns {string[]} Array of daemon actor IDs
+   * @private
+   */
+  _getSummonedDaemonIds() {
+    if (this.document.type !== 'summoner') return [];
+
+    const stocks = this.document.system.stocks || [];
+    return stocks
+      .filter(
+        (stock) => stock.references?.actor && stock.references?.isSummoned
+      )
+      .map((stock) => stock.references.actor);
+  }
+
+  /**
+   * Classify items for special border styling
+   * Adds CSS classes for browsers that don't support :has() selector
+   * @private
+   */
+  _classifyItemsForStyling() {
+    // Find all item elements
+    this.element
+      .querySelectorAll('.items-list .item[data-item-id]')
+      .forEach((itemElement) => {
+        // Remove existing classification classes
+        itemElement.classList.remove(
+          'innate-item',
+          'leveling-granted-item',
+          'daemon-derived'
+        );
+
+        // Check if item has innate badge
+        const hasInnateBadge = itemElement.querySelector('.innate-badge');
+
+        // Check if item has fa-eye icon (indicating view-only/granted status)
+        const hasEyeIcon = itemElement.querySelector('.item-edit .fa-eye');
+
+        // Get item ID to check if it's a daemon-derived item
+        const itemId = itemElement.dataset.itemId;
+        const isDaemonDerived = itemId && itemId.startsWith('daemon-');
+
+        if (hasInnateBadge) {
+          // Item has innate badge - add innate class
+          itemElement.classList.add('innate-item');
+        } else if (isDaemonDerived) {
+          // Item ID indicates it's daemon-derived - add daemon-derived class
+          itemElement.classList.add('daemon-derived');
+        } else if (hasEyeIcon) {
+          // Item has eye icon but no innate badge - must be leveling-granted
+          itemElement.classList.add('leveling-granted-item');
+        }
+      });
   }
 }

@@ -17,6 +17,13 @@
 @import 'components/effects.css';
 @import 'components/barmeter.css';
 @import 'applications/leveling-wizard.css';
+@import 'applications/roll-dialog.css';
+@import 'applications/recruit-dialog.css';
+@import 'applications/accuracy-dialog.css';
+@import 'chat/attribute-check-card.css';
+@import 'chat/roll-card.css';
+@import 'chat/initiative-card.css';
+@import 'chat/daemon-card.css';
 
 /* Styles limited to dasu sheets */
 .dasu {

@@ -1,0 +1,480 @@
+.dasu.accuracy-dialog.combat-themed {
+  padding: 0;
+  font-family: var(--font-primary);
+  min-width: 320px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Combat Header Styling */
+.dialog-header.combat-header {
+  background: var(--color-bg-primary);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.header-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+  opacity: 0.3;
+}
+
+.header-accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-primary);
+}
+
+.actor-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.portrait-frame {
+  position: relative;
+  padding: 2px;
+  background: linear-gradient(45deg, #cd853f, #ffd700);
+  border-radius: 0;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.actor-portrait {
+  width: 40px;
+  height: 40px;
+  border-radius: 0;
+  border: 2px solid #2f1b14;
+  display: block;
+}
+
+.portrait-overlay {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border-radius: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(255, 215, 0, 0.2) 100%
+  );
+  pointer-events: none;
+}
+
+.actor-name {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 1em;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.combat-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.combat-indicator i {
+  color: var(--color-hp);
+}
+
+.roll-type-label {
+  color: var(--color-text-secondary);
+  font-size: 0.8em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Item Information */
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.item-image-frame {
+  position: relative;
+  padding: 2px;
+  background: linear-gradient(45deg, #cd853f, #ffd700);
+  border-radius: 0;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.item-image,
+.item-portrait {
+  width: 40px;
+  height: 40px;
+  border-radius: 0;
+  border: 2px solid #2f1b14;
+  display: block;
+}
+
+.item-name {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 1em;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.item-type-label {
+  color: var(--color-text-secondary);
+  font-size: 0.8em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Form Configuration */
+.roll-config {
+  padding: 16px;
+  background: var(--color-bg-secondary);
+  position: relative;
+  z-index: 1;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.form-group input[type='number'],
+.form-group input[type='text'] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 0.85em;
+  line-height: 1.3;
+  min-height: 36px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 3px rgba(234, 179, 8, 0.3);
+}
+
+.modifier-hint {
+  font-size: 0.7em;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+  display: block;
+  font-style: italic;
+}
+
+/* Roll Type Toggle Buttons */
+.roll-type-toggle {
+  display: flex;
+  gap: 5px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  border: none;
+  border-right: 1px solid var(--color-border);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  min-height: 50px;
+  justify-content: center;
+}
+
+.toggle-btn:last-child {
+  border-right: none;
+}
+
+.toggle-btn:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-primary);
+}
+
+.toggle-btn.active {
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.toggle-btn i {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.toggle-btn span {
+  font-size: 0.85em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+/* Base Bonus Display */
+.base-bonus-info {
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.bonus-display {
+  text-align: center;
+}
+
+.bonus-label {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-right: 8px;
+}
+
+.bonus-value {
+  font-size: 1.3em;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* Combat Summary Styling */
+.roll-summary.combat-summary {
+  padding: 12px;
+  background: var(--color-bg-primary);
+  border-top: 1px solid var(--color-border);
+  position: relative;
+}
+
+.item-stats {
+  text-align: center;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.stat-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.stat-counter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-bg-secondary);
+  padding: 8px 12px;
+  border-radius: 0;
+  border: 1px solid var(--color-primary);
+}
+
+.stat-value {
+  font-size: 1.8em;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.stat-icon {
+  font-size: 1.2em;
+  color: var(--color-text-secondary);
+}
+
+.stat-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.85em;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-breakdown {
+  font-size: 1em;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Combat Footer Styling */
+.dialog-footer.combat-footer {
+  padding: 12px;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.roll-button.combat-roll {
+  flex: 2;
+  padding: 0;
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 40px;
+}
+
+.button-content {
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  min-height: 20px;
+}
+
+.button-content i {
+  color: var(--color-text-primary);
+  font-size: 1em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+  justify-content: center;
+}
+
+.button-text {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dice-display {
+  color: var(--color-text-primary);
+  font-weight: 700;
+  font-size: 0.9em;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px 8px;
+  border-radius: 0;
+  line-height: 1;
+  min-width: 32px;
+  text-align: center;
+}
+
+.roll-button.combat-roll:hover:not(:disabled) {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.roll-button.combat-roll:disabled {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.roll-button.combat-roll:disabled .button-text,
+.roll-button.combat-roll:disabled i {
+  color: var(--color-text-secondary);
+}
+
+.cancel-button.combat-cancel {
+  flex: 1;
+  padding: 10px 16px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.8em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  min-height: 40px;
+  line-height: 1.2;
+}
+
+.cancel-button.combat-cancel:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-bg-secondary);
+}
+
+.cancel-button.combat-cancel i {
+  font-size: 1.1em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+  justify-content: center;
+}

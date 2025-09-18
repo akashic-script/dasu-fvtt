@@ -35,8 +35,60 @@
 
 .sheet-header-bars {
   display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.bars-container {
+  display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  flex: 1;
+}
+
+.stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
+  min-width: fit-content;
+}
+
+.stat-display {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--color-bg-primary);
+  border: 2px solid var(--color-border);
+  border-radius: 0;
+  padding: 0.4rem 0.6rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 8px;
+  min-width: 3.5rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.stat-display .stat-label {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--color-white);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.stat-display .stat-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--color-white);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin: 0;
 }
 
 .sheet-tabs {
@@ -75,16 +127,26 @@
   font-family: var(--font-primary);
 }
 
+/* =========================
+   Attribute Layout and Spacing
+   ========================= */
+.attributes.grid .attribute {
+  padding: 0.35rem;
+}
+
+.attribute-name {
+  flex: 1;
+  text-align: left;
+}
+
 .dasu.actor .sheet-header,
 .dasu.item .sheet-header {
   flex: 0 auto;
-  overflow: hidden;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start;
   margin-bottom: 10px;
-  min-height: 120px;
 
   .profile-img {
     flex: 0 0 100px;
@@ -148,6 +210,7 @@
   background: var(--color-bg-primary);
   color: var(--color-text);
   font-size: 0.9rem;
+  text-align: left;
   transition: all 0.2s ease;
 }
 

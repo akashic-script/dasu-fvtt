@@ -15,9 +15,9 @@ This is an official FoundryVTT system implementation for [Daemon Summoner](https
 
 ### Manual Installation
 
-1. Visit the [Release](https://github.com/akashic-script/dasu-fvtt/releases "‌") page to find your desired version.
+1. Visit the [Release](https://github.com/akashic-script/dasu-fvtt/releases '‌') page to find your desired version.
 2. Download the `vx.x.x.zip` file for your chosen version.
-3. Unzip the downloaded file to your FoundryVTT Data systems folder. (For more details, refer to the [FoundryVTT Configuration Guide](https://foundryvtt.com/article/configuration/#where-user-data "‌")).
+3. Unzip the downloaded file to your FoundryVTT Data systems folder. (For more details, refer to the [FoundryVTT Configuration Guide](https://foundryvtt.com/article/configuration/#where-user-data '‌')).
 4. Make sure the mainfolder is correctly named: `dasu`
 5. Restart FoundryVTT if necessary.
 

@@ -393,6 +393,8 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       case 'attributesTactic':
         // Necessary for preserving active tab on re-render
         context.tab = context.tabs[partId];
+        // Add damage types for select dropdown
+        context.damageTypes = DASU.damageTypes;
         // Add enriched description for ProseMirror
         context.enrichedDescription =
           await foundry.applications.ux.TextEditor.implementation.enrichHTML(
