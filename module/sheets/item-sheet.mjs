@@ -29,6 +29,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       createDoc: this._createEffect,
       deleteDoc: this._deleteEffect,
       toggleEffect: this._toggleEffect,
+      toggleProgressionPreview: this._toggleProgressionPreview,
     },
     form: {
       submitOnChange: false,
@@ -80,6 +81,10 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     },
     attributesFeature: {
       template: 'systems/dasu/templates/item/attribute-parts/feature.hbs',
+      scrollable: [''],
+    },
+    attributesClass: {
+      template: 'systems/dasu/templates/item/attribute-parts/class.hbs',
       scrollable: [''],
     },
     effects: {
@@ -135,6 +140,9 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
         break;
       case 'feature':
         options.parts.push('attributesFeature', 'description', 'effects');
+        break;
+      case 'class':
+        options.parts.push('attributesClass', 'description', 'effects');
         break;
     }
   }
@@ -423,6 +431,40 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
             }
           );
         break;
+      case 'attributesClass':
+        context.tab = context.tabs[partId];
+        // Add class categories from config
+        context.classCategories = {};
+        const classCategories = globalThis.DASU?.CLASS_CATEGORIES || [
+          'official',
+          'community',
+          'homebrew',
+        ];
+        classCategories.forEach((category) => {
+          context.classCategories[category] = game.i18n.localize(
+            `DASU.Class.Category.${category}`
+          );
+        });
+
+        // Add attribute options for starting attributes
+        context.attributeOptions = {
+          pow: game.i18n.localize('DASU.Actor.Attributes.list.pow.label'),
+          dex: game.i18n.localize('DASU.Actor.Attributes.list.dex.label'),
+          will: game.i18n.localize('DASU.Actor.Attributes.list.will.label'),
+          sta: game.i18n.localize('DASU.Actor.Attributes.list.sta.label'),
+        };
+
+        // Add enriched description for ProseMirror
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              secrets: this.document.isOwner,
+              rollData: this.item.getRollData(),
+              relativeTo: this.item,
+            }
+          );
+        break;
       case 'effects':
         context.tab = context.tabs[partId];
         // Prepare active effects for easier access
@@ -471,6 +513,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
         case 'attributesScar':
         case 'attributesSchema':
         case 'attributesFeature':
+        case 'attributesClass':
           tab.id = 'attributes';
           tab.label += 'Attributes';
           break;
@@ -658,6 +701,41 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
             this._removeEffect(event, event.target)
           );
         });
+    }
+
+    // Add action handlers for class level slots
+    if (this.document.type === 'class') {
+      // Add slot type to level
+      this.element.querySelectorAll('.add-slot-type').forEach((element) => {
+        element.addEventListener('change', (event) =>
+          this._addSlotType(event, event.target)
+        );
+      });
+
+      // Remove slot type from level - use event delegation for dynamically created buttons
+      this.element.addEventListener('click', (event) => {
+        if (event.target.closest('.remove-slot-type')) {
+          event.preventDefault();
+          event.stopPropagation();
+          const target = event.target.closest('.remove-slot-type');
+          this._removeSlotType(event, target);
+        }
+
+        // Edit enhanced schema slot
+        if (event.target.closest('.edit-schema-slot')) {
+          event.preventDefault();
+          event.stopPropagation();
+          const target = event.target.closest('.edit-schema-slot');
+          this._editSchemaSlot(event, target);
+        }
+      });
+
+      // Handle inline editing of schema slot details
+      this.element.addEventListener('input', (event) => {
+        if (event.target.classList.contains('schema-slot-field')) {
+          this._updateSchemaSlotField(event, event.target);
+        }
+      });
     }
 
     // Tag allowed types handlers (for tag items only)
@@ -905,6 +983,41 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     const item = effect.parent;
     if (item?.type === 'weapon' && effect.flags?.dasu?.sourceTag) {
       await item.resyncTagEffects();
+    }
+  }
+
+  /**
+   * Handle toggling the progression preview expand/collapse state
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _toggleProgressionPreview(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const previewElement = target.closest('.progression-preview');
+    if (!previewElement) return;
+
+    const contentElement = previewElement.querySelector(
+      '.progression-preview-content'
+    );
+    const iconElement = target.querySelector('i');
+
+    if (!contentElement || !iconElement) return;
+
+    const isCurrentlyHidden = contentElement.style.display === 'none';
+
+    if (isCurrentlyHidden) {
+      // Show content
+      contentElement.style.display = '';
+      iconElement.className = 'fas fa-chevron-up';
+      target.title = 'Hide progression preview';
+    } else {
+      // Hide content
+      contentElement.style.display = 'none';
+      iconElement.className = 'fas fa-chevron-down';
+      target.title = 'Show progression preview';
     }
   }
 
@@ -1347,5 +1460,243 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     if (success) {
       this.render(true);
     }
+  }
+
+  /**
+   * Handle adding a slot type to a specific level
+   * @param {Event} event The change event
+   * @param {HTMLElement} target The target element
+   * @returns {Promise<boolean>}
+   * @protected
+   */
+  async _addSlotType(event, target) {
+    if (this.document.type !== 'class') return false;
+
+    const level = target.dataset.level;
+    const slotType = target.value;
+
+    if (!slotType) return false;
+
+    // Get current level slots
+    const levelSlots = foundry.utils.deepClone(
+      this.document.system.levelSlots || {}
+    );
+
+    // Initialize array for this level if it doesn't exist
+    if (!levelSlots[level]) {
+      levelSlots[level] = [];
+    }
+
+    // Handle schema slots with enhanced structure
+    if (slotType === 'schema') {
+      // For schema slots, we need to prompt for additional details or use defaults
+      const schemaSlot = {
+        type: 'schema',
+        schemaId: '', // To be filled by user later
+        action: 'new', // Default to new schema
+      };
+
+      // Check if this exact schema slot already exists
+      const existingSchemaSlot = levelSlots[level].find(
+        (slot) => typeof slot === 'object' && slot.type === 'schema'
+      );
+
+      if (!existingSchemaSlot) {
+        levelSlots[level].push(schemaSlot);
+      }
+    } else {
+      // For simple slot types, check if it already exists
+      if (!levelSlots[level].includes(slotType)) {
+        levelSlots[level].push(slotType);
+      }
+    }
+
+    // Update the document
+    await this.document.update({ 'system.levelSlots': levelSlots });
+
+    // Reset the select value
+    target.value = '';
+
+    this.render(true);
+    return true;
+  }
+
+  /**
+   * Handle removing a slot type from a specific level
+   * @param {Event} event The click event
+   * @param {HTMLElement} target The target element
+   * @returns {Promise<boolean>}
+   * @protected
+   */
+  async _removeSlotType(event, target) {
+    if (this.document.type !== 'class') return false;
+
+    const level = target.dataset.level;
+    const slotType = target.dataset.slotType;
+    const slotIndex = target.dataset.slotIndex; // For object-based slots
+
+    console.log('Removing slot type:', { level, slotType, slotIndex });
+
+    // Get current level slots
+    const levelSlots = foundry.utils.deepClone(
+      this.document.system.levelSlots || {}
+    );
+    console.log('Current level slots:', levelSlots);
+
+    if (levelSlots[level]) {
+      console.log('Level slots before filter:', levelSlots[level]);
+
+      if (slotIndex !== undefined) {
+        // Remove by index for object-based slots (like enhanced schema slots)
+        const index = parseInt(slotIndex);
+        if (index >= 0 && index < levelSlots[level].length) {
+          levelSlots[level].splice(index, 1);
+        }
+      } else {
+        // Remove by type for simple string slots
+        levelSlots[level] = levelSlots[level].filter((slot) => {
+          // Handle both string slots and object slots
+          if (typeof slot === 'string') {
+            return slot !== slotType;
+          } else if (typeof slot === 'object' && slot.type) {
+            return slot.type !== slotType;
+          }
+          return true;
+        });
+      }
+
+      console.log('Level slots after filter:', levelSlots[level]);
+
+      // If the array is empty, remove the level entirely
+      if (levelSlots[level].length === 0) {
+        delete levelSlots[level];
+        console.log('Removed empty level');
+      }
+    } else {
+      console.log('Level not found in levelSlots');
+    }
+
+    console.log('Updated level slots:', levelSlots);
+
+    // Update the document
+    await this.document.update({ 'system.levelSlots': levelSlots });
+
+    this.render(true);
+    return true;
+  }
+
+  /**
+   * Handle editing enhanced schema slot details
+   * @param {Event} _event The click event
+   * @param {HTMLElement} target The target element
+   * @returns {Promise<boolean>}
+   * @protected
+   */
+  async _editSchemaSlot(_event, target) {
+    if (this.document.type !== 'class') return false;
+
+    const level = target.dataset.level;
+    const slotIndex = parseInt(target.dataset.slotIndex);
+
+    // Get current level slots
+    const levelSlots = foundry.utils.deepClone(
+      this.document.system.levelSlots || {}
+    );
+
+    if (!levelSlots[level] || !levelSlots[level][slotIndex]) {
+      ui.notifications.error('Schema slot not found');
+      return false;
+    }
+
+    const schemaSlot = levelSlots[level][slotIndex];
+
+    // Create a simple dialog for editing schema slot details
+    const content = `
+      <form>
+        <div class="form-group">
+          <label>Schema ID:</label>
+          <input type="text" name="schemaId" value="${
+            schemaSlot.schemaId || ''
+          }" placeholder="e.g., fireSchema" />
+        </div>
+        <div class="form-group">
+          <label>Action:</label>
+          <select name="action">
+            <option value="new" ${
+              schemaSlot.action === 'new' ? 'selected' : ''
+            }>New Schema</option>
+            <option value="upgrade" ${
+              schemaSlot.action === 'upgrade' ? 'selected' : ''
+            }>Upgrade Schema Level</option>
+          </select>
+        </div>
+      </form>
+    `;
+
+    const dialogClass = getDocumentClass('Dialog');
+    const dialog = new dialogClass({
+      title: 'Edit Schema Slot',
+      content,
+      buttons: {
+        save: {
+          label: 'Save',
+          callback: async (html) => {
+            const formData = new FormData(html[0].querySelector('form'));
+            const schemaId = formData.get('schemaId');
+            const action = formData.get('action');
+
+            // Update the schema slot
+            levelSlots[level][slotIndex] = {
+              ...schemaSlot,
+              schemaId,
+              action,
+            };
+
+            await this.document.update({ 'system.levelSlots': levelSlots });
+            this.render(true);
+          },
+        },
+        cancel: {
+          label: 'Cancel',
+        },
+      },
+      default: 'save',
+    });
+
+    dialog.render(true);
+    return true;
+  }
+
+  /**
+   * Handle updating schema slot field inline
+   * @param {Event} _event The input event
+   * @param {HTMLElement} target The target element
+   * @returns {Promise<boolean>}
+   * @protected
+   */
+  async _updateSchemaSlotField(_event, target) {
+    if (this.document.type !== 'class') return false;
+
+    const level = target.dataset.level;
+    const slotIndex = parseInt(target.dataset.slotIndex);
+    const fieldName = target.dataset.field;
+    const value = target.value;
+
+    // Get current level slots
+    const levelSlots = foundry.utils.deepClone(
+      this.document.system.levelSlots || {}
+    );
+
+    if (!levelSlots[level] || !levelSlots[level][slotIndex]) {
+      return false;
+    }
+
+    // Update the specific field
+    levelSlots[level][slotIndex][fieldName] = value;
+
+    // Update the document
+    await this.document.update({ 'system.levelSlots': levelSlots });
+
+    return true;
   }
 }

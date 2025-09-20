@@ -101,6 +101,11 @@
                 <i class='fas fa-gem'></i>
                 <span>{{localize "DASU.Filter.Features"}}</span>
               </label>
+              <label class='filter-option'>
+                <input type='checkbox' value='class' checked>
+                <i class='fas fa-graduation-cap'></i>
+                <span>{{localize "DASU.Filter.Classes"}}</span>
+              </label>
             </div>
             <div class='filter-actions'>
               <button class='apply-filter-btn'>{{localize "DASU.Filter.Apply"}}</button>
@@ -985,6 +990,108 @@
         {{/each}}
       </div>
       {{/if}}
+
+      {{! Class section }}
+      <li class='item flexrow items-header' data-item-type='class' data-sortable="true" draggable="true">
+        <div class='item-name'>
+          <span class='item-name-text'>{{localize 'DASU.TYPES.Item.class'}}</span>
+        </div>
+        <div class='item-controls'>
+          {{#if (and @root.editable @root.isEditMode)}}
+            <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="class"}}' data-action='createDoc' data-document-class='Item' data-type='class'>
+              <i class='fas fa-plus'></i>
+            </a>
+          {{/if}}
+        </div>
+      </li>
+      <div class='item-list class-list'>
+        {{#each classes as |item id|}}
+          <li class='item expandable-item' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+            <div class='item-row flexrow'>
+              <div class='item-name flexrow item-name-clickable' data-action='toggleDescription'>
+                <div class='item-image'>
+                  <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+                </div>
+                <span class='item-name-text'>{{item.name}}</span>
+                {{#if (includes item.traits 'innate')}}
+                  <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
+                {{/if}}
+                {{#if (eq item.system.category 'official')}}
+                  <span class='class-category-badge official' data-tooltip='{{localize "DASU.Class.Official"}}'>
+                    <i class='fas fa-certificate'></i>
+                  </span>
+                {{else if (eq item.system.category 'community')}}
+                  <span class='class-category-badge community' data-tooltip='{{localize "DASU.Class.Community"}}'>
+                    <i class='fas fa-users'></i>
+                  </span>
+                {{else}}
+                  <span class='class-category-badge homebrew' data-tooltip='{{localize "DASU.Class.Homebrew"}}'>
+                    <i class='fas fa-hammer'></i>
+                  </span>
+                {{/if}}
+              </div>
+              <div class='item-actions'>
+                <span class='class-version' data-tooltip='{{localize "DASU.Class.Version"}}'>
+                  v{{item.system.version}}
+                </span>
+              </div>
+              <div class='item-controls'>
+                {{#if (and @root.editable @root.isEditMode)}}
+                  <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="class"}}' data-action='viewDoc'>
+                    <i class='fas fa-edit'></i>
+                  </a>
+                {{/if}}
+                <div class='item-context-menu'>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
+                    <i class='fas fa-bars'></i>
+                  </a>
+                  <div class='context-menu-dropdown' style='display: none;'>
+                    <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
+                      <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
+                      <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
+                    </a>
+                    {{#if (and @root.editable @root.isEditMode)}}
+                      <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="class"}}' data-action='copyDoc'>
+                        <i class='fas fa-copy'></i>
+                        <span>{{localize "DOCUMENT.Copy" type="class"}}</span>
+                      </a>
+                      <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="class"}}' data-action='deleteDoc'>
+                        <i class='fas fa-trash'></i>
+                        <span>{{localize "DOCUMENT.Delete" type="class"}}</span>
+                      </a>
+                    {{/if}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class='item-description-row' style='display: none;'>
+              <div class='item-description-content'>
+                {{#if item.system.description}}
+                  {{{item.system.description}}}
+                {{else}}
+                  <em>No description available</em>
+                {{/if}}
+                {{#if item.system.startingAttributes}}
+                  <div class='class-details'>
+                    <h4>{{localize "DASU.Class.StartingAttributes"}}</h4>
+                    <div class='starting-attributes'>
+                      <span>{{localize "DASU.Attribute.pow"}}: {{item.system.startingAttributes.pow}}</span>
+                      <span>{{localize "DASU.Attribute.dex"}}: {{item.system.startingAttributes.dex}}</span>
+                      <span>{{localize "DASU.Attribute.will"}}: {{item.system.startingAttributes.will}}</span>
+                      <span>{{localize "DASU.Attribute.sta"}}: {{item.system.startingAttributes.sta}}</span>
+                    </div>
+                    <h4>{{localize "DASU.Class.Progression"}}</h4>
+                    <div class='progression-formulas'>
+                      <div><strong>{{localize "DASU.Class.APFormula"}}:</strong> {{item.system.progression.apFormula}}</div>
+                      <div><strong>{{localize "DASU.Class.SPFormula"}}:</strong> {{item.system.progression.spFormula}}</div>
+                    </div>
+                  </div>
+                {{/if}}
+              </div>
+            </div>
+          </li>
+        {{/each}}
+      </div>
     </ol>
   </aside>
 </section>

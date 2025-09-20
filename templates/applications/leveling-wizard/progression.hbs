@@ -1,159 +1,330 @@
 <div class="leveling-wizard-progression-root">
-{{!-- Leveling Wizard Progression Template --}}
-{{!-- Displays the complete level progression grid with slots for item planning --}}
-<div class="wizard-tabs">
-  <nav class="tab-nav">
-    <button class="tab-btn" data-tab="levelup" {{#if (eq activeTab 'levelup')}}aria-selected="true" class="active"{{/if}}>Level Up</button>
-    <button class="tab-btn" data-tab="config" {{#if (eq activeTab 'config')}}aria-selected="true" class="active"{{/if}}>Config</button>
-  </nav>
-</div>
+  {{!-- Leveling Wizard Progression Template --}}
+  {{!-- Displays the complete level progression grid with slots for item planning --}}
 
-<div class="tab-content">
-  {{#if (eq activeTab 'levelup')}}
-    <div class="progression-content">
-      <div class="progression-header">
-        <h3>Level Progression</h3>
-        <div class="legend">
-          <div class="legend-item">
-            <span class="legend-color completed"></span>
-            <span>Completed</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color current"></span>
-            <span>Current</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color future"></span>
-            <span>Future</span>
-          </div>
-        </div>
-      </div>
+  <!-- Tab Navigation -->
+  <div class="wizard-tabs">
+    <nav class="tab-nav">
+      <button class="tab-btn" data-tab="levelup"
+              {{#if (eq activeTab 'levelup')}}aria-selected="true" class="active"{{/if}}>
+        {{localize "DASU.Actor.levelingWizard.tabs.levelup"}}
+      </button>
+      <button class="tab-btn" data-tab="config"
+              {{#if (eq activeTab 'config')}}aria-selected="true" class="active"{{/if}}>
+        {{localize "DASU.Actor.levelingWizard.tabs.config"}}
+      </button>
+    </nav>
+  </div>
 
-      <div class="levels-container">
-        {{#each levels}}
-        <div class="level-row {{#if isCurrentLevel}}current{{else if isCompleted}}completed{{else}}future{{/if}}" 
-             data-level="{{level}}">
-          
-          <!-- Level Number and Requirements -->
-          <div class="level-info">
-            <div class="level-number">
-              <span class="level-label">Level {{level}}</span>
-              {{#if isCurrentLevel}}
-                <i class="fas fa-crosshairs current-indicator"></i>
-              {{/if}}
-            </div>
-            <div class="level-requirements">
-              <div class="requirement">
-                <span class="requirement-label">Merit:</span>
-                <span class="requirement-value">{{meritRequired}}</span>
-              </div>
-              <div class="requirement">
-                <span class="requirement-label">To Level:</span>
-                <span class="requirement-value">{{toLevelRequired}}</span>
-              </div>
-            </div>
-          </div>
+  <!-- Tab Content -->
+  <div class="tab-content">
+    {{#if (eq activeTab 'levelup')}}
+      <div class="progression-content">
 
-          <!-- Level Bonuses -->
-          <div class="level-bonuses">
-            {{#each bonuses as |bonus|}}
-            <div class="bonus {{bonus.type}}-bonus" title="{{bonus.description}}">
-              <i class="{{bonus.icon}}"></i>
-              <span>{{bonus.text}}</span>
+        <!-- Progression Header with Legend -->
+        <div class="progression-header">
+          <h3>{{localize "DASU.Actor.levelingWizard.progression.title"}}</h3>
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-color completed"></span>
+              <span>{{localize "DASU.Actor.levelingWizard.progression.legend.completed"}}</span>
             </div>
-            {{/each}}
-            {{#unless bonuses.length}}
-            <div class="no-bonus">
-              <span>No bonuses</span>
+            <div class="legend-item">
+              <span class="legend-color current"></span>
+              <span>{{localize "DASU.Actor.levelingWizard.progression.legend.current"}}</span>
             </div>
-            {{/unless}}
-          </div>
-
-          <!-- Level Slots -->
-          <div class="level-slots">
-            {{#if gainAbility}}
-            <div class="slot ability-slot {{#if assignedAbility}}has-item{{/if}}" 
-                 data-level="{{level}}" data-slot-type="ability"
-                 {{#if assignedAbility}}data-item-uuid="{{assignedAbility.uuid}}" data-item-name="{{assignedAbility.name}}"{{/if}}>
-              <div class="slot-label">Ability</div>
-              <div class="slot-content">
-                {{#if assignedAbility}}
-                  <div class="slot-item" data-item-uuid="{{assignedAbility.uuid}}">
-                    <span class="item-name">{{assignedAbility.name}}</span>
-                    <button class="remove-item" data-action="removeItem" data-item-uuid="{{assignedAbility.uuid}}">×</button>
-                  </div>
-                {{else}}
-                  <i class="fas fa-plus"></i>
-                {{/if}}
-              </div>
-            </div>
-            {{/if}}
-            {{#if gainSchema}}
-            <div class="slot schema-slot {{#if assignedSchema}}has-item{{/if}}" 
-                 data-level="{{level}}" data-slot-type="schema" data-schema-type="{{schemaType}}"
-                 {{#if assignedSchema}}data-item-uuid="{{assignedSchema.uuid}}" data-item-name="{{assignedSchema.name}}"{{/if}}>
-              <div class="slot-label">
-                {{#if (eq schemaType 'first')}}First Schema{{else if (eq schemaType 'second')}}Second Schema{{else}}Schema{{/if}} (Lvl 
-                {{#if (eq schemaType 'first')}}
-                  {{#if (eq level 1)}}1{{else if (eq level 5)}}2{{else if (eq level 15)}}3{{/if}}
-                {{else if (eq schemaType 'second')}}
-                  {{#if (eq level 10)}}1{{else if (eq level 20)}}2{{else if (eq level 25)}}3{{/if}}
-                {{else}}
-                  1
-                {{/if}})
-              </div>
-              <div class="slot-content">
-                {{#if assignedSchema}}
-                  <div class="slot-item" data-item-uuid="{{assignedSchema.uuid}}">
-                    <span class="item-name">{{assignedSchema.name}}</span>
-                    <button class="remove-item" data-action="removeItem" data-item-uuid="{{assignedSchema.uuid}}">×</button>
-                  </div>
-                {{else}}
-                  <i class="fas fa-plus"></i>
-                {{/if}}
-              </div>
-            </div>
-            {{/if}}
-            {{#if gainStrengthOfWill}}
-            <div class="slot strength-of-will-slot {{#if assignedStrengthOfWill}}has-item{{/if}}" 
-                 data-level="{{level}}" data-slot-type="strength-of-will"
-                 {{#if assignedStrengthOfWill}}data-item-uuid="{{assignedStrengthOfWill.uuid}}" data-item-name="{{assignedStrengthOfWill.name}}"{{/if}}>
-              <div class="slot-label">Strength of Will</div>
-              <div class="slot-content">
-                {{#if assignedStrengthOfWill}}
-                  <div class="slot-item" data-item-uuid="{{assignedStrengthOfWill.uuid}}">
-                    <span class="item-name">{{assignedStrengthOfWill.name}}</span>
-                    <button class="remove-item" data-action="removeItem" data-item-uuid="{{assignedStrengthOfWill.uuid}}">×</button>
-                  </div>
-                {{else}}
-                  <i class="fas fa-plus"></i>
-                {{/if}}
-              </div>
-            </div>
-            {{/if}}
-          </div>
-
-          <!-- Level Totals -->
-          <div class="level-totals">
-            <div class="total ap-total" title="Total AP at this level">
-              <span class="total-label">AP:</span>
-              <span class="total-value">{{totalAP}}</span>
-            </div>
-            <div class="total sp-total" title="Total SP at this level">
-              <span class="total-label">SP:</span>
-              <span class="total-value">{{totalSP}}</span>
+            <div class="legend-item">
+              <span class="legend-color future"></span>
+              <span>{{localize "DASU.Actor.levelingWizard.progression.legend.future"}}</span>
             </div>
           </div>
         </div>
-        {{/each}}
+
+        <!-- Levels Container -->
+        <div class="levels-container">
+          {{#each levels}}
+            <div class="level-row {{#if isCurrentLevel}}current{{else if isCompleted}}completed{{else}}future{{/if}}"
+                 data-level="{{level}}">
+
+              <!-- Level Information and Bonuses -->
+              <div class="level-info-combined">
+                <div class="level-number">
+                  <span class="level-label">{{localize "DASU.Actor.levelingWizard.progression.level"}} {{level}}</span>
+                  {{#if isCurrentLevel}}
+                    <i class="fas fa-crosshairs current-indicator"></i>
+                  {{/if}}
+                </div>
+
+                <div class="level-requirements">
+                  <div class="requirement">
+                    <span class="requirement-label">{{localize "DASU.Actor.levelingWizard.progression.merit"}}</span>
+                    <span class="requirement-value">{{meritRequired}}</span>
+                  </div>
+                  <div class="requirement">
+                    <span class="requirement-label">{{localize "DASU.Actor.levelingWizard.progression.toLevel"}}</span>
+                    <span class="requirement-value">{{toLevelRequired}}</span>
+                  </div>
+                </div>
+
+                <div class="level-bonuses">
+                  {{#each bonuses as |bonus|}}
+                    <div class="bonus {{bonus.type}}-bonus" title="{{bonus.description}}">
+                      <i class="{{bonus.icon}}"></i>
+                      <span>{{bonus.text}}</span>
+                    </div>
+                  {{/each}}
+                  {{#unless bonuses.length}}
+                    <div class="no-bonus">
+                      <span>{{localize "DASU.Actor.levelingWizard.progression.noBonuses"}}</span>
+                    </div>
+                  {{/unless}}
+                </div>
+              </div>
+
+              <!-- Point Allocation Section -->
+              <div class="level-points compact">
+                <!-- Attribute Points (AP) Block -->
+                {{#if apGained}}
+                  <div class="point-block ap-block {{#if isCurrentLevel}}current{{else}}planned{{/if}}">
+                    <div class="point-header">
+                      <span class="point-label">
+                        AP {{#if pointAllocations.ap.spent}}{{pointAllocations.ap.spent}}/{{/if}}{{apGained}}
+                      </span>
+                      <button class="expand-toggle"
+                              data-level="{{level}}"
+                              data-action="toggleAttributeExpand"
+                              title="Show all attributes">
+                        <i class="fas fa-chevron-down"></i>
+                      </button>
+                    </div>
+
+                    <!-- Collapsed view: Only allocated attributes -->
+                    <div class="point-allocations attribute-allocations-collapsed">
+                      {{#each pointAllocations.ap as |points attrName|}}
+                        {{#if (and (gt points 0) (not (eq attrName "spent")) (not (eq attrName "available")) (isValidAttribute attrName))}}
+                          <div class="inline-allocation attribute-allocation compact">
+                            <span class="attr-name">
+                              {{#if (eq attrName "pow")}}Pow
+                              {{else if (eq attrName "dex")}}Dex
+                              {{else if (eq attrName "will")}}Will
+                              {{else if (eq attrName "sta")}}Sta
+                              {{else}}{{attrName}}{{/if}}
+                            </span>
+                            <span class="allocation-display">
+                              {{getBaseAttributeTicks ../../actor attrName ../level}} → {{add (getBaseAttributeTicks ../../actor attrName ../level) points}}
+                            </span>
+                            <button class="remove-btn"
+                                    data-level="{{../level}}"
+                                    data-attribute="{{attrName}}"
+                                    data-action="decreaseAttribute"
+                                    title="Remove allocation">
+                              <i class="fas fa-times"></i>
+                            </button>
+                          </div>
+                        {{/if}}
+                      {{/each}}
+                    </div>
+
+                    <!-- Expanded view: All available attributes -->
+                    <div class="point-allocations attribute-allocations-expanded" style="display: none;">
+                      {{#each ../config.attributes as |attr key|}}
+                        <div class="inline-allocation attribute-allocation">
+                          <span class="attr-name">
+                            {{#if (eq key "pow")}}Pow
+                            {{else if (eq key "dex")}}Dex
+                            {{else if (eq key "will")}}Will
+                            {{else if (eq key "sta")}}Sta
+                            {{else}}{{key}}{{/if}}
+                          </span>
+                          <div class="allocation-controls">
+                            <button class="mini-btn decrease"
+                                    data-level="{{../level}}"
+                                    data-attribute="{{key}}"
+                                    data-action="decreaseAttribute">-</button>
+                            <span class="point-value">{{getCurrentAllocation ../pointAllocations "ap" key}}</span>
+                            <button class="mini-btn increase"
+                                    data-level="{{../level}}"
+                                    data-attribute="{{key}}"
+                                    data-action="increaseAttribute">+</button>
+                          </div>
+                        </div>
+                      {{/each}}
+                    </div>
+                  </div>
+                {{/if}}
+
+                <!-- Skill Points (SP) Block -->
+                {{#if spGained}}
+                  <div class="point-block sp-block {{#if isCurrentLevel}}current{{else}}planned{{/if}}">
+                    <div class="point-header">
+                      <span class="point-label">
+                        SP {{#if pointAllocations.sp.spent}}{{pointAllocations.sp.spent}}/{{/if}}{{spGained}}
+                      </span>
+                      <button class="expand-toggle"
+                              data-level="{{level}}"
+                              data-action="toggleSkillExpand"
+                              title="Show all skills">
+                        <i class="fas fa-chevron-down"></i>
+                      </button>
+                    </div>
+
+                    <!-- Collapsed view: Only allocated skills -->
+                    <div class="point-allocations skill-allocations-collapsed">
+                      {{#each pointAllocations.sp.skills as |points skillName|}}
+                        <div class="inline-allocation skill-allocation compact">
+                          <span class="skill-name">{{skillName}}</span>
+                          <span class="allocation-display">
+                            {{getBaseSkillTicks ../../actor skillName ../level}} → {{add (getBaseSkillTicks ../../actor skillName ../level) points}}
+                          </span>
+                          <button class="remove-btn"
+                                  data-level="{{../level}}"
+                                  data-skill="{{skillName}}"
+                                  data-action="decreaseSkill"
+                                  title="Remove allocation">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      {{/each}}
+                      {{#unless pointAllocations.sp.skills}}
+                        <div class="no-skills-allocated">
+                          <span>{{localize "DASU.Actor.levelingWizard.progression.noSkillsAllocated"}}</span>
+                          <button class="expand-btn"
+                                  data-level="{{level}}"
+                                  data-action="toggleSkillExpand">
+                            <i class="fas fa-plus"></i> {{localize "DASU.Actor.levelingWizard.progression.addSkills"}}
+                          </button>
+                        </div>
+                      {{/unless}}
+                    </div>
+
+                    <!-- Expanded view: All available skills -->
+                    <div class="point-allocations skill-allocations-expanded" style="display: none;">
+                      {{#each ../config.allSkills as |skill|}}
+                        <div class="inline-allocation skill-allocation">
+                          <span class="skill-name">{{skill.label}}</span>
+                          <div class="allocation-controls">
+                            <button class="mini-btn decrease"
+                                    data-level="{{../level}}"
+                                    data-skill="{{skill.value}}"
+                                    data-action="decreaseSkill">-</button>
+                            <span class="point-value">{{getCurrentAllocation ../pointAllocations "sp" skill.value}}</span>
+                            <button class="mini-btn increase"
+                                    data-level="{{../level}}"
+                                    data-skill="{{skill.value}}"
+                                    data-action="increaseSkill">+</button>
+                          </div>
+                        </div>
+                      {{/each}}
+                    </div>
+                  </div>
+                {{/if}}
+              </div>
+
+              <!-- Item Slots Section -->
+              <div class="level-slots">
+
+                <!-- Ability Slot -->
+                {{#if gainAbility}}
+                  <div class="slot ability-slot {{#if assignedAbility}}has-item{{/if}}"
+                       data-level="{{level}}"
+                       data-slot-type="ability"
+                       {{#if assignedAbility}}
+                         data-item-uuid="{{assignedAbility.uuid}}"
+                         data-item-name="{{assignedAbility.name}}"
+                       {{/if}}>
+                    <div class="slot-label">{{localize "DASU.Actor.levelingWizard.slots.ability"}}</div>
+                    <div class="slot-content">
+                      {{#if assignedAbility}}
+                        <div class="slot-item" data-item-uuid="{{assignedAbility.uuid}}">
+                          <span class="item-name">{{assignedAbility.name}}</span>
+                          <button class="remove-item"
+                                  data-action="removeItem"
+                                  data-item-uuid="{{assignedAbility.uuid}}">×</button>
+                        </div>
+                      {{else}}
+                        <i class="fas fa-plus"></i>
+                      {{/if}}
+                    </div>
+                  </div>
+                {{/if}}
+
+                <!-- Schema Slot -->
+                {{#if gainSchema}}
+                  <div class="slot schema-slot {{#if assignedSchema}}has-item{{/if}}"
+                       data-level="{{level}}"
+                       data-slot-type="schema"
+                       data-schema-type="{{schemaType}}"
+                       {{#if assignedSchema}}
+                         data-item-uuid="{{assignedSchema.uuid}}"
+                         data-item-name="{{assignedSchema.name}}"
+                       {{/if}}>
+                    <div class="slot-label">
+                      {{#if schemaDetails}}
+                        {{#if schemaDetails.schemaId}}
+                          {{#if (eq schemaDetails.action "upgrade")}}Upgrade{{else}}New{{/if}} {{schemaDetails.schemaId}}
+                        {{else}}
+                          {{#if (eq schemaDetails.action "upgrade")}}Schema Upgrade{{else}}New Schema{{/if}}
+                        {{/if}}
+                      {{else if (eq schemaType 'first')}}
+                        First Schema (Lvl {{#if (eq level 1)}}1{{else if (eq level 5)}}2{{else if (eq level 15)}}3{{/if}})
+                      {{else if (eq schemaType 'second')}}
+                        Second Schema (Lvl {{#if (eq level 10)}}1{{else if (eq level 20)}}2{{else if (eq level 25)}}3{{/if}})
+                      {{else}}
+                        Schema
+                      {{/if}}
+                    </div>
+                    <div class="slot-content">
+                      {{#if assignedSchema}}
+                        <div class="slot-item" data-item-uuid="{{assignedSchema.uuid}}">
+                          <span class="item-name">{{assignedSchema.name}}</span>
+                          <button class="remove-item"
+                                  data-action="removeItem"
+                                  data-item-uuid="{{assignedSchema.uuid}}">×</button>
+                        </div>
+                      {{else}}
+                        <i class="fas fa-plus"></i>
+                      {{/if}}
+                    </div>
+                  </div>
+                {{/if}}
+
+                <!-- Strength of Will Slot -->
+                {{#if gainStrengthOfWill}}
+                  <div class="slot strength-of-will-slot {{#if assignedStrengthOfWill}}has-item{{/if}}"
+                       data-level="{{level}}"
+                       data-slot-type="strength-of-will"
+                       {{#if assignedStrengthOfWill}}
+                         data-item-uuid="{{assignedStrengthOfWill.uuid}}"
+                         data-item-name="{{assignedStrengthOfWill.name}}"
+                       {{/if}}>
+                    <div class="slot-label">{{localize "DASU.Actor.levelingWizard.slots.strengthOfWill"}}</div>
+                    <div class="slot-content">
+                      {{#if assignedStrengthOfWill}}
+                        <div class="slot-item" data-item-uuid="{{assignedStrengthOfWill.uuid}}">
+                          <span class="item-name">{{assignedStrengthOfWill.name}}</span>
+                          <button class="remove-item"
+                                  data-action="removeItem"
+                                  data-item-uuid="{{assignedStrengthOfWill.uuid}}">×</button>
+                        </div>
+                      {{else}}
+                        <i class="fas fa-plus"></i>
+                      {{/if}}
+                    </div>
+                  </div>
+                {{/if}}
+              </div>
+            </div>
+          {{/each}}
+        </div>
       </div>
-    </div>
-  {{/if}}
-  {{#if (eq activeTab 'config')}}
-    <div class="config-content">
-      <h3>Config</h3>
-      <p>Configuration options will go here.</p>
-    </div>
-  {{/if}}
+    {{/if}}
+
+    <!-- Config Tab Content -->
+    {{#if (eq activeTab 'config')}}
+      <div class="config-content">
+        <h3>{{localize "DASU.Actor.levelingWizard.config.title"}}</h3>
+        <p>{{localize "DASU.Actor.levelingWizard.config.placeholder"}}</p>
+      </div>
+    {{/if}}
+  </div>
 </div>
-</div> 

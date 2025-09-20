@@ -40,7 +40,7 @@ export class DASUSettings {
       scope: 'world',
       config: false,
       type: Number,
-      default: 2,
+      default: 0,
       requiresReload: true,
     });
 

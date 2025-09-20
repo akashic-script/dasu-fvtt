@@ -38,6 +38,17 @@ export default class SummonerDataModel extends BaseActorDataModel {
 
     return {
       ...baseSchema,
+      // Class integration
+      classType: new fields.StringField({
+        required: false,
+        initial: '',
+        label: 'Class',
+      }),
+      classData: new fields.ObjectField({
+        required: false,
+        initial: {},
+        label: 'Class Data Cache',
+      }),
       skills: new fields.ArrayField(skillSchema, { required: false }),
       dejection: new fields.SchemaField(
         {
@@ -129,6 +140,16 @@ export default class SummonerDataModel extends BaseActorDataModel {
           // Add storedItems for trait-based leveling item system
           storedItems: new fields.ObjectField({ required: false, initial: {} }), // Level -> [itemData, ...]
           fullItems: new fields.ObjectField({ required: false, initial: {} }), // Slot key -> full item data
+          // Class-based level bonuses
+          classBonuses: new fields.ObjectField({
+            required: false,
+            initial: {},
+          }), // Level -> applied bonuses
+          // Point allocations for AP/SP per level
+          pointAllocations: new fields.ObjectField({
+            required: false,
+            initial: {},
+          }), // Level -> {ap: {pow:1, dex:0...}, sp: {skills: {academia: 2...}}}
         },
         {
           required: false,
@@ -138,6 +159,8 @@ export default class SummonerDataModel extends BaseActorDataModel {
             strengthOfWill: {},
             storedItems: {},
             fullItems: {},
+            classBonuses: {},
+            pointAllocations: {},
           },
         }
       ),
@@ -167,8 +190,8 @@ export default class SummonerDataModel extends BaseActorDataModel {
    * @returns {number} - Maximum skill points available
    */
   static calculateSkillPoints(level) {
-    // 6 at creation, +2 per level up (max level 30)
-    return 6 + Math.max(0, (level - 1) * 2);
+    // 4 at creation, +2 per level up (max level 30)
+    return 4 + Math.max(0, (level - 1) * 2);
   }
 
   /**
@@ -402,6 +425,226 @@ export default class SummonerDataModel extends BaseActorDataModel {
   }
 
   /**
+   * Get the class data for this summoner
+   * @returns {Object|null} - The class data object or null if no class
+   */
+  getClassData() {
+    return this.classData || null;
+  }
+
+  /**
+   * Set class data for this summoner
+   * @param {Object} classData - The class data to set
+   */
+  setClassData(classData) {
+    this.classType = classData.id || '';
+    this.classData = classData;
+  }
+
+  /**
+   * Calculate attribute points based on class and level
+   * @param {number} level - The character level
+   * @returns {Object} - Object with earned, spent, and unspent AP
+   */
+  calculateAttributePoints(level) {
+    const classData = this.getClassData();
+    let earned = 0;
+
+    if (classData?.progression?.apFormula) {
+      // Use class formula to calculate earned AP
+      for (let i = 1; i <= level; i++) {
+        earned += this.evaluateClassFormula(classData.progression.apFormula, i);
+      }
+    } else {
+      // Fallback to default formula (odd levels 1-29)
+      for (let i = 1; i <= level; i++) {
+        if (i % 2 === 1 && i <= 29) {
+          earned += 1;
+        }
+      }
+    }
+
+    // Calculate spent points from attributes
+    const attributes = this.parent?.system?.attributes || {};
+    const startingAttributes = classData?.startingAttributes || {
+      pow: 1,
+      dex: 1,
+      will: 1,
+      sta: 1,
+    };
+
+    let spent = 0;
+    for (const [attr, value] of Object.entries(attributes)) {
+      const currentTick = value?.tick || 1;
+      const startingTick = startingAttributes[attr] || 1;
+      spent += Math.max(0, currentTick - startingTick);
+    }
+
+    return {
+      earned,
+      spent,
+      unspent: Math.max(0, earned - spent),
+    };
+  }
+
+  /**
+   * Calculate skill points based on class and level
+   * @param {number} level - The character level
+   * @returns {Object} - Object with earned, spent, and unspent SP
+   */
+  calculateSkillPointsFromClass(level) {
+    const classData = this.getClassData();
+    let earned = 0;
+
+    if (classData?.progression?.spFormula) {
+      // Use class formula to calculate earned SP
+      for (let i = 1; i <= level; i++) {
+        earned += this.evaluateClassFormula(classData.progression.spFormula, i);
+      }
+    } else {
+      // Fallback to default formula (2 + 2 * level)
+      earned = 2 + level * 2;
+    }
+
+    const spent = this.constructor.calculateSpentSkillPoints(this.skills || []);
+
+    return {
+      earned,
+      spent,
+      unspent: Math.max(0, earned - spent),
+    };
+  }
+
+  /**
+   * Evaluate a class progression formula
+   * @param {string} formula - The formula to evaluate
+   * @param {number} level - The character level
+   * @returns {number} - The calculated value
+   */
+  evaluateClassFormula(formula, level) {
+    try {
+      // Handle special formula formats
+      if (formula.includes('odd:')) {
+        const match = formula.match(/odd:(\d+)-(\d+)/);
+        if (match) {
+          const start = parseInt(match[1]);
+          const end = parseInt(match[2]);
+          return level >= start && level <= end && level % 2 === 1 ? 1 : 0;
+        }
+      }
+
+      if (formula.includes('even:')) {
+        const match = formula.match(/even:(\d+)-(\d+)/);
+        if (match) {
+          const start = parseInt(match[1]);
+          const end = parseInt(match[2]);
+          return level >= start && level <= end && level % 2 === 0 ? 1 : 0;
+        }
+      }
+
+      // Replace 'level' with actual level value
+      const expression = formula.replace(/level/g, level.toString());
+
+      // Simple evaluation for basic mathematical expressions
+      if (!/^[\d+\-*/()s.]+$/.test(expression)) {
+        console.warn(`Invalid class formula: ${formula}`);
+        return 0;
+      }
+
+      return Math.floor(eval(expression)) || 0;
+    } catch (error) {
+      console.warn(
+        `Error evaluating class formula "${formula}" for level ${level}:`,
+        error
+      );
+      return 0;
+    }
+  }
+
+  /**
+   * Get level bonuses from class for a specific level
+   * @param {number} level - The character level
+   * @returns {Array} - Array of level bonuses for that level
+   */
+  getClassBonusesForLevel(level) {
+    const classData = this.getClassData();
+    if (!classData?.levelBonuses) return [];
+
+    const bonuses = [];
+    for (const bonus of classData.levelBonuses) {
+      const levels = Array.isArray(bonus.level) ? bonus.level : [bonus.level];
+      if (levels.includes(level)) {
+        bonuses.push(bonus);
+      }
+    }
+
+    return bonuses;
+  }
+
+  /**
+   * Check if a schema is allowed by the current class
+   * @param {string} schemaId - The schema ID to check
+   * @returns {boolean} - Whether the schema is allowed
+   */
+  isSchemaAllowedByClass(schemaId) {
+    const classData = this.getClassData();
+    if (!classData?.restrictions) return true;
+
+    const { allowedSchemas, forbiddenSchemas } = classData.restrictions;
+
+    // If specific schemas are allowed, check against that list
+    if (allowedSchemas && allowedSchemas.length > 0) {
+      return allowedSchemas.includes(schemaId);
+    }
+
+    // If no specific allow list, check forbidden list
+    if (forbiddenSchemas && forbiddenSchemas.length > 0) {
+      return !forbiddenSchemas.includes(schemaId);
+    }
+
+    // If no restrictions, allow all schemas
+    return true;
+  }
+
+  /**
+   * Get schema progression from class bonuses
+   * @param {number} level - The character level
+   * @returns {Object} - Schema progression info by slot
+   */
+  getSchemaProgressionFromClass(level) {
+    const classData = this.getClassData();
+    if (!classData?.levelBonuses) return {};
+
+    const progression = {};
+
+    for (let i = 1; i <= level; i++) {
+      const bonuses = this.getClassBonusesForLevel(i);
+      const schemaBonuses = bonuses.filter((bonus) => bonus.type === 'schema');
+
+      for (const bonus of schemaBonuses) {
+        const slot = bonus.schemaSlot;
+        const schemaLevel = bonus.schemaLevel;
+
+        if (slot && schemaLevel) {
+          if (!progression[slot]) {
+            progression[slot] = { maxLevel: 0, unlockedAt: null };
+          }
+
+          if (schemaLevel > progression[slot].maxLevel) {
+            progression[slot].maxLevel = schemaLevel;
+          }
+
+          if (progression[slot].unlockedAt === null && schemaLevel === 1) {
+            progression[slot].unlockedAt = i;
+          }
+        }
+      }
+    }
+
+    return progression;
+  }
+
+  /**
    * Prepare summoner-specific data
    * @param {Array} items - Actor's items for filtering
    */
@@ -430,5 +673,86 @@ export default class SummonerDataModel extends BaseActorDataModel {
       needsCoreSkillInit: !hasAllCoreSkills,
       coreSkills,
     };
+  }
+
+  /**
+   * Calculate total allocated points from leveling wizard
+   * @returns {Object} Total allocated points by attribute and skill
+   */
+  get calculatedAllocations() {
+    const levelingData = this.levelingData || {};
+    const pointAllocations = levelingData.pointAllocations || {};
+
+    // Calculate total attribute points allocated
+    const attributePoints = { pow: 0, dex: 0, will: 0, sta: 0 };
+    const skillPoints = {};
+
+    // Sum up points from all levels
+    for (const [level, allocation] of Object.entries(pointAllocations)) {
+      const levelNum = parseInt(level);
+      if (levelNum <= this.level) {
+        // Only apply points for completed levels
+        // Add attribute points
+        if (allocation.ap) {
+          for (const [attr, points] of Object.entries(allocation.ap)) {
+            if (attr in attributePoints) {
+              attributePoints[attr] += points || 0;
+            }
+          }
+        }
+
+        // Add skill points
+        if (allocation.sp?.skills) {
+          for (const [skill, points] of Object.entries(allocation.sp.skills)) {
+            skillPoints[skill] = (skillPoints[skill] || 0) + (points || 0);
+          }
+        }
+      }
+    }
+
+    return { attributePoints, skillPoints };
+  }
+
+  /**
+   * Get final attribute values including starting values and allocated points
+   * @returns {Object} Final attribute values
+   */
+  get finalAttributes() {
+    const allocations = this.calculatedAllocations;
+    const classData = this.getClassData();
+    const startingAttributes = classData?.startingAttributes || {
+      pow: 1,
+      dex: 1,
+      will: 1,
+      sta: 1,
+    };
+
+    const result = {};
+    for (const attr of ['pow', 'dex', 'will', 'sta']) {
+      const starting = startingAttributes[attr] || 1;
+      const allocated = allocations.attributePoints[attr] || 0;
+      result[attr] = starting + allocated;
+    }
+
+    return result;
+  }
+
+  /**
+   * Prepare derived data after all base data is loaded
+   */
+  prepareDerivedData() {
+    super.prepareDerivedData();
+
+    // Apply calculated allocations to attribute tick values
+    const finalAttributes = this.finalAttributes;
+
+    // Update attribute tick values based on calculated allocations
+    if (this.attributes) {
+      for (const [attr, finalValue] of Object.entries(finalAttributes)) {
+        if (this.attributes[attr]) {
+          this.attributes[attr].tick = Math.min(6, Math.max(1, finalValue));
+        }
+      }
+    }
   }
 }

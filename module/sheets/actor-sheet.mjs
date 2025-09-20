@@ -411,6 +411,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     const scars = [];
     const schemas = [];
     const features = [];
+    const classes = [];
 
     // Iterate through items, allocating to containers
     for (let i of this.document.items) {
@@ -453,6 +454,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         schemas.push(i);
       } else if (i.type === 'feature') {
         features.push(i);
+      } else if (i.type === 'class') {
+        classes.push(i);
       }
     }
 
@@ -474,6 +477,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     context.scars = scars.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.schemas = schemas.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.classes = classes.sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
     // Add summoned daemon items to collections (for summoners only)
     if (this.document.type === 'summoner') {

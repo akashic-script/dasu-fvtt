@@ -10,6 +10,55 @@
       "will": { "label": "Willpower" },
       "sta": { "label": "Stamina" }
     },
+    "Class": {
+      "Official": "Official Class",
+      "Community": "Community Class",
+      "Homebrew": "Homebrew Class",
+      "Version": "Version",
+      "CategoryLabel": "Category",
+      "Metadata": "Class Metadata",
+      "StartingAttributes": "Starting Attributes",
+      "StartingAttributesHelp": "Starting attributes must total exactly 4 points",
+      "StartingAttributesValid": "Starting attributes are valid",
+      "StartingAttributesInvalid": "Starting attributes must total 4 points",
+      "Progression": "Progression",
+      "ProgressionHelp": "Define formulas for AP and SP progression",
+      "ProgressionPreview": "Progression Preview",
+      "APFormula": "AP Formula",
+      "SPFormula": "SP Formula",
+      "LevelSlots": "Level Slots",
+      "LevelSlotsHelp": "Define what types of slots are available for selection at each level",
+      "AddSlotType": "Add Slot Type",
+      "LevelBonuses": "Level Bonuses",
+      "LevelBonusesHelp": "Define fixed bonuses that are automatically granted at specific levels",
+      "AddLevelBonus": "Add Level Bonus",
+      "Category": {
+        "official": "Official",
+        "community": "Community",
+        "homebrew": "Homebrew"
+      },
+      "LevelBonus": {
+        "Levels": "Levels",
+        "Amount": "Amount",
+        "Description": "Description",
+        "SchemaSlot": "Schema Slot",
+        "SchemaLevel": "Schema Level",
+        "TargetAttribute": "Target Attribute",
+        "TargetSkill": "Target Skill",
+        "AptitudeSlot": "Aptitude Slot",
+        "ChooseAttribute": "-- Choose Attribute --",
+        "ap": "Attribute Points",
+        "sp": "Skill Points",
+        "schema": "Schema Bonus",
+        "aptitude": "Aptitude Bonus",
+        "ability": "Ability Grant",
+        "feature": "Feature Grant",
+        "weapon": "Weapon Grant",
+        "item": "Item Grant",
+        "skill": "Skill Bonus",
+        "attribute": "Attribute Bonus"
+      }
+    },
     "Actor": {
       "Attributes": {
         "label": "Attributes",
@@ -67,7 +116,43 @@
         "View": "View Mode"
       },
       "levelingWizard": {
-        "tooltip": "Open Leveling Wizard"
+        "tooltip": "Open Leveling Wizard",
+        "tabs": {
+          "levelup": "Level Up",
+          "config": "Config"
+        },
+        "progression": {
+          "title": "Level Progression",
+          "legend": {
+            "completed": "Completed",
+            "current": "Current",
+            "future": "Future"
+          },
+          "level": "Level",
+          "merit": "Merit:",
+          "toLevel": "To Level:",
+          "noBonuses": "No bonuses",
+          "noSkillsAllocated": "No skills allocated",
+          "addSkills": "Add Skills",
+          "showAllAttributes": "Show all attributes",
+          "showOnlyAllocated": "Show only allocated attributes",
+          "showAllSkills": "Show all skills",
+          "showOnlyAllocatedSkills": "Show only allocated skills",
+          "removeAllocation": "Remove allocation"
+        },
+        "slots": {
+          "ability": "Ability",
+          "schema": "Schema",
+          "strengthOfWill": "Strength of Will",
+          "firstSchema": "First Schema",
+          "secondSchema": "Second Schema",
+          "newSchema": "New Schema",
+          "upgradeSchema": "Schema Upgrade"
+        },
+        "config": {
+          "title": "Config",
+          "placeholder": "Configuration options will go here."
+        }
       },
       "Main": {
         "SummonedDaemons": "Summoned Daemons",
@@ -155,7 +240,8 @@
       "Title": "Filter by Type",
       "Weapons": "Weapons",
       "Schemas": "Schemas",
-      "Features": "Features"
+      "Features": "Features",
+      "Classes": "Classes"
     },
     "Item": {
       "Ability": {
@@ -279,7 +365,8 @@
         "tactic": "Tactic",
         "weapon": "Weapon",
         "schema": "Schema",
-        "feature": "Feature"
+        "feature": "Feature",
+        "class": "Class"
       }
     },
     "aptitudeTypes": {
@@ -495,7 +582,8 @@
       "tactic": "Tactic",
       "weapon": "Weapon",
       "schema": "Schema",
-      "feature": "Feature"
+      "feature": "Feature",
+      "class": "Class"
     }
   }
 }

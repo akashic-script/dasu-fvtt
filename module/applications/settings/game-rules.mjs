@@ -135,7 +135,7 @@ export class GameRulesForm extends foundry.applications.api.HandlebarsApplicatio
       try {
         // Reset all settings to defaults
         await game.settings.set('dasu', 'maxLevel', 30);
-        await game.settings.set('dasu', 'startingAP', 2);
+        await game.settings.set('dasu', 'startingAP', 0);
 
         ui.notifications.info('Game Rules settings reset to defaults!');
 

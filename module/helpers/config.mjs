@@ -15,6 +15,22 @@ DASU.RANGE_TYPES = ['melee', 'ranged'];
 DASU.SCHEMA_TYPES = ['first', 'second'];
 DASU.STRENGTH_OF_WILL_CATEGORIES = ['Strength of Will'];
 
+// Class-related configuration
+DASU.CLASS_CATEGORIES = ['official', 'homebrew', 'community'];
+DASU.LEVEL_BONUS_TYPES = [
+  'ap',
+  'sp',
+  'schema',
+  'aptitude',
+  'ability',
+  'feature',
+  'weapon',
+  'item',
+  'skill',
+  'attribute',
+];
+DASU.STARTING_ATTRIBUTE_TOTAL = 4;
+
 // Item types for the system
 DASU.ITEM_TYPES = [
   'ability',
@@ -26,6 +42,7 @@ DASU.ITEM_TYPES = [
   'scar',
   'schema',
   'feature',
+  'class',
 ];
 
 DASU.CORE_SKILLS = [
@@ -71,82 +88,258 @@ DASU.calculateSP = function (level, formula = '2*level') {
   return 0;
 };
 
-// gainAbility (boolean), when true allows prompts user to add new ability
-// gainAptitude (boolean), when true allows to increase any aptitude by 1
-// gainFirstSchema (number), adds 1 to the first schema
-// gainSecondSchema (number), adds 1 to the second schema
-// gainThirdSchema (number), adds 1 to the third schema
+// Class-based progression system
+// Replaces hardcoded progression with dynamic class-based configuration
 DASU.levelSummonerFormulas = {
-  // These will be loaded from settings
-  get apFormula() {
+  /**
+   * Get AP formula from actor's assigned class, with fallback to settings
+   * @param {Actor} actor - The summoner actor
+   * @returns {string} - The AP progression formula
+   */
+  getAPFormula(actor) {
+    const classData = actor?.system?.getClassData?.();
+    if (classData?.progression?.apFormula) {
+      return classData.progression.apFormula;
+    }
+    // Fallback to settings if no class assigned
     return game.settings.get('dasu', 'apFormula') || 'odd:1-29';
   },
-  get spFormula() {
+
+  /**
+   * Get SP formula from actor's assigned class, with fallback to settings
+   * @param {Actor} actor - The summoner actor
+   * @returns {string} - The SP progression formula
+   */
+  getSPFormula(actor) {
+    const classData = actor?.system?.getClassData?.();
+    if (classData?.progression?.spFormula) {
+      return classData.progression.spFormula;
+    }
+    // Fallback to settings if no class assigned
     return game.settings.get('dasu', 'spFormula') || '2*level';
   },
 
-  // Other progression options (can be moved to settings later)
-  abilityGainLevels: [5, 10, 15, 20, 25, 30], // Levels where abilities are gained
-  aptitudeGainLevels: [3, 7, 11, 15, 19, 23, 27], // Levels where aptitudes are gained
-  schemaGainLevels: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30], // Levels where schemas are gained
-};
-
-// Helper functions to calculate progression
-DASU.calculateAP = function (level, formula = 'odd:1-29') {
-  if (formula.startsWith('odd:')) {
-    const range = formula.split(':')[1]; // '1-29'
-    const [start, end] = range.split('-').map(Number);
-    let ap = 0;
-    for (let i = start; i <= Math.min(end, level); i++) {
-      if (i % 2 === 1) ap += 1; // Odd levels
+  /**
+   * Get level bonuses from actor's assigned class
+   * @param {Actor} actor - The summoner actor
+   * @param {number} level - The character level
+   * @returns {Array} - Array of level bonuses for that level
+   */
+  getLevelBonuses(actor, level) {
+    const classData = actor?.system?.getClassData?.();
+    if (classData?.levelBonuses) {
+      return actor.system.getClassBonusesForLevel(level);
     }
-    return ap;
-  }
-  return 0;
+    // Fallback to default progression if no class assigned
+    return this.getDefaultLevelBonuses(level);
+  },
+
+  /**
+   * Get default level bonuses for actors without assigned classes
+   * @param {number} level - The character level
+   * @returns {Array} - Array of default level bonuses
+   */
+  getDefaultLevelBonuses(level) {
+    const bonuses = [];
+
+    // Default ability gain levels
+    if ([5, 10, 15, 20, 25, 30].includes(level)) {
+      bonuses.push({ type: 'ability', level, description: 'Gain new ability' });
+    }
+
+    // Default aptitude gain levels
+    if ([3, 7, 11, 15, 19, 23, 27].includes(level)) {
+      bonuses.push({
+        type: 'aptitude',
+        level,
+        description: 'Increase any aptitude by 1',
+      });
+    }
+
+    // Default schema progression
+    if ([1].includes(level)) {
+      bonuses.push({
+        type: 'schema',
+        level,
+        schemaSlot: 1,
+        schemaLevel: 1,
+        description: 'Gain first schema',
+      });
+    }
+    if ([5, 15, 25].includes(level)) {
+      bonuses.push({
+        type: 'schema',
+        level,
+        schemaSlot: 1,
+        schemaLevel: Math.min(3, Math.floor((level - 1) / 10) + 2),
+        description: 'Advance first schema',
+      });
+    }
+    if ([10].includes(level)) {
+      bonuses.push({
+        type: 'schema',
+        level,
+        schemaSlot: 2,
+        schemaLevel: 1,
+        description: 'Gain second schema',
+      });
+    }
+    if ([20].includes(level)) {
+      bonuses.push({
+        type: 'schema',
+        level,
+        schemaSlot: 2,
+        schemaLevel: 2,
+        description: 'Advance second schema',
+      });
+    }
+
+    return bonuses;
+  },
 };
 
-DASU.calculateSP = function (level, formula = '2*level') {
-  if (formula === '2*level') {
-    return level * 2;
-  } else if (formula === 'level') {
-    return level;
+// Enhanced helper functions for class-based progression
+DASU.calculateAP = function (level, actor = null, formula = null) {
+  // Use class-based formula if actor provided
+  if (actor) {
+    formula = DASU.levelSummonerFormulas.getAPFormula(actor);
+  } else if (!formula) {
+    formula = 'odd:1-29'; // Default fallback
   }
-  return 0;
+
+  return DASU.evaluateProgressionFormula(formula, level);
 };
 
-DASU.calculateLevelGains = function (level) {
-  const ap = DASU.calculateAP(level, DASU.levelSummonerFormulas.apFormula);
-  const sp = DASU.calculateSP(level, DASU.levelSummonerFormulas.spFormula);
-  const gainAbility =
-    DASU.levelSummonerFormulas.abilityGainLevels.includes(level);
-  const gainAptitude =
-    DASU.levelSummonerFormulas.aptitudeGainLevels.includes(level);
-  const gainFirstSchema = DASU.levelSummonerFormulas.schemaGainLevels.includes(
-    level
-  )
-    ? 1
-    : 0;
-  const gainSecondSchema = DASU.levelSummonerFormulas.schemaGainLevels.includes(
-    level
-  )
-    ? 1
-    : 0;
-  const gainThirdSchema = DASU.levelSummonerFormulas.schemaGainLevels.includes(
-    level
-  )
-    ? 1
-    : 0;
+DASU.calculateSP = function (level, actor = null, formula = null) {
+  // Use class-based formula if actor provided
+  if (actor) {
+    formula = DASU.levelSummonerFormulas.getSPFormula(actor);
+  } else if (!formula) {
+    formula = '2*level'; // Default fallback
+  }
 
-  return {
+  return DASU.evaluateProgressionFormula(formula, level);
+};
+
+/**
+ * Evaluate a progression formula for a given level
+ * @param {string} formula - The formula to evaluate
+ * @param {number} level - The character level
+ * @returns {number} - The calculated value
+ */
+DASU.evaluateProgressionFormula = function (formula, level) {
+  try {
+    // Handle special formula formats
+    if (formula.includes('odd:')) {
+      const match = formula.match(/odd:(\d+)-(\d+)/);
+      if (match) {
+        const start = parseInt(match[1]);
+        const end = parseInt(match[2]);
+        let total = 0;
+        for (let i = start; i <= Math.min(end, level); i++) {
+          if (i % 2 === 1) total += 1;
+        }
+        return total;
+      }
+    }
+
+    if (formula.includes('even:')) {
+      const match = formula.match(/even:(\d+)-(\d+)/);
+      if (match) {
+        const start = parseInt(match[1]);
+        const end = parseInt(match[2]);
+        let total = 0;
+        for (let i = start; i <= Math.min(end, level); i++) {
+          if (i % 2 === 0) total += 1;
+        }
+        return total;
+      }
+    }
+
+    // Replace 'level' with actual level value and evaluate
+    const expression = formula.replace(/level/g, level.toString());
+
+    // Simple evaluation for basic mathematical expressions
+    if (!/^[\d+\-*/()s.]+$/.test(expression)) {
+      console.warn(`Invalid progression formula: ${formula}`);
+      return 0;
+    }
+
+    return Math.floor(eval(expression)) || 0;
+  } catch (error) {
+    console.warn(
+      `Error evaluating progression formula "${formula}" for level ${level}:`,
+      error
+    );
+    return 0;
+  }
+};
+
+/**
+ * Calculate total progression points from level 1 to target level
+ * @param {string} formula - The progression formula
+ * @param {number} targetLevel - The target level
+ * @returns {number} - Total points earned
+ */
+DASU.calculateTotalProgression = function (formula, targetLevel) {
+  let total = 0;
+  for (let i = 1; i <= targetLevel; i++) {
+    total += DASU.evaluateProgressionFormula(formula, i);
+  }
+  return total;
+};
+
+/**
+ * Calculate level gains for a summoner based on their class
+ * @param {number} level - The character level
+ * @param {Actor} actor - The summoner actor (optional, for class-based calculation)
+ * @returns {Object} - Object containing all gains for that level
+ */
+DASU.calculateLevelGains = function (level, actor = null) {
+  // Calculate AP/SP based on class or defaults
+  const ap = DASU.calculateAP(level, actor);
+  const sp = DASU.calculateSP(level, actor);
+
+  // Get level bonuses from class or defaults
+  const levelBonuses = actor
+    ? DASU.levelSummonerFormulas.getLevelBonuses(actor, level)
+    : DASU.levelSummonerFormulas.getDefaultLevelBonuses(level);
+
+  // Parse level bonuses into gain flags
+  const gains = {
     level,
     gainAP: ap,
     gainSP: sp,
-    gainAbility,
-    gainAptitude,
-    gainFirstSchema,
-    gainSecondSchema,
-    gainThirdSchema,
+    gainAbility: false,
+    gainAptitude: false,
+    gainFirstSchema: 0,
+    gainSecondSchema: 0,
+    gainThirdSchema: 0,
+    levelBonuses: levelBonuses, // Include raw bonuses for detailed processing
   };
+
+  // Process level bonuses to set gain flags
+  for (const bonus of levelBonuses) {
+    switch (bonus.type) {
+      case 'ability':
+        gains.gainAbility = true;
+        break;
+      case 'aptitude':
+        gains.gainAptitude = true;
+        break;
+      case 'schema':
+        if (bonus.schemaSlot === 1) {
+          gains.gainFirstSchema = bonus.schemaLevel || 1;
+        } else if (bonus.schemaSlot === 2) {
+          gains.gainSecondSchema = bonus.schemaLevel || 1;
+        } else if (bonus.schemaSlot === 3) {
+          gains.gainThirdSchema = bonus.schemaLevel || 1;
+        }
+        break;
+    }
+  }
+
+  return gains;
 };
 
 // Legacy table for backward compatibility (can be removed later)

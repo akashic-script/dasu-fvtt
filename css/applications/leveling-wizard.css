@@ -14,6 +14,54 @@
    ======================================== */
 
 /* ========================================
+   NO CLASS WARNING SECTION
+   ======================================== */
+
+.dasu-leveling-wizard .no-class-warning {
+  margin: 1rem 0;
+  padding: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+  border: 2px solid #e17055;
+  box-shadow: 0 4px 12px rgba(225, 112, 85, 0.3);
+}
+
+.dasu-leveling-wizard .no-class-warning .warning-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.dasu-leveling-wizard .no-class-warning .fas.fa-exclamation-triangle {
+  color: #e17055;
+  font-size: 1.5rem;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.dasu-leveling-wizard .no-class-warning .warning-text {
+  flex: 1;
+}
+
+.dasu-leveling-wizard .no-class-warning .warning-text strong {
+  display: block;
+  color: #d63031;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.dasu-leveling-wizard .no-class-warning .warning-text p {
+  margin: 0 0 0.5rem 0;
+  color: #2d3436;
+  line-height: 1.4;
+}
+
+.dasu-leveling-wizard .no-class-warning .warning-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* ========================================
    HEADER SECTION
    ======================================== */
 
@@ -302,9 +350,9 @@
 /* Level Rows */
 .dasu-leveling-wizard .level-row {
   display: grid;
-  grid-template-columns: 80px 120px 1fr 100px 80px;
+  grid-template-columns: 150px 2fr 1fr;
   gap: 0.75rem;
-  align-items: center;
+  align-items: flex-start;
   padding: 0.75rem;
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
@@ -364,7 +412,7 @@
   animation: pulse 2s ease-in-out infinite;
 }
 
-.dasu-leveling-wizard .level-info {
+.dasu-leveling-wizard .level-info-combined {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -850,4 +898,339 @@
   background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
   border-color: #4caf50;
   box-shadow: 0 0 15px rgba(76, 175, 80, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   POINT ALLOCATION STYLES
+   ======================================== */
+
+/* Point Block Container */
+.dasu-leveling-wizard .level-points {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.dasu-leveling-wizard .point-block {
+  background: rgba(74, 144, 226, 0.05);
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 0;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.dasu-leveling-wizard .point-block.current {
+  border-color: var(--color-primary);
+  background: rgba(74, 144, 226, 0.1);
+  box-shadow: 0 0 8px rgba(74, 144, 226, 0.2);
+}
+
+.dasu-leveling-wizard .point-block.locked {
+  background: rgba(158, 158, 158, 0.05);
+  border-color: rgba(158, 158, 158, 0.2);
+  opacity: 0.7;
+}
+
+.dasu-leveling-wizard .point-block.planned {
+  background: rgba(255, 193, 7, 0.05);
+  border-color: rgba(255, 193, 7, 0.2);
+}
+
+/* Point Headers */
+.dasu-leveling-wizard .point-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid rgba(74, 144, 226, 0.2);
+}
+
+.dasu-leveling-wizard .point-label {
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #4a90e2;
+  text-shadow: 0 0 4px rgba(74, 144, 226, 0.3);
+}
+
+.dasu-leveling-wizard .ap-block .point-label {
+  color: #4a90e2;
+}
+
+.dasu-leveling-wizard .sp-block .point-label {
+  color: #9c27b0;
+}
+
+/* Point Allocations Container */
+.dasu-leveling-wizard .point-allocations {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+/* Individual Allocation Rows */
+.dasu-leveling-wizard .inline-allocation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  transition: all 0.2s ease;
+}
+
+.dasu-leveling-wizard .inline-allocation:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(74, 144, 226, 0.3);
+}
+
+/* Compact layout for collapsed view */
+.dasu-leveling-wizard .inline-allocation.compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.dasu-leveling-wizard .inline-allocation.compact:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(74, 144, 226, 0.4);
+}
+
+.dasu-leveling-wizard .allocation-display {
+  flex: 1;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #e0e0e0;
+  font-weight: 500;
+  margin: 0 0.5rem;
+}
+
+.dasu-leveling-wizard .remove-btn {
+  width: 20px;
+  height: 20px;
+  background: rgba(220, 53, 69, 0.2);
+  border: 1px solid rgba(220, 53, 69, 0.4);
+  border-radius: 0;
+  color: #dc3545;
+  font-size: 0.7rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.dasu-leveling-wizard .remove-btn:hover {
+  background: rgba(220, 53, 69, 0.3);
+  border-color: #dc3545;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.dasu-leveling-wizard .remove-btn:active {
+  transform: scale(0.95);
+  background: rgba(220, 53, 69, 0.4);
+}
+
+.dasu-leveling-wizard .attr-name,
+.dasu-leveling-wizard .skill-name {
+  flex: 1;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #e8e8e8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Allocation Controls */
+.dasu-leveling-wizard .allocation-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dasu-leveling-wizard .mini-btn {
+  width: 20px;
+  height: 20px;
+  background: rgba(74, 144, 226, 0.2);
+  border: 1px solid rgba(74, 144, 226, 0.4);
+  border-radius: 0;
+  color: #4a90e2;
+  font-size: 0.7rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.dasu-leveling-wizard .mini-btn:hover {
+  background: rgba(74, 144, 226, 0.3);
+  border-color: #4a90e2;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.dasu-leveling-wizard .mini-btn:active {
+  transform: scale(0.95);
+  background: rgba(74, 144, 226, 0.4);
+}
+
+.dasu-leveling-wizard .mini-btn:disabled {
+  background: rgba(158, 158, 158, 0.1);
+  border-color: rgba(158, 158, 158, 0.2);
+  color: #888;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.dasu-leveling-wizard .point-value {
+  min-width: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #4a90e2;
+  background: rgba(74, 144, 226, 0.1);
+  padding: 0.1rem 0.3rem;
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 0;
+}
+
+/* Skill Add Dropdown */
+.dasu-leveling-wizard .skill-add-dropdown {
+  flex: 1;
+  padding: 0.2rem 0.4rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+  color: #e8e8e8;
+  font-size: 0.7rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dasu-leveling-wizard .skill-add-dropdown:focus {
+  outline: none;
+  border-color: #4a90e2;
+  background: rgba(74, 144, 226, 0.1);
+  box-shadow: 0 0 4px rgba(74, 144, 226, 0.3);
+}
+
+.dasu-leveling-wizard .skill-add-dropdown option {
+  background: var(--color-bg-secondary);
+  color: #e8e8e8;
+  padding: 0.2rem;
+}
+
+/* State-specific styling */
+.dasu-leveling-wizard .locked .mini-btn {
+  background: rgba(158, 158, 158, 0.1);
+  border-color: rgba(158, 158, 158, 0.2);
+  color: #888;
+  cursor: not-allowed;
+}
+
+.dasu-leveling-wizard .locked .point-value {
+  background: rgba(158, 158, 158, 0.1);
+  border-color: rgba(158, 158, 158, 0.2);
+  color: #888;
+}
+
+.dasu-leveling-wizard .current .mini-btn {
+  border-color: rgba(74, 144, 226, 0.6);
+  background: rgba(74, 144, 226, 0.3);
+}
+
+.dasu-leveling-wizard .planned .mini-btn {
+  border-color: rgba(255, 193, 7, 0.4);
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.dasu-leveling-wizard .planned .point-value {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+/* Expand Toggle Button */
+.dasu-leveling-wizard .expand-toggle {
+  width: 24px;
+  height: 24px;
+  background: rgba(74, 144, 226, 0.2);
+  border: 1px solid rgba(74, 144, 226, 0.4);
+  border-radius: 0;
+  color: #4a90e2;
+  font-size: 0.7rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.dasu-leveling-wizard .expand-toggle:hover {
+  background: rgba(74, 144, 226, 0.3);
+  border-color: #4a90e2;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.dasu-leveling-wizard .expand-toggle:active {
+  transform: scale(0.95);
+  background: rgba(74, 144, 226, 0.4);
+}
+
+.dasu-leveling-wizard .expand-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.5rem;
+  background: rgba(74, 144, 226, 0.2);
+  border: 1px solid rgba(74, 144, 226, 0.4);
+  border-radius: 0;
+  color: #4a90e2;
+  font-size: 0.7rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.dasu-leveling-wizard .expand-btn:hover {
+  background: rgba(74, 144, 226, 0.3);
+  border-color: #4a90e2;
+  color: #fff;
+}
+
+.dasu-leveling-wizard .no-skills-allocated,
+.dasu-leveling-wizard .no-attributes-allocated {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  font-size: 0.75rem;
+  color: #888;
+  font-style: italic;
 }

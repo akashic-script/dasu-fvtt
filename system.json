@@ -45,6 +45,9 @@
       },
       "feature": {
         "htmlFields": ["description"]
+      },
+      "class": {
+        "htmlFields": ["description"]
       }
     }
   },

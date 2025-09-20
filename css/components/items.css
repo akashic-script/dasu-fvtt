@@ -1704,3 +1704,359 @@
 .daemon-stats-row .daemon-stat-badge:nth-child(5) .stat-label {
   color: var(--color-text-highlight);
 }
+
+/* =========================
+   Class Item Sheet Styles
+   ========================= */
+
+/* Tab visibility system for item sheets */
+.dasu.item .tab {
+  display: none;
+}
+
+.dasu.item .tab.active {
+  display: block !important;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Ensure class attributes tab is visible when active */
+.dasu.item
+  .tab[data-tab='attributes'][data-application-part='attributesClass'] {
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Class metadata section */
+.class-metadata {
+  margin-bottom: 1.5rem;
+}
+
+.class-metadata .section-header {
+  margin-bottom: 1rem;
+}
+
+.class-metadata .form-group {
+  margin-bottom: 0.75rem;
+}
+
+.class-metadata label {
+  min-width: 120px;
+  font-weight: 600;
+  color: var(--dasu-c-dark);
+}
+
+.class-metadata input,
+.class-metadata select {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text);
+}
+
+/* Starting attributes section */
+.starting-attributes {
+  margin-bottom: 1.5rem;
+}
+
+.starting-attributes .help-text {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-left: 0.5rem;
+}
+
+.attribute-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.attribute-grid .form-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.attribute-grid label {
+  min-width: 80px;
+  font-weight: 500;
+  color: var(--dasu-c-dark);
+}
+
+.attribute-grid input {
+  width: 60px;
+  text-align: center;
+  padding: 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+}
+
+.validation-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.validation-info.success {
+  background: rgba(40, 167, 69, 0.1);
+  border: 1px solid #28a745;
+  color: #28a745;
+}
+
+.validation-info.error {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid #dc3545;
+  color: #dc3545;
+}
+
+/* Progression formulas section */
+.progression-formulas {
+  margin-bottom: 1.5rem;
+}
+
+.progression-formulas .help-text {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-left: 0.5rem;
+}
+
+.progression-formulas .form-group {
+  margin-bottom: 0.75rem;
+}
+
+.progression-formulas label {
+  min-width: 120px;
+  font-weight: 600;
+  color: var(--dasu-c-dark);
+}
+
+.progression-formulas input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  font-family: monospace;
+}
+
+.progression-preview {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.progression-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.progression-preview h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--dasu-c-dark);
+}
+
+.progression-expand-toggle {
+  width: 24px;
+  height: 24px;
+  background: rgba(74, 144, 226, 0.2);
+  border: 1px solid rgba(74, 144, 226, 0.4);
+  border-radius: 0;
+  color: #4a90e2;
+  font-size: 0.7rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.progression-expand-toggle:hover {
+  background: rgba(74, 144, 226, 0.3);
+  border-color: #4a90e2;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.progression-expand-toggle:active {
+  transform: scale(0.95);
+  background: rgba(74, 144, 226, 0.4);
+}
+
+.progression-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.progression-table th,
+.progression-table td {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-border);
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.progression-table th {
+  background: var(--color-bg-primary);
+  font-weight: 600;
+  color: var(--dasu-c-dark);
+}
+
+.progression-table td {
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
+}
+
+.bonus-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.bonus-details .form-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bonus-details .form-group.flexcol {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.bonus-details label {
+  min-width: 120px;
+  font-weight: 500;
+  color: var(--dasu-c-dark);
+}
+
+.bonus-details input,
+.bonus-details textarea {
+  flex: 1;
+  padding: 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+}
+
+.bonus-details textarea {
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+}
+
+/* Level slots section */
+.level-slots {
+  margin-bottom: 1.5rem;
+}
+
+.level-slots .help-text {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-left: 0.5rem;
+}
+
+.level-slots-editor {
+  margin-top: 1rem;
+}
+
+.level-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+}
+
+.level-slot-item {
+  padding: 0.75rem;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  min-height: 80px;
+}
+
+.level-header {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.level-number {
+  font-weight: 600;
+  color: var(--dasu-c-dark);
+  font-size: 0.9rem;
+}
+
+.slot-types {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.slot-type-tag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0.5rem;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 0;
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.slot-type-tag span {
+  flex: 1;
+}
+
+.remove-slot-type {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.1rem;
+  margin-left: 0.5rem;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.remove-slot-type:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.add-slot-type {
+  width: 100%;
+  padding: 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.add-slot-type:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}

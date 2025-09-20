@@ -14,7 +14,7 @@
           {{! Attribute Points Display - Header above grid }}
           <div class="attribute-points-display flexrow">
             <label class="resource-label flex1">{{localize 'DASU.Actor.Attributes.points.label.label'}}</label>
-            <span class="tick-button-compact" data-tooltip="AP (Attribute Points): Used to buy attribute ticks. You gain AP at 1st level and every 5 levels, as set in game settings (default: 2). Each tick above 1 in any attribute costs 1 AP.">
+            <span class="tick-button-compact" data-tooltip="AP (Attribute Points): Used to buy attribute ticks. You gain 1 AP at level 1 and then 1 AP at every odd level (3, 5, 7, 9, etc.). Each tick above 1 in any attribute costs 1 AP.">
               AP: {{apSpent}} / {{apEarned}}
             </span>
           </div>
@@ -88,7 +88,7 @@
           {{! Attribute Points Display - Header above grid }}
           <div class="attribute-points-display flexrow">
             <label class="resource-label flex1">{{localize 'DASU.Actor.Attributes.points.label.label'}}</label>
-            <span class="tick-button-compact" data-tooltip="AP (Attribute Points): Used to buy attribute ticks. You gain AP at 1st level and every 5 levels, as set in game settings (default: 2). Each tick above 1 in any attribute costs 1 AP.">
+            <span class="tick-button-compact" data-tooltip="AP (Attribute Points): Used to buy attribute ticks. You gain 1 AP at level 1 and then 1 AP at every odd level (3, 5, 7, 9, etc.). Each tick above 1 in any attribute costs 1 AP.">
               AP: {{apSpent}} / {{apEarned}}
             </span>
           </div>
@@ -567,6 +567,11 @@
                     <input type='checkbox' value='feature' checked>
                     <i class='fas fa-gem'></i>
                     <span>{{localize "DASU.Filter.Features"}}</span>
+                  </label>
+                  <label class='filter-option'>
+                    <input type='checkbox' value='class' checked>
+                    <i class='fas fa-graduation-cap'></i>
+                    <span>{{localize "DASU.Filter.Classes"}}</span>
                   </label>
                 </div>
                 <div class='filter-actions'>
@@ -1366,6 +1371,76 @@
                         {{/unless}}
                       {{/if}}
                     </div>
+                  </div>
+                </div>
+              </li>
+            {{/each}}
+          </div>
+          {{/if}}
+
+          {{! Classes }}
+          {{#if (or (eq itemFilterState null) (includes itemFilterState "class"))}}
+          <li class='item flexrow items-header' data-item-type='class' data-sortable="true" draggable="true">
+            <div class='item-name'>
+<span class='item-name-text'>{{localize 'DASU.TYPES.Item.class'}}</span>
+            </div>
+            <div class='item-controls'>
+              {{#if (and @root.editable @root.isEditMode)}}
+                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="class"}}' data-action='createDoc' data-document-class='Item' data-type='class'>
+                  <i class='fas fa-plus'></i>
+                </a>
+              {{/if}}
+            </div>
+          </li>
+          <div class='item-list class-list'>
+            {{#each classes as |item id|}}
+              <li class='item expandable-item' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+                <div class='item-row flexrow'>
+                  <div class='item-name flexrow item-name-clickable' data-action='toggleDescription'>
+                    <div class='item-image'>
+                      <a class='rollable' data-action='roll' data-roll-type='item' >
+                        <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+                      </a>
+                    </div>
+                    <span class='item-name-text'>{{item.name}}</span>
+                  </div>
+                  <div class='item-actions'>
+                    <span class='class-category' data-tooltip="{{localize (concat "DASU.Class.Category." item.system.category)}}">
+                      {{localize (concat "DASU.Class.Category." item.system.category)}}
+                    </span>
+                  </div>
+                <div class='item-controls'>
+                  {{#if (and @root.editable @root.isEditMode)}}
+                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="class"}}' data-action='viewDoc'>
+                      <i class='fas fa-edit'></i>
+                    </a>
+                  {{/if}}
+                  <div class='item-context-menu'>
+                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
+                      <i class='fas fa-bars'></i>
+                    </a>
+                    <div class='context-menu-dropdown' style='display: none;'>
+                      <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
+                        <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
+                        <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
+                      </a>
+                      {{#if (and @root.editable @root.isEditMode)}}
+                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="class"}}' data-action='copyDoc'>
+                          <i class='fas fa-copy'></i>
+                          <span>{{localize "DOCUMENT.Copy" type="class"}}</span>
+                        </a>
+                        <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="class"}}' data-action='deleteDoc'>
+                          <i class='fas fa-trash'></i>
+                          <span>{{localize "DOCUMENT.Delete" type="class"}}</span>
+                        </a>
+                      {{/if}}
+                    </div>
+                  </div>
+                </div>
+                </div>
+                <div class='item-description-row' style='display: none;'>
+                  <div class='item-description-content'>
+                    {{#if item.system.description}}{{item.system.description}}{{else}}<em>No description available</em>{{/if}}
                   </div>
                 </div>
               </li>

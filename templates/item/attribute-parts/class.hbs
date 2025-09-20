@@ -1,0 +1,170 @@
+{{! Class Attributes Template }}
+<div class='tab flexcol {{tab.cssClass}}' data-group='primary' data-tab='attributes'>
+
+  {{! Class Metadata Section }}
+  <section class="class-metadata">
+    <header class="section-header">
+      <h3>{{localize "DASU.Class.Metadata"}}</h3>
+    </header>
+
+    <div class="form-group flexrow">
+      <label for="system.version">{{localize "DASU.Class.Version"}}</label>
+      <input type="text" name="system.version" value="{{system.version}}" data-dtype="String" />
+    </div>
+
+    <div class="form-group flexrow">
+      <label for="system.category">{{localize "DASU.Class.CategoryLabel"}}</label>
+      <select name="system.category" data-dtype="String">
+        {{#each classCategories as |label value|}}
+          <option value="{{@key}}" {{#if (eq ../system.category @key)}}selected{{/if}}>{{label}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </section>
+
+  {{! Starting Attributes Section }}
+  <section class="starting-attributes">
+    <header class="section-header">
+      <h3>{{localize "DASU.Class.StartingAttributes"}}</h3>
+      <span class="help-text">{{localize "DASU.Class.StartingAttributesHelp"}}</span>
+    </header>
+
+    <div class="attribute-grid">
+      {{#each attributeOptions as |label key|}}
+        <div class="form-group flexrow">
+          <label for="system.startingAttributes.{{@key}}">{{label}}</label>
+          <input type="number"
+                 name="system.startingAttributes.{{@key}}"
+                 value="{{lookup ../system.startingAttributes @key}}"
+                 min="0"
+                 max="4"
+                 data-dtype="Number" />
+        </div>
+      {{/each}}
+    </div>
+
+    {{#if system.startingAttributesValid}}
+      <div class="validation-info success">
+        <i class="fas fa-check-circle"></i>
+        {{localize "DASU.Class.StartingAttributesValid"}} ({{system.startingAttributesTotal}}/4)
+      </div>
+    {{else}}
+      <div class="validation-info error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{localize "DASU.Class.StartingAttributesInvalid"}} ({{system.startingAttributesTotal}}/4)
+      </div>
+    {{/if}}
+  </section>
+
+  {{! Progression Formulas Section }}
+  <section class="progression-formulas">
+    <header class="section-header">
+      <h3>{{localize "DASU.Class.Progression"}}</h3>
+      <span class="help-text">{{localize "DASU.Class.ProgressionHelp"}}</span>
+    </header>
+
+    <div class="form-group flexrow">
+      <label for="system.progression.apFormula">{{localize "DASU.Class.APFormula"}}</label>
+      <input type="text"
+             name="system.progression.apFormula"
+             value="{{system.progression.apFormula}}"
+             data-dtype="String"
+             placeholder="odd:1-29" />
+    </div>
+
+    <div class="form-group flexrow">
+      <label for="system.progression.spFormula">{{localize "DASU.Class.SPFormula"}}</label>
+      <input type="text"
+             name="system.progression.spFormula"
+             value="{{system.progression.spFormula}}"
+             data-dtype="String"
+             placeholder="2+2*level" />
+    </div>
+
+    {{! Progression Preview }}
+    {{#if system.progressionSamples}}
+      <div class="progression-preview">
+        <div class="progression-preview-header">
+          <h4>{{localize "DASU.Class.ProgressionPreview"}}</h4>
+          <button type="button" class="progression-expand-toggle" data-action="toggleProgressionPreview" title="Show progression preview">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+        <div class="progression-preview-content" style="display: none;">
+          <table class="progression-table">
+            <thead>
+              <tr>
+                <th>{{localize "DASU.Level"}}</th>
+                <th>{{localize "DASU.Class.APFormula"}}</th>
+                <th>{{localize "DASU.Class.SPFormula"}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each system.progressionSamples as |sample level|}}
+                <tr>
+                  <td>{{level}}</td>
+                  <td>{{sample.ap}}</td>
+                  <td>{{sample.sp}}</td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {{/if}}
+  </section>
+
+  {{! Level Slots Section }}
+  <section class="level-slots">
+    <header class="section-header">
+      <h3>{{localize "DASU.Class.LevelSlots"}}</h3>
+      <span class="help-text">{{localize "DASU.Class.LevelSlotsHelp"}}</span>
+    </header>
+
+    <div class="level-slots-editor">
+      <div class="level-slots-grid">
+        {{#each (range 1 30) as |level|}}
+          <div class="level-slot-item" data-level="{{level}}">
+            <div class="level-header">
+              <span class="level-number">{{localize "DASU.Level"}} {{level}}</span>
+            </div>
+            <div class="slot-types">
+              {{#each (lookup ../system.levelSlots level) as |slot index|}}
+                <div class="slot-type-tag {{#if slot.type}}enhanced-slot{{/if}}">
+                  {{#if slot.type}}
+                    {{! Enhanced schema slot structure }}
+                    <span class="slot-type">{{localize (concat "DASU.Class.LevelBonus." slot.type)}}</span>
+                    {{#if slot.schemaId}}
+                      <span class="slot-detail">{{slot.schemaId}}</span>
+                    {{/if}}
+                    <span class="slot-action {{slot.action}}">{{#if (eq slot.action "new")}}New{{else if (eq slot.action "upgrade")}}Upgrade{{else}}{{slot.action}}{{/if}}</span>
+                    <button type="button" class="edit-schema-slot" data-level="{{add @../index 1}}" data-slot-index="{{index}}" title="Edit Schema Details">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="remove-slot-type" data-level="{{add @../index 1}}" data-slot-type="{{slot.type}}" data-slot-index="{{index}}">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  {{else}}
+                    {{! Simple slot structure }}
+                    <span>{{localize (concat "DASU.Class.LevelBonus." slot)}}</span>
+                    <button type="button" class="remove-slot-type" data-level="{{add @../index 1}}" data-slot-type="{{slot}}">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  {{/if}}
+                </div>
+              {{/each}}
+              <select class="add-slot-type" data-level="{{level}}">
+                <option value="">{{localize "DASU.Class.AddSlotType"}}</option>
+                {{#each ../levelBonusTypes as |label value|}}
+                  <option value="{{@key}}">{{label}}</option>
+                {{/each}}
+              </select>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </section>
+
+
+</div>

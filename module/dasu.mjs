@@ -299,6 +299,7 @@ Hooks.once('init', function () {
     scar: models.ScarDataModel,
     schema: models.SchemaDataModel,
     feature: models.FeatureDataModel,
+    class: models.ClassDataModel,
   };
 
   // Active Effects are never copied to the Actor,

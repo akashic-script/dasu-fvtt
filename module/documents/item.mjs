@@ -61,6 +61,19 @@ export class DASUItem extends Item {
       ];
       data.system.category = abilityCategories[0]; // Use first category from config
     }
+
+    // Prevent multiple class items per actor
+    if (data.type === 'class' && this.actor) {
+      const existingClasses = this.actor.items.filter(
+        (item) => item.type === 'class'
+      );
+      if (existingClasses.length > 0) {
+        ui.notifications.error(
+          `Cannot add multiple class items. Actor already has: ${existingClasses[0].name}`
+        );
+        return false;
+      }
+    }
   }
 
   /** @override */

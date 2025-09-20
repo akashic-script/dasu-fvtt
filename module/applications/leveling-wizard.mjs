@@ -10,6 +10,7 @@
  *
  * Integrates with actor sheet and updates in real-time.
  */
+import DASUConfig from '../helpers/config.mjs';
 export class LevelingWizard extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.api.ApplicationV2
 ) {
@@ -30,6 +31,12 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
       scrollToCurrent: LevelingWizard.onScrollToCurrent,
       removeItem: LevelingWizard.onRemoveItem,
       levelUp: LevelingWizard.onLevelUp,
+      toggleSkillExpand: LevelingWizard.onToggleSkillExpand,
+      toggleAttributeExpand: LevelingWizard.onToggleAttributeExpand,
+      increaseSkill: LevelingWizard.onIncreaseSkill,
+      decreaseSkill: LevelingWizard.onDecreaseSkill,
+      increaseAttribute: LevelingWizard.onIncreaseAttribute,
+      decreaseAttribute: LevelingWizard.onDecreaseAttribute,
     },
   };
 
@@ -60,7 +67,10 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
       'updateActor',
       (actor, data, options, userId) => {
         if (actor.id === this.actor.id && this.rendered) {
-          this.refresh();
+          // Only refresh if significant changes occurred (not point allocations)
+          if (this._shouldRefreshOnUpdate(data)) {
+            this.refresh();
+          }
           this._checkAndGrantLevelItems(data);
         }
       }
@@ -142,9 +152,23 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     context.actorName = this.actor.name;
     context.activeTab = this.activeTab || 'levelup';
 
+    // First prepare skill options that will be needed in the template
+    const skillSelectOptions = await this._prepareSkillSelectOptions();
+
     // Calculate progression data for all levels
     context.levels = await this._calculateLevelProgression(context.maxLevel);
     this.levels = context.levels;
+
+    // Add skillSelectOptions to each level for easier template access
+    context.levels.forEach((level) => {
+      // Filter out skills that are already allocated for this level
+      const allocatedSkills = new Set(
+        Object.keys(level.pointAllocations?.sp?.skills || {})
+      );
+      level.skillSelectOptions = skillSelectOptions.filter(
+        (skill) => !allocatedSkills.has(skill.value)
+      );
+    });
 
     // Determine next level info and level-up eligibility
     const nextLevel = context.currentLevel + 1;
@@ -157,90 +181,824 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
       (this.actor.system.merit || 0) >= nextLevelData.meritRequired &&
       context.currentLevel < context.maxLevel;
 
+    // Add configuration data for point allocation
+    context.config = {
+      attributes: {
+        pow: { label: 'Power' },
+        dex: { label: 'Dexterity' },
+        will: { label: 'Will' },
+        sta: { label: 'Stamina' },
+      },
+      allSkills: skillSelectOptions,
+    };
+
+    // Keep skillSelectOptions on root context for backwards compatibility
+    context.skillSelectOptions = skillSelectOptions;
+
+    // Add class progression info from _calculateLevelProgression
+    context.hasClass = this._hasClass || false;
+    context.hasClassProgression = this._hasClassProgression || false;
+
     return context;
+  }
+
+  /**
+   * Prepare skill select options for dropdowns
+   * @returns {Array} Array of skill options in selectOptions format
+   */
+  async _prepareSkillSelectOptions() {
+    // Get all skills (core + custom), ensuring core skills are always available
+
+    const coreSkills = DASUConfig.CORE_SKILLS || [];
+
+    let actorSkills;
+    try {
+      actorSkills = this.actor.getAllSkills() || [];
+    } catch (error) {
+      console.error(
+        'DASU Leveling Wizard - Error getting actor skills:',
+        error
+      );
+      actorSkills = [];
+    }
+
+    // Create a combined list, prioritizing actor's version of skills if they exist
+    const skillMap = new Map();
+
+    // Add core skills first
+    coreSkills.forEach((coreSkill) => {
+      // Ensure we have valid data for core skills
+      if (coreSkill && coreSkill.id && coreSkill.name) {
+        skillMap.set(coreSkill.id, {
+          value: coreSkill.id, // selectOptions uses 'value' for the option value (use ID)
+          label: `${coreSkill.name}`, // selectOptions uses 'label' for display text
+          isCore: true,
+        });
+      }
+    });
+
+    // Add/override with actor's skills (both core and custom)
+    actorSkills.forEach((actorSkill) => {
+      // Ensure we have valid data for actor skills
+      if (actorSkill && actorSkill.id && actorSkill.name) {
+        const isCore = actorSkill.isCore || false;
+        skillMap.set(actorSkill.id, {
+          value: actorSkill.id, // Use ID for value instead of name
+          label: isCore ? `${actorSkill.name}` : actorSkill.name,
+          isCore: isCore,
+        });
+      }
+    });
+
+    // Convert to array and sort
+    const skillArray = Array.from(skillMap.values()).sort((a, b) => {
+      // Sort core skills first, then alphabetically
+      if (a.isCore && !b.isCore) return -1;
+      if (!a.isCore && b.isCore) return 1;
+      return (a.label || '').localeCompare(b.label || '');
+    });
+
+    // Convert to selectOptions format - using array format as per Foundry docs
+    // Array format: [{value: "value1", label: "Label 1"}]
+    const skillSelectOptions = [];
+
+    skillArray.forEach((skill) => {
+      // Only add skills with valid value and label
+      if (skill && skill.value && skill.label) {
+        skillSelectOptions.push({
+          value: skill.value,
+          label: skill.label,
+        });
+      }
+    });
+
+    // Final validation
+
+    // Ensure it's never null or undefined and always an array
+    if (!Array.isArray(skillSelectOptions)) {
+      return [];
+    }
+
+    return skillSelectOptions;
   }
 
   /** Override render to set up event listeners after DOM is ready */
   async render(force = false, options = {}) {
     const result = await super.render(force, options);
-    this._setupDragAndDrop();
-    this._setupSlotItemClick();
-    // Add Manual Cleanup button handler
-    const cleanupBtn = this.element.querySelector('.manual-cleanup');
-    if (cleanupBtn) {
-      cleanupBtn.addEventListener('click', async (event) => {
-        event.preventDefault();
-        // Get planned UUIDs for all types
-        const levelingData = this.actor.system.levelingData || {};
-        const plannedUUIDs = new Set();
-        for (const uuid of Object.values(levelingData.abilities || {})) {
-          if (uuid) plannedUUIDs.add(uuid);
-        }
-        for (const uuid of Object.values(levelingData.strengthOfWill || {})) {
-          if (uuid) plannedUUIDs.add(uuid);
-        }
-        for (const uuid of Object.values(levelingData.schemas || {})) {
-          if (uuid) plannedUUIDs.add(uuid);
-        }
-        // Find all orphaned innate items
-        const itemsToDelete = this.actor.items.filter(
-          (i) =>
-            i.getFlag('dasu', 'grantedByLeveling') === true &&
-            (!i.getFlag('dasu', 'levelingSource')?.uuid ||
-              !plannedUUIDs.has(i.getFlag('dasu', 'levelingSource')?.uuid))
-        );
-        if (itemsToDelete.length === 0) {
-          ui.notifications.info('No orphaned level-granted items found.');
-          return;
-        }
-        await this.actor.deleteEmbeddedDocuments(
-          'Item',
-          itemsToDelete.map((i) => i.id)
-        );
-        ui.notifications.info(
-          `Deleted ${itemsToDelete.length} orphaned level-granted items.`
-        );
-        if (this.actor.sheet?.render) this.actor.sheet.render(false);
-        this.render(false);
-      });
-    }
-    // Add Grant Missing Items button handler
-    const grantBtn = this.element.querySelector('.grant-missing-items');
-    if (grantBtn) {
-      grantBtn.addEventListener('click', async (event) => {
-        event.preventDefault();
-        await grantMissingLevelItems(this.actor);
-        ui.notifications.info(
-          'Granted all missing planned items for current and lower levels.'
-        );
-        if (this.actor.sheet?.render) this.actor.sheet.render(false);
-        this.render(false);
-      });
-    }
-    // Add Sync Granted Items button handler
-    const syncBtn = this.element.querySelector('.sync-granted-items');
-    if (syncBtn) {
-      syncBtn.addEventListener('click', async (event) => {
-        event.preventDefault();
-        await this._syncGrantedItems(this.actor);
-        ui.notifications.info('Synced granted items with planned slots.');
-        if (this.actor.sheet?.render) this.actor.sheet.render(false);
-        this.render(false);
-      });
+
+    // Only set up event listeners once
+    if (!this._eventListenersSetup) {
+      this._setupAllEventHandlers();
+      this._eventListenersSetup = true;
     }
 
-    // Tab switching logic
-    if (this.element) {
-      this.element.querySelectorAll('.tab-btn').forEach((btn) => {
-        btn.addEventListener('click', (event) => {
-          const tab = btn.dataset.tab;
-          if (tab && tab !== this.activeTab) {
-            this.activeTab = tab;
-            this.render(false); // Re-render to update the tab
-          }
-        });
-      });
+    this._setupDragAndDrop();
+    this._setupSlotItemClick();
+
+    return result;
+  }
+
+  /**
+   * Set up all event handlers once
+   */
+  _setupAllEventHandlers() {
+    this._setupPointAllocationHandlers();
+    this._setupButtonHandlers();
+    this._setupTabHandlers();
+  }
+
+  /**
+   * Set up button event handlers using delegation
+   */
+  _setupButtonHandlers() {
+    this.element.addEventListener('click', async (event) => {
+      if (event.target.classList.contains('manual-cleanup')) {
+        event.preventDefault();
+        await this._handleCleanup();
+      } else if (event.target.classList.contains('grant-missing-items')) {
+        event.preventDefault();
+        await this._handleGrantMissing();
+      } else if (event.target.classList.contains('sync-granted-items')) {
+        event.preventDefault();
+        await this._handleSyncGranted();
+      }
+    });
+  }
+
+  /**
+   * Set up tab switching handlers
+   */
+  _setupTabHandlers() {
+    this.element.addEventListener('click', (event) => {
+      if (event.target.classList.contains('tab-btn')) {
+        const tab = event.target.dataset.tab;
+        if (tab && tab !== this.activeTab) {
+          this.activeTab = tab;
+          this._updateTabDisplay();
+        }
+      }
+    });
+  }
+
+  /**
+   * Update tab display without full re-render
+   */
+  _updateTabDisplay() {
+    // Update tab buttons
+    this.element.querySelectorAll('.tab-btn').forEach((btn) => {
+      if (btn.dataset.tab === this.activeTab) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+      } else {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      }
+    });
+
+    // Re-render only if needed for tab content switching
+    this.render(false);
+  }
+
+  /**
+   * Handle cleanup button click
+   */
+  async _handleCleanup() {
+    const levelingData = this.actor.system.levelingData || {};
+    const plannedUUIDs = new Set();
+    for (const uuid of Object.values(levelingData.abilities || {})) {
+      if (uuid) plannedUUIDs.add(uuid);
     }
+    for (const uuid of Object.values(levelingData.strengthOfWill || {})) {
+      if (uuid) plannedUUIDs.add(uuid);
+    }
+    for (const uuid of Object.values(levelingData.schemas || {})) {
+      if (uuid) plannedUUIDs.add(uuid);
+    }
+
+    const itemsToDelete = this.actor.items.filter(
+      (i) =>
+        i.getFlag('dasu', 'grantedByLeveling') === true &&
+        (!i.getFlag('dasu', 'levelingSource')?.uuid ||
+          !plannedUUIDs.has(i.getFlag('dasu', 'levelingSource')?.uuid))
+    );
+
+    if (itemsToDelete.length === 0) {
+      ui.notifications.info('No orphaned level-granted items found.');
+      return;
+    }
+
+    await this.actor.deleteEmbeddedDocuments(
+      'Item',
+      itemsToDelete.map((i) => i.id)
+    );
+    ui.notifications.info(
+      `Deleted ${itemsToDelete.length} orphaned level-granted items.`
+    );
+    this._refreshSheetIfOpen();
+  }
+
+  /**
+   * Handle grant missing items button click
+   */
+  async _handleGrantMissing() {
+    await grantMissingLevelItems(this.actor);
+    ui.notifications.info(
+      'Granted all missing planned items for current and lower levels.'
+    );
+    this._refreshSheetIfOpen();
+  }
+
+  /**
+   * Handle sync granted items button click
+   */
+  async _handleSyncGranted() {
+    await this._syncGrantedItems(this.actor);
+    ui.notifications.info('Synced granted items with planned slots.');
+    this._refreshSheetIfOpen();
+  }
+
+  /**
+   * Refresh actor sheet if open
+   */
+  _refreshSheetIfOpen() {
+    if (this.actor.sheet?.rendered) {
+      this.actor.sheet.render(false);
+    }
+  }
+
+  /**
+   * Determine if we should refresh on actor update
+   */
+  _shouldRefreshOnUpdate(updateData) {
+    // Don't refresh for point allocation changes (we handle those specially)
+    if (updateData['system.levelingData']?.pointAllocations) {
+      return false;
+    }
+
+    // Refresh for level changes, item changes, or other significant updates
+    return !!(
+      updateData['system.level'] ||
+      updateData['system.merit'] ||
+      updateData['system.experience'] ||
+      updateData['system.levelingData']?.abilities ||
+      updateData['system.levelingData']?.schemas ||
+      updateData['system.levelingData']?.strengthOfWill ||
+      updateData['items']
+    );
+  }
+
+  /**
+   * Set up event handlers for point allocation controls
+   */
+  _setupPointAllocationHandlers() {
+    // Simplified - most actions now handled by ApplicationV2 action system
+    // Only keeping essential dropdown handler
+    if (!this.element) return;
+
+    this.element.addEventListener('change', (event) => {
+      if (event.target.classList.contains('skill-add-dropdown')) {
+        this._addSkillAllocation(event.target);
+      }
+    });
+  }
+
+  /**
+   * Unified handler for point allocation changes
+   */
+  async _handleAttributeChange(button, delta) {
+    await this._handlePointAllocationChange(button, delta, 'ap');
+  }
+
+  /**
+   * Unified expand/collapse toggle handler
+   */
+  _handleExpandToggle(button, type) {
+    const level = parseInt(button.dataset.level);
+    const levelRow = this.element.querySelector(`[data-level="${level}"]`);
+    if (!levelRow) return;
+
+    const collapsed = levelRow.querySelector(`.${type}-allocations-collapsed`);
+    const expanded = levelRow.querySelector(`.${type}-allocations-expanded`);
+    const toggleIcon = button.querySelector('i');
+
+    const isExpanded = collapsed.style.display === 'none';
+    collapsed.style.display = isExpanded ? '' : 'none';
+    expanded.style.display = isExpanded ? 'none' : '';
+    toggleIcon.className = `fas fa-chevron-${isExpanded ? 'down' : 'up'}`;
+    button.title = `Show ${isExpanded ? 'all' : 'only allocated'} ${type}s`;
+  }
+
+  async _handleSkillExpandToggle(button) {
+    this._handleExpandToggle(button, 'skill');
+  }
+
+  async _handleAttributeExpandToggle(button) {
+    this._handleExpandToggle(button, 'attribute');
+  }
+
+  /**
+   * Unified handler for skill allocation changes
+   */
+  async _handleSkillChange(button, delta) {
+    await this._handlePointAllocationChange(button, delta, 'sp');
+  }
+
+  /**
+   * Unified handler for all point allocation changes
+   */
+  async _handlePointAllocationChange(button, delta, forceType = null) {
+    const level = parseInt(button.dataset.level);
+    const pointType = forceType || button.dataset.pointType;
+    const target = button.dataset.attribute || button.dataset.skill;
+
+    if (isNaN(level) || level < 1) {
+      ui.notifications.error('Invalid level data');
+      return;
+    }
+
+    const currentValue = this._getCurrentAllocation(level, pointType, target);
+    let newValue = Math.max(0, currentValue + delta);
+
+    // Skills are limited to 1 point each
+    if (pointType === 'sp' && newValue > 1) {
+      ui.notifications.warn(
+        'Skills can only have 1 point allocated per level.'
+      );
+      return;
+    }
+
+    // Check available points for increases
+    if (delta > 0) {
+      const levelData = this.levels?.find((l) => l.level === level);
+      const available =
+        pointType === 'ap'
+          ? levelData?.apGained || 0
+          : levelData?.spGained || 0;
+      const currentTotal =
+        pointType === 'ap'
+          ? this._getTotalAPAllocated(level)
+          : this._getTotalSPAllocated(level);
+
+      if (currentTotal >= available) {
+        ui.notifications.warn(
+          `No ${pointType.toUpperCase()} available at level ${level}.`
+        );
+        return;
+      }
+    }
+
+    await this._updatePointAllocation(
+      level,
+      pointType,
+      target,
+      newValue,
+      pointType === 'sp'
+    );
+
+    if (pointType === 'sp') {
+      await this._applyAllSkillAllocations();
+    }
+
+    // Force full render if removing allocation to update collapsed view
+    if (newValue === 0) {
+      this.levels = null;
+      await this.render(true);
+    }
+  }
+
+  /**
+   * Handle direct point input changes
+   */
+  async _handleDirectPointInput(input) {
+    const level = parseInt(input.dataset.level);
+    const pointType = input.dataset.pointType;
+    const attribute = input.dataset.attribute;
+    const skill = input.dataset.skill;
+    let newValue = Math.max(0, parseInt(input.value) || 0);
+    const target = attribute || skill;
+
+    // For skills, limit to maximum 1 point per level
+    if (pointType === 'sp' && skill && newValue > 1) {
+      newValue = 1;
+      input.value = newValue;
+      ui.notifications.warn(
+        'You can only allocate 1 point per skill per level.'
+      );
+    }
+
+    // For AP, validate against available points
+    if (pointType === 'ap') {
+      const levelData = this.levels?.find((l) => l.level === level);
+      const availableAP = levelData?.apGained || 0;
+
+      if (availableAP > 0) {
+        const currentValue = this._getCurrentAllocation(
+          level,
+          pointType,
+          target
+        );
+        const currentTotal = this._getTotalAPAllocated(level);
+        const targetChange = newValue - currentValue;
+
+        if (currentTotal + targetChange > availableAP) {
+          const maxAllowable = availableAP - (currentTotal - currentValue);
+          newValue = Math.max(0, maxAllowable);
+          input.value = newValue;
+          ui.notifications.warn(
+            `Cannot allocate more AP. Only ${availableAP} AP available at level ${level}.`
+          );
+        }
+      }
+    }
+
+    // For SP, validate against available points
+    if (pointType === 'sp') {
+      const levelData = this.levels?.find((l) => l.level === level);
+      const availableSP = levelData?.spGained || 0;
+
+      if (availableSP > 0) {
+        const currentValue = this._getCurrentAllocation(
+          level,
+          pointType,
+          target
+        );
+        const currentTotal = this._getTotalSPAllocated(level);
+        const targetChange = newValue - currentValue;
+
+        if (currentTotal + targetChange > availableSP) {
+          const maxAllowable = Math.min(
+            1,
+            availableSP - (currentTotal - currentValue)
+          ); // Skills still limited to 1
+          newValue = Math.max(0, maxAllowable);
+          input.value = newValue;
+          ui.notifications.warn(
+            `Cannot allocate more SP. Only ${availableSP} SP available at level ${level}.`
+          );
+        }
+      }
+    }
+
+    await this._updatePointAllocation(level, pointType, target, newValue);
+  }
+
+  /**
+   * Handle skill addition input (compact UI)
+   */
+  _handleSkillAdd(input) {
+    // For future: implement autocomplete/suggestions
+    // Current: just prepare for Enter key
+  }
+
+  /**
+   * Add a new skill allocation
+   */
+  async _addSkillAllocation(dropdown) {
+    const level = parseInt(dropdown.dataset.level);
+    const skillName = dropdown.value.trim();
+
+    if (!skillName) return;
+
+    // Check if skill is already allocated for this level
+    const currentValue = this._getCurrentAllocation(level, 'sp', skillName);
+    if (currentValue > 0) {
+      ui.notifications.warn(
+        `${skillName} is already allocated for level ${level}. You can only allocate 1 point per skill per level.`
+      );
+      dropdown.value = '';
+      return;
+    }
+
+    // Check if SP allocation would exceed available points
+    const levelData = this.levels?.find((l) => l.level === level);
+    const availableSP = levelData?.spGained || 0;
+
+    if (availableSP > 0) {
+      const currentTotal = this._getTotalSPAllocated(level);
+
+      if (currentTotal + 1 > availableSP) {
+        ui.notifications.warn(
+          `Cannot allocate more SP. Only ${availableSP} SP available at level ${level}.`
+        );
+        dropdown.value = '';
+        return;
+      }
+    }
+
+    await this._updatePointAllocation(level, 'sp', skillName, 1);
+    dropdown.value = '';
+  }
+
+  /**
+   * Get current allocation for a point type and target
+   */
+  _getCurrentAllocation(level, pointType, target) {
+    const levelingData = this.actor.system.levelingData || {};
+    const pointAllocations = levelingData.pointAllocations || {};
+    const levelData = pointAllocations[level] || {};
+
+    if (pointType === 'ap') {
+      return levelData.ap?.[target] || 0;
+    } else if (pointType === 'sp') {
+      const value = levelData.sp?.skills?.[target] || 0;
+      return value;
+    }
+
+    return 0;
+  }
+
+  /**
+   * Get total AP allocated for a level
+   */
+  _getTotalAPAllocated(level) {
+    const levelingData = this.actor.system.levelingData || {};
+    const pointAllocations = levelingData.pointAllocations || {};
+    const levelData = pointAllocations[level] || {};
+    const apAllocations = levelData.ap || {};
+
+    return Object.values(apAllocations).reduce(
+      (sum, points) => sum + (points || 0),
+      0
+    );
+  }
+
+  /**
+   * Get total SP allocated for a level
+   */
+  _getTotalSPAllocated(level) {
+    const levelingData = this.actor.system.levelingData || {};
+    const pointAllocations = levelingData.pointAllocations || {};
+    const levelData = pointAllocations[level] || {};
+    const spAllocations = levelData.sp?.skills || {};
+
+    return Object.values(spAllocations).reduce(
+      (sum, points) => sum + (points || 0),
+      0
+    );
+  }
+
+  /**
+   * Update point allocation in actor data
+   */
+  async _updatePointAllocation(
+    level,
+    pointType,
+    target,
+    value,
+    skipRender = false
+  ) {
+    if (isNaN(level) || level < 1) return;
+    if (this._updating) return;
+    this._updating = true;
+
+    try {
+      // Use targeted update to avoid schema reinitialization
+      let updateData;
+      if (pointType === 'ap') {
+        updateData = {
+          [`system.levelingData.pointAllocations.${level}.ap.${target}`]: value,
+        };
+      } else if (pointType === 'sp') {
+        updateData =
+          value === 0
+            ? {
+                [`system.levelingData.pointAllocations.${level}.sp.skills.-=${target}`]:
+                  null,
+              }
+            : {
+                [`system.levelingData.pointAllocations.${level}.sp.skills.${target}`]:
+                  value,
+              };
+      }
+
+      await this.actor.update(updateData);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      if (!skipRender) {
+        this._queueRender(pointType === 'sp' && value === 0);
+      }
+    } finally {
+      this._updating = false;
+    }
+  }
+
+  /**
+   * Handle skill removal button click
+   */
+  async _handleSkillRemove(button) {
+    let level = parseInt(button.dataset.level);
+    const skillName = button.dataset.skill;
+
+    // If level is NaN, try to get it from the parent level-row element
+    if (!level) {
+      const levelRow = button.closest('.level-row');
+      if (levelRow) {
+        level = parseInt(levelRow.dataset.level);
+      }
+    }
+
+    if (!level || !skillName) {
+      console.error('Invalid skill remove data:', {
+        level,
+        skillName,
+        buttonLevel: button.dataset.level,
+        parentLevel: button.closest('.level-row')?.dataset.level,
+      });
+      return;
+    }
+
+    // Confirm removal
+    const confirmed = await foundry.applications.api.DialogV2.confirm({
+      window: {
+        title: 'Remove Skill Allocation',
+      },
+      content: `<p>Are you sure you want to remove the allocation for <strong>${skillName}</strong> at level ${level}?</p>
+                <p>This will free up the skill points for reallocation.</p>`,
+      modal: true,
+      rejectClose: false,
+    });
+
+    if (!confirmed) return;
+
+    try {
+      // Remove the skill allocation and from actor skills
+      await this._updatePointAllocation(level, 'sp', skillName, 0, true);
+
+      // Simple refresh
+      this.levels = null;
+      await this.render();
+
+      ui.notifications.info(
+        `Removed skill allocation for ${skillName} at level ${level}.`
+      );
+    } catch (error) {
+      console.error('Error removing skill allocation:', error);
+      ui.notifications.error('Failed to remove skill allocation.');
+    }
+  }
+
+  /**
+   * Queue a render to happen at most once per animation frame
+   */
+  _queueRender(forceFullRender = false) {
+    if (this._renderQueued) return;
+    this._renderQueued = true;
+
+    requestAnimationFrame(() => {
+      this._renderQueued = false;
+      this.render(forceFullRender);
+    });
+  }
+
+  /**
+   * Get class progression data from actor's class items
+   * @returns {Object} Progression data organized by level
+   */
+  _getClassProgression() {
+    const progression = {};
+
+    // Find class items on the actor
+    const classItems = this.actor.items.filter((item) => item.type === 'class');
+
+    for (const classItem of classItems) {
+      const levelSlots = classItem.system.levelSlots || {};
+
+      // Process each level's slots
+      for (const [level, slots] of Object.entries(levelSlots)) {
+        const levelNum = parseInt(level);
+        if (!progression[levelNum]) {
+          progression[levelNum] = {
+            abilities: [],
+            aptitudes: [],
+            schemas: [],
+            strengthOfWill: [],
+            features: [],
+            skills: [],
+            attributes: [],
+          };
+        }
+
+        // Process each slot in this level
+        for (const slot of slots) {
+          if (typeof slot === 'string') {
+            // Simple slot type
+            if (slot === 'ability')
+              progression[levelNum].abilities.push({ type: 'ability' });
+            else if (slot === 'aptitude')
+              progression[levelNum].aptitudes.push({ type: 'aptitude' });
+            else if (slot === 'schema')
+              progression[levelNum].schemas.push({ type: 'schema' });
+            else if (slot === 'feature')
+              progression[levelNum].strengthOfWill.push({ type: 'feature' });
+            else if (slot === 'skill')
+              progression[levelNum].skills.push({ type: 'skill' });
+            else if (slot === 'attribute')
+              progression[levelNum].attributes.push({ type: 'attribute' });
+          } else if (typeof slot === 'object' && slot.type) {
+            // Enhanced slot type (schema with details)
+            if (slot.type === 'schema') {
+              progression[levelNum].schemas.push({
+                type: 'schema',
+                schemaId: slot.schemaId,
+                action: slot.action,
+              });
+            } else if (slot.type === 'ability') {
+              progression[levelNum].abilities.push(slot);
+            } else if (slot.type === 'feature') {
+              progression[levelNum].strengthOfWill.push(slot);
+            }
+            // Add other enhanced slot types as needed
+          }
+        }
+      }
+    }
+
+    return progression;
+  }
+
+  /**
+   * Evaluate a class progression formula
+   * @param {string} formula - The formula to evaluate
+   * @param {number} level - The character level
+   * @returns {number} - The calculated value
+   */
+  _evaluateFormula(formula, level) {
+    try {
+      // Handle special formula formats
+      if (formula.includes('odd:')) {
+        const match = formula.match(/odd:(\d+)-(\d+)/);
+        if (match) {
+          const start = parseInt(match[1]);
+          const end = parseInt(match[2]);
+          return level >= start && level <= end && level % 2 === 1 ? 1 : 0;
+        }
+      }
+
+      if (formula.includes('even:')) {
+        const match = formula.match(/even:(\d+)-(\d+)/);
+        if (match) {
+          const start = parseInt(match[1]);
+          const end = parseInt(match[2]);
+          return level >= start && level <= end && level % 2 === 0 ? 1 : 0;
+        }
+      }
+
+      // Replace 'level' with actual level value and evaluate
+      const expression = formula.replace(/level/g, level.toString());
+
+      // Simple evaluation for basic mathematical expressions
+      // Only allow numbers, operators, and parentheses for security
+      if (!/^[0-9+\-*/()\s]+$/.test(expression)) {
+        console.warn('Invalid formula expression:', expression);
+        return 0;
+      }
+
+      return Math.floor(eval(expression));
+    } catch (error) {
+      console.error('Error evaluating formula:', formula, error);
+      return 0;
+    }
+  }
+
+  /**
+   * Get point allocation data for a specific level
+   * @param {number} level - The character level
+   * @param {number} apGained - AP gained at this level
+   * @param {number} spGained - SP gained at this level
+   * @returns {Object} Point allocation data
+   */
+  _getPointAllocations(level, apGained, spGained) {
+    const levelingData = this.actor.system.levelingData || {};
+    const pointAllocations = levelingData.pointAllocations || {};
+    const levelData = pointAllocations[level] || {};
+
+    // Initialize default structure
+    const result = {
+      ap: {
+        pow: levelData.ap?.pow || 0,
+        dex: levelData.ap?.dex || 0,
+        will: levelData.ap?.will || 0,
+        sta: levelData.ap?.sta || 0,
+        spent: 0,
+        available: apGained,
+        locked: level < this.actor.system.level,
+      },
+      sp: {
+        skills: levelData.sp?.skills || {},
+        spent: 0,
+        available: spGained,
+        locked: level < this.actor.system.level,
+      },
+    };
+
+    // Calculate spent points
+    result.ap.spent =
+      result.ap.pow + result.ap.dex + result.ap.will + result.ap.sta;
+    result.sp.spent = Object.values(result.sp.skills).reduce(
+      (sum, points) => sum + points,
+      0
+    );
+
     return result;
   }
 
@@ -262,26 +1020,162 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
       36, 38, 40, 42, 44, 46, 48, 50, 52, 54,
     ];
 
+    // Get class progression data
+    const classProgression = this._getClassProgression();
+    const classItems = this.actor.items.filter((item) => item.type === 'class');
+    const hasClass = classItems.length > 0;
+
+    // Check if class has meaningful progression data
+    const hasClassProgression =
+      hasClass &&
+      classItems.some((classItem) => {
+        const levelSlots = classItem.system.levelSlots || {};
+        const progression = classItem.system.progression || {};
+
+        // Class has progression if it has level slots OR progression formulas
+        const hasLevelSlots = Object.keys(levelSlots).length > 0;
+        const hasProgressionFormulas =
+          progression.apFormula ||
+          progression.spFormula ||
+          (progression.customFormulas &&
+            Object.keys(progression.customFormulas).length > 0);
+
+        return hasLevelSlots || hasProgressionFormulas;
+      });
+
+    // Store class info for use in _prepareContext
+    this._hasClass = hasClass;
+    this._hasClassProgression = hasClassProgression;
+
     for (let level = 1; level <= maxLevel; level++) {
-      // Calculate basic progression bonuses
-      const spGained = 2; // Every level
-      const totalSP = level * 2;
-      const apGained = level % 2 === 1 ? 1 : 0; // Odd levels only
-      const totalAP = Math.ceil(level / 2);
+      // Calculate progression bonuses - use class formulas if available, otherwise defaults
+      let spGained = 2; // Default: every level
+      let apGained = level % 2 === 1 ? 1 : 0; // Default: odd levels only
 
-      // Determine special bonuses based on level progression
-      const gainAbility = [4, 8, 12, 16, 22, 28].includes(level);
-      const gainAptitude = [4, 9, 14, 21, 26].includes(level);
-      const gainSchema = [1, 5, 10, 15, 20, 25].includes(level);
-      const gainStrengthOfWill = [6, 12, 18, 24, 30].includes(level);
+      // Use class progression formulas if available
+      if (hasClassProgression && classItems.length > 0) {
+        const classItem = classItems[0]; // Use first class item
+        if (classItem.system.progression?.spFormula) {
+          try {
+            // Try actor method first, fallback to our own implementation
+            if (typeof this.actor.evaluateClassFormula === 'function') {
+              spGained = this.actor.evaluateClassFormula(
+                classItem.system.progression.spFormula,
+                level
+              );
+            } else {
+              spGained = this._evaluateFormula(
+                classItem.system.progression.spFormula,
+                level
+              );
+            }
+          } catch (e) {
+            console.warn('Failed to evaluate SP formula, using default:', e);
+          }
+        }
+        if (classItem.system.progression?.apFormula) {
+          try {
+            // Try actor method first, fallback to our own implementation
+            if (typeof this.actor.evaluateClassFormula === 'function') {
+              apGained = this.actor.evaluateClassFormula(
+                classItem.system.progression.apFormula,
+                level
+              );
+            } else {
+              apGained = this._evaluateFormula(
+                classItem.system.progression.apFormula,
+                level
+              );
+            }
+          } catch (e) {
+            console.warn('Failed to evaluate AP formula, using default:', e);
+          }
+        }
+      }
 
-      // Determine schema type (first/second) based on level
+      const totalSP = level * 2; // Keep legacy calculation for now
+      const totalAP = Math.ceil(level / 2); // Keep legacy calculation for now
+
+      // Get class-based progression for this level
+      const classLevelData = classProgression[level] || {};
+
+      // Determine special bonuses - only use class data if actor has a class
+      let gainAbility, gainAptitude, gainSchema, gainStrengthOfWill;
+
+      if (hasClass) {
+        // Use class-based progression from levelSlots
+        gainAbility = classLevelData.abilities?.length > 0;
+        gainAptitude = classLevelData.aptitudes?.length > 0;
+        gainSchema = classLevelData.schemas?.length > 0;
+        gainStrengthOfWill = classLevelData.strengthOfWill?.length > 0;
+
+        // If no levelSlots data but class has progression, check levelBonuses
+        if (
+          !gainAbility &&
+          !gainAptitude &&
+          !gainSchema &&
+          !gainStrengthOfWill &&
+          hasClassProgression &&
+          classItems.length > 0
+        ) {
+          const classItem = classItems[0];
+          const levelBonuses = classItem.system.levelBonuses || [];
+
+          // Check if this level has any bonuses defined
+          for (const bonus of levelBonuses) {
+            const bonusLevels = Array.isArray(bonus.level)
+              ? bonus.level
+              : [bonus.level];
+            if (bonusLevels.includes(level)) {
+              if (bonus.type === 'ability') gainAbility = true;
+              if (bonus.type === 'aptitude') gainAptitude = true;
+              if (bonus.type === 'schema') gainSchema = true;
+              if (bonus.type === 'strengthOfWill' || bonus.type === 'feature')
+                gainStrengthOfWill = true;
+            }
+          }
+        }
+      } else {
+        // No class = no progression slots
+        gainAbility = false;
+        gainAptitude = false;
+        gainSchema = false;
+        gainStrengthOfWill = false;
+      }
+
+      // Enhanced schema information from class
       let schemaType = null;
+      let schemaDetails = null;
       if (gainSchema) {
-        if ([1, 5, 15, 25].includes(level)) {
-          schemaType = 'first';
-        } else if ([10, 20].includes(level)) {
-          schemaType = 'second';
+        if (hasClass && classLevelData.schemas?.length > 0) {
+          schemaDetails = classLevelData.schemas[0]; // Take first schema slot for this level
+          if (schemaDetails.type === 'schema') {
+            // For enhanced schemas, we still need to determine first/second for assignment lookup
+            // This maps class-based schema progression to the traditional schema types
+            if ([1, 5, 15, 25].includes(level)) {
+              schemaType = 'first';
+            } else if ([10, 20].includes(level)) {
+              schemaType = 'second';
+            } else {
+              // For custom levels, try to infer from existing assignments or default to first
+              const hasFirstSchema =
+                this.actor.system.levelingData?.schemas?.first;
+              const hasSecondSchema =
+                this.actor.system.levelingData?.schemas?.second;
+              schemaType = !hasFirstSchema
+                ? 'first'
+                : !hasSecondSchema
+                ? 'second'
+                : 'first';
+            }
+          }
+        } else if (!hasClass) {
+          // Fallback to hardcoded schema type logic only if no class
+          if ([1, 5, 15, 25].includes(level)) {
+            schemaType = 'first';
+          } else if ([10, 20].includes(level)) {
+            schemaType = 'second';
+          }
         }
       }
 
@@ -296,11 +1190,23 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
         gainStrengthOfWill
       );
 
+      // Get point allocation data for this level
+      const pointAllocations = this._getPointAllocations(
+        level,
+        apGained,
+        spGained
+      );
+
+      // Ensure level is available in pointAllocations context
+      pointAllocations.level = level;
+
+      const actorLevel = this.actor.system.level || 1;
+
       const levelData = {
         level,
-        isCurrentLevel: level === this.actor.system.level,
-        isCompleted: level < this.actor.system.level,
-        isFuture: level > this.actor.system.level,
+        isCurrentLevel: level === actorLevel,
+        isCompleted: level < actorLevel,
+        isFuture: level > actorLevel,
         apGained,
         spGained,
         totalAP,
@@ -312,9 +1218,11 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
         gainSchema,
         gainStrengthOfWill,
         schemaType,
+        schemaDetails,
         assignedSchema,
         assignedAbility,
         assignedStrengthOfWill,
+        pointAllocations,
         bonuses: this._getLevelBonuses(
           level,
           apGained,
@@ -323,7 +1231,8 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
           gainAptitude,
           gainSchema,
           gainStrengthOfWill,
-          schemaType
+          schemaType,
+          schemaDetails
         ),
       };
 
@@ -464,7 +1373,8 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     gainAptitude,
     gainSchema,
     gainStrengthOfWill,
-    schemaType
+    schemaType,
+    schemaDetails
   ) {
     const bonuses = [];
 
@@ -508,14 +1418,41 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
 
     // Schema bonus
     if (gainSchema) {
-      const schemaText =
-        schemaType === 'first' ? 'First Schema' : 'Second Schema';
+      let schemaText = 'Schema';
+      let schemaDescription = 'Schema slot';
+
+      if (schemaDetails) {
+        // Use enhanced schema details from class
+        if (schemaDetails.schemaId) {
+          schemaText = `${
+            schemaDetails.action === 'upgrade' ? 'Upgrade' : 'New'
+          } ${schemaDetails.schemaId}`;
+          schemaDescription = `${
+            schemaDetails.action === 'upgrade' ? 'Upgrade existing' : 'New'
+          } schema: ${schemaDetails.schemaId}`;
+        } else {
+          schemaText = `${
+            schemaDetails.action === 'upgrade' ? 'Schema Upgrade' : 'New Schema'
+          }`;
+          schemaDescription = `${
+            schemaDetails.action === 'upgrade'
+              ? 'Upgrade existing schema level'
+              : 'New schema slot'
+          }`;
+        }
+      } else if (schemaType) {
+        // Fallback to old schema type logic
+        schemaText = schemaType === 'first' ? 'First Schema' : 'Second Schema';
+        schemaDescription =
+          schemaType === 'first' ? 'First Schema slot' : 'Second Schema slot';
+      }
+
       bonuses.push({
         type: 'schema',
         icon: 'fas fa-puzzle-piece',
         text: schemaText,
-        description:
-          schemaType === 'first' ? 'First Schema slot' : 'Second Schema slot',
+        description: schemaDescription,
+        schemaDetails: schemaDetails,
       });
     }
 
@@ -555,6 +1492,17 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     // Clean up event listeners to prevent memory leaks
     if (this.actor && this.actor.levelingWizards) {
       this.actor.levelingWizards.delete(this);
+    }
+
+    // Remove hook
+    if (this._actorUpdateHook) {
+      Hooks.off('updateActor', this._actorUpdateHook);
+      this._actorUpdateHook = null;
+    }
+
+    // Cancel any queued renders
+    if (this._renderQueued) {
+      this._renderQueued = false;
     }
 
     // Remove any bound event listeners
@@ -919,6 +1867,441 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     }
   }
 
+  static async onOpenSkillDialog(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const level = parseInt(target.dataset.level);
+    const wizard = this;
+
+    try {
+      await wizard._openSkillAllocationDialog(level);
+    } catch (error) {
+      console.error('Error opening skill dialog:', error);
+      ui.notifications.error('Failed to open skill allocation dialog.');
+    }
+  }
+
+  static async onRemoveSkill(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const wizard = this;
+    await wizard._handleSkillRemove(target);
+  }
+
+  static async onIncreaseAttribute(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const wizard = this;
+    await wizard._handleAttributeChange(target, 1);
+  }
+
+  static async onDecreaseAttribute(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const wizard = this;
+    await wizard._handleAttributeChange(target, -1);
+  }
+
+  static async onToggleSkillExpand(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const wizard = this;
+    await wizard._handleSkillExpandToggle(target);
+  }
+
+  static async onToggleAttributeExpand(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const wizard = this;
+    await wizard._handleAttributeExpandToggle(target);
+  }
+
+  static async onIncreaseSkill(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const wizard = this;
+    await wizard._handleSkillChange(target, 1);
+  }
+
+  static async onDecreaseSkill(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const wizard = this;
+    await wizard._handleSkillChange(target, -1);
+  }
+
+  static async onApplySkillAllocations(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const wizard = this;
+
+    try {
+      await wizard._applyAllSkillAllocations();
+      ui.notifications.info('Applied all skill allocations to character.');
+    } catch (error) {
+      console.error('Error applying skill allocations:', error);
+      ui.notifications.error('Failed to apply skill allocations.');
+    }
+  }
+
+  /**
+   * Open skill allocation dialog for a specific level
+   * @param {number} level - The level to allocate skills for
+   */
+  async _openSkillAllocationDialog(level) {
+    // Refresh level data to ensure we have the latest allocations
+    const maxLevel = game.settings.get('dasu', 'maxLevel') || 30;
+    const freshLevels = await this._calculateLevelProgression(maxLevel);
+    const levelData = freshLevels?.find((l) => l.level === level);
+
+    if (!levelData) {
+      ui.notifications.error(`Invalid level: ${level}`);
+      return;
+    }
+
+    const availableSP = levelData.spGained || 0;
+    const currentTotal = this._getTotalSPAllocated(level);
+    const remainingSP = availableSP - currentTotal;
+
+    if (remainingSP <= 0) {
+      ui.notifications.warn(
+        `No skill points available to allocate at level ${level}.`
+      );
+      return;
+    }
+
+    // Get all available skills and filter out already allocated ones
+    const allSkillOptions = await this._prepareSkillSelectOptions();
+    const allocatedSkills = new Set(
+      Object.keys(levelData.pointAllocations?.sp?.skills || {})
+    );
+    const availableSkills = allSkillOptions.filter(
+      (skill) => !allocatedSkills.has(skill.value)
+    );
+
+    if (availableSkills.length === 0) {
+      ui.notifications.warn('No skills available to allocate.');
+      return;
+    }
+
+    // Create dialog content
+    const maxSelections = Math.min(remainingSP, 2); // Up to 2 skills or remaining SP
+
+    // Add custom CSS and script to the dialog content
+    const style = `
+      <style>
+        .skill-allocation-dialog .skill-checkboxes {
+          max-height: 300px;
+          overflow-y: auto;
+          margin: 10px 0;
+        }
+        .skill-allocation-dialog .skill-option {
+          display: block;
+          margin: 5px 0;
+          padding: 5px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
+          cursor: pointer;
+          transition: background-color 0.2s;
+        }
+        .skill-allocation-dialog .skill-option:hover {
+          background-color: #f0f0f0;
+        }
+        .skill-allocation-dialog .skill-option input {
+          margin-right: 8px;
+        }
+        .skill-allocation-dialog .skill-option input:disabled + span {
+          color: #999;
+        }
+      </style>
+      <script>
+        setTimeout(function() {
+          const checkboxes = document.querySelectorAll('input[name="selectedSkills"]');
+          const maxSelections = ${maxSelections};
+
+          checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+              const selected = document.querySelectorAll('input[name="selectedSkills"]:checked');
+              if (selected.length >= maxSelections) {
+                checkboxes.forEach(cb => {
+                  if (!cb.checked) {
+                    cb.disabled = true;
+                    cb.closest('.skill-option').style.opacity = '0.5';
+                  }
+                });
+              } else {
+                checkboxes.forEach(cb => {
+                  cb.disabled = false;
+                  cb.closest('.skill-option').style.opacity = '1';
+                });
+              }
+            });
+          });
+        }, 100);
+      </script>
+    `;
+
+    const content =
+      style +
+      `
+      <div class="skill-allocation-dialog">
+        <p><strong>Level ${level} Skill Allocation</strong></p>
+        <p>Available Skill Points: ${remainingSP}</p>
+        <p>Select up to ${maxSelections} skill${
+        maxSelections > 1 ? 's' : ''
+      } to increase by 1 tick:</p>
+        <div class="skill-checkboxes">
+          ${availableSkills
+            .map(
+              (skill) => `
+            <label class="skill-option">
+              <input type="checkbox" name="selectedSkills" value="${skill.value}" data-label="${skill.label}">
+              <span>${skill.label}</span>
+            </label>
+          `
+            )
+            .join('')}
+        </div>
+      </div>
+    `;
+
+    // Store reference to wizard for callback
+    const wizard = this;
+
+    // Create and show dialog using DialogV2
+    const dialog = await foundry.applications.api.DialogV2.prompt({
+      window: {
+        title: `Allocate Skills - Level ${level}`,
+        icon: 'fas fa-magic',
+        resizable: true,
+      },
+      content,
+      modal: true,
+      buttons: [
+        {
+          action: 'allocate',
+          icon: 'fas fa-check',
+          label: 'Allocate Skills',
+          default: true,
+          callback: async (event, button, dialog) => {
+            // Get selected skills from checkboxes
+            const checkboxes = dialog.element.querySelectorAll(
+              'input[name="selectedSkills"]:checked'
+            );
+            const selectedSkills = Array.from(checkboxes).map((cb) => cb.value);
+
+            if (selectedSkills.length === 0) {
+              ui.notifications.warn('Please select at least one skill.');
+              return false; // Keep dialog open
+            }
+
+            if (selectedSkills.length > maxSelections) {
+              ui.notifications.warn(
+                `You can only select up to ${maxSelections} skill${
+                  maxSelections > 1 ? 's' : ''
+                }.`
+              );
+              return false; // Keep dialog open
+            }
+
+            // Allocate the selected skills using the wizard instance
+            try {
+              await wizard._allocateSelectedSkills(level, selectedSkills);
+              ui.notifications.info(
+                `Allocated ${selectedSkills.length} skill point${
+                  selectedSkills.length > 1 ? 's' : ''
+                }.`
+              );
+              return true; // Close dialog
+            } catch (error) {
+              console.error('Error allocating skills:', error);
+              ui.notifications.error('Failed to allocate skills.');
+              return false; // Keep dialog open
+            }
+          },
+        },
+        {
+          action: 'cancel',
+          icon: 'fas fa-times',
+          label: 'Cancel',
+        },
+      ],
+    });
+  }
+
+  /**
+   * Allocate selected skills for a level
+   * @param {number} level - The level to allocate for
+   * @param {string[]} selectedSkills - Array of skill names to allocate
+   */
+  async _allocateSelectedSkills(level, selectedSkills) {
+    try {
+      for (const skillName of selectedSkills) {
+        await this._updatePointAllocation(level, 'sp', skillName, 1, true);
+      }
+
+      // Final render after all allocations - force full render to show new skills
+      this._queueRender(true);
+
+      // Check if we need to update the actual actor skills (not just leveling data)
+      const currentLevel = this.actor.system.level || 1;
+
+      // Always apply skill allocations immediately (for current design)
+      await this._applySkillAllocationsToActor(level, selectedSkills);
+
+      if (level > currentLevel) {
+        ui.notifications.info(
+          `Skills allocated for future level ${level} and applied immediately.`
+        );
+      }
+
+      ui.notifications.info(
+        `Allocated 1 point to ${selectedSkills.length} skill${
+          selectedSkills.length > 1 ? 's' : ''
+        } at level ${level}.`
+      );
+    } catch (error) {
+      console.error('Error allocating skills:', error);
+      ui.notifications.error(
+        'Failed to allocate skills. Check console for details.'
+      );
+    }
+  }
+
+  /**
+   * Apply skill allocations to the actual actor skills (not just leveling data)
+   */
+  async _applySkillAllocationsToActor(level, skillNames) {
+    try {
+      const actorData = foundry.utils.deepClone(this.actor.system);
+      let updated = false;
+
+      for (const skillName of skillNames) {
+        // Find the skill in the actor's skills array
+        const skillIndex = actorData.skills?.findIndex(
+          (skill) => skill.name === skillName
+        );
+
+        if (skillIndex !== -1) {
+          actorData.skills[skillIndex].ticks =
+            (actorData.skills[skillIndex].ticks || 0) + 1;
+          updated = true;
+        } else {
+          console.warn(
+            `DASU Leveling Wizard - Skill not found in actor skills: ${skillName}`
+          );
+        }
+      }
+
+      if (updated) {
+        await this.actor.update({ 'system.skills': actorData.skills });
+
+        // Refresh the actor sheet if it's open
+        if (this.actor.sheet?.rendered) {
+          this.actor.sheet.render(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error applying skill allocations to actor:', error);
+    }
+  }
+
+  /**
+   * Apply all skill allocations from leveling data to actual actor skills
+   */
+  async _applyAllSkillAllocations() {
+    try {
+      const levelingData = this.actor.system.levelingData || {};
+      const pointAllocations = levelingData.pointAllocations || {};
+
+      const actorData = foundry.utils.deepClone(this.actor.system);
+      let updated = false;
+
+      // First, reset all skill ticks to 0 (or their base value)
+      if (actorData.skills) {
+        for (const skill of actorData.skills) {
+          const originalTicks = skill.ticks || 0;
+          skill.ticks = 0; // Reset to base
+          if (originalTicks !== 0) {
+            updated = true;
+          }
+        }
+      }
+
+      // Migrate old name-based skill allocations to ID-based (backward compatibility)
+      for (const [level, allocations] of Object.entries(pointAllocations)) {
+        if (allocations.sp?.skills) {
+          const skillAllocations = allocations.sp.skills;
+          const migratedSkills = {};
+          let needsMigration = false;
+
+          for (const [key, points] of Object.entries(skillAllocations)) {
+            // Check if this is a name-based allocation (contains spaces or capitals)
+            const skill = actorData.skills?.find((s) => s.name === key);
+            if (skill && skill.id !== key) {
+              // This is a name-based allocation, convert to ID
+              migratedSkills[skill.id] = points;
+              needsMigration = true;
+            } else {
+              // This is already ID-based or not found
+              migratedSkills[key] = points;
+            }
+          }
+
+          if (needsMigration) {
+            allocations.sp.skills = migratedSkills;
+          }
+        }
+      }
+
+      // Process all levels
+      for (const [level, allocations] of Object.entries(pointAllocations)) {
+        if (level === 'NaN') continue; // Skip invalid level
+
+        const skillAllocations = allocations.sp?.skills || {};
+
+        for (const [skillId, points] of Object.entries(skillAllocations)) {
+          if (points > 0) {
+            // Find the skill in the actor's skills array by ID
+            const skillIndex = actorData.skills?.findIndex(
+              (skill) => skill.id === skillId
+            );
+
+            if (skillIndex !== -1) {
+              actorData.skills[skillIndex].ticks =
+                (actorData.skills[skillIndex].ticks || 0) + points;
+              updated = true;
+            } else {
+              console.warn(
+                `DASU Leveling Wizard - Skill not found in actor skills: ${skillId}`
+              );
+            }
+          }
+        }
+      }
+
+      if (updated) {
+        await this.actor.update({ 'system.skills': actorData.skills });
+
+        // Refresh the actor sheet if it's open
+        if (this.actor.sheet?.rendered) {
+          this.actor.sheet.render(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error applying all skill allocations:', error);
+    }
+  }
+
   async _handleItemDrop(itemId, slotType, level, slot) {
     try {
       // Validate and sanitize inputs
@@ -1032,10 +2415,6 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     }
   }
 
-  async _checkAndGrantLevelItems(data) {
-    // This method is no longer needed as level changes are handled by dasu.levelChanged hook
-  }
-
   _validateItemForSlot(item, slotType) {
     try {
       // Validate item exists
@@ -1120,20 +2499,6 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
   }
 }
 
-// Helper to map actor level to schema progression level
-function getSchemaProgressionLevel(actorLevel, schemaType) {
-  if (schemaType === 'first') {
-    if (actorLevel >= 15) return 3;
-    if (actorLevel >= 5) return 2;
-    if (actorLevel >= 1) return 1;
-  } else if (schemaType === 'second') {
-    if (actorLevel >= 25) return 3;
-    if (actorLevel >= 20) return 2;
-    if (actorLevel >= 10) return 1;
-  }
-  return 0;
-}
-
 // Trait-based Leveling Item Helpers
 async function grantLevelingItem(actor, uuid, level, typeHint) {
   // For schemas, try to find an existing innate schema with the same uuid
@@ -1151,13 +2516,8 @@ async function grantLevelingItem(actor, uuid, level, typeHint) {
         (schemaType === null ||
           i.getFlag('dasu', 'levelingSource')?.schemaType === schemaType)
     );
-    // FIX: Use the level being processed, not actor.system.level
-    const progressionLevel = getSchemaProgressionLevel(level, schemaType);
     if (existing) {
-      // Always set system.level to the correct progression step for this schema
-      if (progressionLevel !== existing.system.level) {
-        await existing.update({ 'system.level': progressionLevel });
-      }
+      // Schema item already exists, progression handled by class data
       return;
     }
   }
@@ -1232,9 +2592,8 @@ async function grantLevelingItem(actor, uuid, level, typeHint) {
     sourceUuid: uuid, // Track original source
   };
   if (typeHint === 'schema' && schemaType) {
-    const progressionLevel = getSchemaProgressionLevel(level, schemaType);
+    // Schema progression level is now handled by class data
     itemData.system = itemData.system || {};
-    itemData.system.level = progressionLevel;
   }
 
   try {
