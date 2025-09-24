@@ -187,5 +187,10 @@
     </div>
   </section>
 
+  <div class='separator'></div>
+  <fieldset>
+    <legend>{{localize 'DASU.Description'}}</legend>
+    {{formInput @root.htmlInputField value=system.description name="system.description" toggled=@root.editable enriched=enrichedDescription disabled=(not @root.editable)}}
+  </fieldset>
 
 </div>

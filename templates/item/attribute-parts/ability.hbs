@@ -301,16 +301,8 @@
 
   {{! ProseMirror Description Section }}
   <div class='separator'></div>
-  <div class='section-header'>
-    <h3>{{localize 'DASU.Item.Ability.FIELDS.description.label'}}</h3>
-    <p class='section-description'>Describe the ability's effects, requirements, or special properties.</p>
-  </div>
-  
-  {{#if editable}} 
-    <prose-mirror name="system.description" data-document-uuid="{{item.uuid}}" value="{{system.description}}" collaborate="true" toggled="true">
-      {{{enrichedDescription}}}
-    </prose-mirror>
-  {{else}} 
-    {{{enrichedDescription}}}
-  {{/if}}
+  <fieldset>
+    <legend>{{localize 'DASU.Description'}}</legend>
+    {{formInput @root.htmlInputField value=system.description name="system.description" toggled=@root.editable enriched=enrichedDescription disabled=(not @root.editable)}}
+  </fieldset>
 </section> 

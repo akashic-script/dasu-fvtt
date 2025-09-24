@@ -44,7 +44,6 @@
   color: var(--dasu-c-dark);
 }
 
-
 .item-description-row {
   width: 100%;
   padding: 0.5rem 1rem;
@@ -271,7 +270,6 @@
 .items-list .items-filter-dropdown.visible {
   display: block !important;
 }
-
 
 /* Items Tab Filter Dropdown */
 .items-list .items-tab-filter-dropdown {
@@ -1361,7 +1359,6 @@
   margin-left: 4px;
   opacity: 0.8;
 }
-
 
 .items-list .items-sort-dropdown {
   display: none !important;

@@ -67,22 +67,14 @@
     </div>
     <div class='resource'>
       <label class='resource-label'>Price</label>
-      <input type='number' name='system.price' value='{{system.price}}' data-dtype='Number' min='0' style='width: 6em;' />
+      <input type='number' name='system.price' value='{{system.price}}' data-dtype='Number' min='0' />
     </div>
   </div>
   
   <div class='separator'></div>
 
-  <div class='section-header'>
-    <h3>{{localize 'DASU.Item.Tag.FIELDS.description.label'}}</h3>
-    <p class='section-description'>Describe the tag's effects and properties.</p>
-  </div>
-
-  {{#if editable}}
-    <prose-mirror name="system.description" data-document-uuid="{{item.uuid}}" value="{{system.description}}" collaborate="true" toggled="true">
-      {{{enrichedDescription}}}
-    </prose-mirror>
-  {{else}}
-    {{{enrichedDescription}}}
-  {{/if}}
+  <fieldset>
+    <legend>{{localize 'DASU.Description'}}</legend>
+    {{formInput @root.htmlInputField value=system.description name="system.description" toggled=@root.editable enriched=enrichedDescription disabled=(not @root.editable)}}
+  </fieldset>
 </section> 

@@ -195,7 +195,8 @@
 /* =========================
    Skill Section
    ========================= */
-.skills-section {}
+.skills-section {
+}
 
 .skill-points {
   padding: 0.35rem;
@@ -666,22 +667,38 @@
 }
 
 .dasu.actor .resource-bar .bar-fill {
-  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-legend-completed) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-success) 0%,
+    var(--color-legend-completed) 100%
+  );
   height: 100%;
   transition: width 0.3s ease;
   border-radius: 0;
 }
 
 .dasu.actor .resource-bar.health .bar-fill {
-  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-legend-completed) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-success) 0%,
+    var(--color-legend-completed) 100%
+  );
 }
 
 .dasu.actor .resource-bar.damage .bar-fill {
-  background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-hp) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-danger) 0%,
+    var(--color-hp) 100%
+  );
 }
 
 .dasu.actor .resource-bar.fatigue .bar-fill {
-  background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-primary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-warning) 0%,
+    var(--color-primary) 100%
+  );
 }
 
 .dasu.actor .resource-bar .bar-text {

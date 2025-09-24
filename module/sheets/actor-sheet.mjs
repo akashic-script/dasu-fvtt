@@ -55,7 +55,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     // Custom property that's merged into `this.options`
     // dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
     form: {
-      submitOnChange: false,
+      submitOnChange: true,
+      closeOnSubmit: false,
     },
   };
 
@@ -183,11 +184,19 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       level < maxLevel;
 
     await this._prepareItems(context);
+
+    // Add system fields for formInput
+    context.fields = this.document.schema.fields;
+    context.systemFields = this.document.system.schema.fields;
+
+    // Add HTMLField for formInput helper
+    context.htmlInputField = new foundry.data.fields.HTMLField();
+
     return context;
   }
 
   /** @override */
-  async _preparePartContext(partId, context) {
+  async _preparePartContext(partId, context, options) {
     switch (partId) {
       case 'main':
         context.tab = context.tabs[partId];

@@ -237,7 +237,6 @@
   color: var(--color-text-secondary);
 }
 
-
 /* ========================================
    PROGRESSION CONTENT
    ======================================== */
@@ -761,8 +760,6 @@
   top: 2px;
   right: 2px;
 }
-
-
 
 /* Upgrade placeholder for missing schemas */
 .dasu-leveling-wizard .upgrade-placeholder {

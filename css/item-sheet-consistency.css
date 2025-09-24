@@ -28,10 +28,10 @@
 
 /* Specific styling for bar inputs that need to show full text */
 .dasu.item input.bar-input,
-.dasu.item input[name*="hp"],
-.dasu.item input[name*="wp"],
-.dasu.item input[name*="current"],
-.dasu.item input[name*="max"] {
+.dasu.item input[name*='hp'],
+.dasu.item input[name*='wp'],
+.dasu.item input[name*='current'],
+.dasu.item input[name*='max'] {
   min-width: 80px;
   padding: 10px 12px;
   font-size: 1em;
@@ -164,7 +164,13 @@
 /* Header consistency override */
 .dasu.item .sheet-header {
   background: var(--color-bg-primary);
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.1) 10px, rgba(0, 0, 0, 0.1) 20px);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
   padding: 8px 12px;
   border-bottom: 1px solid var(--color-primary);
   position: relative;

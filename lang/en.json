@@ -295,7 +295,6 @@
             "type": { "label": "Damage Type" },
             "value": { "label": "Damage Value" }
           },
-          "description": { "label": "Description" },
           "healed": {
             "type": { "label": "Heal Type" },
             "value": { "label": "Heal Value" }
@@ -322,13 +321,11 @@
       },
       "Scar": {
         "FIELDS": {
-          "effect": { "label": "Effect" },
-          "description": { "label": "Description" }
+          "effect": { "label": "Effect" }
         }
       },
       "Schema": {
         "FIELDS": {
-          "description": { "label": "Description" },
           "level": { "label": "Level" }
         },
         "sectionDescription": "Describe the schema's effects and properties.",
@@ -347,21 +344,17 @@
         }
       },
       "Feature": {
-        "FIELDS": {
-          "description": { "label": "Description" }
-        }
+        "FIELDS": {}
       },
       "Special": {
         "FIELDS": {
-          "effect": { "label": "Effect" },
-          "description": { "label": "Description" }
+          "effect": { "label": "Effect" }
         }
       },
       "Tag": {
         "Deleted": "Deleted Tag",
         "FIELDS": {
-          "effect": { "label": "Effect" },
-          "description": { "label": "Description" }
+          "effect": { "label": "Effect" }
         },
         "InvalidTooltip": "This tag has been deleted or is no longer available",
         "AlreadyEquipped": "Already equipped in a weapon"
@@ -381,7 +374,6 @@
             "type": { "label": "Damage Type" },
             "value": { "label": "Damage Value" }
           },
-          "description": { "label": "Description" },
           "effect": { "label": "Effect" },
           "govern": { "label": "Governing Attribute" },
           "isInfinity": { "label": "Guaranteed" },
@@ -406,6 +398,7 @@
       "RemoveFromFavorites": "Remove from favorites",
       "MoreActions": "More actions"
     },
+    "Description": "Description",
     "SearchItems": "Search items...",
     "SearchItemsTooltip": "Search through all items by name",
     "ClearSearch": "Clear search",

@@ -32,7 +32,8 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       toggleProgressionPreview: this._toggleProgressionPreview,
     },
     form: {
-      submitOnChange: false,
+      submitOnChange: true,
+      closeOnSubmit: false,
     },
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
@@ -120,7 +121,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
 
         break;
       case 'tag':
-        options.parts.push('attributesTag', 'description', 'effects');
+        options.parts.push('attributesTag', 'effects');
 
         break;
       case 'tactic':
@@ -128,21 +129,21 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
 
         break;
       case 'special':
-        options.parts.push('attributesSpecial', 'description', 'effects');
+        options.parts.push('attributesSpecial', 'effects');
 
         break;
       case 'scar':
-        options.parts.push('attributesScar', 'description', 'effects');
+        options.parts.push('attributesScar', 'effects');
 
         break;
       case 'schema':
-        options.parts.push('attributesSchema', 'description', 'effects');
+        options.parts.push('attributesSchema', 'effects');
         break;
       case 'feature':
-        options.parts.push('attributesFeature', 'description', 'effects');
+        options.parts.push('attributesFeature', 'effects');
         break;
       case 'class':
-        options.parts.push('attributesClass', 'description', 'effects');
+        options.parts.push('attributesClass', 'effects');
         break;
     }
   }
@@ -200,11 +201,29 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     context.costTypeOptions = DASU.COST_TYPE_OPTIONS;
     context.healTypeOptions = DASU.HEAL_TYPE_OPTIONS;
 
+    // Add system fields for formInput
+    context.fields = this.document.schema.fields;
+    context.systemFields = this.document.system.schema.fields;
+
+    // Add HTMLField for formInput helper
+    context.htmlInputField = new foundry.data.fields.HTMLField();
+
+    // Add enriched description for display mode
+    context.enrichedDescription =
+      await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+        this.item.system.description || '',
+        {
+          secrets: this.document.isOwner,
+          rollData: this.item.getRollData(),
+          relativeTo: this.item,
+        }
+      );
+
     return context;
   }
 
   /** @override */
-  async _preparePartContext(partId, context) {
+  async _preparePartContext(partId, context, options) {
     switch (partId) {
       case 'attributesAbility':
         // This is the unified ability partial that renders different content based on category

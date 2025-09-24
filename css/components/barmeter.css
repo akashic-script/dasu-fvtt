@@ -29,7 +29,6 @@
   box-shadow: 0 3px 8px var(--color-bg-dim);
 }
 
-
 .bar-meter .bar-label {
   width: 3rem;
   min-width: 3rem;
@@ -95,7 +94,6 @@
   background: linear-gradient(90deg, var(--color-hp), var(--color-danger));
 }
 
-
 .bar-meter.hp-bar .bar-inner {
   background: linear-gradient(
     180deg,
@@ -108,12 +106,7 @@
 }
 
 .bar-meter.wp-bar .bar-inner {
-  background: linear-gradient(
-    180deg,
-    #9f7aea 0%,
-    #805ad5 60%,
-    #553c9a 100%
-  );
+  background: linear-gradient(180deg, #9f7aea 0%, #805ad5 60%, #553c9a 100%);
   border-radius: 0;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }

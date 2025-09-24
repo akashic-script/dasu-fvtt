@@ -11,6 +11,10 @@
   overflow-y: auto;
 }
 
+.standard-form fieldset {
+  border-radius: 0;
+}
+
 .sheet-header {
   display: flex;
   align-items: center;
@@ -141,7 +145,6 @@
   text-align: left;
 }
 
-
 .dasu.item .sheet-tabs {
   flex: 0;
 }
@@ -159,9 +162,6 @@
     height: 100%;
   }
 }
-
-
-
 
 .dasu.actor .tox,
 .dasu.item .tox {
@@ -389,10 +389,10 @@
 
 /* Specific styling for bar inputs that need to show full text */
 .dasu.actor input.bar-input,
-.dasu.actor input[name*="hp"],
-.dasu.actor input[name*="wp"],
-.dasu.actor input[name*="current"],
-.dasu.actor input[name*="max"] {
+.dasu.actor input[name*='hp'],
+.dasu.actor input[name*='wp'],
+.dasu.actor input[name*='current'],
+.dasu.actor input[name*='max'] {
   min-width: 80px;
   padding: 10px 12px;
   font-size: 1em;
@@ -525,7 +525,13 @@
 /* Header consistency override */
 .dasu.actor .sheet-header {
   background: var(--color-bg-primary);
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.1) 10px, rgba(0, 0, 0, 0.1) 20px);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
   padding: 8px 12px;
   border-bottom: 1px solid var(--color-primary);
   position: relative;
@@ -651,7 +657,7 @@
   /* border: 1px solid var(--color-primary); */
   border-radius: 0;
   color: var(--color-primary);
-  padding: 0.35rem 0.75rem;
+  /* padding: 0.35rem 0.75rem; */
   font-size: 0.8rem;
   font-weight: bold;
   text-transform: uppercase;
@@ -677,28 +683,44 @@
 /* Primary Action Buttons */
 .dasu.actor .button.primary,
 .dasu.actor button.primary {
-  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-legend-completed) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-success) 0%,
+    var(--color-legend-completed) 100%
+  );
   border-color: var(--color-success);
   color: white;
 }
 
 .dasu.actor .button.primary:hover,
 .dasu.actor button.primary:hover {
-  background: linear-gradient(135deg, var(--color-legend-completed) 0%, var(--color-success) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-legend-completed) 0%,
+    var(--color-success) 100%
+  );
   border-color: var(--color-legend-completed);
 }
 
 /* Danger Action Buttons */
 .dasu.actor .button.danger,
 .dasu.actor button.danger {
-  background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-hp) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-danger) 0%,
+    var(--color-hp) 100%
+  );
   border-color: var(--color-danger);
   color: white;
 }
 
 .dasu.actor .button.danger:hover,
 .dasu.actor button.danger:hover {
-  background: linear-gradient(135deg, var(--color-hp) 0%, var(--color-danger) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-hp) 0%,
+    var(--color-danger) 100%
+  );
   border-color: var(--color-hp);
 }
 
