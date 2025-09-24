@@ -1,0 +1,485 @@
+/* ========================================
+   ITEM SHEET CONSISTENCY OVERRIDES
+   ======================================== */
+
+/* Form styling matching roll-dialog approach */
+.dasu.item input[type='text'],
+.dasu.item input[type='number'],
+.dasu.item input[type='password'],
+.dasu.item input[type='email'],
+.dasu.item input[type='url'],
+.dasu.item input[type='search'],
+.dasu.item input[type='tel'],
+.dasu.item textarea,
+.dasu.item select {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 0.9em;
+  font-family: var(--font-primary);
+  line-height: 1.3;
+  min-height: auto;
+  min-width: 60px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* Specific styling for bar inputs that need to show full text */
+.dasu.item input.bar-input,
+.dasu.item input[name*="hp"],
+.dasu.item input[name*="wp"],
+.dasu.item input[name*="current"],
+.dasu.item input[name*="max"] {
+  min-width: 80px;
+  padding: 10px 12px;
+  font-size: 1em;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Bar value container styling */
+.dasu.item .bar-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: fit-content;
+  white-space: nowrap;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.dasu.item .bar-value input.bar-input {
+  flex: 0 0 auto;
+  min-width: 60px;
+  margin: 0;
+}
+
+.dasu.item input:focus,
+.dasu.item textarea:focus,
+.dasu.item select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 3px rgba(234, 179, 8, 0.3);
+}
+
+.dasu.item input:hover,
+.dasu.item textarea:hover,
+.dasu.item select:hover {
+  border-color: var(--color-primary);
+}
+
+/* Number inputs specific styling */
+.dasu.item input[type='number'] {
+  text-align: center;
+  font-weight: bold;
+  color: var(--color-text-primary);
+}
+
+/* Option elements styling */
+.dasu.item select option {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  padding: 6px 10px;
+  font-size: 0.85em;
+  font-family: var(--font-primary);
+  line-height: 1.3;
+}
+
+.dasu.item select option:hover,
+.dasu.item select option:focus {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.dasu.item select option:checked,
+.dasu.item select option:selected {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-weight: bold;
+}
+
+/* Sheet tabs consistency */
+.dasu.item .sheet-tabs.tabs {
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-primary);
+  border-radius: 0;
+  margin-bottom: 12px;
+  padding: 0;
+  display: flex;
+  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.dasu.item .sheet-tabs.tabs a,
+.dasu.item .sheet-tabs.tabs .tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 36px;
+  min-width: 0;
+  max-width: none;
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dasu.item .sheet-tabs.tabs a.active,
+.dasu.item .sheet-tabs.tabs .tab-btn.active,
+.dasu.item .sheet-tabs.tabs a[aria-selected='true'],
+.dasu.item .sheet-tabs.tabs .tab-btn[aria-selected='true'] {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.dasu.item .sheet-tabs.tabs a:not(.active):hover,
+.dasu.item .sheet-tabs.tabs .tab-btn:not(.active):hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Header consistency override */
+.dasu.item .sheet-header {
+  background: var(--color-bg-primary);
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.1) 10px, rgba(0, 0, 0, 0.1) 20px);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-primary);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.dasu.item .sheet-header .profile-img {
+  position: relative;
+  padding: 2px;
+  background: linear-gradient(45deg, #cd853f, #ffd700);
+  border-radius: 0;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+  border: 2px solid #2f1b14;
+  flex: 0 0 80px;
+  height: 80px;
+  z-index: 1;
+}
+
+/* Content consistency overrides */
+.dasu.item .window-content {
+  background: var(--color-bg-secondary);
+  padding: 16px;
+}
+
+.dasu.item .tab {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding: 8px;
+  position: relative;
+  height: 100%;
+}
+
+/* ========================================
+   FORM GROUPS AND SECTIONS CONSISTENCY
+   ======================================== */
+
+/* Form group styling like roll-dialog */
+.dasu.item .form-group {
+  margin-bottom: 12px;
+}
+
+.dasu.item .form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Section headers */
+.dasu.item .section-header {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding: 12px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dasu.item .section-header h3 {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin: 0;
+  font-size: 0.9em;
+  position: relative;
+  z-index: 1;
+}
+
+.dasu.item .section-header .help-text {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  font-size: 0.75em;
+  margin-top: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ========================================
+   CLASS-SPECIFIC STYLING CONSISTENCY
+   ======================================== */
+
+/* Class sections */
+.dasu.item .class-metadata,
+.dasu.item .starting-attributes,
+.dasu.item .progression-formulas,
+.dasu.item .level-slots {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.dasu.item .attribute-grid {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding: 12px;
+  gap: 12px;
+}
+
+/* Validation info styling */
+.dasu.item .validation-info {
+  border-radius: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-size: 0.75em;
+  padding: 8px 12px;
+  margin-top: 8px;
+}
+
+.dasu.item .validation-info.success {
+  background: rgba(40, 167, 69, 0.1);
+  border: 1px solid #28a745;
+  color: #28a745;
+}
+
+.dasu.item .validation-info.error {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid #dc3545;
+  color: #dc3545;
+}
+
+/* Progression preview styling */
+.dasu.item .progression-preview {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.dasu.item .progression-expand-toggle {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.dasu.item .progression-expand-toggle:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.dasu.item .progression-table th {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+}
+
+.dasu.item .progression-table td {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  padding: 8px 12px;
+}
+
+/* Level slots styling */
+.dasu.item .level-slots-grid {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding: 12px;
+}
+
+.dasu.item .level-slot-item {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  transition: all 0.2s ease;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.dasu.item .level-slot-item:hover {
+  border-color: var(--color-primary);
+}
+
+.dasu.item .level-number {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.dasu.item .slot-type-tag {
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+  border-radius: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 6px 12px;
+  margin-bottom: 4px;
+}
+
+.dasu.item .remove-slot-type {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.dasu.item .remove-slot-type:hover {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+/* ========================================
+   BUTTONS AND CONTROLS CONSISTENCY
+   ======================================== */
+
+/* Button styling consistency */
+.dasu.item button,
+.dasu.item .button {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  /* padding: 8px 16px; */
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-size: 0.85em;
+}
+
+.dasu.item button:hover,
+.dasu.item .button:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ========================================
+   HEADER FIELDS CONSISTENCY
+   ======================================== */
+
+.dasu.item .header-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.dasu.item .document-name {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding: 8px;
+}
+
+.dasu.item .document-name input {
+  background: transparent;
+  border: none;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 4px;
+  width: 100%;
+}
+
+.dasu.item .document-name input:focus {
+  background: var(--color-bg-primary);
+  box-shadow: 0 0 0 2px var(--color-primary);
+  outline: none;
+}
+
+/* Resource styling in header */
+.dasu.item .header-fields .resource {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding: 8px;
+  transition: all 0.2s ease;
+}
+
+.dasu.item .header-fields .resource:hover {
+  border-color: var(--color-primary);
+}
+
+.dasu.item .header-fields .resource label {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-size: 0.85em;
+  margin-bottom: 4px;
+  display: block;
+}

@@ -69,7 +69,7 @@
              name="system.progression.apFormula"
              value="{{system.progression.apFormula}}"
              data-dtype="String"
-             placeholder="odd:1-29" />
+             placeholder="{{localize 'DASU.Class.FormulaPlaceholders.ap'}}" />
     </div>
 
     <div class="form-group flexrow">
@@ -78,7 +78,7 @@
              name="system.progression.spFormula"
              value="{{system.progression.spFormula}}"
              data-dtype="String"
-             placeholder="2+2*level" />
+             placeholder="{{localize 'DASU.Class.FormulaPlaceholders.sp'}}" />
     </div>
 
     {{! Progression Preview }}
@@ -86,7 +86,7 @@
       <div class="progression-preview">
         <div class="progression-preview-header">
           <h4>{{localize "DASU.Class.ProgressionPreview"}}</h4>
-          <button type="button" class="progression-expand-toggle" data-action="toggleProgressionPreview" title="Show progression preview">
+          <button type="button" class="progression-expand-toggle" data-action="toggleProgressionPreview" title="{{localize 'DASU.Class.ProgressionPreviewToggle'}}">
             <i class="fas fa-chevron-down"></i>
           </button>
         </div>
@@ -137,10 +137,31 @@
                     {{#if slot.schemaId}}
                       <span class="slot-detail">{{slot.schemaId}}</span>
                     {{/if}}
-                    <span class="slot-action {{slot.action}}">{{#if (eq slot.action "new")}}New{{else if (eq slot.action "upgrade")}}Upgrade{{else}}{{slot.action}}{{/if}}</span>
-                    <button type="button" class="edit-schema-slot" data-level="{{add @../index 1}}" data-slot-index="{{index}}" title="Edit Schema Details">
-                      <i class="fas fa-edit"></i>
-                    </button>
+                    <select class="slot-action-select" data-level="{{add @../index 1}}" data-slot-index="{{index}}" data-field="action">
+                      <option value="new" {{#if (eq slot.action "new")}}selected{{/if}}>{{localize 'DASU.Class.SlotActions.new'}}</option>
+                      <option value="upgrade" {{#if (eq slot.action "upgrade")}}selected{{/if}}>{{localize 'DASU.Class.SlotActions.upgrade'}}</option>
+                    </select>
+                    {{#if (eq slot.action "new")}}
+                      <input type="number"
+                             class="slot-number-input"
+                             data-level="{{add @../index 1}}"
+                             data-slot-index="{{index}}"
+                             data-field="slotNumber"
+                             value="{{slot.slotNumber}}"
+                             min="1"
+                             max="10"
+                             placeholder="{{localize 'DASU.Class.SlotActions.slotPlaceholder'}}" />
+                    {{/if}}
+                    {{#if (eq slot.action "upgrade")}}
+                      <select class="slot-upgrade-target" data-level="{{add @../index 1}}" data-slot-index="{{index}}" data-field="upgradeSlotNumber">
+                        <option value="">{{localize 'DASU.Class.SlotActions.selectSlotNumber'}}</option>
+                        {{#each (getAvailableSlotNumbers @root.system.levelSlots slot.type (add @../index 1)) as |slotNumber|}}
+                          <option value="{{slotNumber}}" {{#if (eq (toNumber slot.upgradeSlotNumber) (toNumber slotNumber))}}selected{{/if}}>
+                            {{localize 'DASU.Class.SlotActions.slotNumber' number=slotNumber}}
+                          </option>
+                        {{/each}}
+                      </select>
+                    {{/if}}
                     <button type="button" class="remove-slot-type" data-level="{{add @../index 1}}" data-slot-type="{{slot.type}}" data-slot-index="{{index}}">
                       <i class="fas fa-times"></i>
                     </button>

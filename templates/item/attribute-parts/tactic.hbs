@@ -74,23 +74,18 @@
 
   <div class='separator'></div>
 
-  <div class='resource'>
-    <label class='resource-label'>{{localize 'DASU.Item.Tactic.FIELDS.effect.label'}}</label>
-    <textarea name='system.effect' rows='3'>{{system.effect}}</textarea>
-  </div>
-
   {{! ProseMirror Description Section }}
   <div class='separator'></div>
   <div class='section-header'>
     <h3>{{localize 'DASU.Item.Tactic.FIELDS.description.label'}}</h3>
     <p class='section-description'>Describe the tactic's effects, requirements, or special properties.</p>
   </div>
-  
-  {{#if editable}} 
+
+  {{#if editable}}
     <prose-mirror name="system.description" data-document-uuid="{{item.uuid}}" value="{{system.description}}" collaborate="true" toggled="true">
       {{{enrichedDescription}}}
     </prose-mirror>
-  {{else}} 
+  {{else}}
     {{{enrichedDescription}}}
   {{/if}}
 </section>

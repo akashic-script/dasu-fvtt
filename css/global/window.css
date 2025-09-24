@@ -3,30 +3,7 @@
   font-family: var(--font-primary);
 }
 
-.dasu.actor .window-content {
-  padding: 1rem;
-}
-
-.dasu.actor .sheet-header {
-  margin-bottom: 1rem;
-}
-
-.dasu.actor .tab {
-  padding: 0.5rem;
-}
-
-.dasu.item .window-content {
-  padding: 0.5rem;
-}
-
-.dasu.item .sheet-header {
-  margin-bottom: 0.5rem;
-}
-
-.dasu.item .tab {
-  padding: 0.25rem;
-}
-
+/* Basic rollable styling - specific enough to not conflict with consistency files */
 .rollable:hover,
 .rollable:focus {
   color: var(--dasu-c-black);

@@ -277,9 +277,29 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
         if (!allowedTypes.includes('all')) allowedTypes.unshift('all');
         context.allowedTypes = allowedTypes;
         context.rarityOptions = DASU.RARITY_OPTIONS;
+        // Add enriched description for ProseMirror
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              secrets: this.document.isOwner,
+              rollData: this.item.getRollData(),
+              relativeTo: this.item,
+            }
+          );
         break;
       case 'attributesScar':
         context.tab = context.tabs[partId];
+        // Add enriched description for ProseMirror
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              secrets: this.document.isOwner,
+              rollData: this.item.getRollData(),
+              relativeTo: this.item,
+            }
+          );
         break;
       case 'attributesWeapon':
         // Necessary for preserving active tab on re-render
@@ -370,7 +390,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
               ([otherSlotKey, otherSlot]) =>
                 otherSlotKey !== slotKey && otherSlot.tagId
             )
-            .map(([otherSlotKey, otherSlot]) => otherSlot.tagId);
+            .map(([_otherSlotKey, otherSlot]) => otherSlot.tagId);
 
           const availableTagsForSlot = availableTags.filter(
             (tag) => !equippedTagIds.includes(tag._id)
@@ -446,6 +466,17 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
           );
         });
 
+        // Add level slot types for the dropdown
+        context.levelBonusTypes = {
+          ability: game.i18n.localize(
+            'DASU.Actor.levelingWizard.slots.ability'
+          ),
+          schema: game.i18n.localize('DASU.Actor.levelingWizard.slots.schema'),
+          feature: game.i18n.localize(
+            'DASU.Actor.levelingWizard.slots.feature'
+          ),
+        };
+
         // Add attribute options for starting attributes
         context.attributeOptions = {
           pow: game.i18n.localize('DASU.Actor.Attributes.list.pow.label'),
@@ -454,6 +485,45 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
           sta: game.i18n.localize('DASU.Actor.Attributes.list.sta.label'),
         };
 
+        // Add enriched description for ProseMirror
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              secrets: this.document.isOwner,
+              rollData: this.item.getRollData(),
+              relativeTo: this.item,
+            }
+          );
+        break;
+      case 'attributesSpecial':
+        context.tab = context.tabs[partId];
+        // Add enriched description for ProseMirror
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              secrets: this.document.isOwner,
+              rollData: this.item.getRollData(),
+              relativeTo: this.item,
+            }
+          );
+        break;
+      case 'attributesSchema':
+        context.tab = context.tabs[partId];
+        // Add enriched description for ProseMirror
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              secrets: this.document.isOwner,
+              rollData: this.item.getRollData(),
+              relativeTo: this.item,
+            }
+          );
+        break;
+      case 'attributesFeature':
+        context.tab = context.tabs[partId];
         // Add enriched description for ProseMirror
         context.enrichedDescription =
           await foundry.applications.ux.TextEditor.implementation.enrichHTML(
@@ -712,22 +782,18 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
         );
       });
 
-      // Remove slot type from level - use event delegation for dynamically created buttons
-      this.element.addEventListener('click', (event) => {
-        if (event.target.closest('.remove-slot-type')) {
+      // Remove slot type from level - use direct event listeners on buttons
+      this.element.querySelectorAll('.remove-slot-type').forEach((element) => {
+        element.addEventListener('click', (event) => {
           event.preventDefault();
           event.stopPropagation();
-          const target = event.target.closest('.remove-slot-type');
-          this._removeSlotType(event, target);
-        }
-
-        // Edit enhanced schema slot
-        if (event.target.closest('.edit-schema-slot')) {
-          event.preventDefault();
-          event.stopPropagation();
-          const target = event.target.closest('.edit-schema-slot');
-          this._editSchemaSlot(event, target);
-        }
+          // Prevent multiple rapid clicks
+          if (element.disabled) return;
+          element.disabled = true;
+          this._removeSlotType(event, element).finally(() => {
+            if (element) element.disabled = false;
+          });
+        });
       });
 
       // Handle inline editing of schema slot details
@@ -735,6 +801,37 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
         if (event.target.classList.contains('schema-slot-field')) {
           this._updateSchemaSlotField(event, event.target);
         }
+      });
+
+      // Handle schema slot action dropdown changes
+      this.element
+        .querySelectorAll('.slot-action-select')
+        .forEach((element) => {
+          element.addEventListener('change', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            this._updateSchemaSlotAction(event, event.target);
+          });
+        });
+
+      // Handle schema upgrade target dropdown changes
+      this.element
+        .querySelectorAll('.slot-upgrade-target')
+        .forEach((element) => {
+          element.addEventListener('change', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            this._updateSchemaSlotUpgradeTarget(event, event.target);
+          });
+        });
+
+      // Handle slot number input changes
+      this.element.querySelectorAll('.slot-number-input').forEach((element) => {
+        element.addEventListener('change', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          this._updateSchemaSlotNumber(event, event.target);
+        });
       });
     }
 
@@ -889,23 +986,16 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    * @returns {Promise}
    * @protected
    */
-  static async _onEditImage(event, target) {
+  static async _onEditImage(_event, target) {
     const attr = target.dataset.edit;
     const current = foundry.utils.getProperty(this.document, attr);
-    const { img } =
-      this.document.constructor.getDefaultArtwork?.(this.document.toObject()) ??
-      {};
-    const fp = new FilePicker({
+    return foundry.applications.apps.FilePicker.browse('data', {
       current,
       type: 'image',
-      redirectToRoot: img ? [img] : [],
       callback: (path) => {
         this.document.update({ [attr]: path });
       },
-      top: this.position.top + 40,
-      left: this.position.left + 10,
     });
-    return fp.browse();
   }
 
   /**
@@ -916,7 +1006,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @protected
    */
-  static async _viewEffect(event, target) {
+  static async _viewEffect(_event, target) {
     const effect = this._getEffect(target);
     effect.sheet.render(true);
   }
@@ -929,7 +1019,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @protected
    */
-  static async _deleteEffect(event, target) {
+  static async _deleteEffect(_event, target) {
     const effect = this._getEffect(target);
     await effect.delete();
   }
@@ -942,7 +1032,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @private
    */
-  static async _createEffect(event, target) {
+  static async _createEffect(_event, target) {
     // Retrieve the configured document class for ActiveEffect
     const aeCls = getDocumentClass('ActiveEffect');
     // Prepare the document creation data by initializing it a default name.
@@ -976,7 +1066,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @private
    */
-  static async _toggleEffect(event, target) {
+  static async _toggleEffect(_event, target) {
     const effect = this._getEffect(target);
     await effect.update({ disabled: !effect.disabled });
     // If this is a tag effect on a weapon, re-sync tag effects
@@ -1098,7 +1188,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    * @protected
    */
   async _onDrop(event) {
-    const data = TextEditor.getDragEventData(event);
+    const data = foundry.utils.TextEditor.getDragEventData(event);
     const item = this.item;
     const allowed = Hooks.call('dropItemSheetData', item, this, data);
     if (allowed === false) return;
@@ -1167,7 +1257,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     }
 
     // Perform the sort
-    const sortUpdates = SortingHelpers.performIntegerSort(effect, {
+    const sortUpdates = foundry.utils.sortObjectEntries(effect, {
       target,
       siblings,
     });
@@ -1191,7 +1281,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    *                                     not permitted.
    * @protected
    */
-  async _onDropActor(event, data) {
+  async _onDropActor(_event, _data) {
     if (!this.item.isOwner) return false;
   }
 
@@ -1204,7 +1294,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    * @returns {Promise<Item[]|boolean>}  The created or updated Item instances, or false if the drop was not permitted.
    * @protected
    */
-  async _onDropItem(event, data) {
+  async _onDropItem(_event, _data) {
     if (!this.item.isOwner) return false;
   }
 
@@ -1218,7 +1308,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    * @returns {Promise<Item[]>}
    * @protected
    */
-  async _onDropFolder(event, data) {
+  async _onDropFolder(_event, _data) {
     if (!this.item.isOwner) return [];
   }
 
@@ -1231,7 +1321,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
    * @returns {Promise<boolean>}
    * @protected
    */
-  async _addTag(event, target) {
+  async _addTag(_event, target) {
     if (this.document.type !== 'weapon') {
       return false;
     }
@@ -1535,21 +1625,16 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     const slotType = target.dataset.slotType;
     const slotIndex = target.dataset.slotIndex; // For object-based slots
 
-    console.log('Removing slot type:', { level, slotType, slotIndex });
-
     // Get current level slots
     const levelSlots = foundry.utils.deepClone(
       this.document.system.levelSlots || {}
     );
-    console.log('Current level slots:', levelSlots);
 
     if (levelSlots[level]) {
-      console.log('Level slots before filter:', levelSlots[level]);
-
-      if (slotIndex !== undefined) {
+      if (slotIndex !== undefined && slotIndex !== null && slotIndex !== '') {
         // Remove by index for object-based slots (like enhanced schema slots)
         const index = parseInt(slotIndex);
-        if (index >= 0 && index < levelSlots[level].length) {
+        if (!isNaN(index) && index >= 0 && index < levelSlots[level].length) {
           levelSlots[level].splice(index, 1);
         }
       } else {
@@ -1565,105 +1650,16 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
         });
       }
 
-      console.log('Level slots after filter:', levelSlots[level]);
-
-      // If the array is empty, remove the level entirely
+      // If the array is empty, set it to empty array
       if (levelSlots[level].length === 0) {
-        delete levelSlots[level];
-        console.log('Removed empty level');
+        levelSlots[level] = [];
       }
-    } else {
-      console.log('Level not found in levelSlots');
     }
 
-    console.log('Updated level slots:', levelSlots);
-
-    // Update the document
-    await this.document.update({ 'system.levelSlots': levelSlots });
-
+    // Update the document using explicit path for better reliability
+    const updateData = { [`system.levelSlots.${level}`]: levelSlots[level] };
+    await this.document.update(updateData);
     this.render(true);
-    return true;
-  }
-
-  /**
-   * Handle editing enhanced schema slot details
-   * @param {Event} _event The click event
-   * @param {HTMLElement} target The target element
-   * @returns {Promise<boolean>}
-   * @protected
-   */
-  async _editSchemaSlot(_event, target) {
-    if (this.document.type !== 'class') return false;
-
-    const level = target.dataset.level;
-    const slotIndex = parseInt(target.dataset.slotIndex);
-
-    // Get current level slots
-    const levelSlots = foundry.utils.deepClone(
-      this.document.system.levelSlots || {}
-    );
-
-    if (!levelSlots[level] || !levelSlots[level][slotIndex]) {
-      ui.notifications.error('Schema slot not found');
-      return false;
-    }
-
-    const schemaSlot = levelSlots[level][slotIndex];
-
-    // Create a simple dialog for editing schema slot details
-    const content = `
-      <form>
-        <div class="form-group">
-          <label>Schema ID:</label>
-          <input type="text" name="schemaId" value="${
-            schemaSlot.schemaId || ''
-          }" placeholder="e.g., fireSchema" />
-        </div>
-        <div class="form-group">
-          <label>Action:</label>
-          <select name="action">
-            <option value="new" ${
-              schemaSlot.action === 'new' ? 'selected' : ''
-            }>New Schema</option>
-            <option value="upgrade" ${
-              schemaSlot.action === 'upgrade' ? 'selected' : ''
-            }>Upgrade Schema Level</option>
-          </select>
-        </div>
-      </form>
-    `;
-
-    const dialogClass = getDocumentClass('Dialog');
-    const dialog = new dialogClass({
-      title: 'Edit Schema Slot',
-      content,
-      buttons: {
-        save: {
-          label: 'Save',
-          callback: async (html) => {
-            const formData = new FormData(html[0].querySelector('form'));
-            const schemaId = formData.get('schemaId');
-            const action = formData.get('action');
-
-            // Update the schema slot
-            levelSlots[level][slotIndex] = {
-              ...schemaSlot,
-              schemaId,
-              action,
-            };
-
-            await this.document.update({ 'system.levelSlots': levelSlots });
-            this.render(true);
-          },
-        },
-        cancel: {
-          label: 'Cancel',
-        },
-      },
-      default: 'save',
-    });
-
-    dialog.render(true);
     return true;
   }
 
@@ -1692,6 +1688,93 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
     }
 
     // Update the specific field
+    levelSlots[level][slotIndex][fieldName] = value;
+
+    // Update the document
+    await this.document.update({ 'system.levelSlots': levelSlots });
+
+    return true;
+  }
+
+  async _updateSchemaSlotAction(_event, target) {
+    if (this.document.type !== 'class') return false;
+
+    const level = target.dataset.level;
+    const slotIndex = parseInt(target.dataset.slotIndex);
+    const fieldName = target.dataset.field;
+    const value = target.value;
+
+    // Get current level slots
+    const levelSlots = foundry.utils.deepClone(
+      this.document.system.levelSlots || {}
+    );
+
+    if (!levelSlots[level] || !levelSlots[level][slotIndex]) {
+      return false;
+    }
+
+    // Clear relevant fields when switching action types
+    if (value === 'new' && levelSlots[level][slotIndex].upgradeSlotNumber) {
+      delete levelSlots[level][slotIndex].upgradeSlotNumber;
+    }
+    if (value === 'upgrade' && levelSlots[level][slotIndex].slotNumber) {
+      delete levelSlots[level][slotIndex].slotNumber;
+    }
+
+    // Update the action field
+    levelSlots[level][slotIndex][fieldName] = value;
+
+    // Update the document and trigger re-render to show/hide upgrade dropdown
+    await this.document.update({ 'system.levelSlots': levelSlots });
+    this.render(false);
+
+    return true;
+  }
+
+  async _updateSchemaSlotUpgradeTarget(_event, target) {
+    if (this.document.type !== 'class') return false;
+
+    const level = target.dataset.level;
+    const slotIndex = parseInt(target.dataset.slotIndex);
+    const fieldName = target.dataset.field;
+    const value = target.value === '' ? null : parseInt(target.value);
+
+    // Get current level slots
+    const levelSlots = foundry.utils.deepClone(
+      this.document.system.levelSlots || {}
+    );
+
+    if (!levelSlots[level] || !levelSlots[level][slotIndex]) {
+      return false;
+    }
+
+    // Update the upgrade slot number field
+    levelSlots[level][slotIndex][fieldName] = value;
+
+    // Update the document (no re-render needed for upgrade target changes)
+    await this.document.update({ 'system.levelSlots': levelSlots });
+
+    return true;
+  }
+
+  async _updateSchemaSlotNumber(_event, target) {
+    if (this.document.type !== 'class') return false;
+
+    const level = target.dataset.level;
+    const slotIndex = parseInt(target.dataset.slotIndex);
+    const fieldName = target.dataset.field;
+    const value = parseInt(target.value) || null;
+
+    // Get current level slots
+    const levelSlots = foundry.utils.deepClone(
+      this.document.system.levelSlots || {}
+    );
+
+    if (!levelSlots[level] || !levelSlots[level][slotIndex]) {
+      return false;
+    }
+
+    // Update the slot number field
     levelSlots[level][slotIndex][fieldName] = value;
 
     // Update the document

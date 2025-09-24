@@ -57,6 +57,18 @@
         "item": "Item Grant",
         "skill": "Skill Bonus",
         "attribute": "Attribute Bonus"
+      },
+      "ProgressionPreviewToggle": "Show progression preview",
+      "FormulaPlaceholders": {
+        "ap": "odd:1-29",
+        "sp": "2+2*level"
+      },
+      "SlotActions": {
+        "new": "New",
+        "upgrade": "Upgrade",
+        "selectSlotNumber": "Select slot number",
+        "slotPlaceholder": "Slot #",
+        "slotNumber": "Slot {number}"
       }
     },
     "Actor": {
@@ -138,12 +150,39 @@
           "showOnlyAllocated": "Show only allocated attributes",
           "showAllSkills": "Show all skills",
           "showOnlyAllocatedSkills": "Show only allocated skills",
-          "removeAllocation": "Remove allocation"
+          "removeAllocation": "Remove allocation",
+          "attributeAbbr": {
+            "pow": "Pow",
+            "dex": "Dex",
+            "will": "Will",
+            "sta": "Sta"
+          },
+          "schemaUpgradeTooltip": "Schema level will be upgraded",
+          "noSchemaInSlot": "No schema found in slot {number}",
+          "firstSchemaLevel": "First Schema (Lvl {level})",
+          "secondSchemaLevel": "Second Schema (Lvl {level})",
+          "newSchemaSlot": "New Schema (Slot {number})",
+          "upgradeSchemaSlot": "Upgrade Slot {number}",
+          "newSchemaWithId": "New {schemaId} (Slot {number})",
+          "upgradeSchemaWithId": "Upgrade {schemaId} (Slot {number})",
+          "newSchemaWithIdOnly": "New {schemaId}",
+          "upgradeSchemaWithIdOnly": "Upgrade {schemaId}",
+          "currentLevel": "Lvl",
+          "nextLevel": "Lvl",
+          "buttons": {
+            "increase": "+",
+            "decrease": "-",
+            "remove": "×"
+          },
+          "pointTypes": {
+            "ap": "AP",
+            "sp": "SP"
+          }
         },
         "slots": {
           "ability": "Ability",
           "schema": "Schema",
-          "strengthOfWill": "Strength of Will",
+          "feature": "Feature",
           "firstSchema": "First Schema",
           "secondSchema": "Second Schema",
           "newSchema": "New Schema",
@@ -208,9 +247,7 @@
       "Tabs": {
         "Biography": "Biography",
         "Effects": "Effects",
-        "Items": "Items",
-        "Main": "Main",
-        "Stocks": "Stocks"
+        "Main": "Main"
       }
     },
     "Effect": {
@@ -241,7 +278,8 @@
       "Weapons": "Weapons",
       "Schemas": "Schemas",
       "Features": "Features",
-      "Classes": "Classes"
+      "Classes": "Classes",
+      "Daemons": "Daemons"
     },
     "Item": {
       "Ability": {
@@ -278,24 +316,52 @@
           "maxTagSlots": { "label": "Maximum Tag Slots" }
         },
         "Tags": {
-          "TagSlotsDescription": "Equip tags to enhance your item's capabilities.",
+          "TagSlotsDescription": "Equip tags to item.",
           "TagSlotsHeader": "Tag Slots"
         }
       },
       "Scar": {
         "FIELDS": {
-          "effect": { "label": "Effect" }
+          "effect": { "label": "Effect" },
+          "description": { "label": "Description" }
+        }
+      },
+      "Schema": {
+        "FIELDS": {
+          "description": { "label": "Description" },
+          "level": { "label": "Level" }
+        },
+        "sectionDescription": "Describe the schema's effects and properties.",
+        "progression": {
+          "title": "Schema Progression",
+          "level": "Level",
+          "description": "Description",
+          "level1Placeholder": "Description for level 1",
+          "level2Placeholder": "Description for level 2",
+          "level3Placeholder": "Description for level 3",
+          "placeholder": {
+            "level1": "Description for level 1",
+            "level2": "Description for level 2",
+            "level3": "Description for level 3"
+          }
+        }
+      },
+      "Feature": {
+        "FIELDS": {
+          "description": { "label": "Description" }
         }
       },
       "Special": {
         "FIELDS": {
-          "effect": { "label": "Effect" }
+          "effect": { "label": "Effect" },
+          "description": { "label": "Description" }
         }
       },
       "Tag": {
         "Deleted": "Deleted Tag",
         "FIELDS": {
-          "effect": { "label": "Effect" }
+          "effect": { "label": "Effect" },
+          "description": { "label": "Description" }
         },
         "InvalidTooltip": "This tag has been deleted or is no longer available",
         "AlreadyEquipped": "Already equipped in a weapon"
@@ -342,6 +408,7 @@
     },
     "SearchItems": "Search items...",
     "SearchItemsTooltip": "Search through all items by name",
+    "ClearSearch": "Clear search",
     "Sort": {
       "AlphabeticalAsc": "Alphabetical (A-Z)",
       "AlphabeticalDesc": "Alphabetical (Z-A)",

@@ -3,7 +3,7 @@
  *
  * Character progression planner for DASU system:
  * - Visualize level progression from 1 to max level
- * - Plan and assign Abilities, Schemas, and Strength of Will features
+ * - Plan and assign Abilities, Schemas, and Feature items
  * - Drag and drop items from compendiums into level slots
  * - Automatically grant planned items on level up
  * - Track merit requirements and progression bonuses
@@ -71,7 +71,6 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
           if (this._shouldRefreshOnUpdate(data)) {
             this.refresh();
           }
-          this._checkAndGrantLevelItems(data);
         }
       }
     );
@@ -186,7 +185,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
       attributes: {
         pow: { label: 'Power' },
         dex: { label: 'Dexterity' },
-        will: { label: 'Will' },
+        will: { label: 'Willpower' },
         sta: { label: 'Stamina' },
       },
       allSkills: skillSelectOptions,
@@ -368,7 +367,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     for (const uuid of Object.values(levelingData.abilities || {})) {
       if (uuid) plannedUUIDs.add(uuid);
     }
-    for (const uuid of Object.values(levelingData.strengthOfWill || {})) {
+    for (const uuid of Object.values(levelingData.feature || {})) {
       if (uuid) plannedUUIDs.add(uuid);
     }
     for (const uuid of Object.values(levelingData.schemas || {})) {
@@ -442,7 +441,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
       updateData['system.experience'] ||
       updateData['system.levelingData']?.abilities ||
       updateData['system.levelingData']?.schemas ||
-      updateData['system.levelingData']?.strengthOfWill ||
+      updateData['system.levelingData']?.feature ||
       updateData['items']
     );
   }
@@ -564,6 +563,10 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
       this.levels = null;
       await this.render(true);
     }
+
+    // Trigger partial reload of both the actor sheet and leveling wizard to reflect changes
+    this._refreshActorSheet();
+    this._refreshLevelingWizard();
   }
 
   /**
@@ -640,6 +643,10 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     }
 
     await this._updatePointAllocation(level, pointType, target, newValue);
+
+    // Trigger partial reload of both the actor sheet and leveling wizard to reflect changes
+    this._refreshActorSheet();
+    this._refreshLevelingWizard();
   }
 
   /**
@@ -687,6 +694,10 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
 
     await this._updatePointAllocation(level, 'sp', skillName, 1);
     dropdown.value = '';
+
+    // Trigger partial reload of both the actor sheet and leveling wizard to reflect changes
+    this._refreshActorSheet();
+    this._refreshLevelingWizard();
   }
 
   /**
@@ -828,6 +839,9 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
       this.levels = null;
       await this.render();
 
+      // Trigger partial reload of the actor sheet to reflect changes
+      this._refreshActorSheet();
+
       ui.notifications.info(
         `Removed skill allocation for ${skillName} at level ${level}.`
       );
@@ -851,6 +865,24 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
   }
 
   /**
+   * Refresh the actor sheet to reflect leveling changes
+   */
+  _refreshActorSheet() {
+    if (this.actor.sheet?.rendered) {
+      this.actor.sheet.render(false);
+    }
+  }
+
+  /**
+   * Refresh the leveling wizard to reflect changes
+   */
+  _refreshLevelingWizard() {
+    if (this.rendered) {
+      this.render(false);
+    }
+  }
+
+  /**
    * Get class progression data from actor's class items
    * @returns {Object} Progression data organized by level
    */
@@ -871,7 +903,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
             abilities: [],
             aptitudes: [],
             schemas: [],
-            strengthOfWill: [],
+            feature: [],
             features: [],
             skills: [],
             attributes: [],
@@ -889,7 +921,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
             else if (slot === 'schema')
               progression[levelNum].schemas.push({ type: 'schema' });
             else if (slot === 'feature')
-              progression[levelNum].strengthOfWill.push({ type: 'feature' });
+              progression[levelNum].feature.push({ type: 'feature' });
             else if (slot === 'skill')
               progression[levelNum].skills.push({ type: 'skill' });
             else if (slot === 'attribute')
@@ -901,11 +933,13 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
                 type: 'schema',
                 schemaId: slot.schemaId,
                 action: slot.action,
+                slotNumber: slot.slotNumber,
+                upgradeSlotNumber: slot.upgradeSlotNumber,
               });
             } else if (slot.type === 'ability') {
               progression[levelNum].abilities.push(slot);
             } else if (slot.type === 'feature') {
-              progression[levelNum].strengthOfWill.push(slot);
+              progression[levelNum].feature.push(slot);
             }
             // Add other enhanced slot types as needed
           }
@@ -980,13 +1014,13 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
         will: levelData.ap?.will || 0,
         sta: levelData.ap?.sta || 0,
         spent: 0,
-        available: apGained,
+        available: level <= this.actor.system.level ? apGained : 0,
         locked: level < this.actor.system.level,
       },
       sp: {
         skills: levelData.sp?.skills || {},
         spent: 0,
-        available: spGained,
+        available: level <= this.actor.system.level ? spGained : 0,
         locked: level < this.actor.system.level,
       },
     };
@@ -1046,14 +1080,19 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     // Store class info for use in _prepareContext
     this._hasClass = hasClass;
     this._hasClassProgression = hasClassProgression;
+    const currentActorLevel = this.actor.system.level || 1;
 
     for (let level = 1; level <= maxLevel; level++) {
       // Calculate progression bonuses - use class formulas if available, otherwise defaults
       let spGained = 2; // Default: every level
       let apGained = level % 2 === 1 ? 1 : 0; // Default: odd levels only
 
-      // Use class progression formulas if available
-      if (hasClassProgression && classItems.length > 0) {
+      // Only use class progression formulas for levels the actor has actually reached
+      if (
+        hasClassProgression &&
+        classItems.length > 0 &&
+        level <= currentActorLevel
+      ) {
         const classItem = classItems[0]; // Use first class item
         if (classItem.system.progression?.spFormula) {
           try {
@@ -1091,6 +1130,49 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
             console.warn('Failed to evaluate AP formula, using default:', e);
           }
         }
+      } else if (
+        hasClassProgression &&
+        classItems.length > 0 &&
+        level > currentActorLevel
+      ) {
+        // For future levels, show projected class progression but don't apply bonuses
+        const classItem = classItems[0];
+        if (classItem.system.progression?.spFormula) {
+          try {
+            if (typeof this.actor.evaluateClassFormula === 'function') {
+              spGained = this.actor.evaluateClassFormula(
+                classItem.system.progression.spFormula,
+                level
+              );
+            } else {
+              spGained = this._evaluateFormula(
+                classItem.system.progression.spFormula,
+                level
+              );
+            }
+          } catch (e) {
+            // Use default for future levels if formula fails
+            spGained = 2;
+          }
+        }
+        if (classItem.system.progression?.apFormula) {
+          try {
+            if (typeof this.actor.evaluateClassFormula === 'function') {
+              apGained = this.actor.evaluateClassFormula(
+                classItem.system.progression.apFormula,
+                level
+              );
+            } else {
+              apGained = this._evaluateFormula(
+                classItem.system.progression.apFormula,
+                level
+              );
+            }
+          } catch (e) {
+            // Use default for future levels if formula fails
+            apGained = level % 2 === 1 ? 1 : 0;
+          }
+        }
       }
 
       const totalSP = level * 2; // Keep legacy calculation for now
@@ -1100,21 +1182,21 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
       const classLevelData = classProgression[level] || {};
 
       // Determine special bonuses - only use class data if actor has a class
-      let gainAbility, gainAptitude, gainSchema, gainStrengthOfWill;
+      let gainAbility, gainAptitude, gainSchema, gainFeature;
 
       if (hasClass) {
         // Use class-based progression from levelSlots
         gainAbility = classLevelData.abilities?.length > 0;
         gainAptitude = classLevelData.aptitudes?.length > 0;
         gainSchema = classLevelData.schemas?.length > 0;
-        gainStrengthOfWill = classLevelData.strengthOfWill?.length > 0;
+        gainFeature = classLevelData.feature?.length > 0;
 
         // If no levelSlots data but class has progression, check levelBonuses
         if (
           !gainAbility &&
           !gainAptitude &&
           !gainSchema &&
-          !gainStrengthOfWill &&
+          !gainFeature &&
           hasClassProgression &&
           classItems.length > 0
         ) {
@@ -1130,8 +1212,8 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
               if (bonus.type === 'ability') gainAbility = true;
               if (bonus.type === 'aptitude') gainAptitude = true;
               if (bonus.type === 'schema') gainSchema = true;
-              if (bonus.type === 'strengthOfWill' || bonus.type === 'feature')
-                gainStrengthOfWill = true;
+              if (bonus.type === 'feature' || bonus.type === 'feature')
+                gainFeature = true;
             }
           }
         }
@@ -1140,7 +1222,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
         gainAbility = false;
         gainAptitude = false;
         gainSchema = false;
-        gainStrengthOfWill = false;
+        gainFeature = false;
       }
 
       // Enhanced schema information from class
@@ -1180,14 +1262,23 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
       }
 
       // Check for assigned/planned items at this level
-      const assignedSchema = await this._getAssignedSchema(schemaType);
+      let assignedSchema = null;
+      if (schemaDetails && schemaDetails.action === 'upgrade') {
+        // For upgrade actions, auto-detect the existing schema being upgraded
+        assignedSchema = await this._getUpgradeSchema(
+          schemaDetails.upgradeSlotNumber
+        );
+      } else {
+        // For new actions, use normal schema assignment logic
+        assignedSchema = await this._getAssignedSchema(schemaType);
+      }
       const assignedAbility = await this._getAssignedAbility(
         level,
         gainAbility
       );
-      const assignedStrengthOfWill = await this._getAssignedStrengthOfWill(
+      const assignedFeature = await this._getAssignedFeature(
         level,
-        gainStrengthOfWill
+        gainFeature
       );
 
       // Get point allocation data for this level
@@ -1216,12 +1307,12 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
         gainAbility,
         gainAptitude,
         gainSchema,
-        gainStrengthOfWill,
+        gainFeature,
         schemaType,
         schemaDetails,
         assignedSchema,
         assignedAbility,
-        assignedStrengthOfWill,
+        assignedFeature,
         pointAllocations,
         bonuses: this._getLevelBonuses(
           level,
@@ -1230,7 +1321,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
           gainAbility,
           gainAptitude,
           gainSchema,
-          gainStrengthOfWill,
+          gainFeature,
           schemaType,
           schemaDetails
         ),
@@ -1254,7 +1345,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     for (const uuid of Object.values(levelingData.abilities || {})) {
       if (uuid) plannedUUIDs.add(uuid);
     }
-    for (const uuid of Object.values(levelingData.strengthOfWill || {})) {
+    for (const uuid of Object.values(levelingData.feature || {})) {
       if (uuid) plannedUUIDs.add(uuid);
     }
     for (const uuid of Object.values(levelingData.schemas || {})) {
@@ -1314,6 +1405,76 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     return null;
   }
 
+  /** Get assigned schema for upgrade based on slot number */
+  async _getUpgradeSchema(upgradeSlotNumber) {
+    if (!upgradeSlotNumber) return null;
+
+    // Look through all existing schema items on the actor
+    const schemaItems = this.actor.items.filter(
+      (item) => item.type === 'schema'
+    );
+
+    for (const schemaItem of schemaItems) {
+      // Check if this schema has the matching slot number
+      const levelingSource = schemaItem.getFlag('dasu', 'levelingSource');
+      if (levelingSource && levelingSource.slotNumber == upgradeSlotNumber) {
+        return schemaItem;
+      }
+
+      // Also check system data for slot number (fallback)
+      if (schemaItem.system.slotNumber == upgradeSlotNumber) {
+        return schemaItem;
+      }
+    }
+
+    // If no existing schema found, look for planned schemas with this slot number
+    // This would need to check previous levels in the class progression
+    const classProgression = this._getClassProgression();
+
+    for (let level = 1; level < 30; level++) {
+      const levelData = classProgression[level];
+      if (levelData && levelData.schemas) {
+        for (const schema of levelData.schemas) {
+          if (
+            schema.slotNumber == upgradeSlotNumber &&
+            schema.action === 'new'
+          ) {
+            // Found the original schema for this slot, check if it's assigned
+            const schemaType = this._inferSchemaTypeFromLevel(level);
+            return await this._getAssignedSchema(schemaType);
+          }
+        }
+      }
+    }
+
+    // Legacy fallback: For slot 1, try to find the first schema without slot tracking
+    if (upgradeSlotNumber == 1) {
+      for (const schemaItem of schemaItems) {
+        const levelingSource = schemaItem.getFlag('dasu', 'levelingSource');
+        // Check for legacy schema without slotNumber but with schemaType "first"
+        if (
+          levelingSource &&
+          !levelingSource.slotNumber &&
+          levelingSource.schemaType === 'first'
+        ) {
+          return schemaItem;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /** Infer schema type from level for backward compatibility */
+  _inferSchemaTypeFromLevel(level) {
+    if ([1, 5, 15, 25].includes(level)) {
+      return 'first';
+    } else if ([10, 20].includes(level)) {
+      return 'second';
+    }
+    return 'first'; // default
+  }
+
   /** Get assigned ability for a level (planned only) */
   async _getAssignedAbility(level, gainAbility) {
     if (!gainAbility || !this.actor.system.levelingData?.abilities?.[level]) {
@@ -1337,17 +1498,13 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     return null;
   }
 
-  /** Get assigned Strength of Will feature for a level (planned only) */
-  async _getAssignedStrengthOfWill(level, gainStrengthOfWill) {
-    if (
-      !gainStrengthOfWill ||
-      !this.actor.system.levelingData?.strengthOfWill?.[level]
-    ) {
+  /** Get assigned Feature feature for a level (planned only) */
+  async _getAssignedFeature(level, gainFeature) {
+    if (!gainFeature || !this.actor.system.levelingData?.feature?.[level]) {
       return null;
     }
 
-    const plannedFeatureUUID =
-      this.actor.system.levelingData.strengthOfWill[level];
+    const plannedFeatureUUID = this.actor.system.levelingData.feature[level];
     try {
       const plannedFeature = await fromUuid(plannedFeatureUUID);
       if (plannedFeature) {
@@ -1372,7 +1529,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     gainAbility,
     gainAptitude,
     gainSchema,
-    gainStrengthOfWill,
+    gainFeature,
     schemaType,
     schemaDetails
   ) {
@@ -1423,22 +1580,32 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
 
       if (schemaDetails) {
         // Use enhanced schema details from class
-        if (schemaDetails.schemaId) {
-          schemaText = `${
-            schemaDetails.action === 'upgrade' ? 'Upgrade' : 'New'
-          } ${schemaDetails.schemaId}`;
-          schemaDescription = `${
-            schemaDetails.action === 'upgrade' ? 'Upgrade existing' : 'New'
-          } schema: ${schemaDetails.schemaId}`;
+        if (schemaDetails.action === 'upgrade') {
+          // For upgrade actions, show which slot is being upgraded
+          const slotText = schemaDetails.upgradeSlotNumber
+            ? `Slot ${schemaDetails.upgradeSlotNumber}`
+            : 'Schema';
+
+          if (schemaDetails.schemaId) {
+            schemaText = `Upgrade ${schemaDetails.schemaId} (${slotText})`;
+            schemaDescription = `Upgrade existing schema: ${schemaDetails.schemaId} in ${slotText}`;
+          } else {
+            schemaText = `Upgrade ${slotText}`;
+            schemaDescription = `Upgrade existing schema in ${slotText}`;
+          }
         } else {
-          schemaText = `${
-            schemaDetails.action === 'upgrade' ? 'Schema Upgrade' : 'New Schema'
-          }`;
-          schemaDescription = `${
-            schemaDetails.action === 'upgrade'
-              ? 'Upgrade existing schema level'
-              : 'New schema slot'
-          }`;
+          // For new actions, show slot number if available
+          const slotText = schemaDetails.slotNumber
+            ? ` (Slot ${schemaDetails.slotNumber})`
+            : '';
+
+          if (schemaDetails.schemaId) {
+            schemaText = `New ${schemaDetails.schemaId}${slotText}`;
+            schemaDescription = `New schema: ${schemaDetails.schemaId}${slotText}`;
+          } else {
+            schemaText = `New Schema${slotText}`;
+            schemaDescription = `New schema slot${slotText}`;
+          }
         }
       } else if (schemaType) {
         // Fallback to old schema type logic
@@ -1456,13 +1623,13 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
       });
     }
 
-    // Strength of Will bonus
-    if (gainStrengthOfWill) {
+    // Feature bonus
+    if (gainFeature) {
       bonuses.push({
-        type: 'strength-of-will',
+        type: 'feature',
         icon: 'fas fa-shield-alt',
-        text: 'Strength of Will',
-        description: 'New Strength of Will feature',
+        text: 'Feature',
+        description: 'New Feature item',
       });
     }
 
@@ -1547,6 +1714,12 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
   _onDragOver(event) {
     event.preventDefault();
     const slot = event.currentTarget;
+
+    // Don't allow drag-over for upgrade slots
+    if (slot.classList.contains('upgrade-slot')) {
+      return;
+    }
+
     slot.classList.add('drag-over');
     slot.classList.add('drag-over-' + slot.dataset.slotType);
   }
@@ -1556,7 +1729,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     slot.classList.remove('drag-over');
     slot.classList.remove('drag-over-ability');
     slot.classList.remove('drag-over-schema');
-    slot.classList.remove('drag-over-strength-of-will');
+    slot.classList.remove('drag-over-feature');
   }
 
   async _onDrop(event) {
@@ -1565,6 +1738,11 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
 
     const slot = event.currentTarget;
     if (!slot.classList.contains('slot')) {
+      return;
+    }
+
+    // Don't allow drops on upgrade slots
+    if (slot.classList.contains('upgrade-slot')) {
       return;
     }
 
@@ -1665,7 +1843,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
         }
 
         return true;
-      case 'strength-of-will':
+      case 'feature':
         return itemType === 'feature';
       default:
         return false;
@@ -1779,9 +1957,9 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
         if (this.actor.sheet?.render) this.actor.sheet.render(false);
         this.refresh();
       }
-      if (slotType === 'strength-of-will') {
+      if (slotType === 'feature') {
         if ((this.actor.system.level || 1) >= level) {
-          // Remove all granted strengthOfWill items for this level
+          // Remove all granted feature items for this level
           const itemsToRemove = this.actor.items.filter(
             (i) =>
               i.getFlag('dasu', 'grantedByLeveling') === true &&
@@ -1799,9 +1977,9 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
           }
         }
         const updateData = {};
-        updateData[`system.levelingData.strengthOfWill.${level}`] = '';
+        updateData[`system.levelingData.feature.${level}`] = '';
         await this.actor.update(updateData);
-        ui.notifications.info('Strength of Will assignment removed.');
+        ui.notifications.info('Feature assignment removed.');
         if (this.actor.sheet?.render) this.actor.sheet.render(false);
         this.refresh();
       }
@@ -2265,7 +2443,9 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
 
       // Process all levels
       for (const [level, allocations] of Object.entries(pointAllocations)) {
-        if (level === 'NaN') continue; // Skip invalid level
+        const levelNum = parseInt(level);
+        const currentActorLevel = this.actor.system.level || 1;
+        if (isNaN(levelNum) || levelNum > currentActorLevel) continue; // Skip invalid levels and future levels
 
         const skillAllocations = allocations.sp?.skills || {};
 
@@ -2354,8 +2534,8 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
         key = `schema-${schemaType}`;
       } else if (slotType === 'ability') {
         key = `ability-${level}`;
-      } else if (slotType === 'strength-of-will') {
-        key = `strengthOfWill-${level}`;
+      } else if (slotType === 'feature') {
+        key = `feature-${level}`;
       }
 
       if (key) {
@@ -2375,9 +2555,9 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
           ...(latestData.abilities || {}),
           [level]: itemId,
         };
-      } else if (slotType === 'strength-of-will') {
-        latestData.strengthOfWill = {
-          ...(latestData.strengthOfWill || {}),
+      } else if (slotType === 'feature') {
+        latestData.feature = {
+          ...(latestData.feature || {}),
           [level]: itemId,
         };
       }
@@ -2396,6 +2576,16 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
         await grantMissingLevelItems(this.actor);
       }
 
+      // For schemas specifically, check if we need to apply retroactive upgrades
+      if (slotType === 'schema') {
+        await this._checkAndApplyRetroactiveSchemaUpgrades(itemId, level);
+
+        // Re-render both actor sheet and leveling wizard to reflect changes
+        if (this.actor.sheet?.rendered) {
+          this.actor.sheet.render(false);
+        }
+      }
+
       // Update slot visual state
       slot.classList.add('has-item');
       slot.setAttribute('data-item-uuid', itemId);
@@ -2407,6 +2597,9 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
         </div>
       `;
       this._reattachSlotListeners(slot);
+
+      // Refresh the wizard to update upgrade slots that might depend on this assignment
+      this.refresh();
     } catch (error) {
       console.error('Error in _handleItemDrop:', error);
       ui.notifications.error(
@@ -2429,7 +2622,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
           return item.type === 'schema';
         case 'ability':
           return item.type === 'ability';
-        case 'strength-of-will':
+        case 'feature':
           return item.type === 'feature';
         default:
           return false;
@@ -2447,6 +2640,37 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     const div = document.createElement('div');
     div.textContent = input;
     return div.innerHTML;
+  }
+
+  /**
+   * Check if a schema needs retroactive upgrades and apply them
+   * @param {string} itemId - UUID of the schema item
+   * @param {number} level - Level at which the schema was assigned
+   */
+  async _checkAndApplyRetroactiveSchemaUpgrades(itemId, level) {
+    // Find the schema item that was just granted/assigned
+    const schemaItem = this.actor.items.find(
+      (item) =>
+        item.type === 'schema' &&
+        item.getFlag('dasu', 'levelingSource')?.uuid === itemId
+    );
+
+    if (!schemaItem) {
+      // Schema might not be granted yet if level > actor level
+      return;
+    }
+
+    const slotNumber = schemaItem.getFlag('dasu', 'levelingSource')?.slotNumber;
+    const currentActorLevel = this.actor.system.level || 1;
+
+    // Only apply retroactive upgrades if actor is above the assignment level and schema has slot number
+    if (currentActorLevel > level && slotNumber) {
+      await applyRetroactiveSchemaUpgrades(
+        schemaItem,
+        slotNumber,
+        currentActorLevel
+      );
+    }
   }
 
   _validateLevel(level) {
@@ -2500,7 +2724,7 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
 }
 
 // Trait-based Leveling Item Helpers
-async function grantLevelingItem(actor, uuid, level, typeHint) {
+async function grantLevelingItem(actor, uuid, level, typeHint, metadata = {}) {
   // For schemas, try to find an existing innate schema with the same uuid
   if (typeHint === 'schema') {
     // Find the schemaType for this level
@@ -2568,7 +2792,7 @@ async function grantLevelingItem(actor, uuid, level, typeHint) {
     } else if (typeHint === 'ability') {
       key = `ability-${level}`;
     } else if (typeHint === 'feature') {
-      key = `strengthOfWill-${level}`;
+      key = `feature-${level}`;
     }
     itemData = fullItems[key];
   }
@@ -2588,7 +2812,12 @@ async function grantLevelingItem(actor, uuid, level, typeHint) {
   itemData.flags.dasu = {
     ...itemData.flags.dasu,
     grantedByLeveling: true,
-    levelingSource: { level, uuid, ...(schemaType ? { schemaType } : {}) },
+    levelingSource: {
+      level,
+      uuid,
+      ...(schemaType ? { schemaType } : {}),
+      ...(metadata.slotNumber ? { slotNumber: metadata.slotNumber } : {}),
+    },
     sourceUuid: uuid, // Track original source
   };
   if (typeHint === 'schema' && schemaType) {
@@ -2597,7 +2826,15 @@ async function grantLevelingItem(actor, uuid, level, typeHint) {
   }
 
   try {
-    await actor.createEmbeddedDocuments('Item', [itemData]);
+    const createdItems = await actor.createEmbeddedDocuments('Item', [
+      itemData,
+    ]);
+
+    // For schemas, add the initial level 1 active effect
+    if (typeHint === 'schema' && createdItems.length > 0) {
+      const schemaItem = createdItems[0];
+      await applySchemaInitialEffect(schemaItem, level);
+    }
   } catch (error) {
     console.error('[Grant Leveling Item] Error creating item:', error);
   }
@@ -2640,15 +2877,481 @@ async function grantMissingLevelItems(actor) {
       }
     }
   }
-  // Strength of Will
-  for (const [level, uuid] of Object.entries(
-    levelingData.strengthOfWill || {}
-  )) {
+  // Feature
+  for (const [level, uuid] of Object.entries(levelingData.feature || {})) {
     if (parseInt(level) <= currentLevel && uuid) {
       await grantLevelingItem(actor, uuid, parseInt(level), 'feature');
     }
   }
   await actor.update({ 'system.levelingData': levelingData });
+}
+
+async function handleSchemaLevelUp(
+  actor,
+  newLevel,
+  levelingData,
+  itemsToGrant
+) {
+  // Get class progression data
+  const classItems = actor.items.filter((item) => item.type === 'class');
+  if (classItems.length === 0) {
+    // No class - use legacy schema system
+    const schemaType =
+      typeof actor._getSchemaTypeForLevel === 'function'
+        ? actor._getSchemaTypeForLevel(newLevel)
+        : typeof LevelingWizard?.prototype?._getSchemaTypeForLevel ===
+          'function'
+        ? LevelingWizard.prototype._getSchemaTypeForLevel.call(
+            { actor },
+            newLevel
+          )
+        : null;
+    if (schemaType && levelingData.schemas?.[schemaType]) {
+      await grantLevelingItem(
+        actor,
+        levelingData.schemas[schemaType],
+        newLevel,
+        'schema'
+      );
+      itemsToGrant.push({
+        type: 'schema',
+        uuid: levelingData.schemas[schemaType],
+      });
+      delete levelingData.schemas[schemaType];
+    }
+    return;
+  }
+
+  // Use class-based schema progression
+  const classItem = classItems[0];
+  const levelSlots = classItem.system.levelSlots || {};
+  const thisLevelSlots = levelSlots[newLevel];
+
+  if (!thisLevelSlots || !Array.isArray(thisLevelSlots)) return;
+
+  for (const slot of thisLevelSlots) {
+    if (typeof slot === 'object' && slot.type === 'schema') {
+      if (slot.action === 'upgrade' && slot.upgradeSlotNumber) {
+        // Handle schema upgrade
+        await upgradeSchemaSlot(actor, slot.upgradeSlotNumber, newLevel);
+      } else if (slot.action === 'new' || !slot.action) {
+        // Handle new schema (with slot number if available)
+        const schemaType = inferSchemaTypeFromLevel(newLevel);
+        if (schemaType && levelingData.schemas?.[schemaType]) {
+          await grantLevelingItem(
+            actor,
+            levelingData.schemas[schemaType],
+            newLevel,
+            'schema',
+            { slotNumber: slot.slotNumber }
+          );
+          itemsToGrant.push({
+            type: 'schema',
+            uuid: levelingData.schemas[schemaType],
+          });
+          delete levelingData.schemas[schemaType];
+        }
+      }
+    }
+  }
+}
+
+async function upgradeSchemaSlot(actor, slotNumber, newLevel) {
+  // Find the schema item with the matching slot number
+  const schemaItems = actor.items.filter((item) => item.type === 'schema');
+
+  for (const schemaItem of schemaItems) {
+    // Check if this schema has the matching slot number
+    const levelingSource = schemaItem.getFlag('dasu', 'levelingSource');
+    if (levelingSource && levelingSource.slotNumber == slotNumber) {
+      // Upgrade the schema level
+      const currentLevel = schemaItem.system.level || 1;
+      const newSchemaLevel = currentLevel + 1;
+
+      // Apply schema upgrade with active effect
+      await applySchemaUpgrade(schemaItem, currentLevel, newSchemaLevel);
+      return;
+    }
+
+    // Also check system data for slot number (fallback)
+    if (schemaItem.system.slotNumber == slotNumber) {
+      const currentLevel = schemaItem.system.level || 1;
+      const newSchemaLevel = currentLevel + 1;
+
+      // Apply schema upgrade with active effect
+      await applySchemaUpgrade(schemaItem, currentLevel, newSchemaLevel);
+      return;
+    }
+  }
+
+  // Legacy fallback: For slot 1, try to find the first schema without slot tracking
+  if (slotNumber == 1) {
+    for (const schemaItem of schemaItems) {
+      const levelingSource = schemaItem.getFlag('dasu', 'levelingSource');
+      // Check for legacy schema without slotNumber but with schemaType "first"
+      if (
+        levelingSource &&
+        !levelingSource.slotNumber &&
+        levelingSource.schemaType === 'first'
+      ) {
+        const currentLevel = schemaItem.system.level || 1;
+        const newSchemaLevel = currentLevel + 1;
+
+        // Apply schema upgrade with active effect
+        await applySchemaUpgrade(schemaItem, currentLevel, newSchemaLevel);
+
+        // Also update the flag to include the slot number for future upgrades
+        await schemaItem.setFlag('dasu', 'levelingSource', {
+          ...levelingSource,
+          slotNumber: 1,
+        });
+        return;
+      }
+    }
+  }
+
+  ui.notifications.warn(`No schema found in slot ${slotNumber} to upgrade.`);
+}
+
+function inferSchemaTypeFromLevel(level) {
+  if ([1, 5, 15, 25].includes(level)) {
+    return 'first';
+  } else if ([10, 20].includes(level)) {
+    return 'second';
+  }
+  return 'first';
+}
+
+/**
+ * Apply schema upgrade with active effects
+ * @param {Item} schemaItem - The schema item to upgrade
+ * @param {number} currentLevel - Current schema level
+ * @param {number} newLevel - New schema level
+ */
+async function applySchemaUpgrade(schemaItem, currentLevel, newLevel) {
+  // Update the schema level
+  await schemaItem.update({ 'system.level': newLevel });
+
+  // Get level description
+  const newLevelDescription =
+    schemaItem.system[`level${newLevel}`]?.description || '';
+
+  // Create upgrade tracking effect
+  const effectData = {
+    name: `${schemaItem.name} - Level ${newLevel} Upgrade`,
+    icon: schemaItem.img,
+    origin: schemaItem.uuid,
+    duration: { permanent: true },
+    flags: {
+      dasu: {
+        schemaUpgrade: {
+          level: newLevel,
+          previousLevel: currentLevel,
+          schemaId: schemaItem.id,
+          slotNumber: schemaItem.getFlag('dasu', 'levelingSource')?.slotNumber,
+        },
+      },
+    },
+    changes: [
+      // Dev placeholder - uncomment and modify as needed for actual schema benefits
+      // {
+      //   key: 'system.stats.hp.mod',
+      //   mode: 2, // ADD mode
+      //   value: 5, // Example: +5 HP per schema upgrade
+      //   priority: 20
+      // },
+      // {
+      //   key: 'system.stats.wp.mod',
+      //   mode: 2, // ADD mode
+      //   value: 3, // Example: +3 WP per schema upgrade
+      //   priority: 20
+      // }
+    ],
+    disabled: false,
+    transfer: true,
+    description: `Schema upgrade: ${
+      newLevelDescription || `Upgraded to Level ${newLevel}`
+    }`,
+  };
+
+  await schemaItem.createEmbeddedDocuments('ActiveEffect', [effectData]);
+
+  // Re-render both actor sheet and any open leveling wizard
+  const actor = schemaItem.parent;
+  if (actor.sheet?.rendered) {
+    actor.sheet.render(false);
+  }
+
+  // Refresh any open leveling wizard for this actor
+  Object.values(ui.windows).forEach((app) => {
+    if (
+      app.constructor.name === 'LevelingWizard' &&
+      app.actor?.id === actor.id
+    ) {
+      app.refresh();
+    }
+  });
+
+  ui.notifications.info(
+    `${schemaItem.name} upgraded from Level ${currentLevel} to Level ${newLevel}! Active effect applied.`
+  );
+}
+
+/**
+ * Apply initial active effect when schema is first granted
+ * @param {Item} schemaItem - The schema item that was just created
+ * @param {number} level - The level at which this schema was granted
+ */
+async function applySchemaInitialEffect(schemaItem, level) {
+  const actor = schemaItem.parent;
+  const currentActorLevel = actor.system.level || 1;
+  const slotNumber = schemaItem.getFlag('dasu', 'levelingSource')?.slotNumber;
+
+  // Get level 1 description
+  const level1Description = schemaItem.system.level1?.description || '';
+
+  // Create base level effect
+  const effectData = {
+    name: `${schemaItem.name} - Level 1`,
+    icon: schemaItem.img,
+    origin: schemaItem.uuid,
+    duration: { permanent: true },
+    flags: {
+      dasu: {
+        schemaLevel: {
+          level: 1,
+          grantedAtLevel: level,
+          schemaId: schemaItem.id,
+          slotNumber: slotNumber,
+        },
+      },
+    },
+    changes: [
+      // Dev placeholder - uncomment and modify as needed for actual schema benefits
+      // {
+      //   key: 'system.stats.hp.mod',
+      //   mode: 2, // ADD mode
+      //   value: 3, // Base level 1 benefit: +3 HP
+      //   priority: 20
+      // },
+      // {
+      //   key: 'system.stats.wp.mod',
+      //   mode: 2, // ADD mode
+      //   value: 2, // Base level 1 benefit: +2 WP
+      //   priority: 20
+      // }
+    ],
+    disabled: false,
+    transfer: true,
+    description: `Schema Level 1: ${level1Description || 'Base schema level'}`,
+  };
+
+  await schemaItem.createEmbeddedDocuments('ActiveEffect', [effectData]);
+
+  // Apply retroactive upgrades if needed
+  if (currentActorLevel > 1 && slotNumber) {
+    await applyRetroactiveSchemaUpgrades(
+      schemaItem,
+      slotNumber,
+      currentActorLevel
+    );
+  }
+
+  // Re-render both actor sheet and any open leveling wizard
+  if (actor.sheet?.rendered) {
+    actor.sheet.render(false);
+  }
+
+  // Refresh any open leveling wizard for this actor
+  Object.values(ui.windows).forEach((app) => {
+    if (
+      app.constructor.name === 'LevelingWizard' &&
+      app.actor?.id === actor.id
+    ) {
+      app.refresh();
+    }
+  });
+}
+
+/**
+ * Apply retroactive schema upgrades based on class progression
+ * Ensures schema level and effects match what they should be for the actor's current level
+ * @param {Item} schemaItem - The schema item to check for upgrades
+ * @param {number} slotNumber - The slot number this schema occupies
+ * @param {number} currentActorLevel - The current actor level
+ */
+async function applyRetroactiveSchemaUpgrades(
+  schemaItem,
+  slotNumber,
+  currentActorLevel
+) {
+  const actor = schemaItem.parent;
+
+  // Get class progression
+  const classItems = actor.items.filter((item) => item.type === 'class');
+  if (classItems.length === 0) return;
+
+  const classItem = classItems[0];
+  const levelSlots = classItem.system.levelSlots || {};
+
+  // Check existing effects
+  const existingUpgradeEffects = schemaItem.effects.filter(
+    (effect) =>
+      effect.getFlag('dasu', 'schemaUpgrade')?.schemaId === schemaItem.id
+  );
+  const existingLevelEffects = schemaItem.effects.filter(
+    (effect) =>
+      effect.getFlag('dasu', 'schemaLevel')?.schemaId === schemaItem.id
+  );
+
+  // Calculate expected upgrades from class progression
+  let expectedUpgrades = 0;
+  console.log(
+    'Checking for upgrades for slot',
+    slotNumber,
+    'up to level',
+    currentActorLevel
+  );
+
+  for (let checkLevel = 2; checkLevel <= currentActorLevel; checkLevel++) {
+    const slotsAtLevel = levelSlots[checkLevel];
+    if (!slotsAtLevel || !Array.isArray(slotsAtLevel)) continue;
+
+    const upgradeSlot = slotsAtLevel.find(
+      (slot) =>
+        typeof slot === 'object' &&
+        slot.type === 'schema' &&
+        slot.action === 'upgrade' &&
+        slot.upgradeSlotNumber == slotNumber
+    );
+
+    if (upgradeSlot) {
+      expectedUpgrades++;
+      console.log('Found upgrade at level', checkLevel, 'for slot', slotNumber);
+    }
+  }
+
+  const expectedLevel = 1 + expectedUpgrades;
+  const currentSchemaLevel = schemaItem.system.level || 1;
+  const hasBaseEffect = existingLevelEffects.length > 0;
+
+  console.log('Retroactive upgrade check:', {
+    schemaName: schemaItem.name,
+    slotNumber,
+    currentSchemaLevel,
+    expectedLevel,
+    expectedUpgrades,
+    existingUpgradeEffects: existingUpgradeEffects.length,
+    existingLevelEffects: existingLevelEffects.length,
+    hasBaseEffect,
+  });
+
+  // Check if already in correct state
+  if (
+    currentSchemaLevel === expectedLevel &&
+    existingUpgradeEffects.length === expectedUpgrades &&
+    hasBaseEffect
+  ) {
+    console.log('Schema already in correct state, skipping');
+    return;
+  }
+
+  // Update schema level if needed
+  if (currentSchemaLevel !== expectedLevel) {
+    await schemaItem.update({ 'system.level': expectedLevel });
+  }
+
+  // Clear existing effects
+  const allEffectsToRemove = [
+    ...existingUpgradeEffects,
+    ...existingLevelEffects,
+  ];
+  if (allEffectsToRemove.length > 0) {
+    await schemaItem.deleteEmbeddedDocuments(
+      'ActiveEffect',
+      allEffectsToRemove.map((e) => e.id)
+    );
+  }
+
+  // Create base level effect
+  const level1Description = schemaItem.system.level1?.description || '';
+  const baseEffectData = {
+    name: `${schemaItem.name} - Level 1`,
+    icon: schemaItem.img,
+    origin: schemaItem.uuid,
+    duration: { permanent: true },
+    flags: {
+      dasu: {
+        schemaLevel: {
+          level: 1,
+          grantedAtLevel: 1,
+          schemaId: schemaItem.id,
+          slotNumber: slotNumber,
+        },
+      },
+    },
+    changes: [], // Dev placeholder - no actual stat changes
+    disabled: false,
+    transfer: true,
+    description: `Schema Level 1: ${level1Description || 'Base schema level'}`,
+  };
+
+  await schemaItem.createEmbeddedDocuments('ActiveEffect', [baseEffectData]);
+
+  // Create upgrade effects
+  for (let i = 0; i < expectedUpgrades; i++) {
+    const upgradeLevel = i + 2;
+    const levelDescription =
+      schemaItem.system[`level${upgradeLevel}`]?.description || '';
+
+    const upgradeEffectData = {
+      name: `${schemaItem.name} - Level ${upgradeLevel} Upgrade`,
+      icon: schemaItem.img,
+      origin: schemaItem.uuid,
+      duration: { permanent: true },
+      flags: {
+        dasu: {
+          schemaUpgrade: {
+            level: upgradeLevel,
+            previousLevel: upgradeLevel - 1,
+            schemaId: schemaItem.id,
+            slotNumber: slotNumber,
+          },
+        },
+      },
+      changes: [], // Dev placeholder - no actual stat changes
+      disabled: false,
+      transfer: true,
+      description: `Schema upgrade: ${
+        levelDescription || `Upgraded to Level ${upgradeLevel}`
+      }`,
+    };
+
+    await schemaItem.createEmbeddedDocuments('ActiveEffect', [
+      upgradeEffectData,
+    ]);
+  }
+
+  // Re-render both actor sheet and any open leveling wizard
+  if (actor.sheet?.rendered) {
+    actor.sheet.render(false);
+  }
+
+  // Refresh any open leveling wizard for this actor
+  Object.values(ui.windows).forEach((app) => {
+    if (
+      app.constructor.name === 'LevelingWizard' &&
+      app.actor?.id === actor.id
+    ) {
+      app.refresh();
+    }
+  });
+
+  if (expectedUpgrades > 0) {
+    ui.notifications.info(
+      `Applied retroactive upgrades: ${schemaItem.name} is now Level ${expectedLevel} with ${expectedUpgrades} upgrade effects`
+    );
+  }
 }
 
 export { grantLevelingItem, revokeLevelingItems };
@@ -2677,44 +3380,22 @@ Hooks.on('dasu.levelChanged', async (actor, { oldLevel, newLevel }) => {
       });
       delete levelingData.abilities[newLevel];
     }
-    // Strength of Will
-    if (levelingData.strengthOfWill?.[newLevel]) {
+    // Feature
+    if (levelingData.feature?.[newLevel]) {
       await grantLevelingItem(
         actor,
-        levelingData.strengthOfWill[newLevel],
+        levelingData.feature[newLevel],
         newLevel,
         'feature'
       );
       itemsToGrant.push({
         type: 'feature',
-        uuid: levelingData.strengthOfWill[newLevel],
+        uuid: levelingData.feature[newLevel],
       });
-      delete levelingData.strengthOfWill[newLevel];
+      delete levelingData.feature[newLevel];
     }
-    // Schemas
-    const schemaType =
-      typeof actor._getSchemaTypeForLevel === 'function'
-        ? actor._getSchemaTypeForLevel(newLevel)
-        : typeof LevelingWizard?.prototype?._getSchemaTypeForLevel ===
-          'function'
-        ? LevelingWizard.prototype._getSchemaTypeForLevel.call(
-            { actor },
-            newLevel
-          )
-        : null;
-    if (schemaType && levelingData.schemas?.[schemaType]) {
-      await grantLevelingItem(
-        actor,
-        levelingData.schemas[schemaType],
-        newLevel,
-        'schema'
-      );
-      itemsToGrant.push({
-        type: 'schema',
-        uuid: levelingData.schemas[schemaType],
-      });
-      delete levelingData.schemas[schemaType];
-    }
+    // Schemas - handle both new and upgrade actions
+    await handleSchemaLevelUp(actor, newLevel, levelingData, itemsToGrant);
     if (itemsToGrant.length > 0) {
       await actor.update({ 'system.levelingData': levelingData });
       ui.notifications.info(`Granted planned items at level ${newLevel}.`);

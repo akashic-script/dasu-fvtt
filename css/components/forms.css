@@ -37,7 +37,7 @@
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 12px;
 }
 
 .bars-container {
@@ -50,7 +50,7 @@
 .stats-container {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  /* gap: 0.25rem; */
   align-items: center;
   justify-content: center;
   min-width: fit-content;
@@ -84,7 +84,7 @@
 .stat-display .stat-value {
   font-size: 1.1rem;
   font-weight: bold;
-  color: var(--color-white);
+  color: var(--color-primary);
   text-align: center;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -132,6 +132,8 @@
    ========================= */
 .attributes.grid .attribute {
   padding: 0.35rem;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
 }
 
 .attribute-name {
@@ -139,41 +141,17 @@
   text-align: left;
 }
 
-.dasu.actor .sheet-header,
-.dasu.item .sheet-header {
-  flex: 0 auto;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  margin-bottom: 10px;
 
-  .profile-img {
-    flex: 0 0 100px;
-    height: 100px;
-    margin-right: 10px;
-  }
-
-  .header-fields {
-    flex: 1;
-  }
-}
-
-.dasu.actor .sheet-tabs,
 .dasu.item .sheet-tabs {
   flex: 0;
 }
 
-.dasu.actor .sheet-body,
-.dasu.actor .sheet-body .tab,
-.dasu.actor .sheet-body .tab .editor,
 .dasu.item .sheet-body,
 .dasu.item .sheet-body .tab,
 .dasu.item .sheet-body .tab .editor {
   height: 100%;
 }
 
-.dasu.actor .tab.biography,
 .dasu.item .tab.biography {
   flex: 1;
 
@@ -182,82 +160,8 @@
   }
 }
 
-/* =========================
-   Input Field Styling (Sheet specific)
-   ========================= */
-.dasu.actor input[type='text'],
-.dasu.actor input[type='number'],
-.dasu.actor input[type='password'],
-.dasu.actor input[type='email'],
-.dasu.actor input[type='url'],
-.dasu.actor input[type='search'],
-.dasu.actor input[type='tel'],
-.dasu.actor textarea,
-.dasu.actor select,
-.dasu.item input[type='text'],
-.dasu.item input[type='number'],
-.dasu.item input[type='password'],
-.dasu.item input[type='email'],
-.dasu.item input[type='url'],
-.dasu.item input[type='search'],
-.dasu.item input[type='tel'],
-.dasu.item textarea,
-.dasu.item select {
-  width: 100%;
-  padding: 0.25rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0;
-  background: var(--color-bg-primary);
-  color: var(--color-text);
-  font-size: 0.9rem;
-  text-align: left;
-  transition: all 0.2s ease;
-}
 
-.dasu.actor input[type='text']:focus,
-.dasu.actor input[type='number']:focus,
-.dasu.actor input[type='password']:focus,
-.dasu.actor input[type='email']:focus,
-.dasu.actor input[type='url']:focus,
-.dasu.actor input[type='search']:focus,
-.dasu.actor input[type='tel']:focus,
-.dasu.actor textarea:focus,
-.dasu.actor select:focus,
-.dasu.item input[type='text']:focus,
-.dasu.item input[type='number']:focus,
-.dasu.item input[type='password']:focus,
-.dasu.item input[type='email']:focus,
-.dasu.item input[type='url']:focus,
-.dasu.item input[type='search']:focus,
-.dasu.item input[type='tel']:focus,
-.dasu.item textarea:focus,
-.dasu.item select:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 3px var(--color-primary);
-  background: var(--color-bg-secondary);
-}
 
-.dasu.actor input[type='text']:hover,
-.dasu.actor input[type='number']:hover,
-.dasu.actor input[type='password']:hover,
-.dasu.actor input[type='email']:hover,
-.dasu.actor input[type='url']:hover,
-.dasu.actor input[type='search']:hover,
-.dasu.actor input[type='tel']:hover,
-.dasu.actor textarea:hover,
-.dasu.actor select:hover,
-.dasu.item input[type='text']:hover,
-.dasu.item input[type='number']:hover,
-.dasu.item input[type='password']:hover,
-.dasu.item input[type='email']:hover,
-.dasu.item input[type='url']:hover,
-.dasu.item input[type='search']:hover,
-.dasu.item input[type='tel']:hover,
-.dasu.item textarea:hover,
-.dasu.item select:hover {
-  border-color: var(--color-primary);
-  background: var(--color-bg-secondary);
-}
 
 .dasu.actor .tox,
 .dasu.item .tox {
@@ -272,6 +176,116 @@
 
 .dasu.tags.input-element-tags {
   justify-content: flex-start !important;
+}
+
+/* =========================
+   Schema Slot Action Select
+   ========================= */
+.slot-action-select {
+  width: fit-content !important;
+  flex-shrink: 0;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.slot-action-select:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-secondary);
+  box-shadow: 0 0 3px rgba(234, 179, 8, 0.3);
+}
+
+.slot-action-select:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+  background: var(--color-bg-secondary);
+  box-shadow: 0 0 5px rgba(234, 179, 8, 0.5);
+}
+
+.slot-action-select option {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  padding: 0.25rem;
+  font-weight: 600;
+}
+
+/* =========================
+   Schema Upgrade Target Select
+   ========================= */
+.slot-upgrade-target {
+  width: fit-content !important;
+  flex-shrink: 0;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-size: 0.75em;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  max-width: 200px;
+}
+
+.slot-upgrade-target:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-primary);
+  box-shadow: 0 0 3px rgba(234, 179, 8, 0.3);
+}
+
+.slot-upgrade-target:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+  background: var(--color-bg-primary);
+  box-shadow: 0 0 5px rgba(234, 179, 8, 0.5);
+}
+
+.slot-upgrade-target option {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  padding: 0.25rem;
+  font-weight: 500;
+}
+
+/* =========================
+   Schema Slot Number Input
+   ========================= */
+.slot-number-input {
+  width: 60px !important;
+  flex-shrink: 0;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 0.8em;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.slot-number-input:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-secondary);
+  box-shadow: 0 0 3px rgba(234, 179, 8, 0.3);
+}
+
+.slot-number-input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+  background: var(--color-bg-secondary);
+  box-shadow: 0 0 5px rgba(234, 179, 8, 0.5);
 }
 
 /* =========================
@@ -343,4 +357,484 @@
 .sheet-tabs.tabs .tab-btn:focus {
   outline: 2px solid var(--color-bg-primary);
   outline-offset: 2px;
+}
+
+/* =========================
+   Actor Sheet Form Styling
+   ========================= */
+
+/* Form styling matching roll-dialog approach */
+.dasu.actor input[type='text'],
+.dasu.actor input[type='number'],
+.dasu.actor input[type='password'],
+.dasu.actor input[type='email'],
+.dasu.actor input[type='url'],
+.dasu.actor input[type='search'],
+.dasu.actor input[type='tel'],
+.dasu.actor textarea,
+.dasu.actor select {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 0.9em;
+  font-family: var(--font-primary);
+  line-height: 1.3;
+  min-height: auto;
+  min-width: 60px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* Specific styling for bar inputs that need to show full text */
+.dasu.actor input.bar-input,
+.dasu.actor input[name*="hp"],
+.dasu.actor input[name*="wp"],
+.dasu.actor input[name*="current"],
+.dasu.actor input[name*="max"] {
+  min-width: 80px;
+  padding: 10px 12px;
+  font-size: 1em;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Bar value container styling */
+.dasu.actor .bar-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: fit-content;
+  white-space: nowrap;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.dasu.actor .bar-value input.bar-input {
+  flex: 0 0 auto;
+  min-width: 60px;
+  margin: 0;
+}
+
+.dasu.actor input:focus,
+.dasu.actor textarea:focus,
+.dasu.actor select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 3px rgba(234, 179, 8, 0.3);
+}
+
+.dasu.actor input:hover,
+.dasu.actor textarea:hover,
+.dasu.actor select:hover {
+  border-color: var(--color-primary);
+}
+
+/* Number inputs specific styling */
+.dasu.actor input[type='number'] {
+  text-align: center;
+  font-weight: bold;
+  color: var(--color-text-primary);
+}
+
+/* Option elements styling */
+.dasu.actor select option {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  padding: 6px 10px;
+  font-size: 0.85em;
+  font-family: var(--font-primary);
+  line-height: 1.3;
+}
+
+.dasu.actor select option:hover,
+.dasu.actor select option:focus {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.dasu.actor select option:checked,
+.dasu.actor select option:selected {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-weight: bold;
+}
+
+/* Sheet tabs consistency */
+.dasu.actor .sheet-tabs.tabs {
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-primary);
+  border-radius: 0;
+  margin-bottom: 12px;
+  padding: 8px;
+  display: flex;
+  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.dasu.actor .sheet-tabs.tabs a,
+.dasu.actor .sheet-tabs.tabs .tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 36px;
+  min-width: 0;
+  max-width: none;
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dasu.actor .sheet-tabs.tabs a.active,
+.dasu.actor .sheet-tabs.tabs .tab-btn.active,
+.dasu.actor .sheet-tabs.tabs a[aria-selected='true'],
+.dasu.actor .sheet-tabs.tabs .tab-btn[aria-selected='true'] {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.dasu.actor .sheet-tabs.tabs a:not(.active):hover,
+.dasu.actor .sheet-tabs.tabs .tab-btn:not(.active):hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Header consistency override */
+.dasu.actor .sheet-header {
+  background: var(--color-bg-primary);
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.1) 10px, rgba(0, 0, 0, 0.1) 20px);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-primary);
+  position: relative;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.dasu.actor .sheet-header .profile-img {
+  position: relative;
+  padding: 2px;
+  background: linear-gradient(45deg, #cd853f, #ffd700);
+  border-radius: 0;
+  /* box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); */
+  border: 2px solid #2f1b14;
+  flex: 0 0 80px;
+  height: auto;
+  z-index: 1;
+}
+
+/* Content consistency overrides */
+.dasu.actor .window-content {
+  background: var(--color-bg-secondary);
+  padding: 16px;
+}
+
+.dasu.actor .tab {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding: 16px;
+  position: relative;
+  height: 100%;
+}
+
+/* Stat display consistency */
+.dasu.actor .stat-display {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 0;
+  padding: 5px 12px;
+  min-width: 3.5rem;
+  text-align: center;
+}
+
+/* Form group styling like roll-dialog */
+.dasu.actor .form-group {
+  margin-bottom: 12px;
+}
+
+.dasu.actor .form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Attribute header and name styling */
+.dasu.actor .attribute-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.dasu.actor .attribute-name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-size: 0.85em;
+  text-align: left;
+}
+
+/* Skill container layout */
+.dasu.actor .skill {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 2px 4px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.dasu.actor .skill-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.dasu.actor .skill-name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-size: 0.85em;
+  text-align: left;
+}
+
+/* =========================
+   DASU Button Styling
+   ========================= */
+
+/* Enhanced Button Styling */
+.dasu.actor button,
+.dasu.actor .button {
+  background: var(--color-bg-primary);
+  /* border: 1px solid var(--color-primary); */
+  border-radius: 0;
+  color: var(--color-primary);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px var(--color-bg-dim);
+}
+
+.dasu.actor button:hover,
+.dasu.actor .button:hover {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 8px var(--color-bg-dim);
+}
+
+.dasu.actor button:active,
+.dasu.actor .button:active {
+  box-shadow: 0 2px 4px var(--color-bg-dim);
+}
+
+/* Primary Action Buttons */
+.dasu.actor .button.primary,
+.dasu.actor button.primary {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-legend-completed) 100%);
+  border-color: var(--color-success);
+  color: white;
+}
+
+.dasu.actor .button.primary:hover,
+.dasu.actor button.primary:hover {
+  background: linear-gradient(135deg, var(--color-legend-completed) 0%, var(--color-success) 100%);
+  border-color: var(--color-legend-completed);
+}
+
+/* Danger Action Buttons */
+.dasu.actor .button.danger,
+.dasu.actor button.danger {
+  background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-hp) 100%);
+  border-color: var(--color-danger);
+  color: white;
+}
+
+.dasu.actor .button.danger:hover,
+.dasu.actor button.danger:hover {
+  background: linear-gradient(135deg, var(--color-hp) 0%, var(--color-danger) 100%);
+  border-color: var(--color-hp);
+}
+
+/* Tick-Button styling with outline vs filled pattern */
+.dasu.actor .tick-button,
+.dasu.actor .tick-button.rollable,
+.dasu.actor .tick-button.rollable.attribute-value,
+.dasu.actor .attribute-value.tick-button.rollable {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 28px;
+  padding: 4px 8px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 0;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 1em;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+  margin-left: auto;
+  line-height: 1;
+}
+
+.dasu.actor .tick-button:hover,
+.dasu.actor .tick-button.rollable:hover,
+.dasu.actor .tick-button.rollable.attribute-value:hover,
+.dasu.actor .attribute-value.tick-button.rollable:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+/* Hover effects for containers */
+.dasu.actor .attribute:hover,
+.dasu.actor .skill:hover {
+  border-color: var(--color-primary);
+}
+
+/* Rollable elements consistency */
+.dasu.actor .rollable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dasu.actor .rollable:hover {
+  color: var(--color-primary);
+}
+
+.dasu.actor .rollable:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Compact button styling with outline pattern */
+.dasu.actor .tick-button-compact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 1.5rem;
+  padding: 4px 8px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 0;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.75rem;
+  font-family: var(--font-primary);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.dasu.actor .tick-button-compact:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.dasu.actor .tick-button-compact:active {
+  transform: scale(0.98);
+}
+
+.dasu.actor .tick-button-compact[data-action] {
+  cursor: pointer;
+}
+
+/* Labels in point displays */
+.dasu.actor .skill-points-display .resource-label,
+.dasu.actor .attribute-points-display .resource-label {
+  flex: 1;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-size: 0.8em;
+  text-align: left;
+  margin: 0;
+}
+
+/* Tick-button-compact within point displays */
+.dasu.actor .skill-points-display .tick-button-compact,
+.dasu.actor .attribute-points-display .tick-button-compact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: auto;
+  width: auto;
+  height: 1.5rem;
+  padding: 4px 8px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 0;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.8em;
+  font-family: var(--font-primary);
+  text-align: center;
+  cursor: default;
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+  margin-left: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }

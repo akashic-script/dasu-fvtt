@@ -1,9 +1,15 @@
-<div class="feature-levels">
-  <div class="feature-description">
-    <label for="system.description"><strong>Description:</strong></label>
-    <textarea name="system.description" id="system.description" rows="3" style="width: 100%;">{{system.description}}</textarea>
+{{! Feature Attributes Tab }}
+<section class='tab attributes-feature scrollable {{tab.cssClass}}' data-group='primary' data-tab='attributes'>
+  <div class='section-header'>
+    <h3>{{localize 'DASU.Item.Feature.FIELDS.description.label'}}</h3>
+    <p class='section-description'>Describe the feature's effects and properties.</p>
   </div>
-  <style>
-    .feature-description { margin-top: 1em; }
-  </style>
-</div> 
+
+  {{#if editable}}
+    <prose-mirror name="system.description" data-document-uuid="{{item.uuid}}" value="{{system.description}}" collaborate="true" toggled="true">
+      {{{enrichedDescription}}}
+    </prose-mirror>
+  {{else}}
+    {{{enrichedDescription}}}
+  {{/if}}
+</section> 

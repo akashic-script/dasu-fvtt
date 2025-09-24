@@ -8,7 +8,6 @@ import { DASURecruitDialog } from '../applications/recruit-dialog.mjs';
 registerHandlebarsHelpers();
 
 const { api, sheets } = foundry.applications;
-const { mergeObject } = foundry.utils;
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -45,12 +44,13 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       toggleDescription: this._toggleDescription,
       toggleContextMenu: this._toggleContextMenu,
       roll: this._onRoll,
-      levelUp: this._levelUp,
       increaseAttribute: this._increaseAttribute,
       decreaseAttribute: this._decreaseAttribute,
       openLevelingWizard: this._openLevelingWizard,
       rollInitiative: this._rollInitiative,
       recruit: this._onRecruit,
+      openSlotTag: this._openSlotTag,
+      toggleItemSection: this._toggleItemSection,
     },
     // Custom property that's merged into `this.options`
     // dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
@@ -58,11 +58,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       submitOnChange: false,
     },
   };
-
-  /** @override */
-  static get defaultOptions() {
-    return mergeObject(super.defaultOptions, this.DEFAULT_OPTIONS);
-  }
 
   /** @override */
   _getHeaderControls() {
@@ -98,14 +93,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       template: 'systems/dasu/templates/actor/biography.hbs',
       scrollable: [''],
     },
-    stocks: {
-      template: 'systems/dasu/templates/actor/stocks.hbs',
-      scrollable: [''],
-    },
-    items: {
-      template: 'systems/dasu/templates/actor/items.hbs',
-      scrollable: [''],
-    },
     effects: {
       template: 'systems/dasu/templates/actor/effects.hbs',
       scrollable: [''],
@@ -122,10 +109,10 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     // Control which parts show based on document subtype
     switch (this.document.type) {
       case 'summoner':
-        options.parts.push('main', 'stocks', 'items', 'biography', 'effects');
+        options.parts.push('main', 'biography', 'effects');
         break;
       case 'daemon':
-        options.parts.push('main', 'items', 'biography', 'effects');
+        options.parts.push('main', 'biography', 'effects');
         break;
     }
   }
@@ -210,17 +197,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         context.favoriteFilterActive =
           this.actor.getFlag('dasu', 'favoriteFilterActive') || false;
         break;
-      case 'stocks':
-        context.tab = context.tabs[partId];
-        break;
-      case 'items':
-        context.tab = context.tabs[partId];
-        // Add filter state to context for conditional rendering
-        context.itemFilterState =
-          this.actor.getFlag('dasu', 'itemFilterState') || null;
-        context.favoriteFilterActive =
-          this.actor.getFlag('dasu', 'favoriteFilterActive') || false;
-        break;
       case 'biography':
         context.tab = context.tabs[partId];
         // Enrich biography info for display
@@ -281,22 +257,16 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           tab.id = 'main';
           tab.label += 'Main';
           break;
-        case 'stocks':
-          tab.id = 'stocks';
-          tab.label += 'Stocks';
-          break;
         case 'biography':
           tab.id = 'biography';
           tab.label += 'Biography';
-          break;
-        case 'items':
-          tab.id = 'items';
-          tab.label += 'Items';
           break;
         case 'effects':
           tab.id = 'effects';
           tab.label += 'Effects';
           break;
+        default:
+          return tabs;
       }
       if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = 'active';
       tabs[partId] = tab;
@@ -339,7 +309,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     for (const uuid of Object.values(levelingData.abilities || {})) {
       if (uuid) plannedUUIDs.add(uuid);
     }
-    for (const uuid of Object.values(levelingData.strengthOfWill || {})) {
+    for (const uuid of Object.values(levelingData.feature || {})) {
       if (uuid) plannedUUIDs.add(uuid);
     }
     for (const uuid of Object.values(levelingData.schemas || {})) {
@@ -689,6 +659,19 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     // Set up items event listeners (search, filter, dropdown, etc.)
     this._setupItemsEventListeners();
+
+    // Set up collapse/expand handlers for item headers using modern event listeners
+    this.element
+      .querySelectorAll('.items-header .collapse-toggle')
+      .forEach((chevron) => {
+        chevron.removeEventListener('click', this._handleChevronClick);
+        chevron.addEventListener('click', this._handleChevronClick.bind(this));
+      });
+
+    // Remove any existing header click handlers to avoid conflicts
+    this.element.querySelectorAll('.items-header').forEach((header) => {
+      header.removeEventListener('click', this._handleItemHeaderClick);
+    });
   }
 
   /**
@@ -1531,20 +1514,13 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   static async _onEditImage(_event, target) {
     const attr = target.dataset.edit;
     const current = foundry.utils.getProperty(this.document, attr);
-    const { img } =
-      this.document.constructor.getDefaultArtwork?.(this.document.toObject()) ??
-      {};
-    const fp = new FilePicker({
+    return foundry.applications.apps.FilePicker.browse('data', {
       current,
       type: 'image',
-      redirectToRoot: img ? [img] : [],
       callback: (path) => {
         this.document.update({ [attr]: path });
       },
-      top: this.position.top + 40,
-      left: this.position.left + 10,
     });
-    return fp.browse();
   }
 
   /**
@@ -1898,7 +1874,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
                 ?.textContent?.split(' (')[0] || 'Skill';
 
             // Use skill ticks for initiative instead of normal roll
-            await Hooks.callAll(
+            Hooks.callAll(
               'dasu.rollInitiativeWithSkill',
               this.actor,
               skillName,
@@ -2112,7 +2088,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     }
 
     // Perform the sort
-    const sortUpdates = SortingHelpers.performIntegerSort(effect, {
+    const sortUpdates = foundry.utils.sortObjectEntries(effect, {
       target,
       siblings,
     });
@@ -3548,62 +3524,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     };
   }
 
-  activateListeners(html) {
-    super.activateListeners(html);
-    // ... existing code ...
-    // (Removed right-click to remove tag handler and related debug logs)
-    // Add left-click to open tag sheet from slot using UUID if available
-    html.find('.slot-indicator.filled').on('click', (event) => {
-      const slotDiv = event.currentTarget;
-      const slotKey = slotDiv.dataset.slot;
-      const itemId = slotDiv.closest('li.item')?.dataset.itemId;
-      if (!itemId || !slotKey) return;
-      const weapon = this.actor.items.get(itemId);
-      if (!weapon) return;
-      const slot = weapon.system.tagSlots?.[slotKey];
-      if (!slot || !slot.tagId) return;
-      // Try to get the tag by UUID if present
-      if (slot.tagUuid) {
-        fromUuid(slot.tagUuid).then((foundTag) => {
-          if (foundTag && foundTag.sheet) {
-            foundTag.sheet.render(true);
-          } else {
-            ui.notifications.warn('Tag not found by UUID.');
-          }
-        });
-      } else {
-        const tag = this.actor.items.get(slot.tagId);
-        if (tag && tag.sheet) {
-          tag.sheet.render(true);
-        } else {
-          ui.notifications.warn('Tag not found in actor items.');
-        }
-      }
-    });
-    // Expand/collapse item lists
-    html.find('.items-header .collapse-toggle').on('click', function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      const header = this.closest('.items-header');
-      const itemList = header.nextElementSibling;
-      header.classList.toggle('collapsed');
-      if (itemList && itemList.classList.contains('item-list')) {
-        itemList.classList.toggle('collapsed');
-      }
-    });
-    // Add collapse/expand handlers for item headers (only chevron)
-    this.element
-      .querySelectorAll('.items-header .collapse-toggle')
-      .forEach((chevron) => {
-        chevron.removeEventListener('click', this._handleChevronClick);
-        chevron.addEventListener('click', this._handleChevronClick.bind(this));
-      });
-    // Remove header click handler for collapse/expand (handled by chevron only)
-    this.element.querySelectorAll('.items-header').forEach((header) => {
-      header.removeEventListener('click', this._handleItemHeaderClick);
-    });
-  }
-
   // Track drag state globally for the sheet
   _isDragging = false;
 
@@ -4008,5 +3928,66 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           itemElement.classList.add('leveling-granted-item');
         }
       });
+  }
+
+  /**
+   * Action handler for opening slot tag sheets
+   * @param {Event} event - Click event
+   * @param {HTMLElement} target - The clicked element
+   */
+  static async _openSlotTag(_event, target) {
+    const slotDiv = target.closest('.slot-indicator.filled');
+    if (!slotDiv) return;
+
+    const slotKey = slotDiv.dataset.slot;
+    const itemId = slotDiv.closest('li.item')?.dataset.itemId;
+    if (!itemId || !slotKey) return;
+
+    const weapon = this.actor.items.get(itemId);
+    if (!weapon) return;
+
+    const slot = weapon.system.tagSlots?.[slotKey];
+    if (!slot || !slot.tagId) return;
+
+    // Try to get the tag by UUID if present
+    if (slot.tagUuid) {
+      const foundTag = await fromUuid(slot.tagUuid);
+      if (foundTag && foundTag.sheet) {
+        foundTag.sheet.render(true);
+      } else {
+        ui.notifications.warn('Tag not found by UUID.');
+      }
+    } else {
+      const tag = this.actor.items.get(slot.tagId);
+      if (tag && tag.sheet) {
+        tag.sheet.render(true);
+      } else {
+        ui.notifications.warn('Tag not found in actor items.');
+      }
+    }
+  }
+
+  /**
+   * Action handler for toggling item section collapse/expand
+   * @param {Event} event - Click event
+   * @param {HTMLElement} target - The clicked element
+   */
+  static async _toggleItemSection(event, target) {
+    // Prevent toggling if a drag is in progress
+    if (this._isDragging) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const header = target.closest('.items-header');
+    const itemList = header?.nextElementSibling;
+
+    if (header) {
+      header.classList.toggle('collapsed');
+    }
+
+    if (itemList && itemList.classList.contains('item-list')) {
+      itemList.classList.toggle('collapsed');
+    }
   }
 }

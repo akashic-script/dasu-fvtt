@@ -2,6 +2,97 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 :root {
-  --font-primary: 'Roboto', sans-serif;
+  --font-primary: 'PT Sans Narrow', sans-serif;
   --font-secondary: 'Roboto', sans-serif;
 }
+
+/* .window-content,
+.message-content,
+.journal-entry,
+.chat-message,
+.prosemirror,
+.editor-content {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--color-heading-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-primary);
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.875rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.625rem;
+  }
+
+  h5 {
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  h6 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  } */
+} */
+
+/* Fallback for browsers that don't support nested CSS */
+/* .window-content h1, .window-content h2, .window-content h3, .window-content h4, .window-content h5, .window-content h6,
+.message-content h1, .message-content h2, .message-content h3, .message-content h4, .message-content h5, .message-content h6,
+.journal-entry h1, .journal-entry h2, .journal-entry h3, .journal-entry h4, .journal-entry h5, .journal-entry h6,
+.chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5, .chat-message h6,
+.prosemirror h1, .prosemirror h2, .prosemirror h3, .prosemirror h4, .prosemirror h5, .prosemirror h6,
+.editor-content h1, .editor-content h2, .editor-content h3, .editor-content h4, .editor-content h5, .editor-content h6 {
+  color: var(--color-text-primary);
+  font-family: var(--font-primary);
+} */
+
+/* More specific targeting for chat message content */
+/* .chat-message .message-content h1,
+.chat-message .message-content h2,
+.chat-message .message-content h3,
+.chat-message .message-content h4,
+.chat-message .message-content h5,
+.chat-message .message-content h6 {
+  color: var(--color-text-primary) !important;
+  font-family: var(--font-primary);
+}
+
+.chat-message .message-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+} */
+
+/* Utility classes for text styling */
+/* .heading-secondary {
+  color: var(--color-heading-secondary);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+} */

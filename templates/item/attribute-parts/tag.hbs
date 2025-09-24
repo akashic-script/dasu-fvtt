@@ -74,7 +74,15 @@
   <div class='separator'></div>
 
   <div class='section-header'>
-    <h3>Description</h3>
+    <h3>{{localize 'DASU.Item.Tag.FIELDS.description.label'}}</h3>
+    <p class='section-description'>Describe the tag's effects and properties.</p>
   </div>
-  <textarea name='system.description' rows='3'>{{system.description}}</textarea>
+
+  {{#if editable}}
+    <prose-mirror name="system.description" data-document-uuid="{{item.uuid}}" value="{{system.description}}" collaborate="true" toggled="true">
+      {{{enrichedDescription}}}
+    </prose-mirror>
+  {{else}}
+    {{{enrichedDescription}}}
+  {{/if}}
 </section> 

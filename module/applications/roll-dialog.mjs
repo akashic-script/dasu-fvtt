@@ -138,7 +138,7 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
         tick: this.actor.system.attributes.dex?.tick || 1,
       },
       will: {
-        label: 'Will',
+        label: 'Willpower',
         tick: this.actor.system.attributes.will?.tick || 1,
       },
       sta: {
@@ -256,7 +256,7 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
         tick: this.actor.system.attributes.dex?.tick || 1,
       },
       will: {
-        label: 'Will',
+        label: 'Willpower',
         tick: this.actor.system.attributes.will?.tick || 1,
       },
       sta: {

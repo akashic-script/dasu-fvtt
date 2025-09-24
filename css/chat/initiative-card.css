@@ -107,7 +107,7 @@
   background: #ffd700;
   border: 1px solid #ffb800;
   border-radius: 0;
-  color: #8b4513;
+  color: var(--color-critical);
   font-weight: 700;
   font-size: 0.8em;
   text-transform: uppercase;

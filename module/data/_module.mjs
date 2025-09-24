@@ -43,14 +43,10 @@ Hooks.on('updateActor', async (actor, data, options, userId) => {
       );
       delete levelingData.abilities[newLevel];
     }
-    // Grant planned strengthOfWill
-    if (levelingData.strengthOfWill?.[newLevel]) {
-      await grantLevelingItem(
-        actor,
-        levelingData.strengthOfWill[newLevel],
-        newLevel
-      );
-      delete levelingData.strengthOfWill[newLevel];
+    // Grant planned feature
+    if (levelingData.feature?.[newLevel]) {
+      await grantLevelingItem(actor, levelingData.feature[newLevel], newLevel);
+      delete levelingData.feature[newLevel];
     }
     // Grant planned schemas
     // Determine schemaType for this level (copied from LevelingWizard._getSchemaTypeForLevel)

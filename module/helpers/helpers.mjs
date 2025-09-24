@@ -120,6 +120,7 @@ export function registerHandlebarsHelpers() {
 
   // toNumber helper for numeric comparisons
   Handlebars.registerHelper('toNumber', function (value) {
+    if (value === null || value === undefined || value === '') return null;
     return Number(value);
   });
 
@@ -206,4 +207,108 @@ export function registerHandlebarsHelpers() {
     if (!Array.isArray(array)) return '';
     return array.join(separator || ',');
   });
+
+  // String conversion helper for template comparisons
+  Handlebars.registerHelper('toString', function (value) {
+    if (value === null || value === undefined) return '';
+    return String(value);
+  });
+
+  // Get upgradeable slots for schema bonuses
+  Handlebars.registerHelper(
+    'getUpgradeableSlots',
+    function (levelSlots, slotType, currentLevel) {
+      if (!levelSlots || !slotType || !currentLevel) return [];
+
+      const upgradeableSlots = [];
+
+      // Look through all levels below the current one
+      for (let level = 1; level < currentLevel; level++) {
+        const slots = levelSlots[level];
+        if (!slots || !Array.isArray(slots)) continue;
+
+        slots.forEach((slot, index) => {
+          // Only include schema slots of the same type that are set to "new"
+          if (
+            slot.type === slotType &&
+            slot.action === 'new' &&
+            slot.schemaId
+          ) {
+            upgradeableSlots.push({
+              id: `${level}-${index}`,
+              level: level,
+              name: slot.schemaId || `Slot ${index + 1}`,
+              slotIndex: index,
+            });
+          }
+        });
+      }
+
+      return upgradeableSlots;
+    }
+  );
+
+  // Get all schema slots of a specific type for upgrade selection
+  Handlebars.registerHelper(
+    'getAllSchemaSlots',
+    function (levelSlots, slotType) {
+      if (!levelSlots || !slotType) return [];
+
+      const allSlots = [];
+
+      // Look through all levels
+      for (let level = 1; level <= 30; level++) {
+        const slots = levelSlots[level];
+        if (!slots || !Array.isArray(slots)) continue;
+
+        slots.forEach((slot, index) => {
+          // Include schema slots of the same type that are set to "new" and have slot numbers
+          if (
+            slot.type === slotType &&
+            slot.action === 'new' &&
+            slot.slotNumber
+          ) {
+            allSlots.push({
+              id: `${level}-${index}`,
+              level: level,
+              slotNumber: slot.slotNumber,
+              name: slot.schemaId || `Schema ${slot.slotNumber}`,
+              slotIndex: index,
+            });
+          }
+        });
+      }
+
+      return allSlots;
+    }
+  );
+
+  // Get available slot numbers for upgrade selection
+  Handlebars.registerHelper(
+    'getAvailableSlotNumbers',
+    function (levelSlots, slotType, currentLevel) {
+      if (!levelSlots || !slotType || !currentLevel) return [];
+
+      const usedSlotNumbers = new Set();
+
+      // Look through all levels below current level to find existing slot numbers
+      for (let level = 1; level < currentLevel; level++) {
+        const slots = levelSlots[level];
+        if (!slots || !Array.isArray(slots)) continue;
+
+        slots.forEach((slot, index) => {
+          // For schema slots, look for enhanced slot structure
+          if (typeof slot === 'object' && slot.type === slotType) {
+            // Check if it has a slot number and is either "new" action or no action set
+            if (slot.slotNumber && (!slot.action || slot.action === 'new')) {
+              usedSlotNumbers.add(parseInt(slot.slotNumber));
+            }
+          }
+        });
+      }
+
+      // Return array of available slot numbers (convert Set to sorted Array)
+      return Array.from(usedSlotNumbers).sort((a, b) => a - b);
+    }
+  );
 }

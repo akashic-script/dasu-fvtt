@@ -195,9 +195,7 @@
 /* =========================
    Skill Section
    ========================= */
-.skills-section {
-  border: 1px solid var(--color-border);
-}
+.skills-section {}
 
 .skill-points {
   padding: 0.35rem;
@@ -295,12 +293,12 @@
   transition: all 0.3s ease !important;
   z-index: 1 !important;
   pointer-events: none !important;
-  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8) !important;
+  text-shadow: 0 0 2px var(--color-bg-dim) !important;
 }
 
 /* Hover states - show numbers */
 .skill:hover .skill-tick-radio::before {
-  color: #fbbf24 !important;
+  color: var(--color-warning) !important;
 }
 
 .skill:hover .skill-tick-radio:checked::before {
@@ -434,6 +432,7 @@
   padding: 0.2rem 0.4rem;
   align-items: center;
   min-height: 1.4rem;
+  margin-bottom: 0.5rem;
 }
 
 .skill-points-display {
@@ -442,6 +441,7 @@
   padding: 0.2rem 0.4rem;
   align-items: center;
   min-height: 1.4rem;
+  margin-bottom: 0.5rem;
 }
 
 /* =========================
@@ -563,25 +563,31 @@
    Critical Modifier Section
    ========================= */
 .crit-section {
+  background: var(--color-bg-primary);
   border: 1px solid var(--color-border);
+  padding: 0.2rem 0.4rem;
+  align-items: center;
+  min-height: 1.4rem;
   margin-bottom: 0.5rem;
 }
 
 .crit-header {
-  background: var(--color-bg-primary);
-  border-bottom: 1px solid var(--color-border);
-  padding: 0.2rem 0.4rem;
+  display: flex;
   align-items: center;
-  min-height: 1.4rem;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  min-width: 0;
+  gap: 1em;
 }
 
 .crit-threshold-display {
   font-size: 0.8em;
-  color: var(--color-text-highlight);
+  color: var(--color-primary);
   font-weight: 600;
-  background: var(--color-bg-secondary);
+  background: var(--color-bg-primary);
   padding: 0.15rem 0.3rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-primary);
+  text-align: center;
   border-radius: 2px;
 }
 
@@ -595,6 +601,13 @@
   padding: 0.35rem;
   align-items: center;
   gap: 0.5rem;
+}
+
+.crit-section .resource-label {
+  flex: 1;
+  text-align: left;
+  font-size: 0.9em;
+  margin-right: 0.5rem;
 }
 
 .crit-label {
@@ -629,4 +642,55 @@
   border-radius: 2px;
   min-width: 30px;
   text-align: center;
+}
+
+/* =========================
+   DASU Resource Bars
+   ========================= */
+.dasu.actor .resource-bar {
+  background: var(--color-bg-primary);
+  border: 2px solid var(--color-primary);
+  border-radius: 0;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  box-shadow: 0 2px 4px var(--color-bg-dim);
+}
+
+.dasu.actor .resource-bar .bar {
+  background: var(--color-legend-future);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  height: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.dasu.actor .resource-bar .bar-fill {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-legend-completed) 100%);
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 0;
+}
+
+.dasu.actor .resource-bar.health .bar-fill {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-legend-completed) 100%);
+}
+
+.dasu.actor .resource-bar.damage .bar-fill {
+  background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-hp) 100%);
+}
+
+.dasu.actor .resource-bar.fatigue .bar-fill {
+  background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-primary) 100%);
+}
+
+.dasu.actor .resource-bar .bar-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  color: var(--color-text-primary);
+  text-shadow: 0 1px 2px var(--color-bg-dim);
+  font-size: 0.85rem;
 }

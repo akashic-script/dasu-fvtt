@@ -1,38 +1,49 @@
-<div class="schema-levels">
-  <div class="schema-description" style="margin-bottom: 1em;">
-    <label for="system.description"><strong>Description:</strong></label>
-    <textarea name="system.description" id="system.description" rows="3" style="width: 100%;">{{system.description}}</textarea>
+{{! Schema Attributes Tab }}
+<section class='tab attributes-schema scrollable {{tab.cssClass}}' data-group='primary' data-tab='attributes'>
+  <div class='section-header'>
+    <h3>{{localize 'DASU.Item.Schema.FIELDS.description.label'}}</h3>
+    <p class='section-description'>{{localize 'DASU.Item.Schema.sectionDescription'}}</p>
   </div>
+
+  {{#if editable}}
+    <prose-mirror name="system.description" data-document-uuid="{{item.uuid}}" value="{{system.description}}" collaborate="true" toggled="true">
+      {{{enrichedDescription}}}
+    </prose-mirror>
+  {{else}}
+    {{{enrichedDescription}}}
+  {{/if}}
+
+  <div class='separator'></div>
   <div class="schema-level-header" style="margin-bottom: 1em;">
-    <label for="system.level"><strong>Level:</strong></label>
+    <label for="system.level"><strong>{{localize 'DASU.Item.Schema.FIELDS.level.label'}}:</strong></label>
     <input type="number" name="system.level" id="system.level" value="{{system.level}}" min="1" max="3" style="width: 3em; text-align: center;" data-dtype="Number" />
     <span>/ 3</span>
   </div>
-  <h3>Schema Progression</h3>
+  <h3>{{localize 'DASU.Item.Schema.progression.title'}}</h3>
   <table class="schema-level-table">
     <thead>
       <tr>
-        <th>Level</th>
-        <th>Description</th>
+        <th>{{localize 'DASU.Item.Schema.progression.level'}}</th>
+        <th>{{localize 'DASU.Item.Schema.progression.description'}}</th>
       </tr>
     </thead>
     <tbody>
       <tr class="{{#if (gte system.level 1)}}active{{else}}inactive{{/if}}">
         <td>1</td>
         <td>
-          <input type="text" name="system.level1.description" value="{{system.level1.description}}" placeholder="Description for level 1" />
+          <input type="text" name="system.level1.description" value="{{system.level1.description}}" placeholder="{{localize 'DASU.Item.Schema.progression.placeholder.level1'}}" />
         </td>
       </tr>
       <tr class="{{#if (gte system.level 2)}}active{{else}}inactive{{/if}}">
         <td>2</td>
         <td>
-          <input type="text" name="system.level2.description" value="{{system.level2.description}}" placeholder="Description for level 2" />
+          <input type="text" name="system.level2.description" value="{{system.level2.description}}" placeholder="{{localize 'DASU.Item.Schema.progression.placeholder.level2'}}" />
         </td>
       </tr>
       <tr class="{{#if (gte system.level 3)}}active{{else}}inactive{{/if}}">
         <td>3</td>
         <td>
-          <input type="text" name="system.level3.description" value="{{system.level3.description}}" placeholder="Description for level 3" />
+          <input type="text" name="system.level3.description" value="{{system.level3.description}}" placeholder="{{localize 'DASU.Item.Schema.progression.placeholder.level3'}}" />
         </td>
       </tr>
     </tbody>
@@ -42,4 +53,4 @@
     .schema-level-table tr.inactive { opacity: 0.5; }
     .schema-level-header { display: flex; align-items: center; gap: 0.5em; }
   </style>
-</div> 
+</section> 

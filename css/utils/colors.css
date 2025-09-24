@@ -20,6 +20,13 @@
   --color-text-primary: #f7fafc;
   --color-text-secondary: #6c757d;
   --color-text-highlight: #007bff;
+  --color-heading-primary: #ffffff;
+  --color-heading-secondary: #e2e8f0;
+  --color-text-muted: #9ca3af;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+  --color-critical: #8b4513;
   --color-white: #ffffff;
   --color-border: #ffffff;
   --color-hp: #e11d48;
@@ -44,11 +51,11 @@
   --dasu-c-white: #000000;
   --dasu-c-black: #ffffff;
   --dasu-c-groove: #11121f;
-  --dasu-c-primary: #eab308;
+  --dasu-c-primary: #b58d36;
   --dasu-c-success: #10b981;
 
   /* Component color variables for dark theme */
-  --color-primary: #eab308;
+  --color-primary: #b58d36;
   --color-primary-highlight: #ca8a04;
   --color-secondary: #8b5cf6;
   --color-secondary-highlight: #c084fc;
@@ -57,6 +64,13 @@
   --color-text-primary: #f7fafc;
   --color-text-secondary: #6c757d;
   --color-text-highlight: #63b3ed;
+  --color-heading-primary: #ffffff;
+  --color-heading-secondary: #cbd5e0;
+  --color-text-muted: #6b7280;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+  --color-critical: #8b4513;
   --color-white: #ffffff;
   --color-border: #ffffff;
   --color-hp: #e11d48;

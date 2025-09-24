@@ -1270,44 +1270,110 @@
           </li>
           <div class='item-list schema-list'>
             {{#each schemas as |item id|}}
-              <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
-                <div class='item-name flexrow'>
-                  <div class='item-image'>
-                    <a class='rollable' data-action='roll' data-roll-type='item'>
-                      <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
-                    </a>
-                  </div>
-                  {{item.name}}
-                  {{#if (includes item.traits 'innate')}}
-                    <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
-                  {{/if}}
-                </div>
-                <div class='item-controls'>
-                  {{#if (and @root.editable @root.isEditMode)}}
-                    {{#if (eq item.system.level 3)}}
-                      <span class="item-level-label">{{localize "DASU.Level"}}: {{item.system.level}} / 3</span>
+              <li class='item expandable-item' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+                <div class='item-row flexrow'>
+                  <div class='item-name flexrow item-name-clickable' data-action='toggleDescription'>
+                    <div class='item-image'>
+                      <a class='rollable' data-action='roll' data-roll-type='item'>
+                        <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
+                      </a>
+                    </div>
+                    <span class='item-name-text'>{{item.name}}</span>
+                    {{#if (includes item.traits 'innate')}}
+                      <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
                     {{/if}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="schema"}}' data-action='viewDoc'>
-                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived (eq item.system.level 3))}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                    </a>
-                  {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="schema"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="schema"}}</span>
-                        </a>
-                        {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
-                          <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="schema"}}' data-action='deleteDoc'>
-                            <i class='fas fa-trash'></i>
-                            <span>{{localize "DOCUMENT.Delete" type="schema"}}</span>
-                          </a>
-                        {{/unless}}
+                  </div>
+                  <div class='item-controls'>
+                    {{#if (and @root.editable @root.isEditMode)}}
+                      {{#if (eq item.system.level 3)}}
+                        <span class="item-level-label">{{localize "DASU.Level"}}: {{item.system.level}} / 3</span>
                       {{/if}}
+                      <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="schema"}}' data-action='viewDoc'>
+                        <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived (eq item.system.level 3))}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                      </a>
+                    {{/if}}
+                    <div class='item-context-menu'>
+                      <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
+                        <i class='fas fa-bars'></i>
+                      </a>
+                      <div class='context-menu-dropdown' style='display: none;'>
+                        <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
+                          <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
+                          <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
+                        </a>
+                        {{#if (and @root.editable @root.isEditMode)}}
+                          <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="schema"}}' data-action='copyDoc'>
+                            <i class='fas fa-copy'></i>
+                            <span>{{localize "DOCUMENT.Copy" type="schema"}}</span>
+                          </a>
+                          {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
+                            <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="schema"}}' data-action='deleteDoc'>
+                              <i class='fas fa-trash'></i>
+                              <span>{{localize "DOCUMENT.Delete" type="schema"}}</span>
+                            </a>
+                          {{/unless}}
+                        {{/if}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class='item-description-row' style='display: none;'>
+                  <div class='item-description-content'>
+                    {{! Schema-specific level-based descriptions }}
+                    <div class="schema-level-descriptions">
+                      <div class="schema-level-description {{#if (gte item.system.level 1)}}active{{else}}inactive{{/if}}">
+                        <div class="level-header">
+                          <span class="level-number">Level 1</span>
+                          {{#if (gte item.system.level 1)}}
+                            <span class="level-status active">Active</span>
+                          {{else}}
+                            <span class="level-status inactive">Inactive</span>
+                          {{/if}}
+                        </div>
+                        <div class="level-description-text">
+                          {{#if item.system.level1.description}}
+                            {{{item.system.level1.description}}}
+                          {{else}}
+                            <em>No description</em>
+                          {{/if}}
+                        </div>
+                      </div>
+
+                      <div class="schema-level-description {{#if (gte item.system.level 2)}}active{{else}}inactive{{/if}}">
+                        <div class="level-header">
+                          <span class="level-number">Level 2</span>
+                          {{#if (gte item.system.level 2)}}
+                            <span class="level-status active">Active</span>
+                          {{else}}
+                            <span class="level-status inactive">Inactive</span>
+                          {{/if}}
+                        </div>
+                        <div class="level-description-text">
+                          {{#if item.system.level2.description}}
+                            {{{item.system.level2.description}}}
+                          {{else}}
+                            <em>No description</em>
+                          {{/if}}
+                        </div>
+                      </div>
+
+                      <div class="schema-level-description {{#if (gte item.system.level 3)}}active{{else}}inactive{{/if}}">
+                        <div class="level-header">
+                          <span class="level-number">Level 3</span>
+                          {{#if (gte item.system.level 3)}}
+                            <span class="level-status active">Active</span>
+                          {{else}}
+                            <span class="level-status inactive">Inactive</span>
+                          {{/if}}
+                        </div>
+                        <div class="level-description-text">
+                          {{#if item.system.level3.description}}
+                            {{{item.system.level3.description}}}
+                          {{else}}
+                            <em>No description</em>
+                          {{/if}}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

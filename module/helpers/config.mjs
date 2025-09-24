@@ -13,7 +13,6 @@ DASU.RANGE_TYPES = ['melee', 'ranged'];
 
 // New item types for summoner progression
 DASU.SCHEMA_TYPES = ['first', 'second'];
-DASU.STRENGTH_OF_WILL_CATEGORIES = ['Strength of Will'];
 
 // Class-related configuration
 DASU.CLASS_CATEGORIES = ['official', 'homebrew', 'community'];

@@ -133,7 +133,7 @@ export default class SummonerDataModel extends BaseActorDataModel {
             { required: false, initial: { first: '', second: '' } }
           ),
           abilities: new fields.ObjectField({ required: false, initial: {} }), // Level -> UUID mapping for abilities
-          strengthOfWill: new fields.ObjectField({
+          feature: new fields.ObjectField({
             required: false,
             initial: {},
           }), // Level -> UUID mapping for features
@@ -156,7 +156,7 @@ export default class SummonerDataModel extends BaseActorDataModel {
           initial: {
             schemas: { first: '', second: '' },
             abilities: {},
-            strengthOfWill: {},
+            feature: {},
             storedItems: {},
             fullItems: {},
             classBonuses: {},
