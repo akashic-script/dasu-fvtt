@@ -4,7 +4,7 @@
  * Supports weapons (toHit), abilities (toHit), and tactics (toLand)
  */
 
-import { DASUAccuracyRollV1 } from '../helpers/dasu-accuracy-check.mjs';
+import { DASUAccuracyRollV1 } from '../../systems/rolling/dasu-accuracy-check.mjs';
 
 export class DASUAccuracyDialog extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.api.ApplicationV2

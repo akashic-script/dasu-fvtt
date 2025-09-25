@@ -7,29 +7,29 @@ export const DASU_STATUS_CONDITIONS = {
   // Physical Status
   bleeding: {
     id: 'bleeding',
-    label: 'DASU.Status.Bleeding',
-    icon: 'icons/svg/blood.svg',
+    name: 'DASU.Status.Bleeding',
+    img: 'icons/svg/blood.svg',
     tint: '#ff0000',
     description: 'DASU.Status.Description.Bleeding',
   },
   stunned: {
     id: 'stunned',
-    label: 'DASU.Status.Stunned',
-    icon: 'icons/svg/daze.svg',
+    name: 'DASU.Status.Stunned',
+    img: 'icons/svg/daze.svg',
     tint: '#ffaa00',
     description: 'DASU.Status.Description.Stunned',
   },
   sleep: {
     id: 'sleep',
-    label: 'DASU.Status.Sleep',
-    icon: 'icons/svg/sleep.svg',
+    name: 'DASU.Status.Sleep',
+    img: 'icons/svg/sleep.svg',
     tint: '#87ceeb',
     description: 'DASU.Status.Description.Sleep',
   },
   restrained: {
     id: 'restrained',
-    label: 'DASU.Status.Restrained',
-    icon: 'icons/svg/net.svg',
+    name: 'DASU.Status.Restrained',
+    img: 'icons/svg/net.svg',
     tint: '#8b0000',
     description: 'DASU.Status.Description.Restrained',
   },
@@ -37,29 +37,29 @@ export const DASU_STATUS_CONDITIONS = {
   // Mental Status
   charmed: {
     id: 'charmed',
-    label: 'DASU.Status.Charmed',
-    icon: 'icons/svg/heart.svg',
+    name: 'DASU.Status.Charmed',
+    img: 'icons/svg/stoned.svg',
     tint: '#ff69b4',
     description: 'DASU.Status.Description.Charmed',
   },
   dazed: {
     id: 'dazed',
-    label: 'DASU.Status.Dazed',
-    icon: 'icons/svg/confusion.svg',
+    name: 'DASU.Status.Dazed',
+    img: 'icons/svg/daze.svg',
     tint: '#ffd700',
     description: 'DASU.Status.Description.Dazed',
   },
   despair: {
     id: 'despair',
-    label: 'DASU.Status.Despair',
-    icon: 'icons/svg/sadness.svg',
+    name: 'DASU.Status.Despair',
+    img: 'icons/svg/falling.svg',
     tint: '#4b0082',
     description: 'DASU.Status.Description.Despair',
   },
   rage: {
     id: 'rage',
-    label: 'DASU.Status.Rage',
-    icon: 'icons/svg/berserk.svg',
+    name: 'DASU.Status.Rage',
+    img: 'icons/svg/terror.svg',
     tint: '#8b0000',
     description: 'DASU.Status.Description.Rage',
   },
@@ -67,29 +67,29 @@ export const DASU_STATUS_CONDITIONS = {
   // Magical Status
   cursed: {
     id: 'cursed',
-    label: 'DASU.Status.Cursed',
-    icon: 'icons/svg/skull.svg',
+    name: 'DASU.Status.Cursed',
+    img: 'icons/svg/skull.svg',
     tint: '#4b0082',
     description: 'DASU.Status.Description.Cursed',
   },
   empowered: {
     id: 'empowered',
-    label: 'DASU.Status.Empowered',
-    icon: 'icons/svg/upgrade.svg',
+    name: 'DASU.Status.Empowered',
+    img: 'icons/svg/upgrade.svg',
     tint: '#00ff00',
     description: 'DASU.Status.Description.Empowered',
   },
   focused: {
     id: 'focused',
-    label: 'DASU.Status.Focused',
-    icon: 'icons/svg/target.svg',
+    name: 'DASU.Status.Focused',
+    img: 'icons/svg/target.svg',
     tint: '#00aaff',
     description: 'DASU.Status.Description.Focused',
   },
   unraveled: {
     id: 'unraveled',
-    label: 'DASU.Status.Unraveled',
-    icon: 'icons/svg/chaos.svg',
+    name: 'DASU.Status.Unraveled',
+    img: 'icons/svg/lever.svg',
     tint: '#ff1493',
     description: 'DASU.Status.Description.Unraveled',
   },
@@ -97,15 +97,15 @@ export const DASU_STATUS_CONDITIONS = {
   // Sensory Status
   invisible: {
     id: 'invisible',
-    label: 'DASU.Status.Invisible',
-    icon: 'icons/svg/invisible.svg',
+    name: 'DASU.Status.Invisible',
+    img: 'icons/svg/invisible.svg',
     tint: '#ffffff',
     description: 'DASU.Status.Description.Invisible',
   },
   silenced: {
     id: 'silenced',
-    label: 'DASU.Status.Silenced',
-    icon: 'icons/svg/silence.svg',
+    name: 'DASU.Status.Silenced',
+    img: 'icons/svg/silenced.svg',
     tint: '#696969',
     description: 'DASU.Status.Description.Silenced',
   },
@@ -113,8 +113,8 @@ export const DASU_STATUS_CONDITIONS = {
   // Health Status
   infected: {
     id: 'infected',
-    label: 'DASU.Status.Infected',
-    icon: 'icons/svg/disease.svg',
+    name: 'DASU.Status.Infected',
+    img: 'icons/svg/poison.svg',
     tint: '#228b22',
     description: 'DASU.Status.Description.Infected',
   },
@@ -122,15 +122,15 @@ export const DASU_STATUS_CONDITIONS = {
   // Combat Status
   guarded: {
     id: 'guarded',
-    label: 'DASU.Status.Guarded',
-    icon: 'icons/svg/shield.svg',
+    name: 'DASU.Status.Guarded',
+    img: 'icons/svg/shield.svg',
     tint: '#4169e1',
     description: 'DASU.Status.Description.Guarded',
   },
   unguarded: {
     id: 'unguarded',
-    label: 'DASU.Status.Unguarded',
-    icon: 'icons/svg/vulnerable.svg',
+    name: 'DASU.Status.Unguarded',
+    img: 'icons/svg/mage-shield.svg',
     tint: '#ff4500',
     description: 'DASU.Status.Description.Unguarded',
   },
@@ -144,10 +144,10 @@ export function registerStatusConditions() {
   CONFIG.statusEffects = Object.values(DASU_STATUS_CONDITIONS).map(
     (status) => ({
       id: status.id,
-      label: status.label,
-      icon: status.icon,
+      name: status.name,
+      img: status.img,
       tint: status.tint,
-      description: status.description,
+      description: game.i18n.localize(status.description),
     })
   );
 }
@@ -182,13 +182,23 @@ export function getStatusDescription(id) {
 }
 
 /**
- * Get localized label for a status condition
+ * Get localized name for a status condition
  * @param {string} id - The status condition ID
- * @returns {string} The localized label or empty string if not found
+ * @returns {string} The localized name or empty string if not found
  */
-export function getStatusLabel(id) {
+export function getStatusName(id) {
   const status = DASU_STATUS_CONDITIONS[id];
   if (!status) return '';
 
-  return game.i18n.localize(status.label);
+  return game.i18n.localize(status.name);
+}
+
+/**
+ * Get localized label for a status condition (deprecated - use getStatusName)
+ * @param {string} id - The status condition ID
+ * @returns {string} The localized label or empty string if not found
+ * @deprecated Use getStatusName instead
+ */
+export function getStatusLabel(id) {
+  return getStatusName(id);
 }

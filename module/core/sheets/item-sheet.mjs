@@ -1,6 +1,6 @@
-import { prepareActiveEffectCategories } from '../helpers/effects.mjs';
-import DASU from '../helpers/config.mjs';
-import { registerHandlebarsHelpers } from '../helpers/helpers.mjs';
+import { prepareActiveEffectCategories } from '../../utils/effects.mjs';
+import DASU from '../../utils/config.mjs';
+import { registerHandlebarsHelpers } from '../../utils/helpers.mjs';
 registerHandlebarsHelpers();
 
 const { api, sheets } = foundry.applications;

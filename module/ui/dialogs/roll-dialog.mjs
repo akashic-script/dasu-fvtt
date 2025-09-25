@@ -4,7 +4,7 @@
  * Supports both attribute checks and skill checks with success-based rolling
  */
 
-import { DASUAttributeCheckV1 } from '../helpers/dasu-attribute-check.mjs';
+import { DASUAttributeCheckV1 } from '../../systems/rolling/dasu-attribute-check.mjs';
 
 export class DASURollDialog extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.api.ApplicationV2

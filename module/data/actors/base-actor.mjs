@@ -1,4 +1,4 @@
-import { SharedActorComponents } from './shared/components.mjs';
+import { SharedActorComponents } from '../shared/components.mjs';
 
 export default class BaseActorDataModel extends foundry.abstract.TypeDataModel {
   static LOCALIZATION_PREFIXES = ['DASU.Actor.base'];

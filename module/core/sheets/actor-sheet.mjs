@@ -1,9 +1,9 @@
-import { prepareActiveEffectCategories } from '../helpers/effects.mjs';
+import { prepareActiveEffectCategories } from '../../utils/effects.mjs';
 import { DASUSettings } from '../settings.mjs';
-import { registerHandlebarsHelpers } from '../helpers/helpers.mjs';
-import { LevelingWizard } from '../applications/leveling-wizard.mjs';
-import { DASURollDialog } from '../applications/roll-dialog.mjs';
-import { DASURecruitDialog } from '../applications/recruit-dialog.mjs';
+import { registerHandlebarsHelpers } from '../../utils/helpers.mjs';
+import { LevelingWizard } from '../../ui/applications/leveling-wizard.mjs';
+import { DASURollDialog } from '../../ui/dialogs/roll-dialog.mjs';
+import { DASURecruitDialog } from '../../ui/dialogs/recruit-dialog.mjs';
 
 registerHandlebarsHelpers();
 

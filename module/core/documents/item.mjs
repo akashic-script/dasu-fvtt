@@ -1,6 +1,6 @@
-import { slugify } from '../utils/slugify.mjs';
-import { DASUAccuracyRollV1 } from '../helpers/dasu-accuracy-check.mjs';
-import { DASUAccuracyDialog } from '../applications/accuracy-dialog.mjs';
+import { slugify } from '../../utils/slugify.mjs';
+import { DASUAccuracyRollV1 } from '../../systems/rolling/dasu-accuracy-check.mjs';
+import { DASUAccuracyDialog } from '../../ui/dialogs/accuracy-dialog.mjs';
 
 /**
  * Extend the base Item document by defining a custom roll data structure which is ideal for the Simple system.

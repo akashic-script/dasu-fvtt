@@ -1,5 +1,5 @@
 import BaseItemDataModel from './item-base.mjs';
-import { TaggableMixin } from './mixins/taggable.mjs';
+import { TaggableMixin } from '../mixins/taggable.mjs';
 
 if (!globalThis.DASU_TAGGABLE_TYPES) globalThis.DASU_TAGGABLE_TYPES = [];
 if (!globalThis.DASU_TAGGABLE_TYPES.includes('weapon'))

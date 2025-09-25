@@ -10,7 +10,7 @@
  *
  * Integrates with actor sheet and updates in real-time.
  */
-import DASUConfig from '../helpers/config.mjs';
+import DASUConfig from '../../utils/config.mjs';
 export class LevelingWizard extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.api.ApplicationV2
 ) {

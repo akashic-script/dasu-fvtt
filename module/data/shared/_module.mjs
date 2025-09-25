@@ -1,28 +1,28 @@
 // Actor Data Models
-export { default as BaseActorDataModel } from './base-actor.mjs';
-export { default as DaemonDataModel } from './actor-daemon.mjs';
-export { default as SummonerDataModel } from './actor-summoner.mjs';
+export { default as BaseActorDataModel } from '../actors/base-actor.mjs';
+export { default as DaemonDataModel } from '../actors/actor-daemon.mjs';
+export { default as SummonerDataModel } from '../actors/actor-summoner.mjs';
 
 // Item Data Models
-export { default as BaseItemDataModel } from './item-base.mjs';
-export { default as AbilityDataModel } from './item-ability.mjs';
-export { default as ItemDataModel } from './item-item.mjs';
-export { default as WeaponDataModel } from './item-weapon.mjs';
-export { default as TagDataModel } from './item-tag.mjs';
-export { default as TacticDataModel } from './item-tactic.mjs';
-export { default as SpecialDataModel } from './item-special.mjs';
-export { default as ScarDataModel } from './item-scar.mjs';
-export { default as SchemaDataModel } from './item-schema.mjs';
-export { default as FeatureDataModel } from './item-feature.mjs';
-export { default as ClassDataModel } from './item-class.mjs';
+export { default as BaseItemDataModel } from '../items/item-base.mjs';
+export { default as AbilityDataModel } from '../items/item-ability.mjs';
+export { default as ItemDataModel } from '../items/item-item.mjs';
+export { default as WeaponDataModel } from '../items/item-weapon.mjs';
+export { default as TagDataModel } from '../items/item-tag.mjs';
+export { default as TacticDataModel } from '../items/item-tactic.mjs';
+export { default as SpecialDataModel } from '../items/item-special.mjs';
+export { default as ScarDataModel } from '../items/item-scar.mjs';
+export { default as SchemaDataModel } from '../items/item-schema.mjs';
+export { default as FeatureDataModel } from '../items/item-feature.mjs';
+export { default as ClassDataModel } from '../items/item-class.mjs';
 
 // Shared Components
-export { SharedActorComponents } from './shared/components.mjs';
+export { SharedActorComponents } from './components.mjs';
 
 import {
   grantLevelingItem,
   revokeLevelingItems,
-} from '../applications/leveling-wizard.mjs';
+} from '../../ui/applications/leveling-wizard.mjs';
 
 Hooks.on('updateActor', async (actor, data, options, userId) => {
   if (!actor || !actor.system?.levelingData) return;

@@ -1,22 +1,22 @@
 // Import document classes.
-import { DASUActor } from './documents/actor.mjs';
-import { DASUItem } from './documents/item.mjs';
+import { DASUActor } from './core/documents/actor.mjs';
+import { DASUItem } from './core/documents/item.mjs';
 // Import sheet classes.
-import { DASUActorSheet } from './sheets/actor-sheet.mjs';
-import { DASUItemSheet } from './sheets/item-sheet.mjs';
+import { DASUActorSheet } from './core/sheets/actor-sheet.mjs';
+import { DASUItemSheet } from './core/sheets/item-sheet.mjs';
 // Import DataModel classes
-import * as models from './data/_module.mjs';
+import * as models from './data/shared/_module.mjs';
 // Import config
-import DASUConfig from './helpers/config.mjs';
+import DASUConfig from './utils/config.mjs';
 // Import settings
-import { DASUSettings } from './settings.mjs';
+import { DASUSettings } from './core/settings.mjs';
 // Import status conditions
-import { registerStatusConditions } from './data/status-conditions.mjs';
-import { registerHandlebarsHelpers } from './helpers/helpers.mjs';
+import { registerStatusConditions } from './data/shared/status-conditions.mjs';
+import { registerHandlebarsHelpers } from './utils/helpers.mjs';
 // Import roll system
-import { DASUAccuracyRollV1 } from './helpers/dasu-accuracy-check.mjs';
-import { DASUAttributeCheckV1 } from './helpers/dasu-attribute-check.mjs';
-import { DASURollDialog } from './applications/roll-dialog.mjs';
+import { DASUAccuracyRollV1 } from './systems/rolling/dasu-accuracy-check.mjs';
+import { DASUAttributeCheckV1 } from './systems/rolling/dasu-attribute-check.mjs';
+import { DASURollDialog } from './ui/dialogs/roll-dialog.mjs';
 
 const collections = foundry.documents.collections;
 const sheets = foundry.appv1.sheets;
@@ -320,9 +320,6 @@ Hooks.once('init', function () {
     label: 'DASU.SheetLabels.Item',
   });
 
-  // Register custom status conditions
-  registerStatusConditions();
-
   registerHandlebarsHelpers();
 });
 
@@ -359,6 +356,9 @@ Hooks.on('preUpdateActor', (actor, updateData, options, userId) => {
 /* -------------------------------------------- */
 
 Hooks.once('ready', function () {
+  // Register custom status conditions after localization is fully loaded
+  registerStatusConditions();
+
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on('hotbarDrop', (bar, data, slot) => createDocMacro(data, slot));
 });

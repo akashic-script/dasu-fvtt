@@ -1,5 +1,5 @@
 // Feature Data Model for Daemon Summoner system
-import BaseItemDataModel from './base-item.mjs';
+import BaseItemDataModel from './item-base.mjs';
 
 export default class FeatureDataModel extends BaseItemDataModel {
   static defineSchema() {

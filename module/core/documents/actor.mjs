@@ -1,5 +1,5 @@
-import { slugify } from '../utils/slugify.mjs';
-import { SharedActorComponents } from '../data/shared/components.mjs';
+import { slugify } from '../../utils/slugify.mjs';
+import { SharedActorComponents } from '../../data/shared/components.mjs';
 import { DASUSettings } from '../settings.mjs';
 
 /**

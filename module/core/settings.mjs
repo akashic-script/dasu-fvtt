@@ -2,7 +2,7 @@
  * DASU System Settings
  * Centralized configuration for all game system settings
  */
-import { GameRulesForm } from './applications/settings/game-rules.mjs';
+import { GameRulesForm } from '../ui/applications/settings/game-rules.mjs';
 
 export class DASUSettings {
   /**
