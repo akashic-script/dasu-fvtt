@@ -57,10 +57,10 @@
       "paths": ["css", "lang", "templates"]
     }
   },
-  "url": "{{URL}}",
+  "url": "#{URL}#",
   "license": "LICENSE.txt",
   "readme": "README.md",
-  "bugs": "{{URL}}/issues",
+  "bugs": "#{{URL}}#/issues",
   "changelog": "CHANGELOG.md",
   "media": [
     {
@@ -69,10 +69,11 @@
       "thumbnail": "systems/dasu/assets/anvil-impact.png"
     }
   ],
-  "version": "{{VERSION}}",
+  "version": "#{VERSION}#",
   "compatibility": {
-    "minimum": "13.348",
-    "verified": "13.348"
+    "minimum": "13",
+    "verified": "13",
+    "maximum": "13"
   },
   "esmodules": ["module/dasu.mjs"],
   "styles": ["css/dasu.css"],
@@ -98,8 +99,8 @@
   ],
   "packFolders": [],
   "socket": false,
-  "manifest": "{{MANIFEST}}",
-  "download": "{{DOWNLOAD}}",
+  "manifest": "#{MANIFEST}#",
+  "download": "#{DOWNLOAD}#",
   "background": "systems/dasu/assets/anvil-impact.png",
   "grid": {
     "type": 1,
