@@ -7,13 +7,7 @@ const yaml = false;
 
 const packs = await fs.readdir('./packs');
 for (const pack of packs) {
-  if (pack === '.gitattributes' || pack === '.gitkeep') continue;
-
-  // Skip non-directories
-  const packPath = `./packs/${pack}`;
-  const stat = await fs.stat(packPath);
-  if (!stat.isDirectory()) continue;
-
+  if (pack === '.gitattributes') continue;
   console.log('Unpacking ' + pack);
   const directory = `./src/packs/${pack}`;
   try {
@@ -24,19 +18,14 @@ for (const pack of packs) {
     if (error.code === 'ENOENT') console.log('No files inside of ' + pack);
     else console.log(error);
   }
-
-  try {
-    await extractPack(
-      `${MODULE_ID}/packs/${pack}`,
-      `${MODULE_ID}/src/packs/${pack}`,
-      {
-        yaml,
-        transformName,
-      }
-    );
-  } catch (error) {
-    console.error(`Error unpacking ${pack}:`, error);
-  }
+  await extractPack(
+    `${MODULE_ID}/packs/${pack}`,
+    `${MODULE_ID}/src/packs/${pack}`,
+    {
+      yaml,
+      transformName,
+    }
+  );
 }
 /**
  * Prefaces the document with its type
