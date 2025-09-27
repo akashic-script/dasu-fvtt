@@ -64,11 +64,6 @@
 }
 
 /* Context Menu Styles */
-.item-context-menu {
-  position: relative;
-  display: inline-block;
-}
-
 .context-menu-toggle {
   padding: 0.25rem 0.5rem;
   background: none;
@@ -82,52 +77,6 @@
 .context-menu-toggle:hover {
   background-color: var(--color-primary);
   color: var(--color-text-primary);
-}
-
-.context-menu-dropdown {
-  position: fixed;
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  border-radius: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  z-index: 99999;
-  min-width: 180px;
-  overflow: hidden;
-  padding: 0.25rem 0;
-}
-
-.context-menu-item {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  text-decoration: none;
-  color: var(--color-text-primary);
-  transition: background-color 0.2s ease;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.context-menu-item:last-child {
-  border-bottom: none;
-}
-
-.context-menu-item:hover {
-  background-color: var(--color-bg-secondary);
-}
-
-.context-menu-item i {
-  margin-right: 0.75rem;
-  width: 1rem;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.context-menu-item.active {
-  color: var(--color-primary);
-}
-
-.context-menu-item.item-delete:hover {
-  background-color: rgba(220, 53, 69, 0.1);
-  color: var(--color-danger);
 }
 
 /* Search Field */
@@ -251,59 +200,51 @@
 
 /* Filter Dropdown */
 .items-list .items-filter-dropdown {
-  display: none !important;
+  display: none;
   position: fixed;
-  top: auto;
-  right: auto;
-  margin-top: 0.25rem;
   min-width: 150px;
   padding: 0;
-  background: var(--color-bg-primary) !important;
+  background: var(--color-bg-primary);
   border: 1px solid var(--color-border);
   border-radius: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  backdrop-filter: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 99999;
   font-size: 0.92em;
 }
 
 .items-list .items-filter-dropdown.visible {
-  display: block !important;
+  display: block;
 }
 
 /* Items Tab Filter Dropdown */
 .items-list .items-tab-filter-dropdown {
-  display: none !important;
+  display: none;
   position: fixed;
-  top: auto;
-  right: auto;
-  margin-top: 0.25rem;
   min-width: 150px;
   padding: 0;
-  background: var(--color-bg-primary) !important;
+  background: var(--color-bg-primary);
   border: 1px solid var(--color-border);
   border-radius: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  backdrop-filter: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 99999;
   font-size: 0.92em;
 }
 
 .items-list .items-tab-filter-dropdown.visible {
-  display: block !important;
+  display: block;
 }
 
 /* Filtered out items and headers */
 .items-list .item-list.filtered-out,
 .items-list .item-list.filtered-out * {
-  display: none !important;
-  visibility: hidden !important;
+  display: none;
+  visibility: hidden;
 }
 
 .items-list .items-header.filtered-out,
 .items-list .items-header.filtered-out * {
-  display: none !important;
-  visibility: hidden !important;
+  display: none;
+  visibility: hidden;
 }
 
 .items-list .filter-header {
@@ -441,7 +382,7 @@
   display: flex;
   justify-content: space-between;
   cursor: pointer;
-  border-left: none !important;
+  border-left: none;
 }
 
 /* Prevent hover effects on item headers */
@@ -526,13 +467,11 @@
 /* Favorite Button Styling */
 .items-list .item-controls .item-favorite {
   color: var(--dasu-c-faint);
-  /* transition: all 0.2s ease; */
 }
 
 .items-list .item-controls .item-favorite:hover {
   color: var(--dasu-c-primary);
   background: var(--color-bg-secondary);
-  /* transform: scale(1.1); */
 }
 
 .items-list .item-controls .item-favorite.active {
@@ -585,7 +524,6 @@
 .items-list .item {
   display: flex;
   align-items: center;
-  /* gap: 8px; */
   padding: 2px 6px;
   border-left: 4px solid var(--color-border);
   border-radius: 0;
@@ -861,28 +799,6 @@
   color: var(--dasu-c-success);
 }
 
-/* Placeholder item styling for empty stocks */
-.placeholder-item {
-  padding: 1rem;
-  text-align: center;
-  color: var(--dasu-c-faint);
-  font-style: italic;
-  border: 2px dashed var(--color-border);
-  border-radius: 0;
-  margin: 0.5rem 0;
-  background: rgba(0, 0, 0, 0.02);
-}
-
-.placeholder-item .item-name {
-  justify-content: center;
-  font-size: 14px;
-}
-
-.placeholder-item .item-name i {
-  margin-right: 0.5rem;
-  color: var(--dasu-c-primary);
-}
-
 /* Summoned Daemons Section (Main Tab) */
 
 .summoned-daemons .section-header {
@@ -975,12 +891,10 @@
 /* Independent scrolling for main tab layout - only affects main tab */
 .tab.main .sidebar {
   overflow-y: auto;
-  /* height: calc(100vh - 300px); */
 }
 
 .tab.main .main-content {
   overflow-y: auto;
-  /* height: calc(100vh - 300px); */
   padding-left: 0.5rem;
 }
 
@@ -1360,101 +1274,53 @@
   opacity: 0.8;
 }
 
-.items-list .items-sort-dropdown {
-  display: none !important;
-  position: fixed;
-  top: auto;
-  right: auto;
-  margin-top: 0.25rem;
-  min-width: 150px;
-  padding: 0;
-  background: var(--color-bg-primary) !important;
-  border: 1px solid var(--color-border);
-  border-radius: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  backdrop-filter: none;
-  font-size: 0.92em;
-}
-
-.items-list .items-sort-dropdown.visible {
-  display: block !important;
-}
-
-/* Items Tab Sort Button */
-
-/* Items Tab Sort Dropdown */
-.items-list .items-tab-sort-dropdown {
-  display: none !important;
-  position: fixed;
-  top: auto;
-  right: auto;
-  margin-top: 0.25rem;
-  min-width: 150px;
-  padding: 0;
-  background: var(--color-bg-primary) !important;
-  border: 1px solid var(--color-border);
-  border-radius: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  backdrop-filter: none;
-  font-size: 0.92em;
-}
-
-.items-list .items-tab-sort-dropdown.visible {
-  display: block !important;
-}
-
-.items-list .sort-header {
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-bg-secondary);
-  font-weight: 600;
-  font-size: 0.95em;
-  color: var(--dasu-c-dark);
-}
-
-.items-list .sort-options {
-  display: flex;
-  flex-direction: column;
-  padding: 0.25rem 0.25rem 0.25rem 0.25rem;
-  background: var(--color-bg-primary);
-}
-
-.items-list .sort-option {
-  background: none;
-  border: none;
-  color: var(--color-text);
-  cursor: pointer;
-  font-size: 0.92em;
-  padding: 0.35rem 0.5rem;
-  text-align: left;
-  border-radius: 0;
-  transition: all 0.2s ease;
-  min-height: 1.7em;
-}
-
-.items-list .sort-option:hover,
-.items-list .sort-option.active {
-  background: var(--color-bg-secondary);
+/* Special item states */
+nav#context-menu[class*='dasu-context-menu'] .context-item.active {
   color: var(--color-primary);
+  font-weight: 500;
+}
+nav#context-menu[class*='dasu-context-menu'] .context-item.destructive:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--color-danger);
+}
+nav#context-menu[class*='dasu-context-menu']
+  .context-item.success
+  .fas.fa-check {
+  margin-left: auto;
+  color: var(--color-success);
+  font-size: 0.8em;
+}
+nav#context-menu[class*='dasu-context-menu'] .context-item.favorited i {
+  color: #ffd700;
+}
+nav#context-menu[class*='dasu-context-menu'] .context-item.favorited:hover i {
+  color: #ffed4e;
+}
+nav#context-menu[class*='dasu-context-menu'] .context-item.separator {
+  border-top: 1px solid var(--color-border);
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+}
+nav#context-menu[class*='dasu-context-menu'] .context-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+nav#context-menu[class*='dasu-context-menu'] .context-item.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+nav#context-menu[class*='dasu-context-menu'] .context-item.loading i {
+  animation: spin 1s linear infinite;
 }
 
-.items-list .sort-option.clear-sort {
-  color: var(--color-text-secondary);
-  font-style: italic;
-}
-
-.items-list .sort-option.clear-sort:hover {
-  color: var(--color-primary);
-  background: var(--color-bg-secondary);
-}
-
-.items-list .sort-separator {
-  height: 1px;
-  background: var(--color-border);
-  margin: 0.25rem 0;
-  width: 100%;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .items-list .item.summoned-daemon {
@@ -1507,17 +1373,17 @@
 
 /* Add left border to items containing innate badge */
 .items-list .item:has(.innate-badge) {
-  border-left: 4px solid #06b6d4 !important;
+  border-left: 4px solid #06b6d4;
 }
 
-/* Leveling-granted items styling - use purple/violet color */
+/* Leveling-granted items styling */
 .items-list .item:has(.fa-eye):not(:has(.innate-badge)):not(.daemon-derived) {
   border-left: 4px solid var(--dasu-c-success);
 }
 
 /* Daemon-derived items styling - use orange color */
 .items-list .item.daemon-derived {
-  border-left: 4px solid var(--color-secondary-highlight) !important;
+  border-left: 4px solid var(--color-secondary-highlight);
 }
 
 /* =========================
@@ -1533,9 +1399,7 @@
 .daemon-stats-row {
   display: flex;
   gap: 0.25rem;
-  /* padding: 0.25rem 0.5rem; */
   background: var(--color-bg-secondary);
-  /* border-top: 1px solid var(--color-border); */
   margin-top: 0.2rem;
   justify-content: space-evenly;
 }
@@ -1551,7 +1415,6 @@
   border-radius: 0;
   padding: 0.2rem 0.3rem;
   flex: 1;
-  /* min-width: 0; */
   text-align: center;
 }
 
@@ -1610,7 +1473,7 @@
 }
 
 .dasu.item .tab.active {
-  display: block !important;
+  display: block;
   height: 100%;
   overflow-y: auto;
 }

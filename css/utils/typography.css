@@ -58,18 +58,6 @@
     font-weight: 500;
     margin-bottom: 0.5rem;
   } */
-} */
-
-/* Fallback for browsers that don't support nested CSS */
-/* .window-content h1, .window-content h2, .window-content h3, .window-content h4, .window-content h5, .window-content h6,
-.message-content h1, .message-content h2, .message-content h3, .message-content h4, .message-content h5, .message-content h6,
-.journal-entry h1, .journal-entry h2, .journal-entry h3, .journal-entry h4, .journal-entry h5, .journal-entry h6,
-.chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5, .chat-message h6,
-.prosemirror h1, .prosemirror h2, .prosemirror h3, .prosemirror h4, .prosemirror h5, .prosemirror h6,
-.editor-content h1, .editor-content h2, .editor-content h3, .editor-content h4, .editor-content h5, .editor-content h6 {
-  color: var(--color-text-primary);
-  font-family: var(--font-primary);
-} */
 
 /* More specific targeting for chat message content */
 /* .chat-message .message-content h1,

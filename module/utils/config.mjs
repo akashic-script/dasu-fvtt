@@ -341,9 +341,6 @@ DASU.calculateLevelGains = function (level, actor = null) {
   return gains;
 };
 
-// Legacy table for backward compatibility (can be removed later)
-DASU.levelSummonerTable = [];
-
 // Specific to daemon actor type
 DASU.levelDaemonTable = [];
 // From level 1 to 30

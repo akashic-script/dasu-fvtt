@@ -192,13 +192,3 @@ export function getStatusName(id) {
 
   return game.i18n.localize(status.name);
 }
-
-/**
- * Get localized label for a status condition (deprecated - use getStatusName)
- * @param {string} id - The status condition ID
- * @returns {string} The localized label or empty string if not found
- * @deprecated Use getStatusName instead
- */
-export function getStatusLabel(id) {
-  return getStatusName(id);
-}

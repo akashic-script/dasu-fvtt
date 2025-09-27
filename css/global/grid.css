@@ -5,7 +5,6 @@
   grid-column: span 2 / span 2;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  /* margin: 10px 0; */
   padding: 0;
 }
 
@@ -14,8 +13,6 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-/* UNUSED: Extended grid classes - only grid-2col and grid-3col are used in templates */
-/*
 .grid-4col {
   grid-column: span 4 / span 4;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -69,8 +66,6 @@
 .grid-start-3 {
   grid-column-start: 3;
 }
-/* UNUSED: Extended grid start classes - only grid-start-2 and grid-start-3 are used */
-/*
 .grid-start-4 {
   grid-column-start: 4;
 }
@@ -106,8 +101,6 @@
 .grid-span-3 {
   grid-column-end: span 3;
 }
-/* UNUSED: Extended grid span classes - only grid-span-1 and grid-span-2 are used */
-/*
 .grid-span-4 {
   grid-column-end: span 4;
 }
@@ -135,4 +128,3 @@
 .grid-span-12 {
   grid-column-end: span 12;
 }
-*/

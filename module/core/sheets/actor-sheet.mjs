@@ -42,7 +42,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       toggleFavorite: this._toggleFavorite,
       toggleFavoriteFilter: this._toggleFavoriteFilter,
       toggleDescription: this._toggleDescription,
-      toggleContextMenu: this._toggleContextMenu,
       roll: this._onRoll,
       increaseAttribute: this._increaseAttribute,
       decreaseAttribute: this._decreaseAttribute,
@@ -1191,48 +1190,22 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         itemsTabFilterBtn.classList.remove('active');
       }
     }
-
-    // Handle main tab sort dropdown
-    const sortDropdown = this.element.querySelector('.items-sort-dropdown');
-    const sortBtn = this.element.querySelector('.items-sort-btn');
-    if (sortDropdown && sortDropdown.classList.contains('visible')) {
-      if (
-        !sortDropdown.contains(clickedElement) &&
-        !sortBtn.contains(clickedElement)
-      ) {
-        sortDropdown.classList.remove('visible');
-        sortBtn.classList.remove('active');
-      }
-    }
-
-    // Handle items tab sort dropdown
-    const itemsTabSortDropdown = this.element.querySelector(
-      '.items-tab-sort-dropdown'
-    );
-    const itemsTabSortBtn = this.element.querySelector('.items-tab-sort-btn');
-    if (
-      itemsTabSortDropdown &&
-      itemsTabSortDropdown.classList.contains('visible')
-    ) {
-      if (
-        !itemsTabSortDropdown.contains(clickedElement) &&
-        !itemsTabSortBtn.contains(clickedElement)
-      ) {
-        itemsTabSortDropdown.classList.remove('visible');
-        itemsTabSortBtn.classList.remove('active');
-      }
-    }
   }
 
   /**
    * Apply type filter
    * @param {HTMLElement} dropdown The filter dropdown
+   * @param {boolean} closeDropdown Whether to close the dropdown after applying filter
    * @private
    */
-  _applyTypeFilter(dropdown) {
-    const selectedTypes = Array.from(
-      dropdown.querySelectorAll('input[type="checkbox"]:checked')
-    ).map((cb) => cb.value);
+  _applyTypeFilter(dropdown, closeDropdown = true) {
+    const checkboxes = dropdown.querySelectorAll(
+      'input[type="checkbox"]:checked'
+    );
+    const selectedTypes = Array.from(checkboxes).map((cb) => {
+      // Check if checkbox uses 'value' or 'name' attribute
+      return cb.value || cb.name;
+    });
 
     // Store filter state
     this._typeFilterState = selectedTypes;
@@ -1249,11 +1222,15 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     // Apply filter to items immediately
     this._filterItemsByType(selectedTypes);
 
-    // Hide dropdown and reset positioning
-    dropdown.classList.remove('visible');
-    dropdown.style.top = '';
-    dropdown.style.right = '';
-    this.element.querySelector('.items-filter-btn').classList.remove('active');
+    // Hide dropdown and reset positioning only if requested
+    if (closeDropdown) {
+      dropdown.classList.remove('visible');
+      dropdown.style.top = '';
+      dropdown.style.right = '';
+      this.element
+        .querySelector('.items-filter-btn')
+        .classList.remove('active');
+    }
   }
 
   /**
@@ -1789,64 +1766,6 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     const toggleIcon = itemElement.querySelector('.description-toggle-icon');
     if (toggleIcon) {
       toggleIcon.classList.toggle('expanded', !isVisible);
-    }
-  }
-
-  /**
-   * Toggle the context menu dropdown for an item
-   * @param {Event} event   The originating click event
-   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
-   * @private
-   */
-  static async _toggleContextMenu(event, target) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    // Close other open menus
-    document.querySelectorAll('.context-menu-dropdown').forEach((menu) => {
-      if (menu.style.display === 'block') menu.style.display = 'none';
-    });
-
-    const contextMenu = target.closest('.item-context-menu');
-    const dropdown = contextMenu?.querySelector('.context-menu-dropdown');
-    if (!dropdown) return;
-
-    const isVisible = dropdown.style.display === 'block';
-    if (isVisible) {
-      dropdown.style.display = 'none';
-    } else {
-      const rect = target.getBoundingClientRect();
-      const dropdownWidth = 180;
-
-      // Measure actual height
-      dropdown.style.cssText = 'display: block; visibility: hidden;';
-      const dropdownHeight = dropdown.offsetHeight;
-      dropdown.style.visibility = '';
-
-      // Calculate position
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
-
-      const top =
-        spaceBelow < dropdownHeight && spaceAbove > spaceBelow
-          ? rect.top - dropdownHeight
-          : rect.bottom;
-      const left = Math.max(0, rect.right - dropdownWidth);
-
-      Object.assign(dropdown.style, {
-        top: `${top}px`,
-        left: `${left}px`,
-        display: 'block',
-      });
-
-      // Add click outside listener to close the menu
-      const closeMenu = (e) => {
-        if (!contextMenu.contains(e.target)) {
-          dropdown.style.display = 'none';
-          document.removeEventListener('click', closeMenu);
-        }
-      };
-      setTimeout(() => document.addEventListener('click', closeMenu), 0);
     }
   }
 
@@ -2539,119 +2458,354 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /**
-   * Setup sort button and dropdown functionality
+   * Setup Foundry ContextMenu for sort button
    * @param {string} btnSelector CSS selector for the sort button
-   * @param {string} dropdownSelector CSS selector for the sort dropdown
-   * @param {string} filterBtnSelector CSS selector for the filter button
-   * @param {string} filterDropdownSelector CSS selector for the filter dropdown
+   * @param {string} filterBtnSelector CSS selector for the filter button (to close when opening sort)
+   * @param {string} filterDropdownSelector CSS selector for the filter dropdown (to close when opening sort)
    * @private
    */
-  _setupSortButton(
-    btnSelector,
-    dropdownSelector,
-    filterBtnSelector,
-    filterDropdownSelector
-  ) {
+  _setupSortButton(btnSelector, filterBtnSelector, filterDropdownSelector) {
     const sortBtn = this.element.querySelector(btnSelector);
-    const sortDropdown = this.element.querySelector(dropdownSelector);
     const filterBtn = this.element.querySelector(filterBtnSelector);
     const filterDropdown = this.element.querySelector(filterDropdownSelector);
 
-    if (!sortBtn || !sortDropdown) return;
+    if (!sortBtn) return;
 
-    // Sort button click handler
-    sortBtn.addEventListener('click', (event) => {
-      event.stopPropagation();
-      event.preventDefault();
+    // Define sort options for the context menu
+    const sortMenuOptions = [
+      {
+        name: 'DASU.Sort.AlphabeticalAsc',
+        icon: '<i class="fas fa-sort-alpha-down"></i>',
+        callback: () => this._handleSortOption('alpha-asc'),
+      },
+      {
+        name: 'DASU.Sort.AlphabeticalDesc',
+        icon: '<i class="fas fa-sort-alpha-up"></i>',
+        callback: () => this._handleSortOption('alpha-desc'),
+      },
+      {
+        name: 'DASU.Sort.AptitudeAsc',
+        icon: '<i class="fas fa-sort-numeric-down"></i>',
+        callback: () => this._handleSortOption('aptitude-asc'),
+      },
+      {
+        name: 'DASU.Sort.AptitudeDesc',
+        icon: '<i class="fas fa-sort-numeric-up"></i>',
+        callback: () => this._handleSortOption('aptitude-desc'),
+      },
+      {
+        name: 'DASU.Sort.ClearSort',
+        icon: '<i class="fas fa-times"></i>',
+        callback: () => this._clearSortState(),
+      },
+    ];
 
-      // Close filter dropdown if open
-      if (filterDropdown && filterDropdown.classList.contains('visible')) {
-        filterDropdown.classList.remove('visible');
-        filterBtn?.classList.remove('active');
-      }
-
-      // Toggle sort dropdown
-      const isVisible = sortDropdown.classList.contains('visible');
-      if (isVisible) {
-        sortDropdown.classList.remove('visible');
-        sortBtn.classList.remove('active');
-      } else {
-        // Position dropdown
-        const rect = sortBtn.getBoundingClientRect();
-        sortDropdown.style.top = `${rect.bottom + 5}px`;
-        sortDropdown.style.right = `${window.innerWidth - rect.right}px`;
-        sortDropdown.classList.add('visible');
-        sortBtn.classList.add('active');
-      }
-    });
-
-    // Sort option clicks
-    sortDropdown.addEventListener('click', (event) => {
-      const sortOption = event.target.closest('.sort-option');
-      if (sortOption) {
-        const sortType = sortOption.dataset.sort;
-        if (sortType) {
-          if (sortType === 'clear') {
-            this._clearSortState();
-          } else {
-            this._handleSortOption(sortType);
+    // Initialize Foundry ContextMenu for sort button
+    new foundry.applications.ux.ContextMenu.implementation(
+      this.element,
+      btnSelector,
+      sortMenuOptions,
+      {
+        eventName: 'click',
+        jQuery: false,
+        onOpen: (menu) => {
+          // Close filter dropdown if open
+          if (filterDropdown && filterDropdown.classList.contains('visible')) {
+            filterDropdown.classList.remove('visible');
+            filterBtn?.classList.remove('active');
           }
-          // Close dropdown
-          sortDropdown.classList.remove('visible');
+
+          // Add active state to sort button
+          sortBtn.classList.add('active');
+        },
+        onClose: () => {
+          // Remove active state from sort button
           sortBtn.classList.remove('active');
-        }
+
+          // Remove context menu theming
+          this._removeContextMenuTheme();
+        },
+        fixed: true,
       }
-    });
+    );
   }
 
   /**
-   * Setup filter button functionality
+   * Setup filter button using DialogV2 for a better user interface
    * @param {string} btnSelector CSS selector for the filter button
-   * @param {string} dropdownSelector CSS selector for the filter dropdown
-   * @param {string} sortBtnSelector CSS selector for the sort button
-   * @param {string} sortDropdownSelector CSS selector for the sort dropdown
+   * @param {string} sortBtnSelector CSS selector for the sort button (to close)
    * @private
    */
-  _setupFilterButton(
-    btnSelector,
-    dropdownSelector,
-    sortBtnSelector,
-    sortDropdownSelector
-  ) {
+  _setupFilterButton(btnSelector, sortBtnSelector) {
     const filterBtn = this.element.querySelector(btnSelector);
-    const filterDropdown = this.element.querySelector(dropdownSelector);
     const sortBtn = this.element.querySelector(sortBtnSelector);
-    const sortDropdown = this.element.querySelector(sortDropdownSelector);
 
-    if (!filterBtn || !filterDropdown) return;
+    if (!filterBtn) return;
 
+    // Setup click handler to open DialogV2
     filterBtn.addEventListener('click', (event) => {
       event.stopPropagation();
       event.preventDefault();
 
-      // Close sort dropdown if open
-      if (sortDropdown && sortDropdown.classList.contains('visible')) {
-        sortDropdown.classList.remove('visible');
-        sortBtn?.classList.remove('active');
+      // Close sort context menu if open
+      const sortContextMenu = document.querySelector('nav#context-menu');
+      if (sortContextMenu) {
+        sortContextMenu.remove();
+      }
+      if (sortBtn) {
+        sortBtn.classList.remove('active');
       }
 
-      // Toggle filter dropdown
-      const isVisible = filterDropdown.classList.contains('visible');
-      if (isVisible) {
-        filterDropdown.classList.remove('visible');
-        filterBtn.classList.remove('active');
-      } else {
-        // Position dropdown
-        const rect = filterBtn.getBoundingClientRect();
-        filterDropdown.style.top = `${rect.bottom + 5}px`;
-        filterDropdown.style.right = `${window.innerWidth - rect.right}px`;
-        filterDropdown.classList.add('visible');
-        filterBtn.classList.add('active');
+      // Open filter dialog
+      this._openFilterDialog();
+    });
+  }
 
-        // Sync checkbox states with current filter state
-        this._syncCheckboxStates();
+  /**
+   * Open the filter dialog using DialogV2
+   * @private
+   */
+  async _openFilterDialog() {
+    const allTypes = [
+      'weapon',
+      'tag',
+      'technique',
+      'spell',
+      'affliction',
+      'restorative',
+      'tactic',
+      'special',
+      'scar',
+      'schema',
+      'feature',
+      'class',
+    ];
+    const visibleTypes =
+      this.actor.getFlag('dasu', 'itemFilterState') || allTypes;
+
+    const filterTypes = [
+      { value: 'weapon', name: 'DASU.Filter.Weapons', icon: 'fas fa-sword' },
+      { value: 'tag', name: 'DASU.Filter.Tags', icon: 'fas fa-tag' },
+      {
+        value: 'technique',
+        name: 'DASU.Filter.Techniques',
+        icon: 'fas fa-fist-raised',
+      },
+      { value: 'spell', name: 'DASU.Filter.Spells', icon: 'fas fa-magic' },
+      {
+        value: 'affliction',
+        name: 'DASU.Filter.Afflictions',
+        icon: 'fas fa-skull',
+      },
+      {
+        value: 'restorative',
+        name: 'DASU.Filter.Restoratives',
+        icon: 'fas fa-heart',
+      },
+      { value: 'tactic', name: 'DASU.Filter.Tactics', icon: 'fas fa-chess' },
+      { value: 'special', name: 'DASU.Filter.Specials', icon: 'fas fa-star' },
+      { value: 'scar', name: 'DASU.Filter.Scars', icon: 'fas fa-scar' },
+      { value: 'schema', name: 'DASU.Filter.Schemas', icon: 'fas fa-cube' },
+      { value: 'feature', name: 'DASU.Filter.Features', icon: 'fas fa-gem' },
+      {
+        value: 'class',
+        name: 'DASU.Filter.Classes',
+        icon: 'fas fa-graduation-cap',
+      },
+    ];
+
+    // Generate checkboxes HTML
+    const checkboxes = filterTypes
+      .map((type) => {
+        const isVisible = visibleTypes.includes(type.value);
+        return `
+        <label class="filter-option" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem; cursor: pointer; border-radius: 0; transition: all 0.2s ease; margin-bottom: 0.25rem;">
+          <input type="checkbox" name="${type.value}" ${
+          isVisible ? 'checked' : ''
+        } style="margin-right: 0.5rem;">
+          <i class="${type.icon}" style="width: 16px; text-align: center;"></i>
+          <span>${game.i18n.localize(type.name)}</span>
+        </label>
+      `;
+      })
+      .join('');
+
+    const content = `
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <h3 style="margin: 0; font-size: 1rem; color: var(--dasu-c-dark);">${game.i18n.localize(
+            'DASU.Filter.Title'
+          )}</h3>
+          <button type="button" id="select-all-toggle" style="background: none; border: 1px solid var(--color-primary); color: var(--color-primary); padding: 0.25rem 0.5rem; cursor: pointer; border-radius: 0; font-size: 0.8rem;">
+            ${game.i18n.localize('DASU.Filter.SelectAll')}
+          </button>
+        </div>
+        <div style="max-height: 300px; overflow-y: auto; padding: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg-primary);">
+          ${checkboxes}
+        </div>
+      </div>
+    `;
+
+    const dialog = new foundry.applications.api.DialogV2({
+      window: {
+        title: game.i18n.localize('DASU.Filter.Title'),
+        icon: 'fas fa-filter',
+      },
+      content: content,
+      buttons: [
+        {
+          action: 'apply',
+          label: game.i18n.localize('DASU.Filter.Apply'),
+          default: true,
+          callback: (_, button) => this._applyFilterDialog(button.form),
+        },
+        {
+          action: 'clear',
+          label: game.i18n.localize('DASU.Filter.Clear'),
+          callback: (_, __, dialog) => {
+            // Clear all filters
+            this._clearAllFilters();
+
+            // Update dialog checkboxes to show all are selected
+            const checkboxes = dialog.element.querySelectorAll(
+              'input[type="checkbox"]'
+            );
+            checkboxes.forEach((cb) => (cb.checked = true));
+
+            // Update select all button text
+            const selectAllBtn =
+              dialog.element.querySelector('#select-all-toggle');
+            if (selectAllBtn) {
+              selectAllBtn.textContent = game.i18n.localize(
+                'DASU.Filter.DeselectAll'
+              );
+            }
+
+            // Return false to prevent dialog from closing
+            return false;
+          },
+        },
+        {
+          action: 'cancel',
+          label: game.i18n.localize('Cancel'),
+          callback: () => {}, // Just close the dialog
+        },
+      ],
+      modal: true,
+      position: {
+        width: 400,
+        height: 'auto',
+      },
+    });
+
+    const result = await dialog.render(true);
+
+    // Setup select all toggle after dialog renders
+    setTimeout(() => {
+      const selectAllBtn = dialog.element.querySelector('#select-all-toggle');
+      const checkboxes = dialog.element.querySelectorAll(
+        'input[type="checkbox"]'
+      );
+
+      if (selectAllBtn && checkboxes.length > 0) {
+        // Update button text based on current state
+        const updateSelectAllButton = () => {
+          const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
+          selectAllBtn.textContent = allChecked
+            ? game.i18n.localize('DASU.Filter.DeselectAll')
+            : game.i18n.localize('DASU.Filter.SelectAll');
+        };
+
+        // Initial button text
+        updateSelectAllButton();
+
+        // Handle select all click
+        selectAllBtn.addEventListener('click', () => {
+          const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
+          checkboxes.forEach((cb) => (cb.checked = !allChecked));
+          updateSelectAllButton();
+        });
+
+        // Update button text when individual checkboxes change
+        checkboxes.forEach((cb) => {
+          cb.addEventListener('change', () => {
+            updateSelectAllButton();
+            // Apply filter immediately when checkbox changes
+            this._applyFilterDialog(dialog.element.querySelector('form'));
+          });
+        });
+      }
+    }, 50);
+
+    return result;
+  }
+
+  /**
+   * Apply filter settings from dialog form
+   * @param {HTMLFormElement} form The dialog form
+   * @private
+   */
+  _applyFilterDialog(form) {
+    const formData = new FormData(form);
+    const checkedTypes = [];
+
+    // Process all checkbox values
+    const allTypes = [
+      'weapon',
+      'tag',
+      'technique',
+      'spell',
+      'affliction',
+      'restorative',
+      'tactic',
+      'special',
+      'scar',
+      'schema',
+      'feature',
+      'class',
+    ];
+
+    allTypes.forEach((type) => {
+      if (formData.has(type)) {
+        checkedTypes.push(type);
       }
     });
+
+    // Store filter state using the same mechanism as dropdown approach
+    this._typeFilterState = checkedTypes;
+
+    // Save filter state to actor data for persistence (same as dropdown approach)
+    this.actor
+      .update({
+        'flags.dasu.itemFilterState': checkedTypes,
+      })
+      .catch((error) => {
+        console.error('Error saving filter state:', error);
+      });
+
+    // Apply filter to items immediately using the existing method
+    this._filterItemsByType(checkedTypes);
+  }
+
+  /**
+   * Clear all filters (show all types)
+   * @private
+   */
+  _clearAllFilters() {
+    // Clear filter state using the same mechanism as dropdown approach
+    this._typeFilterState = null;
+
+    // Clear persisted filter state from actor data
+    this.actor
+      .update({
+        'flags.dasu.itemFilterState': null,
+      })
+      .catch((error) => {
+        console.error('Error clearing filter state:', error);
+      });
+
+    // Show all items by calling the existing method
+    this._resetItemsDisplay();
   }
 
   /**
@@ -2677,6 +2831,16 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       } else if (currentBtn.classList.contains('clear-filter-btn')) {
         this._handleClearFilter(event);
       }
+    });
+
+    // Add checkbox change listeners for immediate filtering
+    const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', (event) => {
+        event.stopPropagation();
+        // Apply filter immediately when checkbox state changes, but don't close dropdown
+        this._applyTypeFilter(dropdown, false);
+      });
     });
 
     // Also add individual listeners as backup
@@ -2814,28 +2978,19 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     // Setup sort and filter buttons
     this._setupSortButton(
       '.items-sort-btn',
-      '.items-sort-dropdown',
       '.items-filter-btn',
       '.items-filter-dropdown'
     );
-    this._setupFilterButton(
-      '.items-filter-btn',
-      '.items-filter-dropdown',
-      '.items-sort-btn',
-      '.items-sort-dropdown'
-    );
+    this._setupFilterButton('.items-filter-btn', '.items-sort-btn');
     this._setupSortButton(
       '.items-tab-sort-btn',
-      '.items-tab-sort-dropdown',
       '.items-tab-filter-btn',
       '.items-tab-filter-dropdown'
     );
-    this._setupFilterButton(
-      '.items-tab-filter-btn',
-      '.items-tab-filter-dropdown',
-      '.items-tab-sort-btn',
-      '.items-tab-sort-dropdown'
-    );
+    this._setupFilterButton('.items-tab-filter-btn', '.items-tab-sort-btn');
+
+    // Setup item context menus
+    this._setupItemContextMenus();
 
     // Set up mutation observer to watch for DOM changes
     if (!this._mutationObserver) {
@@ -3997,6 +4152,383 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     if (itemList && itemList.classList.contains('item-list')) {
       itemList.classList.toggle('collapsed');
+    }
+  }
+
+  /**
+   * Apply standardized theming to context menu
+   * @param {string} theme Theme variant: 'standard', 'compact', 'wide'
+   * @param {Object} options Additional theme options
+   * @private
+   */
+  _applyContextMenuTheme(theme = 'standard', options = {}) {
+    const contextMenu = document.querySelector('nav#context-menu');
+    if (!contextMenu) return;
+
+    // Remove any existing theme classes
+    this._removeContextMenuTheme();
+
+    // Apply base theme class
+    contextMenu.classList.add('dasu-context-menu');
+
+    // Apply specific theme variant
+    if (theme) {
+      contextMenu.classList.add(theme);
+    }
+
+    // Apply custom classes if provided
+    if (options.customClasses) {
+      const customClasses = Array.isArray(options.customClasses)
+        ? options.customClasses
+        : [options.customClasses];
+      contextMenu.classList.add(...customClasses);
+    }
+  }
+
+  /**
+   * Remove all context menu theming classes
+   * @private
+   */
+  _removeContextMenuTheme() {
+    const contextMenu = document.querySelector('nav#context-menu');
+    if (!contextMenu) return;
+
+    // Remove all theme classes
+    const themeClasses = ['dasu-context-menu', 'standard', 'compact', 'wide'];
+
+    contextMenu.classList.remove(...themeClasses);
+  }
+
+  /**
+   * Create a standardized context menu with theming
+   * @param {string} selector Button selector for the context menu
+   * @param {Array} menuOptions Menu options array
+   * @param {string} theme Theme variant: 'standard', 'compact', 'wide'
+   * @param {Object} contextMenuOptions Additional ContextMenu options
+   * @returns {ContextMenu} The created context menu instance
+   */
+  _createThemedContextMenu(
+    selector,
+    menuOptions,
+    theme = 'standard',
+    contextMenuOptions = {}
+  ) {
+    const defaultOptions = {
+      eventName: 'click',
+      jQuery: false,
+      onOpen: (menu) => {
+        this._applyContextMenuTheme(theme);
+        if (contextMenuOptions.onOpen) {
+          contextMenuOptions.onOpen(menu);
+        }
+      },
+      onClose: () => {
+        this._removeContextMenuTheme();
+        if (contextMenuOptions.onClose) {
+          contextMenuOptions.onClose();
+        }
+      },
+      fixed: true,
+    };
+
+    const mergedOptions = foundry.utils.mergeObject(
+      defaultOptions,
+      contextMenuOptions
+    );
+
+    return new foundry.applications.ux.ContextMenu.implementation(
+      this.element,
+      selector,
+      menuOptions,
+      mergedOptions
+    );
+  }
+
+  /**
+   * Setup context menus for all item control toggles
+   * @private
+   */
+  _setupItemContextMenus() {
+    // Check if we have any context menu toggles
+    const toggles = this.element.querySelectorAll('.context-menu-toggle');
+
+    if (toggles.length === 0) {
+      console.warn('No context menu toggles found');
+      return;
+    }
+
+    // Store reference to this for callbacks
+    const sheet = this;
+
+    // Add click listeners to capture which toggle was clicked before the context menu opens
+    toggles.forEach((toggle) => {
+      toggle.addEventListener('click', () => {
+        // Store the clicked toggle for the context menu
+        sheet._lastClickedToggle = toggle;
+
+        // Find and store the item ID
+        const itemElement = toggle.closest('[data-item-id]');
+        if (itemElement) {
+          sheet._lastClickedItemId = itemElement.dataset.itemId;
+        } else {
+          sheet._lastClickedItemId = null;
+        }
+      });
+    });
+
+    // Simple menu options with no-parameter callbacks like the working sort menu
+    const menuOptions = [
+      {
+        name: 'Toggle Favorite',
+        icon: '<i class="fas fa-star"></i>',
+        callback: function () {
+          try {
+            if (sheet._lastClickedToggle) {
+              const itemElement =
+                sheet._lastClickedToggle.closest('[data-item-id]');
+              if (itemElement) {
+                const itemId = itemElement.dataset.itemId;
+                const item = sheet.actor.items.get(itemId);
+                if (item) {
+                  sheet._toggleItemFavorite(item);
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error in favorite callback:', error);
+          }
+        },
+      },
+      {
+        name: 'Copy Item',
+        icon: '<i class="fas fa-copy"></i>',
+        callback: function () {
+          try {
+            if (sheet._lastClickedToggle) {
+              const itemElement =
+                sheet._lastClickedToggle.closest('[data-item-id]');
+              if (itemElement) {
+                const itemId = itemElement.dataset.itemId;
+                const item = sheet.actor.items.get(itemId);
+                if (item && sheet.isEditable && sheet._isEditMode()) {
+                  sheet._copyItem(item);
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error in copy callback:', error);
+          }
+        },
+      },
+      {
+        name: 'Delete Item',
+        icon: '<i class="fas fa-trash"></i>',
+        className: 'destructive',
+        callback: function () {
+          try {
+            if (sheet._lastClickedToggle) {
+              const itemElement =
+                sheet._lastClickedToggle.closest('[data-item-id]');
+              if (itemElement) {
+                const itemId = itemElement.dataset.itemId;
+                const item = sheet.actor.items.get(itemId);
+                if (item && sheet.isEditable && sheet._isEditMode()) {
+                  sheet._deleteItem(item);
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error in delete callback:', error);
+          }
+        },
+      },
+    ];
+
+    // Initialize Foundry ContextMenu for all context menu toggles
+    try {
+      const contextMenu =
+        new foundry.applications.ux.ContextMenu.implementation(
+          this.element,
+          '.context-menu-toggle',
+          menuOptions,
+          {
+            eventName: 'click',
+            jQuery: false,
+            onOpen: () => {
+              // Use the stored values from the click listener
+              const currentItemId = sheet._lastClickedItemId;
+
+              // Wait for menu DOM to be available, then add attributes and event listeners
+              setTimeout(() => {
+                try {
+                  // Try to find the menu element in the DOM
+                  const contextMenu = document.querySelector('#context-menu');
+                  if (!contextMenu) {
+                    console.warn('Context menu element not found in DOM');
+                    return;
+                  }
+
+                  // Add data-action attributes and event listeners to menu items
+                  const menuItems =
+                    contextMenu.querySelectorAll('.context-item');
+
+                  menuItems.forEach((item, index) => {
+                    // Add data-action attribute based on menu option index
+                    const actions = ['toggleFavorite', 'copyDoc', 'deleteDoc'];
+                    item.setAttribute('data-action', actions[index]);
+
+                    // Add item ID reference
+                    if (currentItemId) {
+                      item.setAttribute('data-item-id', currentItemId);
+
+                      // Update favorite icon based on current item state
+                      if (actions[index] === 'toggleFavorite') {
+                        const targetItem = sheet.actor.items.get(currentItemId);
+                        if (targetItem) {
+                          const iconElement = item.querySelector('i');
+                          if (iconElement) {
+                            // Use solid star if favorited, outline star if not
+                            iconElement.className = targetItem.system.favorite
+                              ? 'fas fa-star fa-fw'
+                              : 'fal fa-star fa-fw';
+                          }
+                          // Add favorited class to the menu item for special styling
+                          item.classList.toggle(
+                            'favorited',
+                            targetItem.system.favorite
+                          );
+                        }
+                      }
+                    }
+
+                    // Add click event listener
+                    item.addEventListener('click', (event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      const action = item.getAttribute('data-action');
+                      const itemId = item.getAttribute('data-item-id');
+
+                      const targetItem = itemId
+                        ? sheet.actor.items.get(itemId)
+                        : null;
+                      if (targetItem) {
+                        switch (action) {
+                          case 'toggleFavorite':
+                            sheet._toggleItemFavorite(targetItem);
+                            break;
+                          case 'copyDoc':
+                            if (sheet.isEditable && sheet._isEditMode()) {
+                              sheet._copyItem(targetItem);
+                            }
+                            break;
+                          case 'deleteDoc':
+                            if (sheet.isEditable && sheet._isEditMode()) {
+                              sheet._deleteItem(targetItem);
+                            }
+                            break;
+                        }
+                      }
+
+                      // Close the context menu after action
+                      if (contextMenu) {
+                        contextMenu.remove();
+                      }
+                    });
+                  });
+                } catch (error) {
+                  console.error('Error setting up context menu items:', error);
+                }
+              }, 10); // Small delay to ensure DOM is ready
+
+              // Add active state to clicked toggle
+              if (sheet._lastClickedToggle) {
+                sheet._lastClickedToggle.classList.add('active');
+              }
+
+              // Apply standardized theming
+              setTimeout(() => {
+                this._applyContextMenuTheme('standard');
+              }, 1);
+            },
+            onClose: () => {
+              // Remove active state from clicked toggle
+              if (sheet._lastClickedToggle) {
+                sheet._lastClickedToggle.classList.remove('active');
+              }
+
+              // Clear the current clicked toggle reference
+              sheet._lastClickedToggle = null;
+
+              // Remove context menu theming
+              this._removeContextMenuTheme();
+            },
+            fixed: true,
+          }
+        );
+    } catch (error) {
+      console.error('Error creating context menu:', error);
+    }
+  }
+
+  /**
+   * Toggle item favorite status
+   * @param {Item} item The item to toggle
+   * @private
+   */
+  async _toggleItemFavorite(item) {
+    await item.update({
+      'system.favorite': !item.system.favorite,
+    });
+  }
+
+  /**
+   * Copy an item
+   * @param {Item} item The item to copy
+   * @private
+   */
+  async _copyItem(item) {
+    await item.clone({}, { save: true });
+    ui.notifications.info(
+      game.i18n.format('DOCUMENT.Copied', {
+        type: item.type,
+        name: item.name,
+      })
+    );
+  }
+
+  /**
+   * Delete an item with confirmation using DialogV2.confirm
+   * @param {Item} item The item to delete
+   * @private
+   */
+  async _deleteItem(item) {
+    const confirmed = await foundry.applications.api.DialogV2.confirm({
+      window: {
+        title: game.i18n.format('DOCUMENT.Delete', { type: item.type }),
+        icon: 'fas fa-trash',
+      },
+      content: `<p>${game.i18n.format('DOCUMENT.DeleteWarning', {
+        type: item.type,
+        name: item.name,
+      })}</p>`,
+      modal: true,
+      rejectClose: false,
+    });
+
+    if (confirmed) {
+      try {
+        await item.delete();
+        ui.notifications.info(
+          game.i18n.format('DOCUMENT.Deleted', {
+            type: item.type,
+            name: item.name,
+          })
+        );
+      } catch (error) {
+        console.error('Error deleting item:', error);
+        ui.notifications.error(game.i18n.localize('DOCUMENT.DeleteFailure'));
+      }
     }
   }
 }

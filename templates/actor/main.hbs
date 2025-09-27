@@ -490,18 +490,6 @@
               <button class='items-sort-btn' data-tooltip='{{localize "DASU.Sort.Title"}}'>
                 <i class='fas fa-sort'></i>
               </button>
-              <div class='items-sort-dropdown'>
-                <div class='sort-header'>{{localize "DASU.Sort.Title"}}</div>
-                <div class='sort-options'>
-                  <button class='sort-option' data-sort="alpha-asc">{{localize "DASU.Sort.AlphabeticalAsc"}}</button>
-                  <button class='sort-option' data-sort="alpha-desc">{{localize "DASU.Sort.AlphabeticalDesc"}}</button>
-                  <div class='sort-separator'></div>
-                  <button class='sort-option' data-sort="aptitude-asc">{{localize "DASU.Sort.AptitudeAsc"}}</button>
-                  <button class='sort-option' data-sort="aptitude-desc">{{localize "DASU.Sort.AptitudeDesc"}}</button>
-                  <div class='sort-separator'></div>
-                  <button class='sort-option clear-sort' data-sort="clear">{{localize "DASU.Sort.ClearSort"}}</button>
-                </div>
-              </div>
               <button class='items-filter-btn' data-tooltip='{{localize "DASU.SortAndFilter"}}'>
                 <i class='fas fa-filter'></i>
               </button>
@@ -648,27 +636,9 @@
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
                   {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
-                        <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
-                        <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
-                      </a>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="weapon"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="weapon"}}</span>
-                        </a>
-                        <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="weapon"}}' data-action='deleteDoc'>
-                          <i class='fas fa-trash'></i>
-                          <span>{{localize "DOCUMENT.Delete" type="weapon"}}</span>
-                        </a>
-                      {{/if}}
-                    </div>
-                  </div>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                    <i class='fas fa-bars'></i>
+                  </a>
                 </div>
                 </div>
                 <div class='item-description-row' style='display: none;'>
@@ -721,29 +691,9 @@
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
                   {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
-                        <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
-                        <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
-                      </a>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="tag"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="tag"}}</span>
-                        </a>
-                        {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
-                          <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="tag"}}' data-action='deleteDoc'>
-                            <i class='fas fa-trash'></i>
-                            <span>{{localize "DOCUMENT.Delete" type="tag"}}</span>
-                          </a>
-                        {{/unless}}
-                      {{/if}}
-                    </div>
-                  </div>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                    <i class='fas fa-bars'></i>
+                  </a>
                 </div>
                 </div>
                 <div class='item-description-row' style='display: none;'>
@@ -799,29 +749,9 @@
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
                   {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
-                        <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
-                        <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
-                      </a>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="technique"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="technique"}}</span>
-                        </a>
-                        {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
-                          <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="technique"}}' data-action='deleteDoc'>
-                            <i class='fas fa-trash'></i>
-                            <span>{{localize "DOCUMENT.Delete" type="technique"}}</span>
-                          </a>
-                        {{/unless}}
-                      {{/if}}
-                    </div>
-                  </div>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                    <i class='fas fa-bars'></i>
+                  </a>
                 </div>
                 </div>
                 <div class='item-description-row' style='display: none;'>
@@ -877,29 +807,9 @@
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
                   {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
-                        <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
-                        <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
-                      </a>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="spell"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="spell"}}</span>
-                        </a>
-                        {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
-                          <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="spell"}}' data-action='deleteDoc'>
-                            <i class='fas fa-trash'></i>
-                            <span>{{localize "DOCUMENT.Delete" type="spell"}}</span>
-                          </a>
-                        {{/unless}}
-                      {{/if}}
-                    </div>
-                  </div>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                    <i class='fas fa-bars'></i>
+                  </a>
                 </div>
                 </div>
                 <div class='item-description-row' style='display: none;'>
@@ -954,29 +864,9 @@
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
                   {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
-                        <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
-                        <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
-                      </a>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="affliction"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="affliction"}}</span>
-                        </a>
-                        {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
-                          <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="affliction"}}' data-action='deleteDoc'>
-                            <i class='fas fa-trash'></i>
-                            <span>{{localize "DOCUMENT.Delete" type="affliction"}}</span>
-                          </a>
-                        {{/unless}}
-                      {{/if}}
-                    </div>
-                  </div>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                    <i class='fas fa-bars'></i>
+                  </a>
                 </div>
               </li>
             {{/each}}
@@ -1025,29 +915,9 @@
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
                   {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
-                        <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
-                        <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
-                      </a>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="restorative"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="restorative"}}</span>
-                        </a>
-                        {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
-                          <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="restorative"}}' data-action='deleteDoc'>
-                            <i class='fas fa-trash'></i>
-                            <span>{{localize "DOCUMENT.Delete" type="restorative"}}</span>
-                          </a>
-                        {{/unless}}
-                      {{/if}}
-                    </div>
-                  </div>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                    <i class='fas fa-bars'></i>
+                  </a>
                 </div>
               </li>
             {{/each}}
@@ -1089,29 +959,9 @@
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
                   {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
-                        <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
-                        <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
-                      </a>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="tactic"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="tactic"}}</span>
-                        </a>
-                        {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
-                          <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="tactic"}}' data-action='deleteDoc'>
-                            <i class='fas fa-trash'></i>
-                            <span>{{localize "DOCUMENT.Delete" type="tactic"}}</span>
-                          </a>
-                        {{/unless}}
-                      {{/if}}
-                    </div>
-                  </div>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                    <i class='fas fa-bars'></i>
+                  </a>
                 </div>
                 </div>
                 <div class='item-description-row' style='display: none;'>
@@ -1159,29 +1009,9 @@
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
                   {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
-                        <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
-                        <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
-                      </a>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="special"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="special"}}</span>
-                        </a>
-                        {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
-                          <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="special"}}' data-action='deleteDoc'>
-                            <i class='fas fa-trash'></i>
-                            <span>{{localize "DOCUMENT.Delete" type="special"}}</span>
-                          </a>
-                        {{/unless}}
-                      {{/if}}
-                    </div>
-                  </div>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                    <i class='fas fa-bars'></i>
+                  </a>
                 </div>
               </li>
             {{/each}}
@@ -1224,29 +1054,9 @@
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
                   {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
-                        <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
-                        <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
-                      </a>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="scar"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="scar"}}</span>
-                        </a>
-                        {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
-                          <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="scar"}}' data-action='deleteDoc'>
-                            <i class='fas fa-trash'></i>
-                            <span>{{localize "DOCUMENT.Delete" type="scar"}}</span>
-                          </a>
-                        {{/unless}}
-                      {{/if}}
-                    </div>
-                  </div>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                    <i class='fas fa-bars'></i>
+                  </a>
                 </div>
               </li>
             {{/each}}
@@ -1292,29 +1102,9 @@
                         <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived (eq item.system.level 3))}}fa-eye{{else}}fa-edit{{/if}}'></i>
                       </a>
                     {{/if}}
-                    <div class='item-context-menu'>
-                      <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                        <i class='fas fa-bars'></i>
-                      </a>
-                      <div class='context-menu-dropdown' style='display: none;'>
-                        <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
-                          <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
-                          <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
-                        </a>
-                        {{#if (and @root.editable @root.isEditMode)}}
-                          <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="schema"}}' data-action='copyDoc'>
-                            <i class='fas fa-copy'></i>
-                            <span>{{localize "DOCUMENT.Copy" type="schema"}}</span>
-                          </a>
-                          {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
-                            <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="schema"}}' data-action='deleteDoc'>
-                              <i class='fas fa-trash'></i>
-                              <span>{{localize "DOCUMENT.Delete" type="schema"}}</span>
-                            </a>
-                          {{/unless}}
-                        {{/if}}
-                      </div>
-                    </div>
+                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                      <i class='fas fa-bars'></i>
+                    </a>
                   </div>
                 </div>
                 <div class='item-description-row' style='display: none;'>
@@ -1419,25 +1209,9 @@
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived (eq item.system.level 3))}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
                   {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="feature"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="feature"}}</span>
-                        </a>
-                        {{#unless (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits 'innate') item.isDaemonDerived)}}
-                          <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="feature"}}' data-action='deleteDoc'>
-                            <i class='fas fa-trash'></i>
-                            <span>{{localize "DOCUMENT.Delete" type="feature"}}</span>
-                          </a>
-                        {{/unless}}
-                      {{/if}}
-                    </div>
-                  </div>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                    <i class='fas fa-bars'></i>
+                  </a>
                 </div>
               </li>
             {{/each}}
@@ -1481,27 +1255,9 @@
                       <i class='fas fa-edit'></i>
                     </a>
                   {{/if}}
-                  <div class='item-context-menu'>
-                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}' data-action='toggleContextMenu'>
-                      <i class='fas fa-bars'></i>
-                    </a>
-                    <div class='context-menu-dropdown' style='display: none;'>
-                      <a class='context-menu-item item-favorite {{#if item.system.favorite}}active{{/if}}' data-tooltip='{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}' data-action='toggleFavorite'>
-                        <i class='{{#if item.system.favorite}}fas{{else}}far{{/if}} fa-star'></i>
-                        <span>{{#if item.system.favorite}}{{localize "DASU.Item.RemoveFromFavorites"}}{{else}}{{localize "DASU.Item.AddToFavorites"}}{{/if}}</span>
-                      </a>
-                      {{#if (and @root.editable @root.isEditMode)}}
-                        <a class='context-menu-item item-copy' data-tooltip='{{localize "DOCUMENT.Copy" type="class"}}' data-action='copyDoc'>
-                          <i class='fas fa-copy'></i>
-                          <span>{{localize "DOCUMENT.Copy" type="class"}}</span>
-                        </a>
-                        <a class='context-menu-item item-delete' data-tooltip='{{localize "DOCUMENT.Delete" type="class"}}' data-action='deleteDoc'>
-                          <i class='fas fa-trash'></i>
-                          <span>{{localize "DOCUMENT.Delete" type="class"}}</span>
-                        </a>
-                      {{/if}}
-                    </div>
-                  </div>
+                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                    <i class='fas fa-bars'></i>
+                  </a>
                 </div>
                 </div>
                 <div class='item-description-row' style='display: none;'>
