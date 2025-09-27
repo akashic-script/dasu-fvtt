@@ -2,8 +2,6 @@
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: 0;
-  /* padding: 8px; */
-  /* margin: 4px 0; */
   font-family: var(--font-primary);
   font-size: 0.85em;
   position: relative;
@@ -26,7 +24,6 @@
     rgba(0, 0, 0, 0.1) 20px
   );
   padding: 4px 8px;
-  /* border: 1px solid var(--color-border); */
   min-height: 28px;
 }
 
@@ -98,7 +95,7 @@
 .success-count-badge.failure {
   background: var(--dasu-c-dark);
   border-color: var(--dasu-c-dark);
-  color: var(--color-text-primary);
+  color: var(--color-primary);
 }
 
 .success-count-badge.partial-success {
@@ -110,7 +107,7 @@
 .success-count-badge.success {
   background: var(--dasu-c-accent);
   border-color: var(--dasu-c-accent);
-  color: var(--color-text-primary);
+  color: var(--color-primary);
 }
 
 .success-count-badge.critical-success {
@@ -181,7 +178,6 @@
 .die.failure {
   background: var(--dasu-c-tan);
   border-color: var(--dasu-c-beige);
-  /* color: var(--dasu-c-faint); */
 }
 
 /* Combat Pool Breakdown */
@@ -194,7 +190,6 @@
   flex-wrap: wrap;
   background: var(--color-bg-secondary);
   padding: 6px 10px;
-  /* border: 1px solid var(--color-border); */
 }
 
 .pool-breakdown {
@@ -211,48 +206,6 @@
   padding: 8px 12px;
   margin-top: 8px;
   background: var(--color-bg-primary);
-  /* border: 1px solid var(--color-border); */
-}
-
-/* Crit Indicator */
-.crit-indicator {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  background: #ffd700;
-  border: 1px solid #ffb800;
-  border-radius: 0;
-  color: var(--color-critical);
-  font-weight: 700;
-  font-size: 0.8em;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  animation: crit-pulse 2s infinite;
-}
-
-.crit-icon {
-  font-size: 1.1em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.crit-text {
-  font-weight: 900;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-@keyframes crit-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 4px rgba(255, 215, 0, 0);
-  }
 }
 
 /* Result Class Styling for Overall Card */

@@ -1,127 +1,70 @@
 {{! Class Attributes Template }}
 <div class='tab flexcol {{tab.cssClass}}' data-group='primary' data-tab='attributes'>
 
-  {{! Class Metadata Section }}
-  <section class="class-metadata">
-    <header class="section-header">
-      <h3>{{localize "DASU.Class.Metadata"}}</h3>
-    </header>
-
-    <div class="form-group flexrow">
-      <label for="system.version">{{localize "DASU.Class.Version"}}</label>
+  <div class="compact-form">
+    <div class="form-row">
+      <label>{{localize "DASU.Class.Version"}}</label>
       <input type="text" name="system.version" value="{{system.version}}" data-dtype="String" />
     </div>
-
-    <div class="form-group flexrow">
-      <label for="system.category">{{localize "DASU.Class.CategoryLabel"}}</label>
+    <div class="form-row">
+      <label>{{localize "DASU.Class.CategoryLabel"}}</label>
       <select name="system.category" data-dtype="String">
         {{#each classCategories as |label value|}}
           <option value="{{@key}}" {{#if (eq ../system.category @key)}}selected{{/if}}>{{label}}</option>
         {{/each}}
       </select>
     </div>
-  </section>
+    <fieldset>
+      <legend>{{localize 'DASU.Description'}}</legend>
+      {{formInput @root.htmlInputField value=system.description name="system.description" toggled=@root.editable enriched=enrichedDescription disabled=(not @root.editable)}}
+    </fieldset>
+  </div>
 
-  {{! Starting Attributes Section }}
-  <section class="starting-attributes">
-    <header class="section-header">
-      <h3>{{localize "DASU.Class.StartingAttributes"}}</h3>
-      <span class="help-text">{{localize "DASU.Class.StartingAttributesHelp"}}</span>
-    </header>
-
-    <div class="attribute-grid">
+  <div class="compact-section">
+    <h4>{{localize "DASU.Class.StartingAttributes"}} <small>({{system.startingAttributesTotal}}/4)</small></h4>
+    <div class="compact-grid">
       {{#each attributeOptions as |label key|}}
-        <div class="form-group flexrow">
-          <label for="system.startingAttributes.{{@key}}">{{label}}</label>
-          <input type="number"
-                 name="system.startingAttributes.{{@key}}"
-                 value="{{lookup ../system.startingAttributes @key}}"
-                 min="0"
-                 max="4"
-                 data-dtype="Number" />
+        <div class="grid-item">
+          <label>{{label}}</label>
+          <input type="number" name="system.startingAttributes.{{@key}}" value="{{lookup ../system.startingAttributes @key}}" min="0" max="4" data-dtype="Number" />
         </div>
       {{/each}}
     </div>
+  </div>
 
-    {{#if system.startingAttributesValid}}
-      <div class="validation-info success">
-        <i class="fas fa-check-circle"></i>
-        {{localize "DASU.Class.StartingAttributesValid"}} ({{system.startingAttributesTotal}}/4)
+  <div class="compact-section">
+    <h4>{{localize "DASU.Class.Progression"}}</h4>
+    <div class="formula-row">
+      <div class="form-row">
+        <label>{{localize "DASU.Class.APFormula"}}</label>
+        <input type="text" name="system.progression.apFormula" value="{{system.progression.apFormula}}" data-dtype="String" placeholder="{{localize 'DASU.Class.FormulaPlaceholders.ap'}}" />
       </div>
-    {{else}}
-      <div class="validation-info error">
-        <i class="fas fa-exclamation-triangle"></i>
-        {{localize "DASU.Class.StartingAttributesInvalid"}} ({{system.startingAttributesTotal}}/4)
+      <div class="form-row">
+        <label>{{localize "DASU.Class.SPFormula"}}</label>
+        <input type="text" name="system.progression.spFormula" value="{{system.progression.spFormula}}" data-dtype="String" placeholder="{{localize 'DASU.Class.FormulaPlaceholders.sp'}}" />
       </div>
-    {{/if}}
-  </section>
-
-  {{! Progression Formulas Section }}
-  <section class="progression-formulas">
-    <header class="section-header">
-      <h3>{{localize "DASU.Class.Progression"}}</h3>
-      <span class="help-text">{{localize "DASU.Class.ProgressionHelp"}}</span>
-    </header>
-
-    <div class="form-group flexrow">
-      <label for="system.progression.apFormula">{{localize "DASU.Class.APFormula"}}</label>
-      <input type="text"
-             name="system.progression.apFormula"
-             value="{{system.progression.apFormula}}"
-             data-dtype="String"
-             placeholder="{{localize 'DASU.Class.FormulaPlaceholders.ap'}}" />
     </div>
 
-    <div class="form-group flexrow">
-      <label for="system.progression.spFormula">{{localize "DASU.Class.SPFormula"}}</label>
-      <input type="text"
-             name="system.progression.spFormula"
-             value="{{system.progression.spFormula}}"
-             data-dtype="String"
-             placeholder="{{localize 'DASU.Class.FormulaPlaceholders.sp'}}" />
-    </div>
-
-    {{! Progression Preview }}
     {{#if system.progressionSamples}}
-      <div class="progression-preview">
-        <div class="progression-preview-header">
-          <h4>{{localize "DASU.Class.ProgressionPreview"}}</h4>
-          <button type="button" class="progression-expand-toggle" data-action="toggleProgressionPreview" title="{{localize 'DASU.Class.ProgressionPreviewToggle'}}">
-            <i class="fas fa-chevron-down"></i>
-          </button>
-        </div>
-        <div class="progression-preview-content" style="display: none;">
-          <table class="progression-table">
-            <thead>
-              <tr>
-                <th>{{localize "DASU.Level"}}</th>
-                <th>{{localize "DASU.Class.APFormula"}}</th>
-                <th>{{localize "DASU.Class.SPFormula"}}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each system.progressionSamples as |sample level|}}
-                <tr>
-                  <td>{{level}}</td>
-                  <td>{{sample.ap}}</td>
-                  <td>{{sample.sp}}</td>
-                </tr>
-              {{/each}}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <details class="progression-preview">
+        <summary>{{localize "DASU.Class.ProgressionPreview"}}</summary>
+        <table class="compact-table">
+          <thead>
+            <tr><th>Lvl</th><th>AP</th><th>SP</th></tr>
+          </thead>
+          <tbody>
+            {{#each system.progressionSamples as |sample level|}}
+              <tr><td>{{level}}</td><td>{{sample.ap}}</td><td>{{sample.sp}}</td></tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </details>
     {{/if}}
-  </section>
+  </div>
 
-  {{! Level Slots Section }}
-  <section class="level-slots">
-    <header class="section-header">
-      <h3>{{localize "DASU.Class.LevelSlots"}}</h3>
-      <span class="help-text">{{localize "DASU.Class.LevelSlotsHelp"}}</span>
-    </header>
-
-    <div class="level-slots-editor">
+  <div class="compact-section">
+    <h4>{{localize "DASU.Class.LevelSlots"}}</h4>
+    <div class="level-slots-compact">
       <div class="level-slots-grid">
         {{#each (range 1 30) as |level|}}
           <div class="level-slot-item" data-level="{{level}}">
@@ -186,11 +129,4 @@
       </div>
     </div>
   </section>
-
-  <div class='separator'></div>
-  <fieldset>
-    <legend>{{localize 'DASU.Description'}}</legend>
-    {{formInput @root.htmlInputField value=system.description name="system.description" toggled=@root.editable enriched=enrichedDescription disabled=(not @root.editable)}}
-  </fieldset>
-
 </div>

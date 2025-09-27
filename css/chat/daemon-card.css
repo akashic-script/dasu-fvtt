@@ -146,7 +146,7 @@
 
 .daemon-card .stat-value {
   font-weight: 700;
-  /* color: var(--color-text-primary); */
+  color: var(--color-primary);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   font-size: 0.8em;

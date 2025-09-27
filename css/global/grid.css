@@ -93,8 +93,6 @@
 .grid-start-12 {
   grid-column-start: 12;
 }
-*/
-
 .grid-span-2 {
   grid-column-end: span 2;
 }

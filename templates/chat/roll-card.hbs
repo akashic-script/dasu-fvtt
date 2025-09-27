@@ -80,6 +80,11 @@
     {{!-- Item-Specific Information --}}
     {{#if isWeapon}}
       <div class="weapon-details">
+        {{#if roll.item.system.description}}
+          <div class="description-info">
+            <span class="description-text">{{{roll.item.system.description}}}</span>
+          </div>
+        {{/if}}
         {{#if roll.results.damage}}
           <div class="damage-info">
             <span class="damage-label">{{localize "DASU.RollCard.Damage"}}:</span>
@@ -98,6 +103,11 @@
 
     {{#if isAbility}}
       <div class="ability-details">
+        {{#if roll.item.system.description}}
+          <div class="description-info">
+            <span class="description-text">{{{roll.item.system.description}}}</span>
+          </div>
+        {{/if}}
         {{#if roll.results.cost}}
           <div class="cost-info">
             <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>
@@ -131,6 +141,11 @@
 
     {{#if isTactic}}
       <div class="tactic-details">
+        {{#if roll.item.system.description}}
+          <div class="description-info">
+            <span class="description-text">{{{roll.item.system.description}}}</span>
+          </div>
+        {{/if}}
         {{#if roll.results.cost}}
           <div class="cost-info">
             <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>

@@ -1,4 +1,10 @@
-.dasu.roll-dialog.combat-themed {
+/* ========================================
+   UNIFIED COMBAT DIALOG STYLES
+   For accuracy-dialog and roll-dialog
+   ======================================== */
+
+/* Base Combat Dialog */
+.dasu.combat-themed {
   padding: 0;
   font-family: var(--font-primary);
   min-width: 320px;
@@ -10,7 +16,10 @@
   position: relative;
 }
 
-/* Combat Header Styling */
+/* ========================================
+   HEADER SECTION
+   ======================================== */
+
 .dialog-header.combat-header {
   background: var(--color-bg-primary);
   padding: 8px 12px;
@@ -21,10 +30,7 @@
 
 .header-background {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: repeating-linear-gradient(
     45deg,
     transparent,
@@ -44,7 +50,9 @@
   background: var(--color-primary);
 }
 
-.actor-info {
+/* Unified Header Info - works for both actor-info and item-info */
+.actor-info,
+.item-info {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -52,7 +60,8 @@
   z-index: 1;
 }
 
-.portrait-frame {
+.portrait-frame,
+.item-image-frame {
   position: relative;
   padding: 2px;
   background: linear-gradient(45deg, #cd853f, #ffd700);
@@ -60,7 +69,9 @@
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
-.actor-portrait {
+.actor-portrait,
+.item-portrait,
+.item-image {
   width: 40px;
   height: 40px;
   border-radius: 0;
@@ -70,10 +81,7 @@
 
 .portrait-overlay {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  right: 2px;
-  bottom: 2px;
+  inset: 2px;
   border-radius: 0;
   background: linear-gradient(
     135deg,
@@ -83,34 +91,46 @@
   pointer-events: none;
 }
 
-.actor-name {
+/* Unified Text Content */
+.actor-name,
+.item-name {
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 1em;
-  font-weight: 600;
+  font: 600 1em var(--font-primary);
   letter-spacing: 0.3px;
 }
 
-.combat-indicator {
+.combat-indicator,
+.roll-indicator {
   display: flex;
   align-items: center;
   gap: 6px;
   margin-top: 2px;
 }
 
-.combat-indicator i {
+.combat-indicator i,
+.roll-indicator i {
   color: var(--color-hp);
 }
 
 .roll-type-label {
   color: var(--color-text-secondary);
-  font-size: 0.8em;
-  font-weight: 500;
+  font: 500 0.8em var(--font-primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* Combat Tabs Styling */
+.actor-label,
+.actor-info span {
+  color: var(--color-text-secondary);
+  font: 500 0.8em var(--font-primary);
+}
+
+/* ========================================
+   CONTENT SECTIONS
+   ======================================== */
+
+/* Tab Navigation (for roll-dialog) */
 .roll-type-selection.combat-tabs {
   padding: 12px 16px;
   background: var(--color-bg-secondary);
@@ -129,11 +149,11 @@
   flex: 1;
   padding: 12px 16px;
   border: 1px solid var(--color-border);
+  border-radius: 0;
   background: var(--color-bg-primary);
   color: var(--color-text-secondary);
-  border-radius: 0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -158,8 +178,7 @@
 }
 
 .tab-label {
-  font-size: 0.9em;
-  font-weight: 600;
+  font: 600 0.9em var(--font-primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   line-height: 1.3;
@@ -183,16 +202,20 @@
   margin-bottom: 12px;
 }
 
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
 .form-group label {
   display: block;
   margin-bottom: 4px;
-  font-weight: 600;
+  font: 600 0.85em var(--font-primary);
   color: var(--color-text-primary);
-  font-size: 0.85em;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 
+/* Form Input Fields */
 .form-group select,
 .form-group input[type='text'],
 .form-group input[type='number'] {
@@ -202,14 +225,13 @@
   border-radius: 0;
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
-  font-size: 0.85em;
+  font: 0.85em var(--font-primary);
   line-height: 1.3;
   min-height: 36px;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
   box-sizing: border-box;
 }
 
-/* Dropdown specific styling - minimal decoration for more text space */
 .form-group select {
   appearance: auto;
   cursor: pointer;
@@ -219,7 +241,7 @@
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
   padding: 6px 10px;
-  font-size: 0.85em;
+  font: 0.85em var(--font-primary);
   line-height: 1.3;
 }
 
@@ -231,14 +253,70 @@
 }
 
 .modifier-hint {
-  font-size: 0.7em;
+  font: italic 0.7em var(--font-primary);
   color: var(--color-text-secondary);
   margin-top: 2px;
   display: block;
-  font-style: italic;
 }
 
-/* Two-Column Layout for Dual Attributes */
+/* Toggle Buttons (for accuracy-dialog) */
+.roll-type-toggle {
+  display: flex;
+  gap: 5px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  border: none;
+  border-right: 1px solid var(--color-border);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font: 500 0.8em var(--font-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  min-height: 50px;
+  justify-content: center;
+}
+
+.toggle-btn:last-child {
+  border-right: none;
+}
+
+.toggle-btn:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-primary);
+}
+
+.toggle-btn.active {
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.toggle-btn i {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.toggle-btn span {
+  font-size: 0.85em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+/* Layout Utilities */
 .dual-attributes.two-column {
   display: flex;
   gap: 16px;
@@ -256,7 +334,6 @@
   width: 100%;
 }
 
-/* Skill + Attribute Selection Styling */
 .skill-attribute-selection {
   display: flex;
   align-items: end;
@@ -270,7 +347,10 @@
   margin-bottom: 0;
 }
 
-/* Combat Summary Styling */
+/* ========================================
+   SUMMARY SECTIONS
+   ======================================== */
+
 .roll-summary.combat-summary {
   padding: 12px;
   background: var(--color-bg-primary);
@@ -278,9 +358,66 @@
   position: relative;
 }
 
+/* Base Bonus Display (accuracy-dialog) */
+.formula-display {
+  text-align: center;
+}
+
+.base-bonus-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.bonus-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-bg-secondary);
+  padding: 8px 12px;
+  border-radius: 0;
+  border: 1px solid var(--color-primary);
+}
+
+.bonus-value {
+  font: 700 1.8em var(--font-primary);
+  color: var(--color-primary);
+}
+
+.bonus-label {
+  font: 600 0.85em var(--font-primary);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.formula-container {
+  margin-bottom: 8px;
+}
+
+.formula-label {
+  font: 600 0.85em var(--font-primary);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-right: 8px;
+}
+
+.roll-formula {
+  font: 700 1em var(--font-primary);
+  color: var(--color-primary);
+}
+
+.roll-description {
+  color: var(--color-text-secondary);
+  font: italic 0.8em var(--font-primary);
+}
+
+/* Dice Arsenal (roll-dialog) */
 .dice-arsenal {
   text-align: center;
-  margin-bottom: 16px;
   position: relative;
 }
 
@@ -303,8 +440,7 @@
 }
 
 .pool-count {
-  font-size: 1.8em;
-  font-weight: 700;
+  font: 700 1.8em var(--font-primary);
   color: var(--color-primary);
 }
 
@@ -319,19 +455,21 @@
 }
 
 .pool-label {
-  font-size: 0.85em;
+  font: 600 0.85em var(--font-primary);
   color: var(--color-text-primary);
-  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .pool-breakdown {
-  font-size: 1em;
+  font: 1em var(--font-primary);
   color: var(--color-text-secondary);
 }
 
-/* Combat Footer Styling */
+/* ========================================
+   FOOTER ACTIONS
+   ======================================== */
+
 .dialog-footer.combat-footer {
   padding: 12px;
   background: var(--color-bg-secondary);
@@ -349,12 +487,11 @@
 
 .roll-button.combat-roll {
   flex: 2;
-  padding: 0;
   background: var(--color-primary);
   border: 1px solid var(--color-primary);
   border-radius: 0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
   position: relative;
   overflow: hidden;
   min-height: 40px;
@@ -384,8 +521,7 @@
 
 .button-text {
   color: var(--color-text-primary);
-  font-weight: 600;
-  font-size: 0.85em;
+  font: 600 0.85em var(--font-primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   line-height: 1.2;
@@ -396,8 +532,7 @@
 
 .dice-display {
   color: var(--color-text-primary);
-  font-weight: 700;
-  font-size: 0.9em;
+  font: 700 0.9em var(--font-primary);
   background: rgba(0, 0, 0, 0.2);
   padding: 4px 8px;
   border-radius: 0;
@@ -431,13 +566,12 @@
   border: 1px solid var(--color-border);
   border-radius: 0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-size: 0.8em;
-  font-weight: 500;
+  font: 500 0.8em var(--font-primary);
   text-transform: uppercase;
   letter-spacing: 0.3px;
   min-height: 40px;

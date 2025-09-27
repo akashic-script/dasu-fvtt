@@ -35,6 +35,23 @@ export default class BaseActorDataModel extends foundry.abstract.TypeDataModel {
         required: false,
         initial: '',
       }),
+      triad: new fields.SchemaField({
+        virtue: new fields.StringField({
+          required: false,
+          initial: '',
+          blank: true,
+        }),
+        sin: new fields.StringField({
+          required: false,
+          initial: '',
+          blank: true,
+        }),
+        anathema: new fields.StringField({
+          required: false,
+          initial: '',
+          blank: true,
+        }),
+      }),
     };
   }
 }

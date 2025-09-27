@@ -1,9 +1,7 @@
-/* Initiative Card Styling - matches roll-card structure */
+/* Initiative Card Styling */
 .dasu.initiative-card {
   background: var(--color-bg-secondary);
-  /* border: 1px solid var(--color-border); */
   border-radius: 0;
-  /* padding: 6px; */
   margin: 2px 0;
   font-family: var(--font-primary);
   font-size: 0.9em;
@@ -12,7 +10,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* Initiative Header - matches roll-header */
+/* Initiative Header */
 .initiative-header {
   display: flex;
   justify-content: space-between;
@@ -27,7 +25,6 @@
     rgba(0, 0, 0, 0.1) 20px
   );
   padding: 4px 8px;
-  /* border: 1px solid var(--dasu-c-primary); */
   min-height: 28px;
 }
 
@@ -64,7 +61,7 @@
   letter-spacing: 0.2px;
 }
 
-/* Initiative Formula Display - matches formula-breakdown */
+/* Initiative Formula Display */
 .initiative-formula {
   text-align: center;
   font-size: 0.9em;
@@ -74,7 +71,6 @@
   flex-wrap: wrap;
   background: var(--color-bg-primary);
   padding: 4px 8px;
-  /* border: 1px solid var(--dasu-c-primary); */
   color: var(--color-text-primary);
   font-weight: 400;
   margin: 4px 0;
@@ -86,7 +82,7 @@
   color: var(--dasu-c-primary);
 }
 
-/* Initiative Result - matches outcome-compact */
+/* Initiative Result */
 .initiative-outcome {
   display: flex;
   justify-content: center;
@@ -95,24 +91,6 @@
   padding: 4px 6px;
   margin-top: 4px;
   background: var(--color-bg-primary);
-  /* border: 1px solid var(--dasu-c-primary); */
-}
-
-/* Crit Indicator */
-.crit-indicator {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  background: #ffd700;
-  border: 1px solid #ffb800;
-  border-radius: 0;
-  color: var(--color-critical);
-  font-weight: 700;
-  font-size: 0.8em;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  animation: crit-pulse 2s infinite;
 }
 
 .crit-icon {
@@ -125,18 +103,6 @@
 .crit-text {
   font-weight: 900;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-@keyframes crit-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 4px rgba(255, 215, 0, 0);
-  }
 }
 
 .initiative-result-badge {

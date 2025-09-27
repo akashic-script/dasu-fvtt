@@ -4,6 +4,27 @@
   data-group='primary'
   data-tab='effects'
 >
+  <fieldset class="status-effects">
+    <div class="status-header">
+      <legend>{{localize "DASU.Actor.StatusConditions"}}</legend>
+      <div class="status-actions">
+        <button type="button" class="status-action-btn" data-action="clearTemporary" data-tooltip="{{localize 'DASU.Actor.StatusActions.ClearTemporary'}}">
+          {{localize "DASU.Actor.StatusActions.ClearTemporary"}}
+        </button>
+        <button type="button" class="status-action-btn" data-action="clearAll" data-tooltip="{{localize 'DASU.Actor.StatusActions.ClearAll'}}">
+          {{localize "DASU.Actor.StatusActions.ClearAll"}}
+        </button>
+      </div>
+    </div>
+    <div class="status-container">
+      {{#each @root.statusConditions as |status id|}}
+      <button type="button" class="status-control {{#if status.active}}active{{/if}}" data-status-id="{{id}}" data-tooltip="{{status.description}}" data-action="toggleStatus">
+        <img src="{{status.img}}" alt="{{status.name}}">
+        <span>{{status.name}}</span>
+      </button>
+      {{/each}}
+    </div>
+  </fieldset>
   <ol class='items-list'>
     {{#each effects as |section sid|}}
       <li

@@ -30,7 +30,7 @@ export class DASUAccuracyDialog extends foundry.applications.api.HandlebarsAppli
       resizable: false,
     },
     position: {
-      width: 450,
+      width: 400,
       height: 'auto',
     },
     actions: {

@@ -14,7 +14,7 @@
           {{! Attribute Points Display - Header above grid }}
           <div class="attribute-points-display flexrow">
             <label class="resource-label flex1">{{localize 'DASU.Actor.Attributes.points.label.label'}}</label>
-            <span class="tick-button-compact" data-tooltip="AP (Attribute Points): Used to buy attribute ticks. You gain 1 AP at level 1 and then 1 AP at every odd level (3, 5, 7, 9, etc.). Each tick above 1 in any attribute costs 1 AP.">
+            <span class="tick-button-compact" data-tooltip="{{localize 'DASU.Actor.Attributes.points.tooltip'}}">
               AP: {{apSpent}} / {{apEarned}}
             </span>
           </div>
@@ -34,7 +34,7 @@
                     {{attribute.tick}}
                   </div>
                 </div>
-                {{!-- {{#if @root.isEditMode}}
+                {{#if @root.isEditMode}}
                   <div class='attribute-controls flexrow'>
                     <button type='button' 
                             class='attribute-decrease' 
@@ -51,7 +51,7 @@
                       <i class='fas fa-plus'></i>
                     </button>
                   </div>
-                {{/if}} --}}
+                {{/if}}
               </div>
             {{/each}}
           </div>
@@ -59,14 +59,14 @@
           {{! Critical Modifier Section for Daemons }}
           <div class="crit-section">
             <div class="crit-header flexrow">
-              <label class="resource-label flex2">Critical Modifier</label>
-              <span class="crit-threshold-display" data-tooltip="Critical Threshold ({{system.stats.crit.value}}): Lower values make crits easier to achieve. Base is 7, reduced by crit mod and certain schemas.">
-                Threshold: {{system.stats.crit.value}}
+              <label class="resource-label flex2">{{localize 'DASU.Actor.Stats.crit.label'}}</label>
+              <span class="crit-threshold-display" data-tooltip="{{localize 'DASU.Actor.Stats.crit.tooltipDaemon' value=system.stats.crit.value}}">
+                {{localize 'DASU.Actor.Stats.crit.threshold'}}: {{system.stats.crit.value}}
               </span>
             </div>
             {{#if @root.isEditMode}}
               <div class="crit-controls flexrow">
-                <label class="crit-label">Crit Mod:</label>
+                <label class="crit-label">{{localize 'DASU.Actor.Stats.crit.mod'}}:</label>
                 <input type="number" 
                        name="system.stats.crit.mod" 
                        value="{{system.stats.crit.mod}}" 
@@ -74,11 +74,11 @@
                        max="6" 
                        data-dtype="Number" 
                        class="crit-mod-input"
-                       data-tooltip="Crit Mod: Each point reduces your critical threshold by 1 (range 0-6)" />
+                       data-tooltip="{{localize 'DASU.Actor.Stats.crit.modTooltip'}}" />
               </div>
             {{else}}
               <div class="crit-display flexrow">
-                <label class="crit-label">Crit Mod:</label>
+                <label class="crit-label">{{localize 'DASU.Actor.Stats.crit.mod'}}:</label>
                 <span class="crit-value">{{system.stats.crit.mod}}</span>
               </div>
             {{/if}}
@@ -88,7 +88,7 @@
           {{! Attribute Points Display - Header above grid }}
           <div class="attribute-points-display flexrow">
             <label class="resource-label flex1">{{localize 'DASU.Actor.Attributes.points.label.label'}}</label>
-            <span class="tick-button-compact" data-tooltip="AP (Attribute Points): Used to buy attribute ticks. You gain 1 AP at level 1 and then 1 AP at every odd level (3, 5, 7, 9, etc.). Each tick above 1 in any attribute costs 1 AP.">
+            <span class="tick-button-compact" data-tooltip="{{localize 'DASU.Actor.Attributes.points.tooltip'}}">
               AP: {{apSpent}} / {{apEarned}}
             </span>
           </div>
@@ -108,7 +108,7 @@
                     {{attribute.tick}}
                   </div>
                 </div>
-                {{!-- {{#if @root.isEditMode}}
+                {{#if @root.isEditMode}}
                   <div class='attribute-controls flexrow'>
                     <button type='button' 
                             class='attribute-decrease' 
@@ -125,7 +125,7 @@
                       <i class='fas fa-plus'></i>
                     </button>
                   </div>
-                {{/if}} --}}
+                {{/if}}
               </div>
             {{/each}}
           </div>
@@ -133,14 +133,14 @@
           {{! Critical Modifier Section for Summoners }}
           <div class="crit-section">
             <div class="crit-header flexrow">
-              <label class="resource-label flex2">Critical Modifier</label>
-              <span class="crit-threshold-display" data-tooltip="Critical Threshold ({{system.stats.crit.value}}): Lower values make crits easier to achieve. Base is 7, reduced by dejections (crit mod).">
-                Threshold: {{system.stats.crit.value}}
+              <label class="resource-label flex2">{{localize 'DASU.Actor.Stats.crit.label'}}</label>
+              <span class="crit-threshold-display" data-tooltip="{{localize 'DASU.Actor.Stats.crit.tooltipSummoner' value=system.stats.crit.value}}">
+                {{localize 'DASU.Actor.Stats.crit.threshold'}}: {{system.stats.crit.value}}
               </span>
             </div>
             {{#if @root.isEditMode}}
               <div class="crit-controls flexrow">
-                <label class="crit-label">Crit Mod:</label>
+                <label class="crit-label">{{localize 'DASU.Actor.Stats.crit.mod'}}:</label>
                 <input type="number" 
                        name="system.stats.crit.mod" 
                        value="{{system.stats.crit.mod}}" 
@@ -148,11 +148,11 @@
                        max="6" 
                        data-dtype="Number" 
                        class="crit-mod-input"
-                       data-tooltip="Dejections: Each point reduces your critical threshold by 1 (range 0-6)" />
+                       data-tooltip="{{localize 'DASU.Actor.Stats.crit.modTooltip'}}" />
               </div>
             {{else}}
               <div class="crit-display flexrow">
-                <label class="crit-label">Dejections:</label>
+                <label class="crit-label">{{localize 'DASU.Actor.Stats.crit.label'}}:</label>
                 <span class="crit-value">{{system.stats.crit.mod}}</span>
               </div>
             {{/if}}
@@ -162,7 +162,7 @@
           {{! Skill Points Display - Header above skills }}
           <div class="skill-points-display flexrow">
             <label class="resource-label flex1">{{localize 'DASU.Actor.Skills.skillPoints.label'}}</label>
-            <span class="tick-button-compact" data-tooltip="SP (Skill Points): Used to buy skill ticks. You gain SP as you level up. Each tick in a skill costs the cumulative value (1 for first, 2 for second, etc.).">
+            <span class="tick-button-compact" data-tooltip="{{localize 'DASU.Actor.Skills.skillPoints.tooltip'}}">
               {{localize 'DASU.Actor.Skills.skillPoints.abbr'}}: {{skillPoints.spent}}/{{skillPoints.max}}
             </span>
           </div>
@@ -185,11 +185,8 @@
                     </div>
                   </div>
                   
-                  {{! Gap }}
-                  {{!-- <div class='skill-gap'></div> --}}
-                  
                   {{! Tick Boxes (1-6) - Only show in edit mode }}
-                  {{!-- {{#if @root.isEditMode}}
+                  {{#if @root.isEditMode}}
                     <div class='skill-ticks flexrow'>
                       {{#each (range 1 6) as |tick|}}
                         <input type='radio' 
@@ -202,7 +199,7 @@
                                data-tick-value='{{tick}}' />
                       {{/each}}
                     </div>
-                  {{/if}} --}}
+                  {{/if}}
                 </div>
               {{/each}}
             </div>
@@ -534,18 +531,19 @@
                     <i class='fas fa-chess'></i>
                     <span>{{localize "DASU.Filter.Tactics"}}</span>
                   </label>
-                  {{#if (ne actor.type 'daemon')}}
                   <label class='filter-option'>
                     <input type='checkbox' value='special' checked>
                     <i class='fas fa-star'></i>
                     <span>{{localize "DASU.Filter.Specials"}}</span>
                   </label>
+                  {{#if (ne actor.type 'daemon')}}
                   <label class='filter-option'>
                     <input type='checkbox' value='scar' checked>
                     <i class='fas fa-scar'></i>
                     <span>{{localize "DASU.Filter.Scars"}}</span>
                   </label>
                   {{/if}}
+                  {{#if (ne actor.type 'daemon')}}
                   <label class='filter-option'>
                     <input type='checkbox' value='schema' checked>
                     <i class='fas fa-cube'></i>
@@ -561,6 +559,7 @@
                     <i class='fas fa-graduation-cap'></i>
                     <span>{{localize "DASU.Filter.Classes"}}</span>
                   </label>
+                  {{/if}}
                 </div>
                 <div class='filter-actions'>
                   <button class='apply-filter-btn'>{{localize "DASU.Filter.Apply"}}</button>
@@ -569,6 +568,9 @@
               </div>
               <button class='items-favorites-btn {{#if favoriteFilterActive}}active{{/if}}' data-tooltip='{{#if favoriteFilterActive}}{{localize "DASU.Filter.ShowAll"}}{{else}}{{localize "DASU.Filter.ShowFavorites"}}{{/if}}' data-action='toggleFavoriteFilter'>
                 <i class='{{#if favoriteFilterActive}}fas{{else}}far{{/if}} fa-star'></i>
+              </button>
+              <button class='items-edit-mode-btn {{#if isEditMode}}active{{/if}}' data-tooltip='{{#if isEditMode}}{{localize "DASU.Actor.EditMode.DisableTooltip"}}{{else}}{{localize "DASU.Actor.EditMode.EnableTooltip"}}{{/if}}' data-action='toggleEditMode'>
+                <i class='fas {{#if isEditMode}}fa-eye-slash{{else}}fa-edit{{/if}}'></i>
               </button>
             </div>
           </li>
@@ -600,7 +602,7 @@
                     </div>
                     <span class='item-name-text'>{{item.name}}</span>
                     {{#if (includes item.traits 'innate')}}
-                      <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
                     {{/if}}
                   </div>
                 <div class='item-slots'>
@@ -635,6 +637,9 @@
                     <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="weapon"}}' data-action='viewDoc'>
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
+                    <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                      <i class='fas fa-trash'></i>
+                    </a>
                   {{/if}}
                   <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
                     <i class='fas fa-bars'></i>
@@ -643,7 +648,7 @@
                 </div>
                 <div class='item-description-row' style='display: none;'>
                   <div class='item-description-content'>
-                    {{#if item.system.description}}{{item.system.description}}{{else}}<em>No description available</em>{{/if}}
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
                   </div>
                 </div>
               </li>
@@ -677,7 +682,7 @@
                     </div>
                     <span class='item-name-text'>{{item.name}}</span>
                     {{#if (includes item.traits 'innate')}}
-                      <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
                     {{/if}}
                     {{#if (isTagEquipped item @root.actor)}}
                       <span class='equipped-indicator' data-tooltip='{{localize "DASU.Tag.AlreadyEquipped"}}'>
@@ -690,6 +695,9 @@
                     <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="tag"}}' data-action='viewDoc'>
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
+                    <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                      <i class='fas fa-trash'></i>
+                    </a>
                   {{/if}}
                   <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
                     <i class='fas fa-bars'></i>
@@ -698,7 +706,7 @@
                 </div>
                 <div class='item-description-row' style='display: none;'>
                   <div class='item-description-content'>
-                    {{#if item.system.description}}{{item.system.description}}{{else}}<em>No description available</em>{{/if}}
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
                   </div>
                 </div>
               </li>
@@ -735,7 +743,7 @@
                     </div>
                     <span class='item-name-text'>{{item.name}}</span>
                     {{#if (includes item.traits 'innate')}}
-                      <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
                     {{/if}}
                   </div>
                 <div class='item-actions'>
@@ -748,6 +756,9 @@
                     <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="technique"}}' data-action='viewDoc'>
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
+                    <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                      <i class='fas fa-trash'></i>
+                    </a>
                   {{/if}}
                   <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
                     <i class='fas fa-bars'></i>
@@ -756,7 +767,7 @@
                 </div>
                 <div class='item-description-row' style='display: none;'>
                   <div class='item-description-content'>
-                    {{#if item.system.description}}{{item.system.description}}{{else}}<em>No description available</em>{{/if}}
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
                   </div>
                 </div>
               </li>
@@ -793,7 +804,7 @@
                     </div>
                     <span class='item-name-text'>{{item.name}}</span>
                     {{#if (includes item.traits 'innate')}}
-                      <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
                     {{/if}}
                   </div>
                 <div class='item-actions'>
@@ -806,6 +817,9 @@
                     <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="spell"}}' data-action='viewDoc'>
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
+                    <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                      <i class='fas fa-trash'></i>
+                    </a>
                   {{/if}}
                   <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
                     <i class='fas fa-bars'></i>
@@ -814,7 +828,7 @@
                 </div>
                 <div class='item-description-row' style='display: none;'>
                   <div class='item-description-content'>
-                    {{#if item.system.description}}{{item.system.description}}{{else}}<em>No description available</em>{{/if}}
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
                   </div>
                 </div>
               </li>
@@ -841,18 +855,19 @@
           </li>
           <div class='item-list affliction-list'>
             {{#each afflictions as |item id|}}
-              <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
-                <div class='item-name flexrow'>
-                  <div class='item-image'>
-                    <a class='rollable' data-action='roll' data-roll-type='item'>
-                      <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
-                    </a>
+              <li class='item expandable-item' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+                <div class='item-row flexrow'>
+                  <div class='item-name flexrow item-name-clickable' data-action='toggleDescription'>
+                    <div class='item-image'>
+                      <a class='rollable' data-action='roll' data-roll-type='item'>
+                        <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
+                      </a>
+                    </div>
+                    <span class='item-name-text'>{{item.name}}</span>
+                    {{#if (includes item.traits 'innate')}}
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
+                    {{/if}}
                   </div>
-                  {{item.name}}
-                  {{#if (includes item.traits 'innate')}}
-                    <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
-                  {{/if}}
-                </div>
                 <div class='item-actions'>
                   <span class='aptitude-value' data-tooltip="{{localizeAptitudeTypeLong item.system.aptitudes.type}}<br>{{localize "DASU.Level"}} {{item.system.aptitudes.value}}">
                     {{#if item.system.aptitudes.type}}{{localizeAptitudeTypeShort item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}
@@ -863,10 +878,19 @@
                     <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="affliction"}}' data-action='viewDoc'>
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
+                    <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                      <i class='fas fa-trash'></i>
+                    </a>
                   {{/if}}
                   <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
                     <i class='fas fa-bars'></i>
                   </a>
+                </div>
+                </div>
+                <div class='item-description-row' style='display: none;'>
+                  <div class='item-description-content'>
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
+                  </div>
                 </div>
               </li>
             {{/each}}
@@ -892,18 +916,19 @@
           </li>
           <div class='item-list restorative-list'>
             {{#each restoratives as |item id|}}
-              <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
-                <div class='item-name flexrow'>
-                  <div class='item-image'>
-                    <a class='rollable' data-action='roll' data-roll-type='item'>
-                      <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
-                    </a>
+              <li class='item expandable-item' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+                <div class='item-row flexrow'>
+                  <div class='item-name flexrow item-name-clickable' data-action='toggleDescription'>
+                    <div class='item-image'>
+                      <a class='rollable' data-action='roll' data-roll-type='item'>
+                        <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
+                      </a>
+                    </div>
+                    <span class='item-name-text'>{{item.name}}</span>
+                    {{#if (includes item.traits 'innate')}}
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
+                    {{/if}}
                   </div>
-                  {{item.name}}
-                  {{#if (includes item.traits 'innate')}}
-                    <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
-                  {{/if}}
-                </div>
                 <div class='item-actions'>
                   <span class='aptitude-value' data-tooltip="{{localizeAptitudeTypeLong item.system.aptitudes.type}}<br>{{localize "DASU.Level"}} {{item.system.aptitudes.value}}">
                     {{#if item.system.aptitudes.type}}{{localizeAptitudeTypeShort item.system.aptitudes.type}}-{{item.system.aptitudes.value}}{{else}}N/A{{/if}}
@@ -914,10 +939,19 @@
                     <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="restorative"}}' data-action='viewDoc'>
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                     </a>
+                    <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                      <i class='fas fa-trash'></i>
+                    </a>
                   {{/if}}
                   <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
                     <i class='fas fa-bars'></i>
                   </a>
+                </div>
+                </div>
+                <div class='item-description-row' style='display: none;'>
+                  <div class='item-description-content'>
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
+                  </div>
                 </div>
               </li>
             {{/each}}
@@ -950,13 +984,16 @@
                     </div>
                     <span class='item-name-text'>{{item.name}}</span>
                     {{#if (includes item.traits 'innate')}}
-                      <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
                     {{/if}}
                   </div>
                 <div class='item-controls'>
                   {{#if (and @root.editable @root.isEditMode)}}
                     <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="tactic"}}' data-action='viewDoc'>
                       <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                    </a>
+                    <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                      <i class='fas fa-trash'></i>
                     </a>
                   {{/if}}
                   <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
@@ -966,7 +1003,7 @@
                 </div>
                 <div class='item-description-row' style='display: none;'>
                   <div class='item-description-content'>
-                    {{#if item.system.description}}{{item.system.description}}{{else}}<em>No description available</em>{{/if}}
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
                   </div>
                 </div>
               </li>
@@ -974,8 +1011,7 @@
           </div>
           {{/if}}
 
-          {{! Specials (only for non-daemon actors) }}
-          {{#if (ne actor.type 'daemon')}}
+          {{! Specials (available for both summoners and daemons) }}
           {{#if (or (eq itemFilterState null) (includes itemFilterState "special"))}}
           <li class='item flexrow items-header' data-item-type='special' data-sortable="true" draggable="true">
             <div class='item-name'>
@@ -991,32 +1027,41 @@
           </li>
           <div class='item-list special-list'>
             {{#each specials as |item id|}}
-              <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
-                <div class='item-name flexrow'>
-                  <div class='item-image'>
-                    <a class='rollable' data-action='roll' data-roll-type='item'>
-                      <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
+              <li class='item expandable-item' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+                <div class='item-row flexrow'>
+                  <div class='item-name flexrow item-name-clickable' data-action='toggleDescription'>
+                    <div class='item-image'>
+                      <a class='rollable' data-action='roll' data-roll-type='item'>
+                        <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
+                      </a>
+                    </div>
+                    <span class='item-name-text'>{{item.name}}</span>
+                    {{#if (includes item.traits 'innate')}}
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
+                    {{/if}}
+                  </div>
+                  <div class='item-controls'>
+                    {{#if (and @root.editable @root.isEditMode)}}
+                      <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="special"}}' data-action='viewDoc'>
+                        <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                      </a>
+                      <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                        <i class='fas fa-trash'></i>
+                      </a>
+                    {{/if}}
+                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                      <i class='fas fa-bars'></i>
                     </a>
                   </div>
-                  {{item.name}}
-                  {{#if (includes item.traits 'innate')}}
-                    <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
-                  {{/if}}
                 </div>
-                <div class='item-controls'>
-                  {{#if (and @root.editable @root.isEditMode)}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="special"}}' data-action='viewDoc'>
-                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                    </a>
-                  {{/if}}
-                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
-                    <i class='fas fa-bars'></i>
-                  </a>
+                <div class='item-description-row' style='display: none;'>
+                  <div class='item-description-content'>
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
+                  </div>
                 </div>
               </li>
             {{/each}}
           </div>
-          {{/if}}
           {{/if}}
 
           {{! Scars (only for non-daemon actors) }}
@@ -1036,27 +1081,37 @@
           </li>
           <div class='item-list scar-list'>
             {{#each scars as |item id|}}
-              <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
-                <div class='item-name flexrow'>
-                  <div class='item-image'>
-                    <a class='rollable' data-action='roll' data-roll-type='item'>
-                      <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
+              <li class='item expandable-item' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+                <div class='item-row flexrow'>
+                  <div class='item-name flexrow item-name-clickable' data-action='toggleDescription'>
+                    <div class='item-image'>
+                      <a class='rollable' data-action='roll' data-roll-type='item'>
+                        <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
+                      </a>
+                    </div>
+                    <span class='item-name-text'>{{item.name}}</span>
+                    {{#if (includes item.traits 'innate')}}
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
+                    {{/if}}
+                  </div>
+                  <div class='item-controls'>
+                    {{#if (and @root.editable @root.isEditMode)}}
+                      <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="scar"}}' data-action='viewDoc'>
+                        <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                      </a>
+                      <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                        <i class='fas fa-trash'></i>
+                      </a>
+                    {{/if}}
+                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                      <i class='fas fa-bars'></i>
                     </a>
                   </div>
-                  {{item.name}}
-                  {{#if (includes item.traits 'innate')}}
-                    <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
-                  {{/if}}
                 </div>
-                <div class='item-controls'>
-                  {{#if (and @root.editable @root.isEditMode)}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="scar"}}' data-action='viewDoc'>
-                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                    </a>
-                  {{/if}}
-                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
-                    <i class='fas fa-bars'></i>
-                  </a>
+                <div class='item-description-row' style='display: none;'>
+                  <div class='item-description-content'>
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
+                  </div>
                 </div>
               </li>
             {{/each}}
@@ -1064,8 +1119,8 @@
           {{/if}}
           {{/if}}
 
-          {{! Schemas }}
-          {{#if (or (eq itemFilterState null) (includes itemFilterState "schema"))}}
+          {{! Schemas (only for summoners, not daemons) }}
+          {{#if (and (ne actor.type 'daemon') (or (eq itemFilterState null) (includes itemFilterState "schema")))}}
           <li class='item flexrow items-header' data-item-type='schema' data-sortable="true" draggable="true">
             <div class='item-name'>
 <span class='item-name-text'>{{localize 'DASU.TYPES.Item.schema'}}</span>
@@ -1090,7 +1145,7 @@
                     </div>
                     <span class='item-name-text'>{{item.name}}</span>
                     {{#if (includes item.traits 'innate')}}
-                      <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
                     {{/if}}
                   </div>
                   <div class='item-controls'>
@@ -1100,6 +1155,9 @@
                       {{/if}}
                       <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="schema"}}' data-action='viewDoc'>
                         <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived (eq item.system.level 3))}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                      </a>
+                      <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                        <i class='fas fa-trash'></i>
                       </a>
                     {{/if}}
                     <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
@@ -1172,8 +1230,8 @@
           </div>
           {{/if}}
 
-          {{! Features }}
-          {{#if (or (eq itemFilterState null) (includes itemFilterState "feature"))}}
+          {{! Features (only for summoners, not daemons) }}
+          {{#if (and (ne actor.type 'daemon') (or (eq itemFilterState null) (includes itemFilterState "feature")))}}
           <li class='item flexrow items-header' data-item-type='feature' data-sortable="true" draggable="true">
             <div class='item-name'>
 <span class='item-name-text'>{{localize 'DASU.TYPES.Item.feature'}}</span>
@@ -1188,38 +1246,48 @@
           </li>
           <div class='item-list feature-list'>
             {{#each features as |item id|}}
-              <li class='item flexrow' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
-                <div class='item-name flexrow'>
-                  <div class='item-image'>
-                    <a class='rollable' data-action='roll' data-roll-type='item'>
-                      <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
+              <li class='item expandable-item' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+                <div class='item-row flexrow'>
+                  <div class='item-name flexrow item-name-clickable' data-action='toggleDescription'>
+                    <div class='item-image'>
+                      <a class='rollable' data-action='roll' data-roll-type='item'>
+                        <img src='{{item.img}}' data-tooltip='{{item.name}}{{#if item.isDaemonDerived}}<br>From: {{item.sourceDaemonName}}{{/if}}' width='24' height='24'/>
+                      </a>
+                    </div>
+                    <span class='item-name-text'>{{item.name}}</span>
+                    {{#if (includes item.traits 'innate')}}
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
+                    {{/if}}
+                  </div>
+                  <div class='item-controls'>
+                    {{#if (and @root.editable @root.isEditMode)}}
+                      {{#if (eq item.system.level 3)}}
+                        <span class="item-level-label">{{localize "DASU.Level"}}: {{item.system.level}} / 3</span>
+                      {{/if}}
+                      <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="feature"}}' data-action='viewDoc'>
+                        <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived (eq item.system.level 3))}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                      </a>
+                      <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                        <i class='fas fa-trash'></i>
+                      </a>
+                    {{/if}}
+                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                      <i class='fas fa-bars'></i>
                     </a>
                   </div>
-                  {{item.name}}
-                  {{#if (includes item.traits 'innate')}}
-                    <span class="badge innate-badge" title="Level-granted">{{localize "DASU.Item.Innate"}}</span>
-                  {{/if}}
                 </div>
-                <div class='item-controls'>
-                  {{#if (and @root.editable @root.isEditMode)}}
-                    {{#if (eq item.system.level 3)}}
-                      <span class="item-level-label">{{localize "DASU.Level"}}: {{item.system.level}} / 3</span>
-                    {{/if}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="feature"}}' data-action='viewDoc'>
-                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived (eq item.system.level 3))}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                    </a>
-                  {{/if}}
-                  <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
-                    <i class='fas fa-bars'></i>
-                  </a>
+                <div class='item-description-row' style='display: none;'>
+                  <div class='item-description-content'>
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
+                  </div>
                 </div>
               </li>
             {{/each}}
           </div>
           {{/if}}
 
-          {{! Classes }}
-          {{#if (or (eq itemFilterState null) (includes itemFilterState "class"))}}
+          {{! Classes (only for summoners, not daemons) }}
+          {{#if (and (ne actor.type 'daemon') (or (eq itemFilterState null) (includes itemFilterState "class")))}}
           <li class='item flexrow items-header' data-item-type='class' data-sortable="true" draggable="true">
             <div class='item-name'>
 <span class='item-name-text'>{{localize 'DASU.TYPES.Item.class'}}</span>
@@ -1254,6 +1322,9 @@
                     <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="class"}}' data-action='viewDoc'>
                       <i class='fas fa-edit'></i>
                     </a>
+                    <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                      <i class='fas fa-trash'></i>
+                    </a>
                   {{/if}}
                   <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
                     <i class='fas fa-bars'></i>
@@ -1262,7 +1333,7 @@
                 </div>
                 <div class='item-description-row' style='display: none;'>
                   <div class='item-description-content'>
-                    {{#if item.system.description}}{{item.system.description}}{{else}}<em>No description available</em>{{/if}}
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
                   </div>
                 </div>
               </li>

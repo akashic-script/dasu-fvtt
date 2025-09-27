@@ -81,7 +81,8 @@
           "sta": { "label": "Stamina", "abbr": "STA" }
         },
         "points": {
-          "label": { "label": "Attribute Points", "abbr": "AP" }
+          "label": { "label": "Attribute Points", "abbr": "AP" },
+          "tooltip": "AP (Attribute Points): Used to buy attribute ticks. You gain 1 AP at level 1 and then 1 AP at every odd level (3, 5, 7, 9, etc.). Each tick above 1 in any attribute costs 1 AP."
         },
         "tick": {
           "label": "Tick",
@@ -111,7 +112,15 @@
         "hp": { "label": "HP", "tooltip": "Health Points" },
         "wp": { "label": "WP", "tooltip": "Willpower Points" },
         "avoid": { "label": "AVD", "tooltip": "Avoid (Dexterity + Stamina)" },
-        "def": { "label": "DEF", "tooltip": "Defense (Power + Willpower)" }
+        "def": { "label": "DEF", "tooltip": "Defense (Power + Willpower)" },
+        "crit": {
+          "label": "Critical Modifier",
+          "threshold": "Threshold",
+          "mod": "Crit Mod",
+          "tooltipDaemon": "Critical Threshold ({value}): Lower values make crits easier to achieve. Base is 7, reduced by crit mod.",
+          "tooltipSummoner": "Critical Threshold ({value}): Lower values make crits easier to achieve. Base is 7, reduced by dejections or certain schemas.",
+          "modTooltip": "Crit Mod: Each point reduces your critical threshold by 1 (range 0-6)"
+        }
       },
       "base": {
         "FIELDS": {
@@ -125,7 +134,10 @@
       },
       "EditMode": {
         "Edit": "Edit Mode",
-        "View": "View Mode"
+        "View": "View Mode",
+        "Toggle": "Toggle Edit Mode",
+        "EnableTooltip": "Enable Edit Mode (shows delete buttons)",
+        "DisableTooltip": "Disable Edit Mode (hides delete buttons)"
       },
       "levelingWizard": {
         "tooltip": "Open Leveling Wizard",
@@ -201,7 +213,8 @@
         "label": "Skills",
         "skillPoints": {
           "label": "Skill Points",
-          "abbr": "SP"
+          "abbr": "SP",
+          "tooltip": "SP (Skill Points): Used to buy skill ticks. You gain SP as you level up. Each tick in a skill costs the cumulative value (1 for first, 2 for second, etc.)."
         },
         "base": {
           "tooltip": "Skill Base Value"
@@ -212,6 +225,16 @@
         "ticks": {
           "tooltip": "Skill Ticks (1-6)"
         }
+      },
+      "Triad": {
+        "Virtue": "Virtue",
+        "Sin": "Sin",
+        "Anathema": "Anathema"
+      },
+      "StatusConditions": "Status Conditions",
+      "StatusActions": {
+        "ClearTemporary": "Clear Temp",
+        "ClearAll": "Clear All"
       },
       "Stocks": {
         "Title": "Daemon Stocks",
@@ -396,7 +419,10 @@
       "Innate": "Innate",
       "AddToFavorites": "Add to favorites",
       "RemoveFromFavorites": "Remove from favorites",
-      "MoreActions": "More actions"
+      "MoreActions": "More actions",
+      "NoDescriptionAvailable": "No description available",
+      "LevelGranted": "Level-granted",
+      "DeleteWithoutConfirm": "Delete (no confirmation)"
     },
     "Description": "Description",
     "SearchItems": "Search items...",

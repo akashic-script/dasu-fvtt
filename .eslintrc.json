@@ -9,6 +9,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
+  "ignorePatterns": ["docs/"],
   "rules": {
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "single"],

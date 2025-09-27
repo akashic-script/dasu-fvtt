@@ -17,10 +17,10 @@
 @import 'components/effects.css';
 @import 'components/barmeter.css';
 @import 'applications/leveling-wizard.css';
-@import 'applications/roll-dialog.css';
 @import 'applications/recruit-dialog.css';
-@import 'applications/accuracy-dialog.css';
+@import 'applications/combat-dialog.css';
 @import 'item-sheet-consistency.css';
+@import 'chat/shared-components.css';
 @import 'chat/attribute-check-card.css';
 @import 'chat/roll-card.css';
 @import 'chat/initiative-card.css';

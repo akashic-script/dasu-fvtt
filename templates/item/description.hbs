@@ -1,11 +1,7 @@
 {{! Description Tab }}
-<section
-  class='tab description standard-form {{tab.cssClass}}'
-  data-group='primary'
-  data-tab='description'
->
-  <fieldset>
-    <legend>{{systemFields.description.label}}</legend>
+<div class='tab description compact-tab {{tab.cssClass}}' data-group='primary' data-tab='description'>
+  <div class="form-row">
+    <label>{{systemFields.description.label}}</label>
     {{formInput @root.htmlInputField value=system.description name="system.description" toggled=@root.editable enriched=enrichedDescription disabled=(not @root.editable)}}
-  </fieldset>
-</section>
+  </div>
+</div>

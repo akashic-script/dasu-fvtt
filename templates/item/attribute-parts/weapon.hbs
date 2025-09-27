@@ -1,142 +1,111 @@
 {{! Weapon Attributes Tab }}
 <section class='tab attributes-weapon scrollable {{tab.cssClass}}' data-group='primary' data-tab='attributes'>
-  
+
   {{! Basic Weapon Stats }}
   <div class='section-header'>
     <h3>Weapon Statistics</h3>
   </div>
-  
+
   <div class='grid grid-2col'>
     <div class='resource'>
       <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.cost.label'}}</label>
-      <input
-        type='text'
-        name='system.cost'
-        value='{{system.cost}}'
-        data-dtype='Number'
-      />
+      <input type='text' name='system.cost' value='{{system.cost}}' data-dtype='Number' />
     </div>
     <div class='resource'>
       <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.toHit.label'}}</label>
-      <input
-        type='text'
-        name='system.toHit'
-        value='{{system.toHit}}'
-        data-dtype='Number'
-      />
+      <input type='text' name='system.toHit' value='{{system.toHit}}' data-dtype='Number' />
     </div>
   </div>
-    <div class='grid grid-2col'>
-      <div class='resource'>
+  <div class='grid grid-2col'>
+    <div class='resource'>
       <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.damage.value.label'}}</label>
-      <input
-        type='text'
-        name='system.damage.value'
-        value='{{system.damage.value}}'
-        data-dtype='Number'
-      />
+      <input type='text' name='system.damage.value' value='{{system.damage.value}}' data-dtype='Number' />
     </div>
-  <div class='resource'>
-    <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.damage.type.label'}}</label>
-    <select name='system.damage.type' data-dtype='String'>
-      {{#each damageTypes as |label value|}}
+    <div class='resource'>
+      <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.damage.type.label'}}</label>
+      <select name='system.damage.type' data-dtype='String'>
+        {{#each damageTypes as |label value|}}
         <option value="{{value}}" {{#if (eq ../system.damage.type value)}}selected{{/if}}>{{localize label}}</option>
-      {{/each}}
-    </select>
+        {{/each}}
+      </select>
+    </div>
   </div>
-  </div>
+  {{! Description }}
+  <div class='separator'></div>
+  <fieldset>
+    <legend>{{localize 'DASU.Description'}}</legend>
+    {{formInput @root.htmlInputField value=system.description name="system.description" toggled=@root.editable
+    enriched=enrichedDescription disabled=(not @root.editable)}}
+  </fieldset>
 
   {{! Tag Slots Section }}
   <div class='separator'></div>
   <div class='section-header' style='display: flex; align-items: center; justify-content: space-between;'>
     <div>
       <h3 style='display: inline;'>{{localize 'DASU.Item.General.Tags.TagSlotsHeader'}}</h3>
-      <span class='section-description' style='margin-left: 1rem;'>{{localize 'DASU.Item.General.Tags.TagSlotsDescription'}}</span>
     </div>
     <div style='display: flex; align-items: center; gap: 0.5rem;'>
       <span style='font-weight: 500;'>{{usedTagSlots}} /</span>
-      <input
-        type='number'
-        id='maxTagSlots'
-        name='system.maxTagSlots'
-        value='{{system.maxTagSlots}}'
-        min='1'
-        max='10'
-        data-dtype='Number'
-        style='width: 3.5rem; text-align: center;'
-      />
+      <input type='number' id='maxTagSlots' name='system.maxTagSlots' value='{{system.maxTagSlots}}' min='1' max='10'
+        data-dtype='Number' style='width: 3.5rem; text-align: center;' />
     </div>
   </div>
-  
+
   <div class='tag-slots-container'>
     {{#each tagSlots as |slot slotKey|}}
-      <div class='tag-slot' data-slot-key='{{slotKey}}' data-drop-zone='tag-slot'>
-        <div class='tag-slot-header'>
-          <span class='slot-label'>Slot {{slot.slotNumber}}</span>
-          {{#if slot.tagId}}
-            <a class='remove-tag' data-action='removeTag' data-slot-key='{{slotKey}}' data-tooltip='Remove Tag'>
-              <i class='fas fa-times'></i>
-            </a>
-          {{/if}}
-        </div>
+    <div class='tag-slot' data-slot-key='{{slotKey}}' data-drop-zone='tag-slot'>
+      <div class='tag-slot-header'>
+        <span class='slot-label'>Slot {{slot.slotNumber}}</span>
         {{#if slot.tagId}}
-          <div class='equipped-tag'>
-            <div class='tag-info'>
-              <img src='{{slot.tag.img}}' width='24' height='24' data-tooltip='{{slot.tag.name}}'/>
-              <span class='tag-name'>{{slot.tag.name}}</span>
-              {{#if slot.tag.isInvalid}}
-                <span class='invalid-tag-warning' data-tooltip='Tag has been deleted from inventory'>
-                  <i class='fas fa-exclamation-triangle'></i>
-                  <span>Tag Deleted</span>
-                </span>
-              {{/if}}
-            </div>
-            {{#if slot.tag.isInvalid}}
-              <div class='invalid-tag-controls'>
-                <button class='clear-invalid-tag' data-slot-key='{{slotKey}}' data-action='clearInvalidTag' data-tooltip='Remove invalid tag reference'>
-                  <i class='fas fa-times'></i>
-                  Clear Invalid Tag
-                </button>
-              </div>
-            {{else}}
-              <div class='tag-rank-controls'>
-                <label>Rank:</label>
-                <input 
-                  type='number' 
-                  name='system.tagSlots.{{slotKey}}.rank.current' 
-                  value='{{slot.rank.current}}' 
-                  min='1' 
-                  max='{{slot.rank.max}}'
-                  data-dtype='Number'
-                  data-slot-key='{{slotKey}}'
-                  data-action='updateTagRank'
-                />
-                <span class='max-rank'>/ {{slot.rank.max}}</span>
-              </div>
-            {{/if}}
-          </div>
-        {{else}}
-          <div class='empty-slot'>
-            <div class='drop-zone'>
-              <i class='fas fa-plus'></i>
-              <span>Drop tag here or select below</span>
-            </div>
-            <select class='tag-selector' data-slot-key='{{slotKey}}' data-action='addTag'>
-              <option value=''>Select a tag...</option>
-              {{#each slot.availableTags as |tag|}}
-                <option value='{{tag._id}}'>{{tag.name}}</option>
-              {{/each}}
-            </select>
-          </div>
+        <a class='remove-tag' data-action='removeTag' data-slot-key='{{slotKey}}' data-tooltip='Remove Tag'>
+          <i class='fas fa-times'></i>
+        </a>
         {{/if}}
       </div>
+      {{#if slot.tagId}}
+      <div class='equipped-tag'>
+        <div class='tag-info'>
+          <img src='{{slot.tag.img}}' width='24' height='24' data-tooltip='{{slot.tag.name}}' />
+          <span class='tag-name'>{{slot.tag.name}}</span>
+          {{#if slot.tag.isInvalid}}
+          <span class='invalid-tag-warning' data-tooltip='Tag has been deleted from inventory'>
+            <i class='fas fa-exclamation-triangle'></i>
+            <span>Tag Deleted</span>
+          </span>
+          {{/if}}
+        </div>
+        {{#if slot.tag.isInvalid}}
+        <div class='invalid-tag-controls'>
+          <button class='clear-invalid-tag' data-slot-key='{{slotKey}}' data-action='clearInvalidTag'
+            data-tooltip='Remove invalid tag reference'>
+            <i class='fas fa-times'></i>
+            Clear Invalid Tag
+          </button>
+        </div>
+        {{else}}
+        <div class='tag-rank-controls'>
+          <label>Rank:</label>
+          <input type='number' name='system.tagSlots.{{slotKey}}.rank.current' value='{{slot.rank.current}}' min='1'
+            max='{{slot.rank.max}}' data-dtype='Number' data-slot-key='{{slotKey}}' data-action='updateTagRank' />
+          <span class='max-rank'>/ {{slot.rank.max}}</span>
+        </div>
+        {{/if}}
+      </div>
+      {{else}}
+      <div class='empty-slot'>
+        <div class='drop-zone'>
+          <i class='fas fa-plus'></i>
+          <span>Drop tag here or select below</span>
+        </div>
+        <select class='tag-selector' data-slot-key='{{slotKey}}' data-action='addTag'>
+          <option value=''>Select a tag...</option>
+          {{#each slot.availableTags as |tag|}}
+          <option value='{{tag._id}}'>{{tag.name}}</option>
+          {{/each}}
+        </select>
+      </div>
+      {{/if}}
+    </div>
     {{/each}}
   </div>
-
-  {{! ProseMirror Description Section }}
-  <div class='separator'></div>
-  <fieldset>
-    <legend>{{localize 'DASU.Description'}}</legend>
-    {{formInput @root.htmlInputField value=system.description name="system.description" toggled=@root.editable enriched=enrichedDescription disabled=(not @root.editable)}}
-  </fieldset>
-</section> 
+</section>

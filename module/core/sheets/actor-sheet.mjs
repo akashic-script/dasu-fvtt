@@ -4,6 +4,7 @@ import { registerHandlebarsHelpers } from '../../utils/helpers.mjs';
 import { LevelingWizard } from '../../ui/applications/leveling-wizard.mjs';
 import { DASURollDialog } from '../../ui/dialogs/roll-dialog.mjs';
 import { DASURecruitDialog } from '../../ui/dialogs/recruit-dialog.mjs';
+import { DASU_STATUS_CONDITIONS } from '../../data/shared/status-conditions.mjs';
 
 registerHandlebarsHelpers();
 
@@ -36,11 +37,16 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       createDoc: this._createDoc,
       copyDoc: this._copyDoc,
       deleteDoc: this._deleteDoc,
+      deleteDocNoConfirm: this._deleteDocNoConfirm,
       toggleEffect: this._toggleEffect,
+      toggleStatus: this._toggleStatus,
+      clearTemporary: this._clearTemporary,
+      clearAll: this._clearAll,
       toggleSummoned: this._toggleSummoned,
       removeFromStock: this._removeFromStock,
       toggleFavorite: this._toggleFavorite,
       toggleFavoriteFilter: this._toggleFavoriteFilter,
+      toggleEditMode: this._toggleEditMode,
       toggleDescription: this._toggleDescription,
       roll: this._onRoll,
       increaseAttribute: this._increaseAttribute,
@@ -195,7 +201,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /** @override */
-  async _preparePartContext(partId, context, options) {
+  async _preparePartContext(partId, context, _options) {
     switch (partId) {
       case 'main':
         context.tab = context.tabs[partId];
@@ -230,6 +236,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           // as well as any items
           this.actor.allApplicableEffects()
         );
+        // Add status conditions data
+        context.statusConditions = this._prepareStatusConditions();
         break;
     }
     return context;
@@ -347,9 +355,11 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
   /**
    * Toggle edit mode for the actor sheet
+   * @param {PointerEvent} _event   The originating click event
+   * @param {HTMLElement} _target   The capturing HTML element which defined a [data-action]
    * @protected
    */
-  async _toggleEditMode() {
+  static async _toggleEditMode(_event, _target) {
     const currentMode = this._isEditMode();
     const newMode = !currentMode;
 
@@ -365,7 +375,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @protected
    */
   _isEditMode() {
-    return this.document.getFlag('dasu', 'editMode') !== false;
+    return this.document.getFlag('dasu', 'editMode') === true;
   }
 
   /**
@@ -393,6 +403,16 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     // Iterate through items, allocating to containers
     for (let i of this.document.items) {
+      // Enrich item description for display
+      i.enrichedDescription =
+        await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+          i.system.description || '',
+          {
+            secrets: this.document.isOwner,
+            rollData: this.actor.getRollData(),
+            relativeTo: this.actor,
+          }
+        );
       // Append to abilities.
       if (i.type === 'ability') {
         // Handle different ability categories
@@ -421,18 +441,24 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       else if (i.type === 'tactic') {
         tactics.push(i);
       }
-      // Append to specials (only for summoners, not daemons).
-      else if (i.type === 'special' && this.document.type !== 'daemon') {
+      // Append to specials (available for both summoners and daemons).
+      else if (i.type === 'special') {
         specials.push(i);
       }
       // Append to scars (only for summoners, not daemons).
       else if (i.type === 'scar' && this.document.type !== 'daemon') {
         scars.push(i);
-      } else if (i.type === 'schema') {
+      }
+      // Append to schemas (only for summoners, not daemons).
+      else if (i.type === 'schema' && this.document.type !== 'daemon') {
         schemas.push(i);
-      } else if (i.type === 'feature') {
+      }
+      // Append to features (only for summoners, not daemons).
+      else if (i.type === 'feature' && this.document.type !== 'daemon') {
         features.push(i);
-      } else if (i.type === 'class') {
+      }
+      // Append to classes (only for summoners, not daemons).
+      else if (i.type === 'class' && this.document.type !== 'daemon') {
         classes.push(i);
       }
     }
@@ -1281,7 +1307,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target The target element
    * @private
    */
-  static async _toggleFavoriteFilter(_event, target) {
+  static async _toggleFavoriteFilter(_event, _target) {
     // Get the current favorite filter state
     const currentState =
       this.actor.getFlag('dasu', 'favoriteFilterActive') || false;
@@ -1394,6 +1420,11 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         itemLists.forEach((itemList) => {
           const itemListClass = itemList.classList[1]?.replace('-list', '');
 
+          // Skip filtering for summoned daemons
+          if (itemListClass === 'summoned-daemons') {
+            return;
+          }
+
           // Map item list class to filter type
           // For ability subcategories, the filter uses the subcategory name
           let filterType = itemListClass;
@@ -1426,7 +1457,17 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           const systemCategory = header.dataset.systemCategory;
           const itemList = header.nextElementSibling;
 
+          // Skip filtering for summoned daemons header
+          if (header.dataset.action === 'toggleSummonedDaemons') {
+            return;
+          }
+
           if (itemList && itemList.classList.contains('item-list')) {
+            // Skip if the item list is summoned daemons
+            if (itemList.classList.contains('summoned-daemons-list')) {
+              return;
+            }
+
             // For ability subcategories, use the system category
             // For other types, use the item type
             let filterType = itemType;
@@ -1533,6 +1574,28 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   static async _deleteDoc(_event, target) {
     const doc = this._getEmbeddedDocument(target);
     await doc.delete();
+  }
+
+  /**
+   * Delete an embedded Document without confirmation (for Edit Mode)
+   * @param {PointerEvent} _event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _deleteDocNoConfirm(_event, target) {
+    try {
+      const doc = this._getEmbeddedDocument(target);
+      await doc.delete();
+      ui.notifications.info(
+        game.i18n.format('DOCUMENT.Deleted', {
+          type: doc.documentName,
+          name: doc.name,
+        })
+      );
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      ui.notifications.error(game.i18n.localize('DOCUMENT.DeleteFailure'));
+    }
   }
 
   /**
@@ -1712,6 +1775,120 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   static async _toggleEffect(_event, target) {
     const effect = this._getEmbeddedDocument(target);
     await effect.update({ disabled: !effect.disabled });
+  }
+
+  /**
+   * Toggle a status condition on/off
+   *
+   * @this DASUActorSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _toggleStatus(_event, target) {
+    const statusId = target.dataset.statusId;
+    const actor = this.actor;
+
+    if (!statusId || !actor) return;
+
+    // Check if status condition is currently active
+    const existingEffect = actor.effects.find(
+      (effect) => effect.statuses && effect.statuses.has(statusId)
+    );
+
+    if (existingEffect) {
+      // Remove the status condition
+      await existingEffect.delete();
+    } else {
+      // Add the status condition
+      const statusCondition = DASU_STATUS_CONDITIONS[statusId];
+      if (statusCondition) {
+        await actor.createEmbeddedDocuments('ActiveEffect', [
+          {
+            name: game.i18n.localize(statusCondition.name),
+            img: statusCondition.img,
+            statuses: [statusId],
+            tint: statusCondition.tint,
+            origin: actor.uuid,
+          },
+        ]);
+      }
+    }
+  }
+
+  /**
+   * Clear all temporary status conditions
+   *
+   * @this DASUActorSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _clearTemporary(_event, _target) {
+    const actor = this.actor;
+    if (!actor) return;
+
+    // Find all temporary status effects (effects with duration)
+    const temporaryEffects = actor.effects.filter((effect) => {
+      // Check if effect has any status conditions and has duration
+      return (
+        effect.statuses &&
+        effect.statuses.size > 0 &&
+        (effect.duration?.rounds > 0 ||
+          effect.duration?.seconds > 0 ||
+          effect.duration?.turns > 0)
+      );
+    });
+
+    if (temporaryEffects.length > 0) {
+      await actor.deleteEmbeddedDocuments(
+        'ActiveEffect',
+        temporaryEffects.map((e) => e.id)
+      );
+      ui.notifications.info(
+        `Cleared ${temporaryEffects.length} temporary status condition(s).`
+      );
+    } else {
+      ui.notifications.warn('No temporary status conditions to clear.');
+    }
+  }
+
+  /**
+   * Clear all status conditions
+   *
+   * @this DASUActorSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _clearAll(_event, _target) {
+    const actor = this.actor;
+    if (!actor) return;
+
+    // Find all status effects (effects with status conditions)
+    const statusEffects = actor.effects.filter(
+      (effect) => effect.statuses && effect.statuses.size > 0
+    );
+
+    if (statusEffects.length > 0) {
+      const confirmed = await Dialog.confirm({
+        title: 'Clear All Status Conditions',
+        content: `<p>Are you sure you want to clear all ${statusEffects.length} status condition(s)?</p>`,
+        defaultYes: false,
+      });
+
+      if (confirmed) {
+        await actor.deleteEmbeddedDocuments(
+          'ActiveEffect',
+          statusEffects.map((e) => e.id)
+        );
+        ui.notifications.info(
+          `Cleared all ${statusEffects.length} status condition(s).`
+        );
+      }
+    } else {
+      ui.notifications.warn('No status conditions to clear.');
+    }
   }
 
   /**
@@ -2508,7 +2685,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       {
         eventName: 'click',
         jQuery: false,
-        onOpen: (menu) => {
+        onOpen: (_menu) => {
           // Close filter dropdown if open
           if (filterDropdown && filterDropdown.classList.contains('visible')) {
             filterDropdown.classList.remove('visible');
@@ -3688,6 +3865,32 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     };
   }
 
+  /**
+   * Prepare status conditions data for template rendering
+   * @returns {Object} Status conditions with active state
+   * @private
+   */
+  _prepareStatusConditions() {
+    const statusConditions = {};
+    const activeEffects = this.actor.effects;
+
+    // Create status condition objects with active state
+    for (const [id, condition] of Object.entries(DASU_STATUS_CONDITIONS)) {
+      const isActive = activeEffects.some(
+        (effect) => effect.statuses && effect.statuses.has(id)
+      );
+
+      statusConditions[id] = {
+        ...condition,
+        name: game.i18n.localize(condition.name),
+        description: game.i18n.localize(condition.description),
+        active: isActive,
+      };
+    }
+
+    return statusConditions;
+  }
+
   // Track drag state globally for the sheet
   _isDragging = false;
 
@@ -4346,126 +4549,124 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     // Initialize Foundry ContextMenu for all context menu toggles
     try {
-      const contextMenu =
-        new foundry.applications.ux.ContextMenu.implementation(
-          this.element,
-          '.context-menu-toggle',
-          menuOptions,
-          {
-            eventName: 'click',
-            jQuery: false,
-            onOpen: () => {
-              // Use the stored values from the click listener
-              const currentItemId = sheet._lastClickedItemId;
+      new foundry.applications.ux.ContextMenu.implementation(
+        this.element,
+        '.context-menu-toggle',
+        menuOptions,
+        {
+          eventName: 'click',
+          jQuery: false,
+          onOpen: () => {
+            // Use the stored values from the click listener
+            const currentItemId = sheet._lastClickedItemId;
 
-              // Wait for menu DOM to be available, then add attributes and event listeners
-              setTimeout(() => {
-                try {
-                  // Try to find the menu element in the DOM
-                  const contextMenu = document.querySelector('#context-menu');
-                  if (!contextMenu) {
-                    console.warn('Context menu element not found in DOM');
-                    return;
+            // Wait for menu DOM to be available, then add attributes and event listeners
+            setTimeout(() => {
+              try {
+                // Try to find the menu element in the DOM
+                const contextMenu = document.querySelector('#context-menu');
+                if (!contextMenu) {
+                  console.warn('Context menu element not found in DOM');
+                  return;
+                }
+
+                // Add data-action attributes and event listeners to menu items
+                const menuItems = contextMenu.querySelectorAll('.context-item');
+
+                menuItems.forEach((item, index) => {
+                  // Add data-action attribute based on menu option index
+                  const actions = ['toggleFavorite', 'copyDoc', 'deleteDoc'];
+                  item.setAttribute('data-action', actions[index]);
+
+                  // Add item ID reference
+                  if (currentItemId) {
+                    item.setAttribute('data-item-id', currentItemId);
+
+                    // Update favorite icon based on current item state
+                    if (actions[index] === 'toggleFavorite') {
+                      const targetItem = sheet.actor.items.get(currentItemId);
+                      if (targetItem) {
+                        const iconElement = item.querySelector('i');
+                        if (iconElement) {
+                          // Use solid star if favorited, outline star if not
+                          iconElement.className = targetItem.system.favorite
+                            ? 'fas fa-star fa-fw'
+                            : 'fal fa-star fa-fw';
+                        }
+                        // Add favorited class to the menu item for special styling
+                        item.classList.toggle(
+                          'favorited',
+                          targetItem.system.favorite
+                        );
+                      }
+                    }
                   }
 
-                  // Add data-action attributes and event listeners to menu items
-                  const menuItems =
-                    contextMenu.querySelectorAll('.context-item');
+                  // Add click event listener
+                  item.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
 
-                  menuItems.forEach((item, index) => {
-                    // Add data-action attribute based on menu option index
-                    const actions = ['toggleFavorite', 'copyDoc', 'deleteDoc'];
-                    item.setAttribute('data-action', actions[index]);
+                    const action = item.getAttribute('data-action');
+                    const itemId = item.getAttribute('data-item-id');
 
-                    // Add item ID reference
-                    if (currentItemId) {
-                      item.setAttribute('data-item-id', currentItemId);
-
-                      // Update favorite icon based on current item state
-                      if (actions[index] === 'toggleFavorite') {
-                        const targetItem = sheet.actor.items.get(currentItemId);
-                        if (targetItem) {
-                          const iconElement = item.querySelector('i');
-                          if (iconElement) {
-                            // Use solid star if favorited, outline star if not
-                            iconElement.className = targetItem.system.favorite
-                              ? 'fas fa-star fa-fw'
-                              : 'fal fa-star fa-fw';
+                    const targetItem = itemId
+                      ? sheet.actor.items.get(itemId)
+                      : null;
+                    if (targetItem) {
+                      switch (action) {
+                        case 'toggleFavorite':
+                          sheet._toggleItemFavorite(targetItem);
+                          break;
+                        case 'copyDoc':
+                          if (sheet.isEditable && sheet._isEditMode()) {
+                            sheet._copyItem(targetItem);
                           }
-                          // Add favorited class to the menu item for special styling
-                          item.classList.toggle(
-                            'favorited',
-                            targetItem.system.favorite
-                          );
-                        }
+                          break;
+                        case 'deleteDoc':
+                          if (sheet.isEditable && sheet._isEditMode()) {
+                            sheet._deleteItem(targetItem);
+                          }
+                          break;
                       }
                     }
 
-                    // Add click event listener
-                    item.addEventListener('click', (event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-
-                      const action = item.getAttribute('data-action');
-                      const itemId = item.getAttribute('data-item-id');
-
-                      const targetItem = itemId
-                        ? sheet.actor.items.get(itemId)
-                        : null;
-                      if (targetItem) {
-                        switch (action) {
-                          case 'toggleFavorite':
-                            sheet._toggleItemFavorite(targetItem);
-                            break;
-                          case 'copyDoc':
-                            if (sheet.isEditable && sheet._isEditMode()) {
-                              sheet._copyItem(targetItem);
-                            }
-                            break;
-                          case 'deleteDoc':
-                            if (sheet.isEditable && sheet._isEditMode()) {
-                              sheet._deleteItem(targetItem);
-                            }
-                            break;
-                        }
-                      }
-
-                      // Close the context menu after action
-                      if (contextMenu) {
-                        contextMenu.remove();
-                      }
-                    });
+                    // Close the context menu after action
+                    if (contextMenu) {
+                      contextMenu.remove();
+                    }
                   });
-                } catch (error) {
-                  console.error('Error setting up context menu items:', error);
-                }
-              }, 10); // Small delay to ensure DOM is ready
-
-              // Add active state to clicked toggle
-              if (sheet._lastClickedToggle) {
-                sheet._lastClickedToggle.classList.add('active');
+                });
+              } catch (error) {
+                console.error('Error setting up context menu items:', error);
               }
+            }, 10); // Small delay to ensure DOM is ready
 
-              // Apply standardized theming
-              setTimeout(() => {
-                this._applyContextMenuTheme('standard');
-              }, 1);
-            },
-            onClose: () => {
-              // Remove active state from clicked toggle
-              if (sheet._lastClickedToggle) {
-                sheet._lastClickedToggle.classList.remove('active');
-              }
+            // Add active state to clicked toggle
+            if (sheet._lastClickedToggle) {
+              sheet._lastClickedToggle.classList.add('active');
+            }
 
-              // Clear the current clicked toggle reference
-              sheet._lastClickedToggle = null;
+            // Apply standardized theming
+            setTimeout(() => {
+              this._applyContextMenuTheme('standard');
+            }, 1);
+          },
+          onClose: () => {
+            // Remove active state from clicked toggle
+            if (sheet._lastClickedToggle) {
+              sheet._lastClickedToggle.classList.remove('active');
+            }
 
-              // Remove context menu theming
-              this._removeContextMenuTheme();
-            },
-            fixed: true,
-          }
-        );
+            // Clear the current clicked toggle reference
+            sheet._lastClickedToggle = null;
+
+            // Remove context menu theming
+            this._removeContextMenuTheme();
+          },
+          fixed: true,
+        }
+      );
     } catch (error) {
       console.error('Error creating context menu:', error);
     }
@@ -4529,6 +4730,26 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         console.error('Error deleting item:', error);
         ui.notifications.error(game.i18n.localize('DOCUMENT.DeleteFailure'));
       }
+    }
+  }
+
+  /**
+   * Delete an item without confirmation (for Edit Mode)
+   * @param {Item} item The item to delete
+   * @private
+   */
+  async _deleteItemNoConfirm(item) {
+    try {
+      await item.delete();
+      ui.notifications.info(
+        game.i18n.format('DOCUMENT.Deleted', {
+          type: item.type,
+          name: item.name,
+        })
+      );
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      ui.notifications.error(game.i18n.localize('DOCUMENT.DeleteFailure'));
     }
   }
 }

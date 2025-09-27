@@ -4,8 +4,6 @@
 
 .dasu-leveling-wizard .no-class-warning {
   margin: 1rem 0;
-  padding: 0;
-  border-radius: 0;
   background: var(--color-bg-secondary);
   background-image: repeating-linear-gradient(
     45deg,
@@ -72,7 +70,6 @@
   );
   border-bottom: 2px solid var(--color-primary);
   flex-shrink: 0;
-  border-radius: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -86,7 +83,6 @@
 .dasu-leveling-wizard .character-portrait img {
   width: 48px;
   height: 48px;
-  border-radius: 0;
   border: 2px solid var(--color-primary);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -110,21 +106,18 @@
   gap: 0.2rem;
   background: var(--color-bg-primary);
   padding: 0.3rem 0.5rem;
-  border-radius: 0;
   border: 1px solid var(--color-primary);
 }
 
 .dasu-leveling-wizard .stat label {
-  font-size: 0.7rem;
+  font: bold 0.7rem var(--font-primary);
   color: var(--color-text-muted);
-  font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .dasu-leveling-wizard .stat span {
-  font-size: 1rem;
-  font-weight: bold;
+  font: bold 1rem var(--font-primary);
   color: var(--color-info);
 }
 

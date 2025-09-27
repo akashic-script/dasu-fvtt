@@ -55,7 +55,7 @@
   font-size: 0.9rem;
   color: var(--color-text-secondary);
   line-height: 1.4;
-  margin-left: 2rem;
+  /* margin-left: 2rem; */
 }
 
 .item-description-content em {
@@ -158,9 +158,10 @@
 .items-list .items-filter-btn,
 .items-list .items-favorites-btn,
 .items-list .items-sort-btn,
+.items-list .items-edit-mode-btn,
 .items-list .items-tab-filter-btn,
 .items-list .items-tab-sort-btn {
-  padding: 0.5rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   background: var(--color-bg-primary);
   border: 1px solid var(--color-primary);
   border-radius: 0;
@@ -1114,7 +1115,7 @@
 
 /* Separators */
 .separator {
-  margin: 1rem 0;
+  margin: 0.5rem 0;
   height: 1px;
   background: linear-gradient(
     to right,
@@ -1383,7 +1384,7 @@ nav#context-menu[class*='dasu-context-menu'] .context-item.loading i {
 
 /* Daemon-derived items styling - use orange color */
 .items-list .item.daemon-derived {
-  border-left: 4px solid var(--color-secondary-highlight);
+  border-left: 4px solid var(--color-secondary-highlight) !important;
 }
 
 /* =========================

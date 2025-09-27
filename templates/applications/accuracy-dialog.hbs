@@ -25,18 +25,8 @@
 
   {{!-- Roll Configuration --}}
   <div class="roll-config">
-    
-    {{!-- Base Bonus Display --}}
-    <div class="base-bonus-info">
-      <div class="bonus-display">
-        <span class="bonus-label">{{bonusLabel}}:</span>
-        <span class="bonus-value">{{#if (gt baseBonus 0)}}+{{/if}}{{baseBonus}}</span>
-      </div>
-    </div>
-
     {{!-- Advantage/Disadvantage Toggle --}}
     <div class="form-group">
-      <label for="rollType">Roll Type:</label>
       <div class="roll-type-toggle">
         <button type="button" 
                 class="toggle-btn {{#if (eq rollData.rollType 'disadvantage')}}active{{/if}}" 
@@ -93,6 +83,13 @@
   {{!-- Roll Summary --}}
   <div class="roll-summary combat-summary">
     <div class="formula-display">
+      {{!-- Base Bonus Display --}}
+      <div class="base-bonus-info">
+        <div class="bonus-display">
+          <span class="bonus-label">{{bonusLabel}}:</span>
+          <span class="bonus-value">{{#if (gt baseBonus 0)}}+{{/if}}{{baseBonus}}</span>
+        </div>
+      </div>
       <div class="formula-container">
         <span class="formula-label">Formula:</span>
         <span class="roll-formula">{{formula}}</span>
