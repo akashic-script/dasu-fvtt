@@ -24,6 +24,37 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     this._favoriteFilterActive = false;
   }
 
+  /**
+   * Available sheet modes.
+   */
+  static MODES = Object.freeze({
+    PREVIEW: 1,
+    EDIT: 2,
+  });
+
+  /**
+   * The mode the sheet is currently in.
+   * @type {typeof DASUActorSheet.MODES[keyof typeof DASUActorSheet.MODES]}
+   * @protected
+   */
+  _mode = DASUActorSheet.MODES.PREVIEW;
+
+  /**
+   * Is this sheet in Preview Mode?
+   * @returns {boolean}
+   */
+  get isPreviewMode() {
+    return this._mode === DASUActorSheet.MODES.PREVIEW;
+  }
+
+  /**
+   * Is this sheet in Edit Mode?
+   * @returns {boolean}
+   */
+  get isEditMode() {
+    return this._mode === DASUActorSheet.MODES.EDIT;
+  }
+
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ['dasu', 'actor'],
@@ -46,6 +77,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       removeFromStock: this._removeFromStock,
       toggleFavorite: this._toggleFavorite,
       toggleFavoriteFilter: this._toggleFavoriteFilter,
+      toggleMode: this._toggleMode,
       toggleEditMode: this._toggleEditMode,
       toggleDescription: this._toggleDescription,
       roll: this._onRoll,
@@ -66,6 +98,32 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   };
 
   /** @override */
+  async _renderFrame(options) {
+    const frame = await super._renderFrame(options);
+
+    // Add edit mode toggle button outside header controls
+    if (this.isEditable) {
+      const isEditMode = this._mode === DASUActorSheet.MODES.EDIT;
+      const toggleButton = this._constructButton({
+        label: '',
+        classes: [
+          'header-control',
+          'icon',
+          'fa-solid',
+          isEditMode ? 'fa-eye' : 'fa-edit',
+        ],
+        dataset: {
+          action: 'toggleMode',
+          tooltip: 'DASU.Actor.EditMode.Toggle',
+        },
+      });
+      this.window.controls.after(toggleButton);
+    }
+
+    return frame;
+  }
+
+  /** @override */
   _getHeaderControls() {
     const controls = super._getHeaderControls();
 
@@ -80,6 +138,39 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     }
 
     return controls;
+  }
+
+  /**
+   * Helper method for constructing an HTML button
+   */
+  _constructButton({
+    label = '',
+    classes = [],
+    dataset = {},
+    type = 'button',
+    disabled = false,
+  }) {
+    const button = document.createElement('button');
+    button.type = type;
+    button.classList.add(...classes);
+    button.textContent = label;
+    button.disabled = disabled;
+    Object.assign(button.dataset, dataset);
+    return button;
+  }
+
+  /**
+   * Update the toggle button icon based on current mode
+   */
+  _updateToggleButtonIcon() {
+    const toggleButton = this.element?.querySelector(
+      '[data-action="toggleMode"]'
+    );
+    if (!toggleButton) return;
+
+    const isEditMode = this._mode === DASUActorSheet.MODES.EDIT;
+    toggleButton.classList.remove('fa-edit', 'fa-eye');
+    toggleButton.classList.add(isEditMode ? 'fa-eye' : 'fa-edit');
   }
 
   /** @override */
@@ -108,6 +199,21 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   /** @override */
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
+
+    if (this.isEditable) {
+      // Handle mode configuration
+      if (options.mode) this._mode = options.mode;
+      else if (options.renderContext === `create${this.document.documentName}`)
+        this._mode = DASUActorSheet.MODES.EDIT;
+      else {
+        // Sync with existing flag for backward compatibility
+        const isEditFlag = this.document.getFlag('dasu', 'editMode') === true;
+        this._mode = isEditFlag
+          ? DASUActorSheet.MODES.EDIT
+          : DASUActorSheet.MODES.PREVIEW;
+      }
+    }
+
     // Not all parts always render
     options.parts = ['header', 'tabs'];
     // Don't show the other tabs if only limited view
@@ -137,6 +243,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       flags: this.actor.flags,
       config: globalThis.DASU,
       maxLevel: DASUSettings.getMaxLevel(),
+      isPlay: this.isPreviewMode,
+      isEdit: this.isEditMode,
       tabs: this._getTabs(options.parts),
       fields: this.document.schema.fields,
       systemFields: this.document.system.schema.fields,
@@ -210,6 +318,19 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           this.actor.getFlag('dasu', 'itemFilterState') || null;
         context.favoriteFilterActive =
           this.actor.getFlag('dasu', 'favoriteFilterActive') || false;
+        // Enrich biography info for display in daemon sidebar
+        context.enrichedBiography =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.actor.system.biography || '',
+            {
+              // Whether to show secret blocks in the finished html
+              secrets: this.document.isOwner,
+              // Data to fill in for inline rolls
+              rollData: this.actor.getRollData(),
+              // Relative UUID resolution
+              relativeTo: this.actor,
+            }
+          );
         break;
       case 'biography':
         context.tab = context.tabs[partId];
@@ -354,11 +475,23 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /**
-   * Toggle edit mode for the actor sheet
-   * @param {PointerEvent} _event   The originating click event
-   * @param {HTMLElement} _target   The capturing HTML element which defined a [data-action]
-   * @protected
+   * Toggle between Preview and Edit modes
    */
+  static async _toggleMode(event, target) {
+    if (!this.isEditable) return;
+
+    this._mode = this.isPreviewMode
+      ? DASUActorSheet.MODES.EDIT
+      : DASUActorSheet.MODES.PREVIEW;
+    await this.document.setFlag(
+      'dasu',
+      'editMode',
+      this._mode === DASUActorSheet.MODES.EDIT
+    );
+    this._updateToggleButtonIcon();
+    this.render();
+  }
+
   static async _toggleEditMode(_event, _target) {
     const currentMode = this._isEditMode();
     const newMode = !currentMode;

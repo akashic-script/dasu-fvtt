@@ -136,8 +136,8 @@
         "Edit": "Edit Mode",
         "View": "View Mode",
         "Toggle": "Toggle Edit Mode",
-        "EnableTooltip": "Enable Edit Mode (shows delete buttons)",
-        "DisableTooltip": "Disable Edit Mode (hides delete buttons)"
+        "EnableTooltip": "Enable Edit Mode",
+        "DisableTooltip": "Disable Edit Mode"
       },
       "levelingWizard": {
         "tooltip": "Open Leveling Wizard",
@@ -227,6 +227,7 @@
         }
       },
       "Triad": {
+        "Header": "Moral Triad",
         "Virtue": "Virtue",
         "Sin": "Sin",
         "Anathema": "Anathema"
@@ -653,23 +654,5 @@
   },
   "DOCUMENT": {
     "Copy": "Copy"
-  },
-  "TYPES": {
-    "Actor": {
-      "daemon": "Daemon",
-      "summoner": "Summoner"
-    },
-    "Item": {
-      "ability": "Ability",
-      "item": "Item",
-      "scar": "Scar",
-      "special": "Special",
-      "tag": "Tag",
-      "tactic": "Tactic",
-      "weapon": "Weapon",
-      "schema": "Schema",
-      "feature": "Feature",
-      "class": "Class"
-    }
   }
 }

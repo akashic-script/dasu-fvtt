@@ -1,53 +1,54 @@
 {{! Biography Tab }}
-<section
-  class='tab biography scrollable {{tab.cssClass}}'
-  data-group='primary'
-  data-tab='biography'
->
+<section class='tab biography scrollable {{tab.cssClass}}' data-group='primary' data-tab='biography'>
   <section class='grid grid-3col'>
     <aside class='sidebar grid-span-1'>
-      <div class='placeholder-fields-card' style='background: var(--color-bg-primary); border: 1px solid var(--color-border); padding: 0.2rem 0.4rem; align-items: center; min-height: 1.4rem; margin-bottom: 0.5rem;'>
-        <h3 class='card-header'>Moral Triad</h3>
-        <div class='field-group'>
-          <label class='resource-label' for='triad-virtue'>{{localize 'DASU.Actor.Triad.Virtue'}}</label>
+      {{! Moral Triad Section }}
+      <div class='card-container'
+        style='background: var(--color-bg-primary); border: 1px solid var(--color-border); padding: 0.2rem 0.4rem; align-items: center; min-height: 1.4rem; margin-bottom: 0.5rem;'>
+        <h4 class="section-header">{{localize 'DASU.Actor.Triad.Header'}}</h4>
+        <div class="triad-field flexrow">
+          <label class="resource-label" for='triad-virtue'>{{localize 'DASU.Actor.Triad.Virtue'}}:</label>
           {{#if @root.isEditMode}}
-            <input type='text' id='triad-virtue' list='virtue-suggestions' name='system.triad.virtue' value='{{system.triad.virtue}}' placeholder='Enter a virtue...' />
+          <input type='text' id='triad-virtue' list='virtue-suggestions' name='system.triad.virtue'
+            value='{{system.triad.virtue}}' placeholder='Enter a virtue...' />
           {{else}}
-            <span class='field-value'>{{system.triad.virtue}}</span>
+          <span class="field-value">{{system.triad.virtue}}</span>
           {{/if}}
         </div>
-
-        <div class='field-group'>
-          <label class='resource-label' for='triad-sin'>{{localize 'DASU.Actor.Triad.Sin'}}</label>
+        <div class="triad-field flexrow">
+          <label class="resource-label" for='triad-sin'>{{localize 'DASU.Actor.Triad.Sin'}}:</label>
           {{#if @root.isEditMode}}
-            <input type='text' id='triad-sin' list='sin-suggestions' name='system.triad.sin' value='{{system.triad.sin}}' placeholder='Enter a sin...' />
+          <input type='text' id='triad-sin' list='sin-suggestions' name='system.triad.sin' value='{{system.triad.sin}}'
+            placeholder='Enter a sin...' />
           {{else}}
-            <span class='field-value'>{{system.triad.sin}}</span>
+          <span class="field-value">{{system.triad.sin}}</span>
           {{/if}}
         </div>
-
-        <div class='field-group'>
-          <label class='resource-label' for='triad-anathema'>{{localize 'DASU.Actor.Triad.Anathema'}}</label>
+        <div class="triad-field flexrow">
+          <label class="resource-label" for='triad-anathema'>{{localize 'DASU.Actor.Triad.Anathema'}}:</label>
           {{#if @root.isEditMode}}
-            <input type='text' id='triad-anathema' list='anathema-suggestions' name='system.triad.anathema' value='{{system.triad.anathema}}' placeholder='Enter an anathema...' />
+          <input type='text' id='triad-anathema' list='anathema-suggestions' name='system.triad.anathema'
+            value='{{system.triad.anathema}}' placeholder='Enter an anathema...' />
           {{else}}
-            <span class='field-value'>{{system.triad.anathema}}</span>
+          <span class="field-value">{{system.triad.anathema}}</span>
           {{/if}}
         </div>
       </div>
 
       {{! Datalist suggestions for moral triad fields }}
       <datalist id='virtue-suggestions'>
-        <option value='Compassion'>
-        <option value='Courage'>
-        <option value='Honesty'>
-        <option value='Justice'>
-        <option value='Loyalty'>
-        <option value='Temperance'>
-        <option value='Wisdom'>
-        <option value='Patience'>
-        <option value='Humility'>
-        <option value='Generosity'>
+        <option value='Ambition'>
+        <option value='Cunning'>
+        <option value='Passion'>
+        <option value='Competition'>
+        <option value='Yearning'>
+        <option value='Indulgence'>
+        <option value='Certainty'>
+        <option value='Comfort'>
+        <option value='Devotion'>
+        <option value='Discernment'>
+        <option value='Conviction'>
+        <option value='Aspiration'>
       </datalist>
 
       <datalist id='sin-suggestions'>
@@ -58,30 +59,38 @@
         <option value='Lust'>
         <option value='Gluttony'>
         <option value='Sloth'>
-        <option value='Betrayal'>
-        <option value='Cruelty'>
-        <option value='Deception'>
+        <option value='Ignorance'>
+        <option value='Attachment'>
+        <option value='Aversion'>
+        <option value='Delusion'>
+        <option value='Obsession'>
       </datalist>
 
       <datalist id='anathema-suggestions'>
-        <option value='Violence against innocents'>
-        <option value='Breaking sacred oaths'>
-        <option value='Destroying knowledge'>
-        <option value='Harming nature'>
-        <option value='Betraying allies'>
-        <option value='Using forbidden magic'>
-        <option value='Desecrating holy sites'>
-        <option value='Torturing captives'>
-        <option value='Abandoning duty'>
-        <option value='Corrupting the pure'>
+        <option value='Dishonor'>
+        <option value='Disgrace'>
+        <option value='Poverty'>
+        <option value='Helplessness'>
+        <option value='Insignificance'>
+        <option value='Sterility'>
+        <option value='Starvation'>
+        <option value='Paralysis'>
+        <option value='Confusion'>
+        <option value='Subjugation'>
+        <option value='Blindness'>
+        <option value='Emptiness'>
       </datalist>
     </aside>
 
     <main class='main-content grid-span-2'>
-      <fieldset class='biography-description'>
-        <legend>{{systemFields.biography.label}}</legend>
-        {{formInput @root.htmlInputField value=system.biography name="system.biography" toggled=@root.editable enriched=enrichedBiography disabled=(not @root.editable)}}
-      </fieldset>
+      <div class='card-container'
+        style='background: var(--color-bg-primary); border: 1px solid var(--color-border); padding: 0.2rem 0.4rem; align-items: center; min-height: 1.4rem; margin-bottom: 0.5rem;'>
+        <fieldset class='biography-description'>
+          <legend>{{systemFields.biography.label}}</legend>
+          {{formInput @root.htmlInputField value=system.biography name="system.biography" toggled=@root.editable
+          enriched=enrichedBiography disabled=(not @root.editable)}}
+        </fieldset>
+      </div>
     </main>
   </section>
 </section>

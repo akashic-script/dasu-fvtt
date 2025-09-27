@@ -83,6 +83,31 @@
               </div>
             {{/if}}
           </div>
+
+          {{! Moral Triad Section for Daemons }}
+          <div class='card-container' style='background: var(--color-bg-primary); border: 1px solid var(--color-border); padding: 0.2rem 0.4rem; align-items: center; min-height: 1.4rem; margin-bottom: 0.5rem;'>
+            <h4 class="section-header">{{localize 'DASU.Actor.Triad.Header'}}</h4>
+            <div class="triad-field flexrow">
+              <label class="resource-label">{{localize 'DASU.Actor.Triad.Virtue'}}:</label>
+              <span class="field-value">{{system.triad.virtue}}</span>
+            </div>
+            <div class="triad-field flexrow">
+              <label class="resource-label">{{localize 'DASU.Actor.Triad.Sin'}}:</label>
+              <span class="field-value">{{system.triad.sin}}</span>
+            </div>
+            <div class="triad-field flexrow">
+              <label class="resource-label">{{localize 'DASU.Actor.Triad.Anathema'}}:</label>
+              <span class="field-value">{{system.triad.anathema}}</span>
+            </div>
+          </div>
+
+          {{! Biography Section for Daemons }}
+          <div class='card-container' style='background: var(--color-bg-primary); border: 1px solid var(--color-border); padding: 0.2rem 0.4rem; align-items: center; min-height: 1.4rem; margin-bottom: 0.5rem;'>
+            <h4 class="section-header">{{systemFields.biography.label}}</h4>
+            <div class="biography-content">
+              {{{enrichedBiography}}}
+            </div>
+          </div>
         {{else}}
           {{! Standard layout for Summoners }}
           {{! Attribute Points Display - Header above grid }}
@@ -336,19 +361,19 @@
                         <div class='item-actions'>
                           <span class='summoned-status'>{{localize 'DASU.Actor.Stocks.Summoned'}}</span>
                         </div>
-                        {{#if (and @root.editable @root.isEditMode)}}
-                          <div class='item-controls'>
+                        <div class='item-controls'>
+                          <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type='daemon'}}' data-action='viewDoc'>
+                            <i class='fas fa-edit'></i>
+                          </a>
+                          {{#if (and @root.editable @root.isEditMode)}}
                             <a class='item-control toggle-summoned' data-tooltip='{{localize "DASU.Actor.Stocks.ToggleSummoned"}}' data-action='toggleSummoned'>
                               <i class='fas fa-user-check'></i>
-                            </a>
-                            <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type='daemon'}}' data-action='viewDoc'>
-                              <i class='fas fa-edit'></i>
                             </a>
                             <a class='item-control item-delete' data-tooltip='{{localize "DASU.Actor.Stocks.RemoveFromStock"}}' data-action='removeFromStock'>
                               <i class='fas fa-trash'></i>
                             </a>
-                          </div>
-                        {{/if}}
+                          {{/if}}
+                        </div>
                       </div>
                       {{! Second row - stats }}
                       <div class='daemon-stats-row flexrow'>
@@ -633,10 +658,10 @@
                   {{/each}}
                 </div>
                 <div class='item-controls'>
+                  <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="weapon"}}' data-action='viewDoc'>
+                    <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                  </a>
                   {{#if (and @root.editable @root.isEditMode)}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="weapon"}}' data-action='viewDoc'>
-                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                    </a>
                     <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                       <i class='fas fa-trash'></i>
                     </a>
@@ -691,10 +716,10 @@
                     {{/if}}
                   </div>
                 <div class='item-controls'>
+                  <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="tag"}}' data-action='viewDoc'>
+                    <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                  </a>
                   {{#if (and @root.editable @root.isEditMode)}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="tag"}}' data-action='viewDoc'>
-                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                    </a>
                     <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                       <i class='fas fa-trash'></i>
                     </a>
@@ -752,10 +777,10 @@
                   </span>
                 </div>
                 <div class='item-controls'>
+                  <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="technique"}}' data-action='viewDoc'>
+                    <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                  </a>
                   {{#if (and @root.editable @root.isEditMode)}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="technique"}}' data-action='viewDoc'>
-                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                    </a>
                     <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                       <i class='fas fa-trash'></i>
                     </a>
@@ -813,10 +838,10 @@
                   </span>
                 </div>
                 <div class='item-controls'>
+                  <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="spell"}}' data-action='viewDoc'>
+                    <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                  </a>
                   {{#if (and @root.editable @root.isEditMode)}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="spell"}}' data-action='viewDoc'>
-                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                    </a>
                     <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                       <i class='fas fa-trash'></i>
                     </a>
@@ -874,10 +899,10 @@
                   </span>
                 </div>
                 <div class='item-controls'>
+                  <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="affliction"}}' data-action='viewDoc'>
+                    <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                  </a>
                   {{#if (and @root.editable @root.isEditMode)}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="affliction"}}' data-action='viewDoc'>
-                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                    </a>
                     <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                       <i class='fas fa-trash'></i>
                     </a>
@@ -935,10 +960,10 @@
                   </span>
                 </div>
                 <div class='item-controls'>
+                  <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="restorative"}}' data-action='viewDoc'>
+                    <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                  </a>
                   {{#if (and @root.editable @root.isEditMode)}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="restorative"}}' data-action='viewDoc'>
-                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                    </a>
                     <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                       <i class='fas fa-trash'></i>
                     </a>
@@ -988,10 +1013,10 @@
                     {{/if}}
                   </div>
                 <div class='item-controls'>
+                  <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="tactic"}}' data-action='viewDoc'>
+                    <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                  </a>
                   {{#if (and @root.editable @root.isEditMode)}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="tactic"}}' data-action='viewDoc'>
-                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                    </a>
                     <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                       <i class='fas fa-trash'></i>
                     </a>
@@ -1041,10 +1066,10 @@
                     {{/if}}
                   </div>
                   <div class='item-controls'>
+                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="special"}}' data-action='viewDoc'>
+                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                    </a>
                     {{#if (and @root.editable @root.isEditMode)}}
-                      <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="special"}}' data-action='viewDoc'>
-                        <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                      </a>
                       <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                         <i class='fas fa-trash'></i>
                       </a>
@@ -1095,10 +1120,10 @@
                     {{/if}}
                   </div>
                   <div class='item-controls'>
+                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="scar"}}' data-action='viewDoc'>
+                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                    </a>
                     {{#if (and @root.editable @root.isEditMode)}}
-                      <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="scar"}}' data-action='viewDoc'>
-                        <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                      </a>
                       <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                         <i class='fas fa-trash'></i>
                       </a>
@@ -1149,13 +1174,13 @@
                     {{/if}}
                   </div>
                   <div class='item-controls'>
+                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="schema"}}' data-action='viewDoc'>
+                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived (eq item.system.level 3))}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                    </a>
                     {{#if (and @root.editable @root.isEditMode)}}
                       {{#if (eq item.system.level 3)}}
                         <span class="item-level-label">{{localize "DASU.Level"}}: {{item.system.level}} / 3</span>
                       {{/if}}
-                      <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="schema"}}' data-action='viewDoc'>
-                        <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived (eq item.system.level 3))}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                      </a>
                       <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                         <i class='fas fa-trash'></i>
                       </a>
@@ -1260,13 +1285,13 @@
                     {{/if}}
                   </div>
                   <div class='item-controls'>
+                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="feature"}}' data-action='viewDoc'>
+                      <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived (eq item.system.level 3))}}fa-eye{{else}}fa-edit{{/if}}'></i>
+                    </a>
                     {{#if (and @root.editable @root.isEditMode)}}
                       {{#if (eq item.system.level 3)}}
                         <span class="item-level-label">{{localize "DASU.Level"}}: {{item.system.level}} / 3</span>
                       {{/if}}
-                      <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="feature"}}' data-action='viewDoc'>
-                        <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived (eq item.system.level 3))}}fa-eye{{else}}fa-edit{{/if}}'></i>
-                      </a>
                       <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                         <i class='fas fa-trash'></i>
                       </a>
@@ -1318,10 +1343,10 @@
                     </span>
                   </div>
                 <div class='item-controls'>
+                  <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="class"}}' data-action='viewDoc'>
+                    <i class='fas fa-edit'></i>
+                  </a>
                   {{#if (and @root.editable @root.isEditMode)}}
-                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="class"}}' data-action='viewDoc'>
-                      <i class='fas fa-edit'></i>
-                    </a>
                     <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
                       <i class='fas fa-trash'></i>
                     </a>
