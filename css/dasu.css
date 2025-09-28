@@ -21,10 +21,9 @@
 @import 'applications/combat-dialog.css';
 @import 'item-sheet-consistency.css';
 @import 'chat/shared-components.css';
-@import 'chat/attribute-check-card.css';
-@import 'chat/roll-card.css';
 @import 'chat/initiative-card.css';
 @import 'chat/daemon-card.css';
+@import 'chat/checks.css';
 
 /* Styles limited to dasu sheets */
 .dasu {

@@ -30,6 +30,7 @@
                   <div class='tick-button rollable attribute-value'
                        data-action='roll'
                        data-roll='{{attribute.tick}}d6'
+                       data-attribute='{{key}}'
                        data-label='{{localize (concat "DASU.Actor.Attributes.list." key ".label")}} Check ({{attribute.tick}} dice)'>
                     {{attribute.tick}}
                   </div>
@@ -129,6 +130,7 @@
                   <div class='tick-button rollable attribute-value'
                        data-action='roll'
                        data-roll='{{attribute.tick}}d6'
+                       data-attribute='{{key}}'
                        data-label='{{localize (concat "DASU.Actor.Attributes.list." key ".label")}} Check ({{attribute.tick}} dice)'>
                     {{attribute.tick}}
                   </div>
@@ -365,14 +367,14 @@
                           <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type='daemon'}}' data-action='viewDoc'>
                             <i class='fas fa-edit'></i>
                           </a>
-                          {{#if (and @root.editable @root.isEditMode)}}
-                            <a class='item-control toggle-summoned' data-tooltip='{{localize "DASU.Actor.Stocks.ToggleSummoned"}}' data-action='toggleSummoned'>
-                              <i class='fas fa-user-check'></i>
-                            </a>
-                            <a class='item-control item-delete' data-tooltip='{{localize "DASU.Actor.Stocks.RemoveFromStock"}}' data-action='removeFromStock'>
-                              <i class='fas fa-trash'></i>
-                            </a>
-                          {{/if}}
+                          <a class='item-control toggle-summoned' data-tooltip='{{localize "DASU.Actor.Stocks.ToggleSummoned"}}' data-action='toggleSummoned'>
+                            <i class='fas fa-user-check'></i>
+                          </a>
+                          <a class='item-control item-delete' data-tooltip='{{localize "DASU.Actor.Stocks.RemoveFromStock"}}' data-action='removeFromStock'>
+                            <i class='fas fa-trash'></i>
+                          </a>
+                          {{!-- {{#if (and @root.editable @root.isEditMode)}} --}}
+                          {{!-- {{/if}} --}}
                         </div>
                       </div>
                       {{! Second row - stats }}
@@ -433,19 +435,19 @@
                         <div class='item-actions'>
                           <span class='unsummoned-status'>{{localize 'DASU.Actor.Stocks.Unsummoned'}}</span>
                         </div>
-                        {{#if (and @root.editable @root.isEditMode)}}
-                          <div class='item-controls'>
-                            <a class='item-control toggle-summoned' data-tooltip='{{localize "DASU.Actor.Stocks.ToggleSummoned"}}' data-action='toggleSummoned'>
-                              <i class='fas fa-user-plus'></i>
-                            </a>
-                            <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type='daemon'}}' data-action='viewDoc'>
-                              <i class='fas fa-edit'></i>
-                            </a>
-                            <a class='item-control item-delete' data-tooltip='{{localize "DASU.Actor.Stocks.RemoveFromStock"}}' data-action='removeFromStock'>
-                              <i class='fas fa-trash'></i>
-                            </a>
-                          </div>
-                        {{/if}}
+                        <div class='item-controls'>
+                          <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type='daemon'}}' data-action='viewDoc'>
+                            <i class='fas fa-edit'></i>
+                          </a>
+                          <a class='item-control toggle-summoned' data-tooltip='{{localize "DASU.Actor.Stocks.ToggleSummoned"}}' data-action='toggleSummoned'>
+                            <i class='fas fa-user-plus'></i>
+                          </a>
+                          <a class='item-control item-delete' data-tooltip='{{localize "DASU.Actor.Stocks.RemoveFromStock"}}' data-action='removeFromStock'>
+                            <i class='fas fa-trash'></i>
+                          </a>
+                        </div>
+                        {{!-- {{#if (and @root.editable @root.isEditMode)}} --}}
+                        {{!-- {{/if}} --}}
                       </div>
                       {{! Second row - stats }}
                       <div class='daemon-stats-row flexrow'>

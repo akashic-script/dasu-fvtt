@@ -1,0 +1,65 @@
+{{!-- DASU Attribute/Skill Check Chat Message Template (Checks System) --}}
+<div class="dasu check-card {{result.type}} {{resultClass}}" data-actor-id="{{actor.id}}">
+
+  {{!-- Compact Header --}}
+  <header class="check-header">
+    <div class="check-title">
+      <img class="actor-image" src="{{actor.img}}" alt="{{actor.name}}" />
+      <div class="title-info">
+        <h3 class="check-name">{{checkLabel}}</h3>
+      </div>
+    </div>
+  </header>
+
+  {{!-- Compact Dice Display --}}
+  <div class="dice-container">
+    {{#each result.additionalData.rollResults}}
+      <div class="die {{#if (gte this 4)}}success{{else}}failure{{/if}}">{{this}}</div>
+    {{/each}}
+  </div>
+
+  {{!-- Pool breakdown in one line --}}
+  <div class="pool-breakdown">
+    {{#if result.primary}}
+      <span class="attr-part">{{upper result.primary.attribute}}: {{result.primary.dice}}d6</span>
+    {{/if}}
+    {{#if result.secondary}}
+      <span class="attr-part">{{upper result.secondary.attribute}}: {{result.secondary.dice}}d6</span>
+    {{/if}}
+    {{#if result.modifiers}}
+      {{#each result.modifiers}}
+        {{#if (neq value 0)}}
+          <span class="mod-part">{{#if (gt value 0)}}+{{/if}}{{value}} {{label}}</span>
+        {{/if}}
+      {{/each}}
+    {{/if}}
+  </div>
+
+  {{!-- Compact outcome with success badge and crit indicator --}}
+  <div class="outcome-compact {{successLevel}}">
+    <div class="success-count-badge {{resultClass}}">
+      <span class="count">{{result.finalResult}}</span>
+      <span class="icon">{{#if (gt result.finalResult 0)}}<i class="fas fa-check"></i>{{else}}<i class="fas fa-times"></i>{{/if}}</span>
+    </div>
+    {{#if result.critical}}
+      <div class="crit-indicator">
+        <span class="crit-icon"><i class="fas fa-star"></i></span>
+        <span class="crit-text">{{localize "DASU.Checks.Critical"}}</span>
+      </div>
+    {{/if}}
+  </div>
+
+  {{!-- Footer --}}
+  <footer class="roll-footer">
+    <div class="roll-metadata">
+      <span class="roll-type">{{#if isSkillCheck}}{{localize "DASU.Checks.SkillCheck"}}{{else}}{{localize "DASU.Checks.AttributeCheck"}}{{/if}}</span>
+      <span class="message-type">
+        {{#if (eq rollMode "public")}}{{localize "DASU.MessageTypes.public"}}{{/if}}
+        {{#if (eq rollMode "gmroll")}}{{localize "DASU.MessageTypes.gmroll"}}{{/if}}
+        {{#if (eq rollMode "blindroll")}}{{localize "DASU.MessageTypes.blindroll"}}{{/if}}
+        {{#if (eq rollMode "selfroll")}}{{localize "DASU.MessageTypes.selfroll"}}{{/if}}
+      </span>
+    </div>
+  </footer>
+
+</div>

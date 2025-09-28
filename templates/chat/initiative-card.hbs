@@ -29,4 +29,18 @@
       </div>
     {{/if}}
   </div>
+
+  {{!-- Footer --}}
+  <footer class="roll-footer">
+    <div class="roll-metadata">
+      <span class="roll-type">{{localize 'DASU.InitiativeRoll'}}</span>
+      <span class="message-type">
+        {{#if (eq rollMode "public")}}{{localize "DASU.MessageTypes.public"}}{{/if}}
+        {{#if (eq rollMode "gmroll")}}{{localize "DASU.MessageTypes.gmroll"}}{{/if}}
+        {{#if (eq rollMode "blindroll")}}{{localize "DASU.MessageTypes.blindroll"}}{{/if}}
+        {{#if (eq rollMode "selfroll")}}{{localize "DASU.MessageTypes.selfroll"}}{{/if}}
+      </span>
+    </div>
+  </footer>
+
 </div>

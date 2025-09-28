@@ -650,6 +650,25 @@
       "Restores": "Restores",
       "vsDefense": "vs Defense",
       "vsAvoid": "vs Avoid"
+    },
+    "Checks": {
+      "AttributeCheck": "Attribute Check",
+      "SkillCheck": "Skill Check",
+      "InitiativeRoll": "Initiative Roll",
+      "AccuracyRoll": "Accuracy Roll",
+      "DisplayRoll": "Display Roll",
+      "Display": "Display",
+      "Roll": "Roll",
+      "Critical": "Critical!",
+      "Attribute": "Attribute",
+      "Skill": "Skill",
+      "Check": "Check"
+    },
+    "Traits": {
+      "Rank": "Rank:",
+      "Rarity": "Rarity:",
+      "Price": "Price:",
+      "Level": "Level:"
     }
   },
   "DOCUMENT": {

@@ -1,5 +1,4 @@
 import { slugify } from '../../utils/slugify.mjs';
-import { DASUAccuracyRollV1 } from '../../systems/rolling/dasu-accuracy-check.mjs';
 import { DASUAccuracyDialog } from '../../ui/dialogs/accuracy-dialog.mjs';
 
 /**
@@ -406,6 +405,43 @@ export class DASUItem extends Item {
           `Failed to open accuracy dialog for ${item.name}: ${error.message}`
         );
         return null;
+      }
+    }
+
+    // For display-type items, use the new checks system
+    if (
+      ['tag', 'special', 'scar', 'schema', 'feature', 'class'].includes(
+        item.type
+      )
+    ) {
+      try {
+        // Check if the DASU checks system is available
+        if (game.dasu?.checks) {
+          // Create display data
+          const displayData = {
+            label: `${item.name}`,
+            additionalData: {
+              label: `${item.name}`,
+              description: item.system.description,
+              itemType: item.type,
+            },
+          };
+
+          // If the item has a formula, include it as a roll
+          if (this.system.formula) {
+            const rollData = this.getRollData();
+            const roll = new Roll(rollData.formula, rollData.actor);
+            await roll.evaluate();
+            displayData.roll = roll;
+            displayData.additionalData.formula = rollData.formula;
+          }
+
+          // Use the display check system
+          return await game.dasu.checks.display(this.actor, item, displayData);
+        }
+      } catch (error) {
+        console.error('DASU | Error creating display check:', error);
+        // Fall back to legacy system if new system fails
       }
     }
 

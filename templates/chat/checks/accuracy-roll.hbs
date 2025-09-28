@@ -1,20 +1,20 @@
-{{!-- DASU Roll Chat Message Template --}}
-<div class="dasu roll-card {{roll.rollType}}" data-item-id="{{roll.item.id}}" data-actor-id="{{roll.actor.id}}">
-  
+{{!-- DASU Accuracy Roll Chat Message Template (Checks System) --}}
+<div class="dasu roll-card {{result.type}}" data-item-id="{{item.id}}" data-actor-id="{{actor.id}}">
+
   {{!-- Combat-themed Header --}}
   <header class="roll-header">
     <div class="roll-title">
-      <img class="item-image" src="{{roll.item.img}}" alt="{{roll.item.name}}" />
+      <img class="item-image" src="{{item.img}}" alt="{{item.name}}" />
       <div class="title-info">
-        <h3 class="item-name">{{roll.rollLabel}}</h3>
+        <h3 class="item-name">{{checkLabel}}</h3>
       </div>
     </div>
     <div class="item-type">
       <span class="type-label">
-        {{#if (and (eq roll.item.type "ability") roll.item.system.category)}}
-          {{capitalize roll.item.system.category}}
+        {{#if (and (eq item.type "ability") item.system.category)}}
+          {{capitalize item.system.category}}
         {{else}}
-          {{capitalize roll.item.type}}
+          {{capitalize item.type}}
         {{/if}}
       </span>
     </div>
@@ -22,9 +22,9 @@
 
   {{!-- Combat Dice Display --}}
   <div class="dice-container">
-    {{#if roll.results.diceWithStatus}}
+    {{#if result.additionalData.diceWithStatus}}
       {{!-- Show all dice for advantage/disadvantage rolls --}}
-      {{#each roll.results.diceWithStatus}}
+      {{#each result.additionalData.diceWithStatus}}
         <div class="die {{#if dropped}}dropped{{/if}}">
           {{value}}
           {{#if dropped}}<span class="drop-indicator">✕</span>{{/if}}
@@ -32,26 +32,26 @@
       {{/each}}
     {{else}}
       {{!-- Fallback for normal rolls --}}
-      {{#each roll.results.rollResults}}
+      {{#each result.additionalData.rollResults}}
         <div class="die">{{this}}</div>
       {{/each}}
     {{/if}}
     <div class="modifier">
-      {{#if (gt roll.totalBonus 0)}}
-        <span class="bonus">+{{roll.totalBonus}}</span>
-      {{else if (lt roll.totalBonus 0)}}
-        <span class="penalty">{{roll.totalBonus}}</span>
+      {{#if (gt result.additionalData.totalBonus 0)}}
+        <span class="bonus">+{{result.additionalData.totalBonus}}</span>
+      {{else if (lt result.additionalData.totalBonus 0)}}
+        <span class="penalty">{{result.additionalData.totalBonus}}</span>
       {{/if}}
     </div>
   </div>
-  
+
   {{!-- Formula breakdown --}}
   <div class="formula-breakdown">
-    <span class="formula-display">{{roll.results.formula}}</span>
-    {{#if roll.bonusModifier}}
-      {{#if (ne roll.bonusModifier 0)}}
+    <span class="formula-display">{{result.roll.formula}}</span>
+    {{#if result.flatBonus}}
+      {{#if (ne result.flatBonus 0)}}
         <span class="modifier-breakdown">
-          (Base: {{#if (gt roll.bonus 0)}}+{{/if}}{{roll.bonus}}{{#if (ne roll.bonusModifier 0)}}, Mod: {{#if (gt roll.bonusModifier 0)}}+{{/if}}{{roll.bonusModifier}}{{/if}})
+          (Base: {{#if (gt result.flatBonus 0)}}+{{/if}}{{result.flatBonus}}{{#if (ne result.modifierTotal 0)}}, Mod: {{#if (gt result.modifierTotal 0)}}+{{/if}}{{result.modifierTotal}}{{/if}})
         </span>
       {{/if}}
     {{/if}}
@@ -60,16 +60,16 @@
   {{!-- Combat Result Badge --}}
   <div class="outcome-compact">
     <div class="result-badge">
-      <span class="result-value">{{roll.results.total}}</span>
+      <span class="result-value">{{result.finalResult}}</span>
       <span class="result-icon">
-        {{#if isTactic}}
+        {{#if (eq item.type "tactic")}}
           <i class="fas fa-crosshairs"> {{localize "DASU.RollCard.vsDefense"}}</i>
         {{else}}
           <i class="fas fa-crosshairs"> {{localize "DASU.RollCard.vsAvoid"}}</i>
         {{/if}}
       </span>
     </div>
-    {{#if hasCrit}}
+    {{#if result.critical}}
       <div class="crit-indicator">
         <span class="crit-icon"><i class="fas fa-star"></i></span>
         <span class="crit-text">{{localize "DASU.Crit"}}</span>
@@ -78,91 +78,91 @@
   </div>
 
     {{!-- Item-Specific Information --}}
-    {{#if isWeapon}}
+    {{#if (eq item.type "weapon")}}
       <div class="weapon-details">
-        {{#if roll.item.system.description}}
+        {{#if item.system.description}}
           <div class="description-info">
-            <span class="description-text">{{{roll.item.system.description}}}</span>
+            <span class="description-text">{{{item.system.description}}}</span>
           </div>
         {{/if}}
-        {{#if roll.results.damage}}
+        {{#if item.system.damage}}
           <div class="damage-info">
             <span class="damage-label">{{localize "DASU.RollCard.Damage"}}:</span>
-            <span class="damage-value">{{roll.results.damage.value}}</span>
-            <span class="damage-type">{{capitalize roll.results.damage.type}}</span>
+            <span class="damage-value">{{item.system.damage.value}}</span>
+            <span class="damage-type">{{capitalize item.system.damage.type}}</span>
           </div>
         {{/if}}
-        {{#if roll.item.system.cost}}
+        {{#if item.system.cost}}
           <div class="cost-info">
             <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>
-            <span class="cost-value">{{roll.item.system.cost}} {{localize "DASU.Labels.willPoints"}}</span>
+            <span class="cost-value">{{item.system.cost}} {{localize "DASU.Labels.willPoints"}}</span>
           </div>
         {{/if}}
       </div>
     {{/if}}
 
-    {{#if isAbility}}
+    {{#if (eq item.type "ability")}}
       <div class="ability-details">
-        {{#if roll.item.system.description}}
+        {{#if item.system.description}}
           <div class="description-info">
-            <span class="description-text">{{{roll.item.system.description}}}</span>
+            <span class="description-text">{{{item.system.description}}}</span>
           </div>
         {{/if}}
-        {{#if roll.results.cost}}
+        {{#if item.system.cost}}
           <div class="cost-info">
             <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>
-            <span class="cost-value">{{roll.results.cost.value}} {{upper roll.results.cost.type}}</span>
+            <span class="cost-value">{{item.system.cost}} {{upper item.system.costType}}</span>
           </div>
         {{/if}}
         {{!-- Only show damage for spell and technique categories --}}
-        {{#if (or (eq roll.item.system.category "spell") (eq roll.item.system.category "technique"))}}
-          {{#if roll.results.damage}}
+        {{#if (or (eq item.system.category "spell") (eq item.system.category "technique"))}}
+          {{#if item.system.damage}}
             <div class="damage-info">
               <span class="damage-label">{{localize "DASU.RollCard.Damage"}}:</span>
-              <span class="damage-value">{{roll.results.damage.value}}</span>
-              <span class="damage-type">{{capitalize roll.results.damage.type}}</span>
+              <span class="damage-value">{{item.system.damage.value}}</span>
+              <span class="damage-type">{{capitalize item.system.damage.type}}</span>
             </div>
           {{/if}}
         {{/if}}
-        {{#if roll.results.healing}}
+        {{#if item.system.healed}}
           <div class="healing-info">
             <span class="healing-label">{{localize "DASU.RollCard.Restores"}}:</span>
-            <span class="healing-value">{{roll.results.healing.value}} {{upper roll.results.healing.type}}</span>
+            <span class="healing-value">{{item.system.healed.value}} {{upper item.system.healed.type}}</span>
           </div>
         {{/if}}
-        {{#if roll.item.system.effect}}
+        {{#if item.system.effect}}
           <div class="effect-info">
             <span class="effect-label">{{localize "DASU.RollCard.Effect"}}:</span>
-            <span class="effect-text">{{roll.item.system.effect}}</span>
+            <span class="effect-text">{{item.system.effect}}</span>
           </div>
         {{/if}}
       </div>
     {{/if}}
 
-    {{#if isTactic}}
+    {{#if (eq item.type "tactic")}}
       <div class="tactic-details">
-        {{#if roll.item.system.description}}
+        {{#if item.system.description}}
           <div class="description-info">
-            <span class="description-text">{{{roll.item.system.description}}}</span>
+            <span class="description-text">{{{item.system.description}}}</span>
           </div>
         {{/if}}
-        {{#if roll.results.cost}}
+        {{#if item.system.cost}}
           <div class="cost-info">
             <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>
-            <span class="cost-value">{{roll.results.cost.value}} {{localize "DASU.Labels.willPoints"}}</span>
+            <span class="cost-value">{{item.system.cost}} {{localize "DASU.Labels.willPoints"}}</span>
           </div>
         {{/if}}
-        {{#if roll.results.damage}}
+        {{#if item.system.damage}}
           <div class="damage-info">
             <span class="damage-label">{{localize "DASU.RollCard.Damage"}}:</span>
-            <span class="damage-value">{{roll.results.damage.value}}</span>
-            <span class="damage-type">{{capitalize roll.results.damage.type}}</span>
+            <span class="damage-value">{{item.system.damage.value}}</span>
+            <span class="damage-type">{{capitalize item.system.damage.type}}</span>
           </div>
         {{/if}}
-        {{#if roll.results.effect}}
+        {{#if item.system.effect}}
           <div class="effect-info">
             <span class="effect-label">{{localize "DASU.RollCard.Effect"}}:</span>
-            <span class="effect-text">{{roll.results.effect}}</span>
+            <span class="effect-text">{{item.system.effect}}</span>
           </div>
         {{/if}}
       </div>
@@ -173,7 +173,7 @@
   {{!-- Footer --}}
   <footer class="roll-footer">
     <div class="roll-metadata">
-      <span class="roll-type">{{capitalize roll.rollType}} Roll</span>
+      <span class="roll-type">{{capitalize result.type}} {{localize "DASU.Checks.Roll"}}</span>
       <span class="message-type">
         {{#if (eq rollMode "public")}}{{localize "DASU.MessageTypes.public"}}{{/if}}
         {{#if (eq rollMode "gmroll")}}{{localize "DASU.MessageTypes.gmroll"}}{{/if}}

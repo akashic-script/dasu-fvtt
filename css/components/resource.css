@@ -50,7 +50,6 @@
 
 .attribute {
   padding: 0 0.15rem;
-  border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
 }

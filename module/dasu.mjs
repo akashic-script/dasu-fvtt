@@ -14,8 +14,7 @@ import { DASUSettings } from './core/settings.mjs';
 import { registerStatusConditions } from './data/shared/status-conditions.mjs';
 import { registerHandlebarsHelpers } from './utils/helpers.mjs';
 // Import roll system
-import { DASUAccuracyRollV1 } from './systems/rolling/dasu-accuracy-check.mjs';
-import { DASUAttributeCheckV1 } from './systems/rolling/dasu-attribute-check.mjs';
+import Checks from './systems/rolling/index.mjs';
 import { DASURollDialog } from './ui/dialogs/roll-dialog.mjs';
 
 const collections = foundry.documents.collections;
@@ -39,8 +38,7 @@ globalThis.DASU = {
   },
   utils: {
     rollItemMacro,
-    DASUAccuracyRollV1,
-    DASUAttributeCheckV1,
+    Checks,
   },
   settings: DASUSettings,
   models,
@@ -51,6 +49,16 @@ globalThis.DASU = {
 Hooks.once('init', function () {
   // Add custom constants for configuration.
   CONFIG.DASU = globalThis.DASU;
+
+  // Register Checks system
+  game.dasu = game.dasu || {};
+  game.dasu.checks = Checks;
+
+  // Global roll methods using Checks
+  game.dasu.rollAttribute = Checks.attributeCheck;
+  game.dasu.rollSkill = Checks.skillCheck;
+  game.dasu.rollAccuracy = Checks.accuracyCheck;
+  game.dasu.rollInitiative = Checks.initiativeCheck;
 
   /**
    * Set an initiative formula for the system
@@ -424,8 +432,8 @@ function rollItemMacro(itemUuid) {
       );
     }
 
-    // Trigger the item roll
-    item.roll();
+    // Trigger the item roll using Checks API
+    return Checks.accuracyCheck(item.parent, item);
   });
 }
 

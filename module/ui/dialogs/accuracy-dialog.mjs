@@ -4,7 +4,7 @@
  * Supports weapons (toHit), abilities (toHit), and tactics (toLand)
  */
 
-import { DASUAccuracyRollV1 } from '../../systems/rolling/dasu-accuracy-check.mjs';
+import Checks from '../../systems/rolling/index.mjs';
 
 export class DASUAccuracyDialog extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.api.ApplicationV2
@@ -238,13 +238,27 @@ export class DASUAccuracyDialog extends foundry.applications.api.HandlebarsAppli
         rollType: this.rollData.rollType,
       };
 
-      // Create and execute the roll
-      const accuracyRoll = new DASUAccuracyRollV1(
-        this.item,
-        this.actor,
-        rollOptions
-      );
-      await accuracyRoll.render();
+      // Create and execute the roll using new Checks API
+      const config = (check) => {
+        if (rollOptions.bonusModifier) {
+          check.modifiers.push({
+            label: 'Bonus Modifier',
+            value: rollOptions.bonusModifier,
+            source: 'dialog',
+          });
+        }
+
+        // Handle advantage/disadvantage
+        if (rollOptions.rollType === 'advantage') {
+          check.advantageState = 'advantage';
+          check.baseRoll = '3d6kh2';
+        } else if (rollOptions.rollType === 'disadvantage') {
+          check.advantageState = 'disadvantage';
+          check.baseRoll = '3d6kl2';
+        }
+      };
+
+      await Checks.accuracyCheck(this.actor, this.item, config);
 
       // Close the dialog
       this.close();

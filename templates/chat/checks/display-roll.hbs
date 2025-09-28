@@ -1,0 +1,186 @@
+{{!-- DASU Display Roll Chat Message Template (Checks System) --}}
+<div class="dasu roll-card {{result.type}}" data-actor-id="{{actor.id}}">
+
+  {{!-- Header --}}
+  <header class="roll-header">
+    <div class="roll-title">
+      {{#if item}}
+        <img class="item-image" src="{{item.img}}" alt="{{item.name}}" />
+      {{else}}
+        <img class="actor-image" src="{{actor.img}}" alt="{{actor.name}}" />
+      {{/if}}
+      <div class="title-info">
+        <h3 class="check-name">{{checkLabel}}</h3>
+      </div>
+    </div>
+    {{#if item}}
+      <div class="item-type">
+        <span class="type-label">
+          {{#if (and (eq item.type "ability") item.system.category)}}
+            {{capitalize item.system.category}}
+          {{else}}
+            {{capitalize item.type}}
+          {{/if}}
+        </span>
+      </div>
+    {{/if}}
+  </header>
+
+  {{#if hasRoll}}
+    {{!-- Roll Result Display --}}
+    <div class="dice-container">
+      {{#if rollTerms}}
+        {{#each rollTerms}}
+          {{#if (eq this.class "Die")}}
+            {{#each this.results}}
+              <div class="die">{{this.result}}</div>
+            {{/each}}
+          {{/if}}
+        {{/each}}
+      {{/if}}
+      {{#if result.additionalData.modifier}}
+        <div class="modifier">
+          {{#if (gt result.additionalData.modifier 0)}}
+            <span class="bonus">+{{result.additionalData.modifier}}</span>
+          {{else if (lt result.additionalData.modifier 0)}}
+            <span class="penalty">{{result.additionalData.modifier}}</span>
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
+
+    {{!-- Formula breakdown --}}
+    {{#if rollFormula}}
+      <div class="formula-breakdown">
+        <span class="formula-display">{{rollFormula}}</span>
+        {{#if result.additionalData.description}}
+          <span class="modifier-breakdown">{{result.additionalData.description}}</span>
+        {{/if}}
+      </div>
+    {{/if}}
+
+    {{!-- Result Badge --}}
+    <div class="outcome-compact">
+      <div class="result-badge">
+        <span class="result-value">{{rollTotal}}</span>
+        <span class="result-icon">
+          <i class="fas fa-dice"></i>
+        </span>
+      </div>
+    </div>
+  {{/if}}
+
+  {{!-- Item Traits Section --}}
+  {{#if item}}
+    {{#if (or (eq item.type "tag") (eq item.type "schema") (eq item.type "special") (eq item.type "scar") (eq item.type "feature") (eq item.type "class"))}}
+      <div class="item-traits">
+        {{#if (eq item.type "tag")}}
+          {{!-- Tag traits: Rank, Rarity, Price --}}
+          {{#if item.system.rank}}
+            <div class="trait-info">
+              <span class="trait-label">{{localize "DASU.Traits.Rank"}}</span>
+              <span class="trait-value">{{item.system.rank.current}}/{{item.system.rank.max}}</span>
+            </div>
+          {{/if}}
+          {{#if item.system.rarity}}
+            <div class="trait-info">
+              <span class="trait-label">{{localize "DASU.Traits.Rarity"}}</span>
+              <span class="trait-value">{{item.system.rarity}}</span>
+            </div>
+          {{/if}}
+          {{#if item.system.price}}
+            <div class="trait-info">
+              <span class="trait-label">{{localize "DASU.Traits.Price"}}</span>
+              <span class="trait-value">{{item.system.price}}</span>
+            </div>
+          {{/if}}
+        {{/if}}
+        {{#if (eq item.type "schema")}}
+          {{!-- Schema traits: Level --}}
+          {{#if item.system.level}}
+            <div class="trait-info">
+              <span class="trait-label">{{localize "DASU.Traits.Level"}}</span>
+              <span class="trait-value">{{item.system.level.current}}/{{item.system.level.max}}</span>
+            </div>
+          {{/if}}
+        {{/if}}
+        {{#if (or (eq item.type "special") (eq item.type "scar") (eq item.type "feature") (eq item.type "class"))}}
+          {{!-- Other item traits --}}
+          {{#if item.system.rank}}
+            <div class="trait-info">
+              <span class="trait-label">{{localize "DASU.Traits.Rank"}}</span>
+              <span class="trait-value">{{item.system.rank.current}}/{{item.system.rank.max}}</span>
+            </div>
+          {{/if}}
+          {{#if item.system.level}}
+            <div class="trait-info">
+              <span class="trait-label">{{localize "DASU.Traits.Level"}}</span>
+              <span class="trait-value">{{item.system.level.current}}/{{item.system.level.max}}</span>
+            </div>
+          {{/if}}
+          {{#if item.system.rarity}}
+            <div class="trait-info">
+              <span class="trait-label">{{localize "DASU.Traits.Rarity"}}</span>
+              <span class="trait-value">{{item.system.rarity}}</span>
+            </div>
+          {{/if}}
+        {{/if}}
+      </div>
+    {{/if}}
+
+    {{!-- Item Description --}}
+    {{#if item.system.description}}
+      <div class="item-details">
+        <div class="description-info">
+          <span class="description-text">{{{item.system.description}}}</span>
+        </div>
+      </div>
+    {{/if}}
+
+    {{!-- Schema Progression --}}
+    {{#if (eq item.type "schema")}}
+      <div class="schema-progression">
+        <div class="schema-level {{#if (gte item.system.level 1)}}active{{else}}inactive{{/if}}">
+          <div class="level-header">
+            <span class="level-number">1</span>
+          </div>
+          {{#if item.system.level1.description}}
+            <div class="level-description">{{{item.system.level1.description}}}</div>
+          {{/if}}
+        </div>
+
+        <div class="schema-level {{#if (gte item.system.level 2)}}active{{else}}inactive{{/if}}">
+          <div class="level-header">
+            <span class="level-number">2</span>
+          </div>
+          {{#if item.system.level2.description}}
+            <div class="level-description">{{{item.system.level2.description}}}</div>
+          {{/if}}
+        </div>
+
+        <div class="schema-level {{#if (gte item.system.level 3)}}active{{else}}inactive{{/if}}">
+          <div class="level-header">
+            <span class="level-number">3</span>
+          </div>
+          {{#if item.system.level3.description}}
+            <div class="level-description">{{{item.system.level3.description}}}</div>
+          {{/if}}
+        </div>
+      </div>
+    {{/if}}
+  {{/if}}
+
+  {{!-- Footer --}}
+  <footer class="roll-footer">
+    <div class="roll-metadata">
+      <span class="roll-type">{{localize "DASU.Checks.Display"}}</span>
+      <span class="message-type">
+        {{#if (eq rollMode "public")}}{{localize "DASU.MessageTypes.public"}}{{/if}}
+        {{#if (eq rollMode "gmroll")}}{{localize "DASU.MessageTypes.gmroll"}}{{/if}}
+        {{#if (eq rollMode "blindroll")}}{{localize "DASU.MessageTypes.blindroll"}}{{/if}}
+        {{#if (eq rollMode "selfroll")}}{{localize "DASU.MessageTypes.selfroll"}}{{/if}}
+      </span>
+    </div>
+  </footer>
+
+</div>

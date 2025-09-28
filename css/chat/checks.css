@@ -1,0 +1,597 @@
+/* DASU Checks System Chat Card Styles */
+
+/* Chat Message */
+.chat-message.message.flexcol {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--dasu-c-primary);
+  border-radius: 0;
+  margin: 4px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message-content {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--dasu-c-primary);
+}
+
+/* Chat Message Header Styling */
+.chat-message .message-header {
+  background: var(--color-bg-primary);
+  border-bottom: 1px solid var(--dasu-c-primary);
+}
+
+.chat-message .message-sender {
+  color: var(--dasu-c-primary);
+  font-weight: 600;
+  margin: 0;
+}
+
+.chat-message .message-metadata {
+  color: var(--dasu-c-primary);
+  font-size: 0.8em;
+}
+
+.chat-message .message-metadata .message-timestamp {
+  color: var(--dasu-c-primary);
+}
+
+.chat-message .message-metadata .message-delete {
+  color: var(--dasu-c-primary);
+  opacity: 0.8;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.chat-message .message-metadata .message-delete:hover {
+  color: var(--color-hp);
+  opacity: 1;
+}
+
+/* Base Check Card Styles */
+.dasu.check-card,
+.dasu.roll-card {
+  background: var(--color-bg-secondary);
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.dasu.check-card:hover,
+.dasu.roll-card:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Headers with diagonal stripes */
+.check-header,
+.roll-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-bg-primary);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 8px,
+    rgba(0, 0, 0, 0.06) 8px,
+    rgba(0, 0, 0, 0.06) 16px
+  );
+  padding: 4px 8px;
+  min-height: 24px;
+}
+
+.check-title,
+.roll-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0; /* Allows text truncation */
+}
+
+.actor-image,
+.item-image {
+  width: 18px;
+  height: 18px;
+  border-radius: 0;
+  border: 1px solid var(--color-primary);
+  position: relative;
+  flex-shrink: 0;
+  object-fit: cover;
+  background: var(--color-bg-secondary);
+}
+
+.check-name,
+.item-name {
+  margin: 0;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.item-type .type-label {
+  background: var(--color-bg-secondary);
+  padding: 2px 6px;
+  border-radius: 0;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--color-text-highlight);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Dice Display */
+.dice-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+  padding: 4px 6px;
+  background: var(--color-bg-secondary);
+}
+
+.die {
+  width: 20px;
+  height: 20px;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  border: 1px solid;
+  position: relative;
+  line-height: 1;
+}
+
+.die.success {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: var(--dasu-c-white);
+}
+
+.die.failure {
+  background: var(--dasu-c-tan);
+  border-color: var(--dasu-c-beige);
+  color: var(--color-text-secondary);
+}
+
+.die.dropped {
+  opacity: 0.5;
+  background: var(--dasu-c-tan);
+  border-color: var(--dasu-c-beige);
+  color: var(--color-text-secondary);
+  position: relative;
+}
+
+.drop-indicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(25%, -25%);
+  color: var(--color-hp);
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.modifier .bonus {
+  color: var(--dasu-c-white);
+  background: var(--dasu-c-success);
+  padding: 2px 6px;
+  border: 1px solid var(--dasu-c-success);
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+.modifier .penalty {
+  color: var(--dasu-c-white);
+  background: var(--color-hp);
+  padding: 2px 6px;
+  border: 1px solid var(--color-hp);
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+/* Pool Breakdown */
+.pool-breakdown {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: var(--color-bg-secondary);
+  padding: 3px 6px;
+  font-size: 0.7rem;
+  color: var(--dasu-c-black);
+  font-weight: 400;
+}
+
+.attr-part,
+.skill-part,
+.mod-part {
+  font-family: monospace;
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: var(--dasu-c-primary);
+}
+
+/* Formula Breakdown */
+.formula-breakdown {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 3px 6px;
+  font-size: 0.7rem;
+  color: var(--color-text-primary);
+  font-weight: 400;
+}
+
+.formula-display {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--dasu-c-primary);
+}
+
+.modifier-breakdown {
+  font-size: 0.8em;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Outcome Display */
+.outcome-compact {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--color-bg-primary);
+}
+
+.success-count-badge,
+.result-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px;
+  border-radius: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: 1px solid;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  overflow: hidden;
+  min-height: 20px;
+  min-width: 36px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.success-count-badge.failure {
+  background: var(--dasu-c-dark);
+  border-color: var(--dasu-c-dark);
+  color: var(--color-text-secondary);
+}
+
+.success-count-badge.partial-success {
+  background: var(--dasu-c-primary);
+  border-color: var(--dasu-c-primary);
+  color: var(--color-text-primary);
+}
+
+.success-count-badge.success {
+  background: var(--dasu-c-accent);
+  border-color: var(--dasu-c-accent);
+  color: var(--color-primary);
+}
+
+.success-count-badge.critical-success {
+  background: var(--dasu-c-primary);
+  border-color: var(--dasu-c-primary);
+  color: var(--color-text-primary);
+}
+
+.success-count-badge .count {
+  font-weight: 900;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 12px;
+}
+
+.success-count-badge .icon {
+  font-size: 0.7rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  height: 10px;
+}
+
+.result-value {
+  font-weight: 900;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.result-icon {
+  font-size: 0.7rem;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+/* Critical Indicator */
+.crit-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--dasu-c-critical);
+  border: 1px solid var(--dasu-c-critical);
+  border-radius: 0;
+  color: var(--color-primary);
+  font-weight: bold;
+  font-size: 11px;
+}
+
+/* Item Details */
+.weapon-details,
+.ability-details,
+.tactic-details {
+  padding: 4px 6px;
+  background: var(--color-bg-primary);
+}
+
+/* Item Traits Section */
+.item-traits {
+  padding: 4px 6px;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.7rem;
+}
+
+.trait-info {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--color-bg-primary);
+  padding: 2px 6px;
+  border: 1px solid var(--dasu-c-primary);
+  border-radius: 0;
+  white-space: nowrap;
+}
+
+.trait-label {
+  font-weight: 600;
+  color: var(--dasu-c-primary);
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+}
+
+.trait-value {
+  font-weight: 700;
+  color: var(--dasu-c-primary);
+  font-size: 0.7rem;
+}
+
+.description-info,
+.cost-info,
+.damage-info,
+.healing-info,
+.effect-info {
+  display: flex;
+  gap: 4px;
+  margin: 2px 0;
+  align-items: center;
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.damage-label,
+.cost-label,
+.healing-label,
+.effect-label {
+  font-weight: 500;
+  color: var(--dasu-c-primary);
+}
+
+.damage-value,
+.damage-type,
+.cost-value,
+.healing-value {
+  font-weight: 600;
+  color: var(--dasu-c-primary);
+}
+
+.effect-text {
+  font-style: italic;
+  color: var(--color-text-secondary);
+  flex: 1;
+}
+
+/* Description styling - different from other info blocks */
+.description-info {
+  display: block;
+  margin: 2px 0;
+  padding: 3px 6px;
+  background: var(--color-bg-secondary);
+  border-left: 2px solid var(--dasu-c-primary);
+  border-radius: 0;
+  font-size: 0.7rem;
+}
+
+.description-text {
+  color: var(--color-heading-primary);
+  line-height: 1.4;
+}
+
+/* Schema Progression Styling */
+.schema-progression {
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+  padding: 4px 6px;
+  margin: 0;
+}
+
+.schema-level {
+  padding: 3px 6px;
+  margin: 2px 0;
+  border-left: 3px solid;
+  background: var(--color-bg-primary);
+  transition: all 0.2s ease;
+}
+
+.schema-level.active {
+  border-left-color: var(--dasu-c-primary);
+  background: var(--color-bg-primary);
+  opacity: 1;
+}
+
+.schema-level.inactive {
+  border-left-color: var(--dasu-c-dark);
+  background: var(--color-bg-secondary);
+  opacity: 0.6;
+}
+
+.level-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.level-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 0%;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.schema-level.active .level-number {
+  background: var(--dasu-c-primary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--dasu-c-primary);
+}
+
+.schema-level.inactive .level-number {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-secondary);
+}
+
+.level-description {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+.schema-level.active .level-description {
+  color: var(--color-text-primary);
+}
+
+.schema-level.inactive .level-description {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Footer */
+.roll-footer {
+  padding: 3px 6px;
+  background: var(--color-bg-primary);
+  border-top: 1px solid var(--dasu-c-primary);
+  font-size: 0.65rem;
+  color: var(--dasu-c-primary);
+}
+
+.roll-metadata {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.message-type {
+  font-weight: 600;
+  color: var(--color-text-highlight);
+  font-size: 1em;
+}
+
+/* Result Class  - Attribute Checks */
+.dasu.check-card.failure {
+  border-color: var(--dasu-c-dark);
+}
+
+.dasu.check-card.partial-success {
+  border-color: var(--dasu-c-primary);
+}
+
+.dasu.check-card.success {
+  border-color: var(--dasu-c-accent);
+}
+
+.dasu.check-card.critical-success {
+  border-color: var(--dasu-c-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Result Class - Roll Cards (Items) */
+.dasu.roll-card.weapon {
+  border-color: var(--dasu-c-success);
+}
+
+.dasu.roll-card.ability {
+  border-color: var(--dasu-c-primary);
+}
+
+.dasu.roll-card.tactic {
+  border-color: var(--dasu-c-dark);
+}
+
+/* Focus states for accessibility */
+.success-count-badge:focus,
+.result-badge:focus,
+.die:focus {
+  outline: 1px solid var(--dasu-c-primary);
+  outline-offset: 1px;
+}

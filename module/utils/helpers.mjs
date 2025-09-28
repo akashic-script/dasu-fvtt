@@ -27,6 +27,9 @@ export function registerHandlebarsHelpers() {
   Handlebars.registerHelper('neq', (a, b) => a !== b);
   Handlebars.registerHelper('gte', (a, b) => a >= b);
   Handlebars.registerHelper('lte', (a, b) => a <= b);
+  Handlebars.registerHelper('and', (a, b) => a && b);
+  Handlebars.registerHelper('or', (a, b) => a || b);
+  Handlebars.registerHelper('not', (a) => !a);
   Handlebars.registerHelper('decrement', (a) => a - 1);
 
   // Skill helpers

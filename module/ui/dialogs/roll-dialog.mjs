@@ -4,7 +4,7 @@
  * Supports both attribute checks and skill checks with success-based rolling
  */
 
-import { DASUAttributeCheckV1 } from '../../systems/rolling/dasu-attribute-check.mjs';
+import Checks from '../../systems/rolling/index.mjs';
 
 export class DASURollDialog extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.api.ApplicationV2
@@ -12,10 +12,21 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
   constructor(actor, initialData = {}, options = {}) {
     super(options);
     this.actor = actor;
+
+    // Handle selectedAttribute for single attribute checks
+    let primaryAttribute = initialData.primaryAttribute || 'pow';
+    let secondaryAttribute = initialData.secondaryAttribute || 'dex';
+
+    if (initialData.selectedAttribute) {
+      primaryAttribute = initialData.selectedAttribute;
+      // For single attribute checks, set secondary to same as primary initially
+      secondaryAttribute = initialData.selectedAttribute;
+    }
+
     this.rollData = {
       rollType: initialData.rollType || 'attribute', // 'attribute', 'skill', or 'initiative'
-      primaryAttribute: initialData.primaryAttribute || 'pow',
-      secondaryAttribute: initialData.secondaryAttribute || 'dex',
+      primaryAttribute,
+      secondaryAttribute,
       selectedSkill: initialData.selectedSkill || null,
       governingAttribute: initialData.governingAttribute || null,
       diceMod: initialData.diceMod || 0,
@@ -529,13 +540,49 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
         };
       }
 
-      // Create and execute the roll
-      const rollMode = game.settings.get('core', 'rollMode');
-      const attributeCheck = new DASUAttributeCheckV1(this.actor, checkData, {
-        rollMode,
-      });
+      // Create and execute the roll using new Checks API
+      if (this.rollData.rollType === 'skill' && checkData.skill) {
+        // Skill check
+        const attributes = {
+          primary: checkData.skill.govern,
+          secondary: null,
+        };
 
-      await attributeCheck.render();
+        const config = (check) => {
+          if (checkData.diceMod) {
+            check.modifiers.push({
+              label: 'Dice Modifier',
+              value: checkData.diceMod,
+              source: 'dialog',
+            });
+          }
+        };
+
+        await Checks.skillCheck(
+          this.actor,
+          attributes,
+          checkData.skill,
+          config
+        );
+      } else {
+        // Attribute check
+        const attributes = {
+          primary: this.rollData.primaryAttribute,
+          secondary: this.rollData.secondaryAttribute,
+        };
+
+        const config = (check) => {
+          if (checkData.diceMod) {
+            check.modifiers.push({
+              label: 'Dice Modifier',
+              value: checkData.diceMod,
+              source: 'dialog',
+            });
+          }
+        };
+
+        await Checks.attributeCheck(this.actor, attributes, config);
+      }
 
       // Close the dialog
       this.close();
@@ -605,7 +652,9 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
         };
       } else {
         // Attribute check format: "3d6"
-        const attributeName = label.split(' Check')[0].toLowerCase();
+        // Use data-attribute if available, otherwise extract from label
+        const attributeName =
+          dataset.attribute || label.split(' Check')[0].toLowerCase();
         initialData = {
           rollType: 'attribute',
           selectedAttribute: attributeName,
