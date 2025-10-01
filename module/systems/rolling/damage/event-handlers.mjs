@@ -223,6 +223,8 @@ export class DamageEventHandlers {
 
       const targetId = button.dataset.targetId;
       const amount = parseInt(button.dataset.amount);
+      const tempDepleted = parseInt(button.dataset.tempDepleted) || 0;
+      const actualDamage = parseInt(button.dataset.actualDamage) || amount;
       const resource = button.dataset.resource;
       const isHealing = button.dataset.isHealing === 'true';
 
@@ -255,10 +257,15 @@ export class DamageEventHandlers {
             }`
           );
         } else {
-          // Undo damage by applying healing
-          await targetActor.applyHealing(amount, resource, {
-            suppressChat: true,
-          });
+          // Undo damage: restore temp HP first, then regular HP
+          if (tempDepleted > 0) {
+            await targetActor.addTempHP(tempDepleted, resource);
+          }
+          if (actualDamage > 0) {
+            await targetActor.applyHealing(actualDamage, resource, {
+              suppressChat: true,
+            });
+          }
           ui.notifications.info(
             `Undid ${amount} ${resource.toUpperCase()} damage for ${
               targetActor.name
@@ -283,6 +290,8 @@ export class DamageEventHandlers {
 
       const targetId = button.dataset.targetId;
       const amount = parseInt(button.dataset.amount);
+      const tempDepleted = parseInt(button.dataset.tempDepleted) || 0;
+      const actualDamage = parseInt(button.dataset.actualDamage) || amount;
       const resource = button.dataset.resource;
       const isHealing = button.dataset.isHealing === 'true';
 
@@ -315,10 +324,22 @@ export class DamageEventHandlers {
             }`
           );
         } else {
-          // Redo damage
-          await targetActor.applyDamage(amount, 'none', resource, {
-            suppressChat: true,
-          });
+          // Redo damage: remove temp HP first, then apply damage to regular HP
+          // This simulates the same flow as the original damage
+          if (tempDepleted > 0) {
+            const currentTemp = targetActor.system.stats[resource].temp || 0;
+            if (currentTemp >= tempDepleted) {
+              // Remove the temp HP that was restored during undo
+              await targetActor.update({
+                [`system.stats.${resource}.temp`]: currentTemp - tempDepleted,
+              });
+            }
+          }
+          if (actualDamage > 0) {
+            await targetActor.applyDamage(actualDamage, 'none', resource, {
+              suppressChat: true,
+            });
+          }
           ui.notifications.info(
             `Reapplied ${amount} ${resource.toUpperCase()} damage to ${
               targetActor.name

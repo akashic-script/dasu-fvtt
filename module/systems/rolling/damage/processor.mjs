@@ -134,6 +134,8 @@ export class DamageProcessor {
         originalDamage: baseDamage,
         finalDamage: finalDamage,
         appliedDamage: damageResult.applied,
+        tempDepleted: damageResult.tempDepleted || 0,
+        actualDamage: damageResult.actualDamage || damageResult.applied,
         damageType: damageType,
         resourceTarget: resourceTarget,
         hitResult: targetData.result,
@@ -195,6 +197,24 @@ export class DamageProcessor {
       ? ` from <span class="source-item">${source.item.name}</span>`
       : '';
 
+    // Build damage display text
+    let damageDisplayText = '';
+    const tempDepleted = result.tempDepleted || 0;
+    const actualDamage = result.actualDamage || result.appliedDamage;
+
+    if (tempDepleted > 0 && actualDamage > 0) {
+      // Both temp and regular damage
+      damageDisplayText = `<span class="damage-amount temp">${tempDepleted}</span> temp + <span class="damage-amount">${actualDamage}</span> ${result.resourceTarget.toUpperCase()}`;
+    } else if (tempDepleted > 0) {
+      // Only temp damage
+      damageDisplayText = `<span class="damage-amount temp">${tempDepleted}</span> temp ${result.resourceTarget.toUpperCase()}`;
+    } else {
+      // Only regular damage
+      damageDisplayText = `<span class="damage-amount">${
+        result.appliedDamage
+      }</span> ${result.resourceTarget.toUpperCase()}`;
+    }
+
     // Build action buttons
     const editButton = source.item
       ? `<button class="damage-action-btn edit" data-action="editDamage" data-target-id="${result.targetId}">
@@ -211,16 +231,18 @@ export class DamageProcessor {
             <span class="target-name clickable" ${targetAttrs}>${
       result.targetName
     }</span> ${damageText} for
-            <span class="damage-amount">${
-              result.appliedDamage
-            }</span> ${result.resourceTarget.toUpperCase()}${sourceItemText}${modifiersText}
+            ${damageDisplayText}${sourceItemText}${modifiersText}
           </div>
           <div class="damage-actions">
             <button class="damage-action-btn undo" data-action="undoDamage" data-target-id="${
               result.targetId
-            }" data-amount="${result.appliedDamage}" data-resource="${
-      result.resourceTarget
-    }" data-is-healing="${result.isHealing}">
+            }" data-amount="${result.appliedDamage}" data-temp-depleted="${
+      result.tempDepleted || 0
+    }" data-actual-damage="${
+      result.actualDamage || result.appliedDamage
+    }" data-resource="${result.resourceTarget}" data-is-healing="${
+      result.isHealing
+    }">
               <i class="fas fa-undo"></i>Undo
             </button>
             ${editButton}

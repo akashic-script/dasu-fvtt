@@ -4,6 +4,7 @@ import { registerHandlebarsHelpers } from '../../utils/helpers.mjs';
 import { LevelingWizard } from '../../ui/applications/leveling-wizard.mjs';
 import { DASURollDialog } from '../../ui/dialogs/roll-dialog.mjs';
 import { DASURecruitDialog } from '../../ui/dialogs/recruit-dialog.mjs';
+import { ResourceManagerDialog } from '../../ui/dialogs/resource-manager-dialog.mjs';
 import { DASU_STATUS_CONDITIONS } from '../../data/shared/status-conditions.mjs';
 
 registerHandlebarsHelpers();
@@ -91,6 +92,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       recruit: this._onRecruit,
       openSlotTag: this._openSlotTag,
       toggleItemSection: this._toggleItemSection,
+      manageResource: this._manageResource,
     },
     // Custom property that's merged into `this.options`
     // dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
@@ -4083,6 +4085,19 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       false;
     await this.document.setFlag('dasu', 'summonedDaemonsCollapsed', !current);
     this.render();
+  }
+
+  /**
+   * Open the resource manager dialog
+   * @param {Event} event - Click event
+   * @param {HTMLElement} target - Target element
+   */
+  static async _manageResource(event, target) {
+    const resourceType =
+      target.dataset.resource || target.closest('.bar-meter')?.dataset.resource;
+    if (!resourceType) return;
+
+    await ResourceManagerDialog.open(this.actor, resourceType);
   }
 
   /**

@@ -15,25 +15,45 @@
     <div class="sheet-header-bars">
       {{!-- Resource Bars --}}
       <div class="bars-container">
-        {{!-- HP Bar --}}
-        <div class="bar-meter hp-bar">
-          <span class="bar-label">{{localize 'DASU.Actor.Stats.hp.label'}}</span>
-          <div class="bar-outer">
-            <div class="bar-inner" style="width: {{percent system.stats.hp.current system.stats.hp.max}}%;"></div>
+        {{!-- HP Bar with Temp --}}
+        <div class="bar-group">
+          <div class="temp-hp-section {{#unless system.stats.hp.temp}}empty{{/unless}}">
+            <div class="temp-hp-bar">
+              <div class="temp-fill" style="width: {{percent system.stats.hp.temp system.stats.hp.max}}%;"></div>
+            </div>
+            {{#if system.stats.hp.temp}}
+              <span class="temp-value" data-tooltip="Temporary HP"><i class="fas fa-shield-alt"></i>{{system.stats.hp.temp}}</span>
+            {{/if}}
           </div>
-          <span class="bar-value">
-            <input type="text" name="system.stats.hp.current" value="{{system.stats.hp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.hp.max}}
-          </span>
+          <div class="bar-meter hp-bar">
+            <span class="bar-label" data-action="manageResource" data-resource="hp">{{localize 'DASU.Actor.Stats.hp.label'}}</span>
+            <div class="bar-outer">
+              <div class="bar-inner" style="width: {{percent system.stats.hp.current system.stats.hp.max}}%;"></div>
+            </div>
+            <span class="bar-value">
+              <input type="text" name="system.stats.hp.current" value="{{system.stats.hp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.hp.max}}
+            </span>
+          </div>
         </div>
-        {{!-- WP Bar --}}
-        <div class="bar-meter wp-bar">
-          <span class="bar-label">{{localize 'DASU.Actor.Stats.wp.label'}}</span>
-          <div class="bar-outer">
-            <div class="bar-inner" style="width: {{percent system.stats.wp.current system.stats.wp.max}}%;"></div>
+        {{!-- WP Bar with Temp --}}
+        <div class="bar-group">
+          <div class="temp-hp-section {{#unless system.stats.wp.temp}}empty{{/unless}}">
+            <div class="temp-hp-bar">
+              <div class="temp-fill" style="width: {{percent system.stats.wp.temp system.stats.wp.max}}%;"></div>
+            </div>
+            {{#if system.stats.wp.temp}}
+              <span class="temp-value" data-tooltip="Temporary WP"><i class="fas fa-shield-alt"></i>{{system.stats.wp.temp}}</span>
+            {{/if}}
           </div>
-          <span class="bar-value">
-            <input type="text" name="system.stats.wp.current" value="{{system.stats.wp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.wp.max}}
-          </span>
+          <div class="bar-meter wp-bar">
+            <span class="bar-label" data-action="manageResource" data-resource="wp">{{localize 'DASU.Actor.Stats.wp.label'}}</span>
+            <div class="bar-outer">
+              <div class="bar-inner" style="width: {{percent system.stats.wp.current system.stats.wp.max}}%;"></div>
+            </div>
+            <span class="bar-value">
+              <input type="text" name="system.stats.wp.current" value="{{system.stats.wp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.wp.max}}
+            </span>
+          </div>
         </div>
       </div>
       {{!-- Defense Stats --}}

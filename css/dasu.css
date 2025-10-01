@@ -25,8 +25,8 @@
 @import 'applications/leveling-wizard.css';
 @import 'applications/recruit-dialog.css';
 @import 'applications/combat-dialog.css';
-@import 'dialogs/damage-edit-dialog.css';
-@import 'dialogs/healing-edit-dialog.css';
+@import 'dialogs/shared-edit-dialog.css';
+@import 'dialogs/resource-manager-dialog.css';
 @import 'item-sheet-consistency.css';
 @import 'chat/shared-components.css';
 @import 'chat/initiative-card.css';

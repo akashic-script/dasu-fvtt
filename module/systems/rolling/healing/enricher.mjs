@@ -63,9 +63,13 @@ function _parseHealingInstance(instanceText) {
     'Invalid healing resource target:'
   );
 
+  // Check for 'temp' flag in third token
+  const isTemp = tokens[2] && tokens[2].toLowerCase() === 'temp';
+
   return {
     formula,
     resourceTarget,
+    isTemp,
   };
 }
 
@@ -108,13 +112,15 @@ function _parseHealingEnricher(match) {
  * @private
  */
 function _generateHealingLabel(instance) {
-  const { formula, resourceTarget } = instance;
+  const { formula, resourceTarget, isTemp } = instance;
+
+  const tempPrefix = isTemp ? 'Temp ' : '';
 
   if (resourceTarget === 'both') {
-    return `${formula} HP & WP`;
+    return `${formula} ${tempPrefix}HP & WP`;
   }
 
-  return `${formula} ${resourceTarget.toUpperCase()}`;
+  return `${formula} ${tempPrefix}${resourceTarget.toUpperCase()}`;
 }
 
 /**
@@ -126,14 +132,16 @@ function _generateHealingLabel(instance) {
  * @private
  */
 function _createHealingInstanceLink(instance, customLabel, sourceActorUuid) {
-  const { formula, resourceTarget } = instance;
+  const { formula, resourceTarget, isTemp } = instance;
 
   const labelText = customLabel || _generateHealingLabel(instance);
-  const tooltip = `Heal ${formula} ${resourceTarget.toUpperCase()}`;
+  const healType = isTemp ? 'Grant temporary' : 'Heal';
+  const tooltip = `${healType} ${formula} ${resourceTarget.toUpperCase()}`;
 
   const dataset = {
     formula,
     resourceTarget,
+    isTemp: isTemp ? 'true' : 'false',
   };
 
   // Store source actor UUID if available
@@ -142,8 +150,8 @@ function _createHealingInstanceLink(instance, customLabel, sourceActorUuid) {
   }
 
   return createEnricherLink({
-    cssClass: 'dasu-healing-link',
-    iconClass: 'fa-heart',
+    cssClass: isTemp ? 'dasu-healing-link temp-hp' : 'dasu-healing-link',
+    iconClass: isTemp ? 'fa-shield-alt' : 'fa-heart',
     labelText,
     tooltip,
     dataset,
@@ -269,6 +277,80 @@ async function _applyQuickHealing(
 }
 
 /**
+ * Apply temporary HP to actor
+ *
+ * @param {Actor} targetActor - Actor receiving temp HP
+ * @param {number} amount - Amount of temp HP to grant
+ * @param {string} resourceTarget - Resource target (hp, wp, both)
+ * @param {Roll} roll - The roll that determined the amount
+ * @param {Actor} sourceActor - Actor granting temp HP
+ * @param {string} [tokenId] - Token ID for unlinked tokens
+ * @returns {Promise<void>}
+ * @private
+ */
+async function _applyTempHP(
+  targetActor,
+  amount,
+  resourceTarget,
+  roll,
+  sourceActor,
+  tokenId = null
+) {
+  // Build flavor text with dice results for chat message
+  const diceResults = roll.dice
+    .map((d) => d.results.map((r) => r.result).join(', '))
+    .join('; ');
+  const flavorText = `<span class="flavor-text">temporary HP granted (${roll.formula}: ${diceResults} = ${amount})</span>`;
+
+  // Apply temp HP to target
+  if (resourceTarget === 'both') {
+    await targetActor.addTempHP(amount, 'hp');
+    await targetActor.addTempHP(amount, 'wp');
+  } else {
+    await targetActor.addTempHP(amount, resourceTarget);
+  }
+
+  // Build chat message content
+  const icon = '<i class="fas fa-shield-alt"></i>';
+  const targetAttrs = `data-actor-id="${targetActor.id}"${
+    tokenId ? ` data-token-id="${tokenId}"` : ''
+  }`;
+
+  const content = `
+    <div class='dasu healing-applied temp-hp'>
+      <div class='healing-applied-content'>
+        <div class='healing-text'>
+          <span class='healing-icon'>${icon}</span>
+          <strong class="target-name clickable" ${targetAttrs}>${
+    targetActor.name
+  }</strong> gains
+          <strong class='healing-amount'>${amount}</strong> temporary ${resourceTarget.toUpperCase()}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Create chat message
+  await ChatMessage.create({
+    content,
+    speaker: ChatMessage.getSpeaker({ actor: sourceActor }),
+    style: CONST.CHAT_MESSAGE_STYLES.OTHER,
+    flavor: flavorText,
+    flags: {
+      dasu: {
+        tempHPGrant: {
+          targetId: targetActor.id,
+          targetName: targetActor.name,
+          amount,
+          resourceTarget,
+        },
+        enricherHealing: true,
+      },
+    },
+  });
+}
+
+/**
  * Handle healing link clicks
  *
  * @param {Event} event - Click event
@@ -280,6 +362,7 @@ async function _onHealingLinkClick(event) {
   const link = event.currentTarget;
   const formula = link.dataset.formula;
   const resourceTarget = link.dataset.resourceTarget;
+  const isTemp = link.dataset.isTemp === 'true';
   const sourceActorUuid = link.dataset.sourceActorUuid;
 
   // Try to get source actor from stored UUID first
@@ -317,21 +400,33 @@ async function _onHealingLinkClick(event) {
         : [{ actor: sourceActor, id: 'actor-only' }];
     }
 
-    // Apply healing to all targets
+    // Apply healing or temp HP to all targets
     for (const target of healTargets) {
       const targetActor = target.actor;
       if (!targetActor) continue;
 
       // Get token ID for unlinked tokens
       const tokenId = target.id !== 'actor-only' ? target.id : null;
-      await _applyQuickHealing(
-        targetActor,
-        baseHealing,
-        resourceTarget,
-        roll,
-        sourceActor,
-        tokenId
-      );
+
+      if (isTemp) {
+        await _applyTempHP(
+          targetActor,
+          baseHealing,
+          resourceTarget,
+          roll,
+          sourceActor,
+          tokenId
+        );
+      } else {
+        await _applyQuickHealing(
+          targetActor,
+          baseHealing,
+          resourceTarget,
+          roll,
+          sourceActor,
+          tokenId
+        );
+      }
     }
   } catch (error) {
     ui.notifications.error(`Failed to process healing: ${error.message}`);

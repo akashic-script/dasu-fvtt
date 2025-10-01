@@ -49,12 +49,13 @@ export class SharedActorComponents {
         multiplier: new fields.NumberField({ required: true, initial: 1 }),
       });
 
-    // Create a function for hp/wp with current
+    // Create a function for hp/wp with current and temp
     const createResourceStatSchema = () =>
       new fields.SchemaField({
         mod: new fields.NumberField({ required: true, initial: 0 }),
         multiplier: new fields.NumberField({ required: true, initial: 1 }),
         current: new fields.NumberField({ required: true, initial: 0, min: 0 }),
+        temp: new fields.NumberField({ required: true, initial: 0, min: 0 }),
       });
 
     // Create a function for crit with specific mod range

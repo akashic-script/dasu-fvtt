@@ -354,7 +354,13 @@ export class DASUActor extends Actor {
     damage = Math.max(0, Math.round(damage));
 
     if (damage === 0) {
-      return { applied: 0, resourceTarget, actor: this };
+      return {
+        applied: 0,
+        resourceTarget,
+        actor: this,
+        tempDepleted: 0,
+        actualDamage: 0,
+      };
     }
 
     // Get current values - handle different actor types
@@ -364,39 +370,68 @@ export class DASUActor extends Actor {
       this.system.stats?.hp?.current ?? this.system.hp?.current ?? 0;
     const currentWp =
       this.system.stats?.wp?.current ?? this.system.wp?.current ?? 0;
+    const tempHp = this.system.stats?.hp?.temp ?? 0;
+    const tempWp = this.system.stats?.wp?.temp ?? 0;
     const maxHp = this.system.stats?.hp?.max ?? this.system.hp?.max ?? 20;
     const maxWp = this.system.stats?.wp?.max ?? this.system.wp?.max ?? 20;
 
-    // Debug disabled
-
     const updates = {};
     let appliedDamage = 0;
+    let tempDepleted = 0;
 
-    // Apply HP damage
+    // Apply HP damage (temp HP first, then regular HP)
     if (resourceTarget === 'hp' || resourceTarget === 'both') {
-      const newHp = Math.max(0, currentHp - damage);
-      appliedDamage += currentHp - newHp;
+      let remaining = damage;
 
-      // Use correct path based on actor data structure
-      // Prioritize system.stats.hp.current for daemons
-      if (this.system.stats?.hp?.current !== undefined) {
-        updates['system.stats.hp.current'] = newHp;
-      } else {
-        updates['system.hp.current'] = newHp;
+      // 1. Deplete temp HP first
+      if (tempHp > 0) {
+        const tempUsed = Math.min(remaining, tempHp);
+        tempDepleted += tempUsed;
+        remaining -= tempUsed;
+
+        if (this.system.stats?.hp?.temp !== undefined) {
+          updates['system.stats.hp.temp'] = tempHp - tempUsed;
+        }
+      }
+
+      // 2. Apply remaining damage to current HP
+      if (remaining > 0) {
+        const newHp = Math.max(0, currentHp - remaining);
+        appliedDamage += currentHp - newHp;
+
+        if (this.system.stats?.hp?.current !== undefined) {
+          updates['system.stats.hp.current'] = newHp;
+        } else {
+          updates['system.hp.current'] = newHp;
+        }
       }
     }
 
-    // Apply WP damage
+    // Apply WP damage (temp WP first, then regular WP)
     if (resourceTarget === 'wp' || resourceTarget === 'both') {
-      const newWp = Math.max(0, currentWp - damage);
-      appliedDamage += currentWp - newWp;
+      let remaining = damage;
 
-      // Use correct path based on actor data structure
-      // Prioritize system.stats.wp.current for daemons
-      if (this.system.stats?.wp?.current !== undefined) {
-        updates['system.stats.wp.current'] = newWp;
-      } else {
-        updates['system.wp.current'] = newWp;
+      // 1. Deplete temp WP first
+      if (tempWp > 0) {
+        const tempUsed = Math.min(remaining, tempWp);
+        tempDepleted += tempUsed;
+        remaining -= tempUsed;
+
+        if (this.system.stats?.wp?.temp !== undefined) {
+          updates['system.stats.wp.temp'] = tempWp - tempUsed;
+        }
+      }
+
+      // 2. Apply remaining damage to current WP
+      if (remaining > 0) {
+        const newWp = Math.max(0, currentWp - remaining);
+        appliedDamage += currentWp - newWp;
+
+        if (this.system.stats?.wp?.current !== undefined) {
+          updates['system.stats.wp.current'] = newWp;
+        } else {
+          updates['system.wp.current'] = newWp;
+        }
       }
     }
 
@@ -410,6 +445,9 @@ export class DASUActor extends Actor {
 
     return {
       applied: appliedDamage,
+      tempDepleted,
+      actualDamage: appliedDamage,
+      totalDamage: damage,
       resourceTarget,
       actor: this,
       updates,
@@ -488,6 +526,65 @@ export class DASUActor extends Actor {
       actor: this,
       updates,
     };
+  }
+
+  /**
+   * Add temporary HP to actor (stacks with existing temp HP)
+   * @param {number} amount - Amount of temp HP to add
+   * @param {string} resource - Resource type ('hp' or 'wp')
+   * @returns {Promise<Actor>}
+   */
+  async addTempHP(amount, resource = 'hp') {
+    if (!['hp', 'wp'].includes(resource)) {
+      console.warn(`Invalid resource type: ${resource}. Must be 'hp' or 'wp'.`);
+      return this;
+    }
+
+    const currentTemp = this.system.stats[resource].temp ?? 0;
+    const newTemp = currentTemp + amount;
+
+    await this.update({
+      [`system.stats.${resource}.temp`]: newTemp,
+    });
+
+    ui.notifications.info(
+      `${
+        this.name
+      } gains ${amount} temporary ${resource.toUpperCase()}! (Total: ${newTemp})`
+    );
+
+    return this;
+  }
+
+  /**
+   * Remove temporary HP from a specific resource
+   * @param {string} resource - Resource type ('hp' or 'wp')
+   * @returns {Promise<Actor>}
+   */
+  async removeTempHP(resource = 'hp') {
+    if (!['hp', 'wp'].includes(resource)) {
+      console.warn(`Invalid resource type: ${resource}. Must be 'hp' or 'wp'.`);
+      return this;
+    }
+
+    await this.update({
+      [`system.stats.${resource}.temp`]: 0,
+    });
+
+    return this;
+  }
+
+  /**
+   * Remove all temporary HP from all resources
+   * @returns {Promise<Actor>}
+   */
+  async clearAllTempHP() {
+    await this.update({
+      'system.stats.hp.temp': 0,
+      'system.stats.wp.temp': 0,
+    });
+
+    return this;
   }
 
   /**

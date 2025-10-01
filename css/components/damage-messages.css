@@ -30,6 +30,12 @@
   line-height: 1.2;
 }
 
+.damage-amount.temp {
+  color: #4fc3f7;
+  font-weight: bold;
+  text-shadow: 0 0 2px rgba(79, 195, 247, 0.5);
+}
+
 /* Edited message styles */
 .edited-content {
   text-decoration: line-through;
