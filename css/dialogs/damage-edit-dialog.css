@@ -1,0 +1,234 @@
+/* DASU Damage Edit Dialog Styles */
+.dasu.damage-edit-dialog {
+  font-family: var(--font-primary);
+  width: 500px;
+  max-width: 500px;
+}
+
+.damage-edit-dialog .window-content {
+  background: var(--color-bg-secondary);
+  padding: 0;
+}
+
+.damage-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+
+/* Header */
+.form-header {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 8px;
+}
+
+.form-header h3 {
+  margin: 0 0 4px 0;
+  color: var(--dasu-c-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.current-status {
+  display: flex;
+  gap: 12px;
+  font-size: 0.8rem;
+}
+
+.status-item {
+  background: var(--color-bg-primary);
+  padding: 2px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  font-weight: 600;
+}
+
+/* Form sections */
+.form-section {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  padding: 8px;
+  border-radius: 0;
+}
+
+.form-section h4 {
+  margin: 0 0 8px 0;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 4px;
+}
+
+/* Source info */
+.source-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.source-actor {
+  font-weight: 700;
+  color: var(--dasu-c-primary);
+}
+
+.source-item {
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+.original-damage {
+  background: var(--color-bg-secondary);
+  padding: 2px 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  font-weight: 600;
+}
+
+/* Form groups */
+.dasu.damage-edit-dialog .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.dasu.damage-edit-dialog .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.dasu.damage-edit-dialog .form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.dasu.damage-edit-dialog .form-group select,
+.dasu.damage-edit-dialog .form-group input[type='number'] {
+  padding: 4px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-secondary);
+  font-family: var(--font-primary);
+  font-size: 0.8rem;
+}
+
+.dasu.damage-edit-dialog .form-group select:focus,
+.dasu.damage-edit-dialog .form-group input[type='number']:focus {
+  outline: none;
+  border-color: var(--dasu-c-primary);
+  box-shadow: 0 0 0 1px var(--dasu-c-primary);
+}
+
+/* Checkbox groups */
+.checkbox-group {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.checkbox-group input[type='checkbox'] {
+  margin: 0;
+}
+
+/* Preview section */
+.preview-section {
+  border-color: var(--dasu-c-primary);
+  background: linear-gradient(
+    135deg,
+    rgba(181, 141, 54, 0.05) 0%,
+    rgba(181, 141, 54, 0.02) 100%
+  );
+}
+
+.damage-preview {
+  font-size: 0.9rem;
+}
+
+.preview-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+.preview-calculation {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.damage-breakdown {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-primary);
+  padding: 2px 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+.final-result {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.preview-icon {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.preview-text {
+  flex: 1;
+}
+
+.preview-text strong {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.preview-resistance {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+.preview-change {
+  margin-top: 4px;
+  padding: 4px 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 0;
+}
+
+/* Two-column layout */
+.form-columns {
+  display: flex;
+  gap: 12px;
+}
+
+.form-column {
+  flex: 1;
+}
+
+.dasu.damage-edit-dialog .form-column .form-group {
+  margin-bottom: 8px;
+}

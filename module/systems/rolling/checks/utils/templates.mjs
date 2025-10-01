@@ -30,15 +30,10 @@ export class TemplateUtils {
           section.data
         );
       } catch (error) {
-        console.error(
-          `Checks | Error rendering template ${section.partial}:`,
-          error
-        );
         return `<!-- Template error: ${section.partial} -->`;
       }
     }
 
-    console.warn('Checks | Invalid section format:', section);
     return '';
   }
 

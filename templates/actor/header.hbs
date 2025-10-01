@@ -10,14 +10,14 @@
   {{! -- Name and Bars -- }}
   <div class="sheet-header-center">
     <div class="document-name">
-      <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
+      <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'DASU.Actor.Header.NamePlaceholder'}}"/>
     </div>
     <div class="sheet-header-bars">
       {{!-- Resource Bars --}}
       <div class="bars-container">
         {{!-- HP Bar --}}
         <div class="bar-meter hp-bar">
-          <span class="bar-label">HP</span>
+          <span class="bar-label">{{localize 'DASU.Actor.Stats.hp.label'}}</span>
           <div class="bar-outer">
             <div class="bar-inner" style="width: {{percent system.stats.hp.current system.stats.hp.max}}%;"></div>
           </div>
@@ -27,7 +27,7 @@
         </div>
         {{!-- WP Bar --}}
         <div class="bar-meter wp-bar">
-          <span class="bar-label">WP</span>
+          <span class="bar-label">{{localize 'DASU.Actor.Stats.wp.label'}}</span>
           <div class="bar-outer">
             <div class="bar-inner" style="width: {{percent system.stats.wp.current system.stats.wp.max}}%;"></div>
           </div>
@@ -48,11 +48,6 @@
           <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stats.def.tooltip'}}">{{localize 'DASU.Actor.Stats.def.label'}}</span>
           <span class="stat-value">{{system.stats.def.value}}</span>
         </div>
-        {{!-- Crit Threshold Stat --}}
-        {{!-- <div class="stat-display">
-          <span class="stat-label" data-tooltip="Critical Threshold: Need to roll double dice at or above this number to achieve a critical hit. Lower is better.">CRIT</span>
-          <span class="stat-value">{{system.stats.crit.value}}</span>
-        </div> --}}
       </div>
     </div>
   </div>
@@ -61,7 +56,7 @@
   <div class="sheet-header-right">
     <div class="level-box">
       <div class="level-row">
-        <span class="level-label">Level</span>
+        <span class="level-label">{{localize 'DASU.Level'}}</span>
         {{#if (and actor.type (eq actor.type 'summoner'))}}
           {{!-- Summoner: Show level as text with leveling wizard button --}}
           <span class="level-value">{{system.level}}</span>
@@ -80,7 +75,7 @@
         {{/if}}
       </div>
       <div class="merit-row">
-        <span class="merit-label">Merit</span>
+        <span class="merit-label">{{localize 'DASU.Actor.Header.Merit'}}</span>
         <input type="text" name="system.merit" value="{{system.merit}}" data-dtype="Number" class="merit-input" />
       </div>
     </div>
@@ -91,6 +86,29 @@
           <span>{{localize 'DASU.Initiative'}}</span>
         </button>
       </div>
+    {{/if}}
+  </div>
+
+  {{! -- Resistances Row -- }}
+  <div class="resistances-row">
+    {{#if system.resistances}}
+      {{#each system.resistances as |resistance key|}}
+        <div class="resistance-display {{#if @root.isEditMode}}resistance-edit-mode{{/if}}" data-resistance="{{key}}" data-tooltip="{{resistance.label}}: {{resistance.resTypeCurr}}">
+          <img class="resistance-icon"
+               src="systems/dasu/assets/static/resistances/{{key}}.png"
+               alt="{{key}}" />
+          {{#if @root.isEditMode}}
+            <select name="system.resistances.{{key}}.base"
+                    class="resistance-select"
+                    data-dtype="Number"
+                    data-tooltip="{{resistance.label}}: {{resistance.resTypeBase}}">
+              {{selectOptions @root.config.resTypeAbbr selected=resistance.base localize=true}}
+            </select>
+          {{else}}
+            <span class="resistance-value">{{resistance.resTypeCurrAbbr}}</span>
+          {{/if}}
+        </div>
+      {{/each}}
     {{/if}}
   </div>
 </header>

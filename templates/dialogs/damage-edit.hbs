@@ -1,0 +1,144 @@
+<form class="damage-edit-form">
+  <div class="form-header">
+    <h3>{{localize "DASU.Damage.EditDialog.Title" name=targetActor.name}}</h3>
+    <div class="current-status">
+      {{#if isGM}}
+        <span class="status-item">{{localize "DASU.Actor.Stats.hp.label"}}: {{currentHp}}/{{maxHp}}</span>
+        <span class="status-item">{{localize "DASU.Actor.Stats.wp.label"}}: {{currentWp}}/{{maxWp}}</span>
+      {{else}}
+        <span class="status-item">{{localize "DASU.Actor.Stats.hp.label"}}: XX/XX</span>
+        <span class="status-item">{{localize "DASU.Actor.Stats.wp.label"}}: XX/XX</span>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="form-body">
+    <div class="form-section">
+      <h4>{{localize "DASU.Damage.EditDialog.DamageSource"}}</h4>
+      <div class="source-info">
+        <span class="source-actor">{{sourceActor.name}}</span>
+        {{#if sourceItem}}
+          <span class="source-item">{{localize "DASU.Damage.EditDialog.Using" item=sourceItem.name}}</span>
+        {{/if}}
+        <span class="original-damage">{{localize "DASU.Damage.EditDialog.Original" amount=originalDamage}}</span>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h4>{{localize "DASU.Damage.EditDialog.DamageConfiguration"}}</h4>
+      <div class="form-columns">
+        <div class="form-column">
+          <div class="form-group">
+            <label for="damageType">{{localize "DASU.Damage.EditDialog.DamageType"}}</label>
+            <select name="damageType" id="damageType">
+              {{#each damageTypes}}
+                <option value="{{value}}" {{#if (eq value ../damageData.damageType)}}selected{{/if}}>
+                  {{label}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="govern" data-tooltip="{{localize "DASU.Damage.EditDialog.AttributeTickHint"}}">{{localize "DASU.Damage.EditDialog.GoverningAttribute"}}</label>
+            <select name="govern" id="govern">
+              <option value="">{{localize "DASU.Damage.EditDialog.NoGoverningAttribute"}}</option>
+              {{#each attributeOptions}}
+                <option value="{{value}}" {{#if (eq value ../damageData.govern)}}selected{{/if}}>
+                  {{label}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-column">
+          <div class="form-group">
+            <label for="damageMod">{{localize "DASU.Damage.EditDialog.DamageModifier"}}</label>
+            <input type="number" name="damageMod" id="damageMod" value="{{damageData.damageMod}}" min="-20" max="20" step="1">
+          </div>
+
+          <div class="form-group">
+            <label for="resourceTarget">{{localize "DASU.Damage.EditDialog.TargetResource"}}</label>
+            <select name="resourceTarget" id="resourceTarget">
+              {{#each resourceOptions}}
+                <option value="{{value}}" {{#if (eq value ../damageData.resourceTarget)}}selected{{/if}}>
+                  {{label}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h4>{{localize "DASU.Damage.EditDialog.ResistanceOptions"}}</h4>
+      <div class="form-columns">
+        <div class="form-column">
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" name="ignoreResist" {{#if damageData.ignoreResist}}checked{{/if}}>
+              {{localize "DASU.Damage.EditDialog.IgnoreResist"}}
+            </label>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" name="ignoreWeak" {{#if damageData.ignoreWeak}}checked{{/if}}>
+              {{localize "DASU.Damage.EditDialog.IgnoreWeak"}}
+            </label>
+          </div>
+        </div>
+
+        <div class="form-column">
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" name="ignoreNullify" {{#if damageData.ignoreNullify}}checked{{/if}}>
+              {{localize "DASU.Damage.EditDialog.IgnoreNullify"}}
+            </label>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" name="ignoreDrain" {{#if damageData.ignoreDrain}}checked{{/if}}>
+              {{localize "DASU.Damage.EditDialog.IgnoreDrain"}}
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section preview-section">
+      <h4>{{localize "DASU.Damage.EditDialog.Preview"}}</h4>
+      <div class="damage-preview">
+        <div class="preview-content">
+          <span class="preview-icon">{{#if previewDamage.isHealing}}♥{{else}}⚔{{/if}}</span>
+          <div class="preview-calculation">
+            <div class="damage-breakdown">
+              {{#if previewDamage.breakdown}}
+                {{previewDamage.breakdown}}
+              {{else}}
+                {{localize "DASU.Damage.EditDialog.BaseDamage"}} {{previewDamage.baseDamage}}
+              {{/if}}
+            </div>
+            <div class="final-result">
+              <strong>{{#if previewDamage.isHealing}}{{localize "DASU.Damage.EditDialog.Healing"}}{{else}}{{localize "DASU.Damage.EditDialog.Damage"}}{{/if}}: {{previewDamage.finalDamage}} {{damageData.resourceTarget}}</strong>
+              {{#if previewDamage.resistance}}
+                {{#unless (eq previewDamage.resistance.type "normal")}}
+                  <span class="preview-resistance">({{previewDamage.resistance.type}})</span>
+                {{/unless}}
+              {{/if}}
+            </div>
+          </div>
+        </div>
+        {{#unless (eq previewDamage.finalDamage originalDamage)}}
+          <div class="preview-change">
+            {{localize "DASU.Damage.EditDialog.Change" amount=(subtract previewDamage.finalDamage originalDamage)}}
+          </div>
+        {{/unless}}
+      </div>
+    </div>
+  </div>
+</form>
+

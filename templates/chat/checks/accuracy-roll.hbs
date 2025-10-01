@@ -60,14 +60,21 @@
   {{!-- Combat Result Badge --}}
   <div class="outcome-compact">
     <div class="result-badge">
-      <span class="result-value">{{result.finalResult}}</span>
-      <span class="result-icon">
-        {{#if (eq item.type "tactic")}}
-          <i class="fas fa-crosshairs"> {{localize "DASU.RollCard.vsDefense"}}</i>
-        {{else}}
-          <i class="fas fa-crosshairs"> {{localize "DASU.RollCard.vsAvoid"}}</i>
-        {{/if}}
-      </span>
+      {{#if result.autoSuccess}}
+        <span class="result-value auto-success">AUTO SUCCESS</span>
+        <span class="result-icon">
+          <i class="fas fa-infinity"></i> {{localize "DASU.RollCard.NeverMiss"}}
+        </span>
+      {{else}}
+        <span class="result-value">{{result.finalResult}}</span>
+        <span class="result-icon">
+          {{#if (eq item.type "tactic")}}
+            <i class="fas fa-crosshairs"> {{localize "DASU.RollCard.vsDefense"}}</i>
+          {{else}}
+            <i class="fas fa-crosshairs"> {{localize "DASU.RollCard.vsAvoid"}}</i>
+          {{/if}}
+        </span>
+      {{/if}}
     </div>
     {{#if result.critical}}
       <div class="crit-indicator">
@@ -124,11 +131,13 @@
             </div>
           {{/if}}
         {{/if}}
-        {{#if item.system.healed}}
-          <div class="healing-info">
-            <span class="healing-label">{{localize "DASU.RollCard.Restores"}}:</span>
-            <span class="healing-value">{{item.system.healed.value}} {{upper item.system.healed.type}}</span>
-          </div>
+        {{#if (eq item.system.category "restorative")}}
+          {{#if item.system.healed}}
+            <div class="healing-info">
+              <span class="healing-label">{{localize "DASU.RollCard.Restores"}}:</span>
+              <span class="healing-value">{{item.system.healed.value}} {{upper item.system.healed.type}}</span>
+            </div>
+          {{/if}}
         {{/if}}
         {{#if item.system.effect}}
           <div class="effect-info">

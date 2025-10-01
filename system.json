@@ -108,6 +108,6 @@
     "units": "ft",
     "diagonals": 0
   },
-  "primaryTokenAttribute": "system.stats.hp",
-  "secondaryTokenAttribute": "system.stats.wp"
+  "primaryTokenAttribute": "stats.hp.current",
+  "secondaryTokenAttribute": "stats.wp.current"
 }

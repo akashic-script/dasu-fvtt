@@ -5,6 +5,7 @@
       "Item": "DASU Item Sheet"
     },
     "Attributes": {
+      "none": { "label": "No Attribute" },
       "pow": { "label": "Power" },
       "dex": { "label": "Dexterity" },
       "will": { "label": "Willpower" },
@@ -141,6 +142,7 @@
       },
       "levelingWizard": {
         "tooltip": "Open Leveling Wizard",
+        "noClass": "No Class",
         "tabs": {
           "levelup": "Level Up",
           "config": "Config"
@@ -208,6 +210,10 @@
       "Main": {
         "SummonedDaemons": "Summoned Daemons",
         "NoSummonedDaemons": "No daemons currently summoned"
+      },
+      "Header": {
+        "NamePlaceholder": "Name",
+        "Merit": "Merit"
       },
       "Skills": {
         "label": "Skills",
@@ -324,6 +330,7 @@
             "value": { "label": "Heal Value" }
           },
           "isInfinity": { "label": "Guaranteed" },
+          "resourceTarget": { "label": "Target Resource" },
           "toHit": { "label": "To Hit Bonus" }
         },
         "CATEGORIES": {
@@ -399,8 +406,8 @@
             "value": { "label": "Damage Value" }
           },
           "effect": { "label": "Effect" },
-          "govern": { "label": "Governing Attribute" },
           "isInfinity": { "label": "Guaranteed" },
+          "resourceTarget": { "label": "Target Resource" },
           "toLand": { "label": "To Land Bonus" }
         }
       },
@@ -456,6 +463,9 @@
         "class": "Class"
       }
     },
+    "FIELDS": {
+      "govern": { "label": "Governing Attribute" }
+    },
     "aptitudeTypes": {
       "d": { "long": "Dark", "short": "D" },
       "da": { "long": "Debuff Almighty", "short": "DA" },
@@ -484,6 +494,13 @@
       "physical": "Physical",
       "untyped": "Untyped",
       "wind": "Wind"
+    },
+    "resistanceTypes": {
+      "-1": { "long": "Weak", "short": "WK" },
+      "0": { "long": "Normal", "short": "-" },
+      "1": { "long": "Resist", "short": "RS" },
+      "2": { "long": "Nullify", "short": "NU" },
+      "3": { "long": "Drain", "short": "DR" }
     },
     "CostType": {
       "wp": "WP",
@@ -649,7 +666,31 @@
       "Effect": "Effect",
       "Restores": "Restores",
       "vsDefense": "vs Defense",
-      "vsAvoid": "vs Avoid"
+      "vsAvoid": "vs Avoid",
+      "NeverMiss": "Never Miss"
+    },
+    "Healing": {
+      "EditDialog": {
+        "Title": "Edit Healing for {name}",
+        "Cancel": "Cancel",
+        "ApplyChanges": "Apply Changes",
+        "HealingSource": "Healing Source",
+        "Using": "using {item}",
+        "Original": "Original: {amount}",
+        "HealingConfiguration": "Healing Configuration",
+        "HealingModifier": "Healing Modifier",
+        "HealingModifierHint": "Additional healing to apply (+/-)",
+        "HealType": "Heal Type",
+        "AttributeTick": "Attribute Tick",
+        "NoAttributeTick": "No Attribute Tick",
+        "AttributeTickHint": "Extra Damage/Healing based on Attribute tick",
+        "GoverningAttribute": "Governing Attribute",
+        "NoGoverningAttribute": "No Flat Bonus",
+        "Preview": "Preview",
+        "BaseHealing": "Base Healing:",
+        "Healing": "Healing",
+        "Change": "Change: {amount}"
+      }
     },
     "Checks": {
       "AttributeCheck": "Attribute Check",
@@ -662,16 +703,130 @@
       "Critical": "Critical!",
       "Attribute": "Attribute",
       "Skill": "Skill",
-      "Check": "Check"
+      "Check": "Check",
+      "TargetedIndividuals": "Targeted Individuals",
+      "ApplyTargeted": "Apply Targeted",
+      "ApplyTargetedHealing": "Apply Targeted Healing",
+      "NoTargetsSelected": "Nothing is targeted",
+      "AddTargets": "Add Targets",
+      "TargetResult": {
+        "Hit": "HIT",
+        "Miss": "MISS",
+        "Critical": "CRIT",
+        "Fumble": "FUMBLE",
+        "Unknown": "UNKNOWN"
+      }
+    },
+    "ContextMenu": {
+      "Retarget": "Retarget"
     },
     "Traits": {
       "Rank": "Rank:",
       "Rarity": "Rarity:",
       "Price": "Price:",
       "Level": "Level:"
+    },
+    "Damage": {
+      "ResultsTitle": "Damage Results",
+      "Resistance": "Resistance",
+      "CriticalHit": "Critical Hit",
+      "ApplyDamage": "Apply Damage",
+      "ApplyHealing": "Apply Healing",
+      "ApplyAll": "Apply All",
+      "Edit": "Edit",
+      "Targets": "Targets",
+      "TotalDamage": "Total Damage",
+      "EditDialog": {
+        "Title": "Edit Damage for {name}",
+        "DamageSource": "Damage Source",
+        "DamageConfiguration": "Damage Configuration",
+        "ResistanceOptions": "Resistance Options",
+        "Preview": "Preview",
+        "DamageType": "Damage Type:",
+        "AttributeTick": "Attribute Tick:",
+        "GoverningAttribute": "Governing Attribute:",
+        "DamageModifier": "Damage Modifier:",
+        "TargetResource": "Target Resource:",
+        "IgnoreResist": "Ignore Resist",
+        "IgnoreWeak": "Ignore Weak",
+        "IgnoreNullify": "Ignore Nullify",
+        "IgnoreDrain": "Ignore Drain",
+        "Cancel": "Cancel",
+        "ApplyChanges": "Apply Changes",
+        "Original": "Original: {amount}",
+        "Using": "using {item}",
+        "Change": "Change: {amount}",
+        "Damage": "Damage",
+        "Healing": "Healing",
+        "BaseDamage": "Base:"
+      },
+      "Notifications": {
+        "WeaponDataNotFound": "Could not extract weapon data from chat message",
+        "CustomizationNotImplemented": "Damage customization not yet implemented",
+        "DamageApplicationFailed": "Failed to apply damage",
+        "NoTargetsFound": "No targets found to apply damage to",
+        "BulkDamageApplicationFailed": "Failed to apply damage to targets",
+        "DamageDataNotFound": "Could not find damage data",
+        "TargetDataNotFound": "Could not find target data",
+        "EditDamageFailed": "Failed to edit damage",
+        "TargetActorNotFound": "Target actor not found",
+        "UndoHealing": "Undid {amount} {resource} healing for {name}",
+        "UndoDamage": "Undid {amount} {resource} damage for {name}",
+        "UndoDamageFailed": "Failed to undo damage",
+        "EditDialogProcessFailed": "Failed to process damage edit dialog",
+        "EditDialogOpenFailed": "Failed to open damage editing dialog",
+        "DamageRevised": "Damage revised: {original} → {new} {resource} for {name}",
+        "NoNetChange": "No net change applied",
+        "DamageChangesFailed": "Failed to apply damage changes"
+      },
+      "Actions": {
+        "Undo": "Undo",
+        "Edit": "Edit",
+        "Undone": "Undone"
+      }
+    },
+    "DAMAGE_TYPES": {
+      "Physical": "Physical",
+      "Fire": "Fire",
+      "Ice": "Ice",
+      "Electric": "Electric",
+      "Wind": "Wind",
+      "Earth": "Earth",
+      "Light": "Light",
+      "Dark": "Dark"
+    },
+    "RESISTANCE": {
+      "Weak": "Weak",
+      "Normal": "Normal",
+      "Resist": "Resist",
+      "Nullify": "Nullify",
+      "Drain": "Drain"
+    },
+    "ResourceTargets": {
+      "Both": "Both"
     }
   },
   "DOCUMENT": {
-    "Copy": "Copy"
+    "Copy": "Copy",
+    "Delete": "Delete {type}",
+    "DeleteWarning": "Are you sure you want to delete {name}? This action cannot be undone."
+  },
+  "TYPES": {
+    "Actor": {
+      "daemon": "Daemon",
+      "summoner": "Summoner"
+    },
+    "Item": {
+      "ability": "Ability",
+      "item": "Item",
+      "scar": "Scar",
+      "special": "Special",
+      "tag": "Tag",
+      "tactic": "Tactic",
+      "weapon": "Weapon",
+      "schema": "Schema",
+      "feature": "Feature",
+      "class": "Class"
+    }
   }
 }

@@ -20,6 +20,11 @@ export default class AbilityDataModel extends BaseItemDataModel {
         choices: abilityCategories,
         initial: 'spell', // Set initial value to prevent validation error
       }),
+      govern: new fields.StringField({
+        required: true,
+        choices: ['none', 'pow', 'dex', 'will', 'sta'],
+        initial: 'pow',
+      }),
       // Common ability fields
       damage: new fields.SchemaField({
         value: new fields.NumberField({ required: true, initial: 0 }),
@@ -46,6 +51,11 @@ export default class AbilityDataModel extends BaseItemDataModel {
         initial: 'wp',
       }),
       toHit: new fields.NumberField({ required: true, initial: 0 }),
+      resourceTarget: new fields.StringField({
+        required: true,
+        choices: ['hp', 'wp', 'both'],
+        initial: 'hp',
+      }),
       aptitudes: new fields.SchemaField({
         type: new fields.StringField({ required: true, initial: 'f' }),
         value: new fields.NumberField({ required: true, initial: 0 }),
@@ -96,6 +106,11 @@ export default class AbilityDataModel extends BaseItemDataModel {
     // Ensure aptitudes.value is a single number, not an array
     if (Array.isArray(this.aptitudes?.value)) {
       this.aptitudes.value = this.aptitudes.value[1] || 0;
+    }
+
+    // Restoratives always have isInfinity set to true (never miss)
+    if (this.category === 'restorative') {
+      this.isInfinity = true;
     }
   }
 }

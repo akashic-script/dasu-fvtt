@@ -23,6 +23,12 @@ import { ChecksPipeline } from './checks/core/pipeline.mjs';
 import { D6Check } from './checks/d6-check.mjs';
 import { AttributeCheck } from './checks/attribute-check.mjs';
 import { DisplayCheck } from './checks/display-check.mjs';
+import { TargetedIndividuals } from './checks/targeted-individuals.mjs';
+import { TargetedProcessing } from './checks/targeted-processing.mjs';
+import { Retarget } from './retarget.mjs';
+import { contextMenu } from './context-menu.mjs';
+import { initializeDamageSystem } from './damage/index.mjs';
+import { initializeHealingEventHandlers } from './healing/event-handlers.mjs';
 
 // Create singleton pipeline instance
 const pipeline = new ChecksPipeline();
@@ -108,12 +114,51 @@ export const Checks = {
     }
     return !!message?.flags?.dasu?.checkResult;
   },
+
+  /**
+   * Context menu management for check messages
+   * @namespace
+   */
+  contextMenu: {
+    /**
+     * Register a context menu option for check messages
+     * @param {string} id - Unique identifier for the option
+     * @param {ContextMenuOption} option - The context menu option configuration
+     */
+    registerOption: (id, option) => contextMenu.registerOption(id, option),
+
+    /**
+     * Unregister a context menu option
+     * @param {string} id - The option ID to remove
+     */
+    unregisterOption: (id) => contextMenu.unregisterOption(id),
+
+    /**
+     * Get all registered context menu options
+     * @returns {Array<{id: string, option: ContextMenuOption}>}
+     */
+    getOptions: () => contextMenu.getOrderedOptions(),
+  },
 };
 
 // Initialize check modules
 D6Check.initialize();
 AttributeCheck.initialize();
 DisplayCheck.initialize();
+TargetedIndividuals.initialize();
+TargetedProcessing.initialize();
+
+// Initialize context menu framework
+contextMenu.initialize();
+
+// Initialize retarget module (uses context menu framework)
+Retarget.initialize();
+
+// Initialize damage system
+initializeDamageSystem();
+
+// Initialize healing system
+initializeHealingEventHandlers();
 
 // Default export
 export default Checks;

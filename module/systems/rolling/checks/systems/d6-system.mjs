@@ -36,6 +36,48 @@ export class D6System {
   }
 
   static async process(check, result, actor, item) {
+    // Check if item has isInfinity (auto-success for accuracy checks)
+    const isInfinityItem = item?.system?.isInfinity;
+
+    if (check.type === 'accuracy' && isInfinityItem) {
+      // Auto-success for infinity items - still roll dice but guarantee success
+      const totalBonus = check.flatBonus + result.modifierTotal;
+      const formula = `${check.baseRoll} + ${totalBonus}`;
+      const roll = new Roll(formula);
+      await roll.evaluate();
+
+      result.roll = roll;
+      result.diceResult = this._extractDiceResult(roll);
+      result.flatBonus = check.flatBonus;
+      result.advantageState = check.advantageState;
+      result.finalResult = 999; // High value to ensure success in targeting
+      result.autoSuccess = true; // Flag to indicate this was an auto-success
+
+      // Check for criticals normally from the actual dice roll
+      const rollResults = this._extractRollResults(roll);
+      const critThreshold = actor.system.stats?.crit?.value ?? 7;
+      result.critical = this._checkForCritical(
+        rollResults,
+        critThreshold,
+        check.advantageState
+      );
+
+      // Store additional data
+      result.additionalData.rollResults = rollResults;
+      result.additionalData.critThreshold = critThreshold;
+      result.additionalData.totalBonus = totalBonus;
+      result.additionalData.isInfinity = true;
+
+      // For advantage/disadvantage rolls, also store dice with status
+      if (check.advantageState !== AdvantageStates.NORMAL) {
+        result.additionalData.diceWithStatus =
+          this._extractDiceWithStatus(roll);
+      }
+
+      return;
+    }
+
+    // Normal processing for non-infinity items
     // Calculate total bonus
     const totalBonus = check.flatBonus + result.modifierTotal;
 

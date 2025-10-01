@@ -664,10 +664,9 @@
 .dasu.actor button,
 .dasu.actor .button {
   background: var(--color-bg-primary);
-  /* border: 1px solid var(--color-primary); */
   border-radius: 0;
   color: var(--color-primary);
-  /* padding: 0.35rem 0.75rem; */
+  padding: 0.35rem 0.75rem;
   font-size: 0.8rem;
   font-weight: bold;
   text-transform: uppercase;
@@ -683,6 +682,7 @@
   color: white;
   border-color: var(--color-primary);
   box-shadow: 0 4px 8px var(--color-bg-dim);
+  opacity: 1;
 }
 
 .dasu.actor button:active,

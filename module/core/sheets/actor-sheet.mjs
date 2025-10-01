@@ -62,6 +62,9 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       width: 700,
       height: 950,
     },
+    window: {
+      resizable: true,
+    },
     actions: {
       onEditImage: this._onEditImage,
       viewDoc: this._viewDoc,
@@ -304,6 +307,25 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     // Add HTMLField for formInput helper
     context.htmlInputField = new foundry.data.fields.HTMLField();
+
+    // Enrich resistance data for display
+    if (context.system.resistances) {
+      for (let [k, v] of Object.entries(context.system.resistances)) {
+        if (v && typeof v === 'object') {
+          v.label = game.i18n.localize(globalThis.DASU.damageTypes[k]) ?? k;
+          v.resTypeBase =
+            game.i18n.localize(globalThis.DASU.resType[v.base]) ?? v.base;
+          v.resTypeBaseAbbr =
+            game.i18n.localize(globalThis.DASU.resTypeAbbr[v.base]) ?? v.base;
+          v.resTypeCurr =
+            game.i18n.localize(globalThis.DASU.resType[v.current]) ?? v.current;
+          v.resTypeCurrAbbr =
+            game.i18n.localize(globalThis.DASU.resTypeAbbr[v.current]) ??
+            v.current;
+          v.icon = globalThis.DASU.resIcon[k];
+        }
+      }
+    }
 
     return context;
   }
@@ -2572,6 +2594,19 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       this._mutationObserver = null;
     }
 
+    // Clean up context menu
+    if (this._itemContextMenu) {
+      try {
+        // Only try to close if the context menu's element still exists
+        if (this._itemContextMenu.element) {
+          this._itemContextMenu.close();
+        }
+      } catch (e) {
+        // Silently ignore errors during cleanup
+      }
+      this._itemContextMenu = null;
+    }
+
     // Clean up daemon item hook listeners
     this._cleanupDaemonItemHooks();
 
@@ -4585,11 +4620,15 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @private
    */
   _setupItemContextMenus() {
+    // Safety check: ensure element exists and is attached to DOM
+    if (!this.element || !this.element.isConnected) {
+      return;
+    }
+
     // Check if we have any context menu toggles
     const toggles = this.element.querySelectorAll('.context-menu-toggle');
 
     if (toggles.length === 0) {
-      console.warn('No context menu toggles found');
       return;
     }
 
@@ -4680,126 +4719,244 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       },
     ];
 
+    // Allow modules to add custom options via hook
+    // Hook signature: (menuOptions, sheet, actor)
+    const customMenuOptions = [];
+    Hooks.callAll(
+      'getItemContextMenuOptions',
+      customMenuOptions,
+      this,
+      this.actor
+    );
+
+    // Store custom options separately - we'll add them dynamically in onOpen callback
+    // This prevents Foundry's ContextMenu from pre-sizing the menu for items that might be
+    // conditionally hidden, avoiding empty space in the menu
+    const customOptions = customMenuOptions.map((opt) => ({
+      name: opt.name,
+      icon: opt.icon,
+      className: opt.className,
+      condition: opt.condition,
+      callback: opt.callback,
+    }));
+
+    // Clean up existing context menu if it exists
+    if (this._itemContextMenu) {
+      try {
+        // Only try to close if the context menu's element still exists and is connected
+        if (this._itemContextMenu.element?.isConnected) {
+          this._itemContextMenu.close();
+        }
+      } catch (e) {
+        // Silently ignore errors during cleanup
+      }
+      this._itemContextMenu = null;
+    }
+
     // Initialize Foundry ContextMenu for all context menu toggles
     try {
-      new foundry.applications.ux.ContextMenu.implementation(
-        this.element,
-        '.context-menu-toggle',
-        menuOptions,
-        {
-          eventName: 'click',
-          jQuery: false,
-          onOpen: () => {
-            // Use the stored values from the click listener
-            const currentItemId = sheet._lastClickedItemId;
+      this._itemContextMenu =
+        new foundry.applications.ux.ContextMenu.implementation(
+          this.element,
+          '.context-menu-toggle',
+          menuOptions,
+          {
+            eventName: 'click',
+            jQuery: false,
+            onOpen: () => {
+              // Use the stored values from the click listener
+              const currentItemId = sheet._lastClickedItemId;
 
-            // Wait for menu DOM to be available, then add attributes and event listeners
-            setTimeout(() => {
-              try {
-                // Try to find the menu element in the DOM
-                const contextMenu = document.querySelector('#context-menu');
-                if (!contextMenu) {
-                  console.warn('Context menu element not found in DOM');
-                  return;
-                }
-
-                // Add data-action attributes and event listeners to menu items
-                const menuItems = contextMenu.querySelectorAll('.context-item');
-
-                menuItems.forEach((item, index) => {
-                  // Add data-action attribute based on menu option index
-                  const actions = ['toggleFavorite', 'copyDoc', 'deleteDoc'];
-                  item.setAttribute('data-action', actions[index]);
-
-                  // Add item ID reference
-                  if (currentItemId) {
-                    item.setAttribute('data-item-id', currentItemId);
-
-                    // Update favorite icon based on current item state
-                    if (actions[index] === 'toggleFavorite') {
-                      const targetItem = sheet.actor.items.get(currentItemId);
-                      if (targetItem) {
-                        const iconElement = item.querySelector('i');
-                        if (iconElement) {
-                          // Use solid star if favorited, outline star if not
-                          iconElement.className = targetItem.system.favorite
-                            ? 'fas fa-star fa-fw'
-                            : 'fal fa-star fa-fw';
-                        }
-                        // Add favorited class to the menu item for special styling
-                        item.classList.toggle(
-                          'favorited',
-                          targetItem.system.favorite
-                        );
-                      }
-                    }
+              // Wait for menu DOM to be available, then add attributes and event listeners
+              // Use requestAnimationFrame for better timing
+              requestAnimationFrame(() => {
+                try {
+                  // Try to find the menu element in the DOM
+                  const contextMenu = document.querySelector('#context-menu');
+                  if (!contextMenu) {
+                    return;
                   }
 
-                  // Add click event listener
-                  item.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
+                  // Add data-action attributes and event listeners to built-in menu items
+                  const menuItems =
+                    contextMenu.querySelectorAll('.context-item');
 
-                    const action = item.getAttribute('data-action');
-                    const itemId = item.getAttribute('data-item-id');
+                  const actions = ['toggleFavorite', 'copyDoc', 'deleteDoc'];
 
-                    const targetItem = itemId
-                      ? sheet.actor.items.get(itemId)
-                      : null;
-                    if (targetItem) {
-                      switch (action) {
-                        case 'toggleFavorite':
-                          sheet._toggleItemFavorite(targetItem);
-                          break;
-                        case 'copyDoc':
-                          if (sheet.isEditable && sheet._isEditMode()) {
-                            sheet._copyItem(targetItem);
+                  menuItems.forEach((item, index) => {
+                    // Add data-action attribute based on menu option index
+                    item.setAttribute('data-action', actions[index]);
+
+                    // Add item ID reference
+                    if (currentItemId) {
+                      item.setAttribute('data-item-id', currentItemId);
+
+                      // Update favorite icon based on current item state
+                      if (actions[index] === 'toggleFavorite') {
+                        const targetItem = sheet.actor.items.get(currentItemId);
+                        if (targetItem) {
+                          const iconElement = item.querySelector('i');
+                          if (iconElement) {
+                            // Use solid star if favorited, outline star if not
+                            iconElement.className = targetItem.system.favorite
+                              ? 'fas fa-star fa-fw'
+                              : 'fal fa-star fa-fw';
                           }
-                          break;
-                        case 'deleteDoc':
-                          if (sheet.isEditable && sheet._isEditMode()) {
-                            sheet._deleteItem(targetItem);
-                          }
-                          break;
+                          // Add favorited class to the menu item for special styling
+                          item.classList.toggle(
+                            'favorited',
+                            targetItem.system.favorite
+                          );
+                        }
                       }
                     }
 
-                    // Close the context menu after action
-                    if (contextMenu) {
-                      contextMenu.remove();
+                    // Add click event listener with capture and once
+                    item.addEventListener(
+                      'click',
+                      (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        event.stopImmediatePropagation();
+
+                        const action = item.getAttribute('data-action');
+                        const itemId = item.getAttribute('data-item-id');
+
+                        const targetItem = itemId
+                          ? sheet.actor.items.get(itemId)
+                          : null;
+
+                        if (!targetItem) {
+                          ui.notifications.warn('Item not found');
+                          return;
+                        }
+
+                        switch (action) {
+                          case 'toggleFavorite':
+                            sheet._toggleItemFavorite(targetItem);
+                            break;
+                          case 'copyDoc':
+                            // Context menu copy works outside edit mode
+                            if (sheet.isEditable) {
+                              sheet._copyItem(targetItem);
+                            } else {
+                              ui.notifications.warn(
+                                'You do not have permission to copy items'
+                              );
+                            }
+                            break;
+                          case 'deleteDoc':
+                            // Context menu delete works outside edit mode (with confirmation)
+                            if (sheet.isEditable) {
+                              sheet._deleteItem(targetItem);
+                            } else {
+                              ui.notifications.warn(
+                                'You do not have permission to delete items'
+                              );
+                            }
+                            break;
+                        }
+
+                        // Close the context menu after action
+                        if (contextMenu) {
+                          contextMenu.remove();
+                        }
+                      },
+                      { capture: true }
+                    );
+                  });
+
+                  // Dynamically add custom menu items from hooks
+                  // Items are only created if their condition passes, preventing empty space
+                  customOptions.forEach((customOpt, customIndex) => {
+                    // Evaluate condition - skip if it returns false
+                    if (customOpt.condition) {
+                      try {
+                        const shouldShow = customOpt.condition(currentItemId);
+                        if (!shouldShow) return;
+                      } catch (error) {
+                        console.error(
+                          'Error evaluating custom menu condition:',
+                          error
+                        );
+                        return;
+                      }
+                    }
+
+                    // Create the menu item element
+                    const li = document.createElement('li');
+                    li.className = 'context-item';
+                    if (customOpt.className) {
+                      li.classList.add(customOpt.className);
+                    }
+                    li.setAttribute('data-action', `custom-${customIndex}`);
+                    if (currentItemId) {
+                      li.setAttribute('data-item-id', currentItemId);
+                    }
+
+                    li.innerHTML = `${customOpt.icon}<span>${customOpt.name}</span>`;
+
+                    // Add click handler for custom action
+                    li.addEventListener(
+                      'click',
+                      (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        event.stopImmediatePropagation();
+
+                        const itemId = li.getAttribute('data-item-id');
+                        const targetItem = itemId
+                          ? sheet.actor.items.get(itemId)
+                          : null;
+
+                        if (customOpt.callback) {
+                          customOpt.callback(itemId, targetItem);
+                        }
+
+                        if (contextMenu) {
+                          contextMenu.remove();
+                        }
+                      },
+                      { capture: true }
+                    );
+
+                    // Append to menu
+                    const menuElement =
+                      contextMenu.querySelector('menu.context-items');
+                    if (menuElement) {
+                      menuElement.appendChild(li);
                     }
                   });
-                });
-              } catch (error) {
-                console.error('Error setting up context menu items:', error);
+                } catch (error) {
+                  console.error('Error setting up context menu items:', error);
+                }
+              });
+
+              // Add active state to clicked toggle
+              if (sheet._lastClickedToggle) {
+                sheet._lastClickedToggle.classList.add('active');
               }
-            }, 10); // Small delay to ensure DOM is ready
 
-            // Add active state to clicked toggle
-            if (sheet._lastClickedToggle) {
-              sheet._lastClickedToggle.classList.add('active');
-            }
+              // Apply standardized theming
+              setTimeout(() => {
+                this._applyContextMenuTheme('standard');
+              }, 1);
+            },
+            onClose: () => {
+              // Remove active state from clicked toggle
+              if (sheet._lastClickedToggle) {
+                sheet._lastClickedToggle.classList.remove('active');
+              }
 
-            // Apply standardized theming
-            setTimeout(() => {
-              this._applyContextMenuTheme('standard');
-            }, 1);
-          },
-          onClose: () => {
-            // Remove active state from clicked toggle
-            if (sheet._lastClickedToggle) {
-              sheet._lastClickedToggle.classList.remove('active');
-            }
+              // Clear the current clicked toggle reference
+              sheet._lastClickedToggle = null;
 
-            // Clear the current clicked toggle reference
-            sheet._lastClickedToggle = null;
-
-            // Remove context menu theming
-            this._removeContextMenuTheme();
-          },
-          fixed: true,
-        }
-      );
+              // Remove context menu theming
+              this._removeContextMenuTheme();
+            },
+            fixed: true,
+          }
+        );
     } catch (error) {
       console.error('Error creating context menu:', error);
     }

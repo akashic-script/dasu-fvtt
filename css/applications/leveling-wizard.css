@@ -136,6 +136,38 @@
 .dasu-leveling-wizard .control-group {
   display: flex;
   gap: 0.4rem;
+  align-items: center;
+}
+
+.dasu-leveling-wizard .class-name-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 4px 8px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-primary);
+  border-radius: 0;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-family: var(--font-primary);
+}
+
+.dasu-leveling-wizard .class-name-badge i {
+  color: var(--color-primary);
+}
+
+.dasu-leveling-wizard .class-name-badge.no-class {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.dasu-leveling-wizard .class-name-badge.no-class i {
+  color: var(--color-text-secondary);
 }
 
 .dasu-leveling-wizard .control-btn {
@@ -380,6 +412,7 @@
   gap: 0.4rem;
   font-weight: bold;
   font-size: 1rem;
+  width: 100%;
 }
 
 .dasu-leveling-wizard .level-label {
@@ -905,23 +938,6 @@
   border-color: var(--color-danger);
   background: rgba(244, 67, 54, 0.1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* ========================================
-   RESPONSIVE DESIGN
-   ======================================== */
-
-@media (max-width: 768px) {
-  .dasu-leveling-wizard .wizard-header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .dasu-leveling-wizard .level-row {
-    grid-template-columns: 60px 100px 1fr 80px 80px;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-  }
 }
 
 /* Wizard Tabs Navigation */

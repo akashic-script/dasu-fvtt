@@ -11,11 +11,18 @@ import DASUConfig from './utils/config.mjs';
 // Import settings
 import { DASUSettings } from './core/settings.mjs';
 // Import status conditions
-import { registerStatusConditions } from './data/shared/status-conditions.mjs';
+import {
+  registerStatusConditions,
+  DASU_STATUS_CONDITIONS,
+} from './data/shared/status-conditions.mjs';
 import { registerHandlebarsHelpers } from './utils/helpers.mjs';
 // Import roll system
 import Checks from './systems/rolling/index.mjs';
 import { DASURollDialog } from './ui/dialogs/roll-dialog.mjs';
+// Import enrichers
+import { registerEffectEnricher } from './systems/enrichers/effect-enricher.mjs';
+import { initializeHealingEnricher } from './systems/rolling/healing/enricher.mjs';
+import { initializeDamageEnricher } from './systems/rolling/damage/enricher.mjs';
 
 const collections = foundry.documents.collections;
 const sheets = foundry.appv1.sheets;
@@ -329,6 +336,32 @@ Hooks.once('init', function () {
   });
 
   registerHandlebarsHelpers();
+
+  // Register status conditions early (before enrichers need them)
+  // Note: Localization will be applied when ready hook fires
+  CONFIG.DASU_STATUS_CONDITIONS = DASU_STATUS_CONDITIONS;
+
+  // Register enrichers
+  registerEffectEnricher();
+  initializeHealingEnricher();
+  initializeDamageEnricher();
+});
+
+// Initialize event handlers when ready
+Hooks.once('ready', function () {
+  // Import and initialize healing event handlers
+  import('./systems/rolling/healing/event-handlers.mjs').then((module) => {
+    if (module.initializeHealingEventHandlers) {
+      module.initializeHealingEventHandlers();
+    }
+  });
+
+  // Import and initialize target sheet handlers
+  import('./utils/target-sheet-handlers.mjs').then((module) => {
+    if (module.initializeTargetSheetHandlers) {
+      module.initializeTargetSheetHandlers();
+    }
+  });
 });
 
 // Global level change listener for DASU
@@ -367,8 +400,30 @@ Hooks.once('ready', function () {
   // Register custom status conditions after localization is fully loaded
   registerStatusConditions();
 
+  // Register item context menu options
+  // Hook signature: (menuOptions, sheet, actor)
+  Hooks.on('getItemContextMenuOptions', (menuOptions, sheet, actor) => {
+    menuOptions.push({
+      name: 'Ability Fusion',
+      icon: '<i class="fas fa-layer-group"></i>',
+      condition: function (itemId) {
+        if (!itemId) return false;
+        const item = actor.items.get(itemId);
+        return item && item.type === 'ability';
+      },
+      callback: function (itemId, item) {
+        if (item) {
+          ui.notifications.info(`Ability Fusion activated for ${item.name}`);
+          // TODO: Implement ability fusion logic
+        }
+      },
+    });
+  });
+
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on('hotbarDrop', (bar, data, slot) => createDocMacro(data, slot));
+
+  // Context menu hooks are now handled by individual modules in the rolling system
 });
 
 /* -------------------------------------------- */

@@ -11,6 +11,11 @@ export default class WeaponDataModel extends TaggableMixin(BaseItemDataModel) {
     const baseSchema = super.defineSchema();
     return {
       ...baseSchema,
+      govern: new fields.StringField({
+        required: true,
+        choices: ['none', 'pow', 'dex', 'will', 'sta'],
+        initial: 'pow',
+      }),
       range: new fields.StringField({
         required: true,
         choices: ['melee', 'ranged'],

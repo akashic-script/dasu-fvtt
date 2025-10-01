@@ -150,6 +150,9 @@ export function registerStatusConditions() {
       description: game.i18n.localize(status.description),
     })
   );
+
+  // Also make DASU status conditions available on CONFIG for enrichers
+  CONFIG.DASU_STATUS_CONDITIONS = DASU_STATUS_CONDITIONS;
 }
 
 /**

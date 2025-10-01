@@ -27,7 +27,7 @@ export class CheckHooks {
       try {
         await callback(check);
       } catch (error) {
-        console.error('Checks | Error in prepare callback:', error);
+        // Silently continue on callback errors
       }
     }
 

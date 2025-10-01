@@ -394,6 +394,7 @@ export class DASUItem extends Item {
     const item = this;
 
     // For rollable items (weapons, abilities, tactics), open accuracy dialog
+    // Restoratives now also use the accuracy dialog for targeted individuals display
     if (['weapon', 'ability', 'tactic'].includes(item.type)) {
       try {
         // Open the accuracy dialog instead of rolling immediately
@@ -541,6 +542,274 @@ export class DASUItem extends Item {
     }
     // Proceed with normal deletion
     return super.delete(options);
+  }
+
+  /**
+   * Handle restorative item rolls - show healing preparation message with application buttons
+   * Restoratives use manual application rather than automatic healing
+   * @param {Event} event - The originating click event (unused but kept for interface consistency)
+   * @returns {Promise<ChatMessage|null>} The chat message result or null if invalid
+   * @private
+   */
+  async _rollRestorative(event) {
+    const healingType = this.system.healed?.type || 'hp';
+    const baseHealingAmount = this.system.healed?.value || 0;
+
+    if (baseHealingAmount <= 0) {
+      ui.notifications.warn(
+        'This restorative has no healing value configured.'
+      );
+      return null;
+    }
+
+    // Calculate final healing amount including attribute tick
+    const finalHealingAmount =
+      this._calculateRestorativeHealing(baseHealingAmount);
+
+    const currentTargets = Array.from(game.user.targets);
+    return await this._createHealingPrepMessage(
+      finalHealingAmount,
+      healingType,
+      currentTargets,
+      baseHealingAmount
+    );
+  }
+
+  /**
+   * Calculate restorative healing amount including attribute tick
+   * @param {number} baseAmount - Base healing amount from the item
+   * @returns {number} Final healing amount with attribute tick
+   * @private
+   */
+  _calculateRestorativeHealing(baseAmount) {
+    if (!this.actor) {
+      return baseAmount;
+    }
+
+    // Get attribute tick - use item's governing attribute or default to POW
+    const attributeTick = this.system?.govern || 'pow';
+
+    // Get governing attribute tick value for healing bonus
+    let tickValue = 1; // Default tick value
+    if (this.actor.system?.attributes?.[attributeTick]?.tick) {
+      tickValue = this.actor.system.attributes[attributeTick].tick;
+    } else if (this.actor.system?.attributes?.[attributeTick]?.current) {
+      // Fallback: calculate tick from current value (DASU: 1 tick per 5 points)
+      tickValue = Math.max(
+        1,
+        Math.floor(this.actor.system.attributes[attributeTick].current / 5)
+      );
+    }
+
+    // Calculate healing using DASU formula: Base Healing + Governing Attribute Tick
+    return Math.max(0, baseAmount + tickValue);
+  }
+
+  /**
+   * Create a healing preparation message with application buttons
+   * Shows healing item info and provides "Apply Self" and "Apply Targeted" buttons
+   * @param {number} healingAmount - Final amount of healing to apply
+   * @param {string} healingType - Type of healing (hp, wp, both)
+   * @param {Array} currentTargets - Currently targeted tokens (for display only)
+   * @param {number} baseAmount - Base healing amount before attribute tick
+   * @returns {Promise<ChatMessage>} The created chat message
+   * @private
+   */
+  async _createHealingPrepMessage(
+    healingAmount,
+    healingType,
+    currentTargets,
+    baseAmount
+  ) {
+    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+
+    // Build the content with application options
+    let content = "<div class='dasu healing-prep'>";
+
+    // Header with item info
+    content += "<header class='healing-header'>";
+    content += `<img src='${this.img}' alt='${this.name}' class='item-image'/>`;
+    content += `<h3>${this.name}</h3>`;
+    content += "<span class='item-type'>Restorative</span>";
+    content += '</header>';
+
+    // Healing info
+    content += '<div class="healing-info">';
+    content += '<div class="healing-amount-display">';
+    content += `<span class="healing-value">${healingAmount}</span>`;
+    content += `<span class="resource-type">${healingType.toUpperCase()}</span>`;
+    content += '</div>';
+
+    // Show breakdown if attribute tick was added
+    if (baseAmount && healingAmount > baseAmount) {
+      const attributeTick = this.system?.govern || 'pow';
+      const tickValue = healingAmount - baseAmount;
+      content += '<div class="healing-breakdown">';
+      content += `<small>Base: ${baseAmount} + ${attributeTick.toUpperCase()} tick: ${tickValue}</small>`;
+      content += '</div>';
+    }
+
+    if (this.system.description) {
+      content += `<div class='healing-description'>${this.system.description}</div>`;
+    }
+    content += '</div>';
+
+    // Target info
+    content += "<div class='target-info'>";
+    if (currentTargets.length > 0) {
+      content += "<div class='current-targets'>";
+      content += `<strong>Current Targets (${currentTargets.length}):</strong>`;
+      for (const target of currentTargets) {
+        content += `<span class='target-name clickable' data-actor-id='${
+          target.actor?.id
+        }'>${target.actor?.name || 'Unknown'}</span>`;
+      }
+      content += '</div>';
+    } else {
+      content += "<div class='no-targets'>No targets currently selected</div>";
+    }
+    content += '</div>';
+
+    // Application buttons
+    content += "<div class='healing-actions'>";
+    content += `<button class='healing-action-btn apply-self' data-action='applySelf' data-item-id='${this.id}' data-amount='${healingAmount}' data-type='${healingType}'>`;
+    content += "<i class='fas fa-user'></i>Apply Self";
+    content += '</button>';
+    content += `<button class='healing-action-btn apply-targeted' data-action='applyTargeted' data-item-id='${this.id}' data-amount='${healingAmount}' data-type='${healingType}'>`;
+    content += "<i class='fas fa-crosshairs'></i>Apply Targeted";
+    content += '</button>';
+    content += '</div>';
+
+    content += '</div>';
+
+    // Create the chat message
+    const chatData = {
+      user: game.user.id,
+      speaker: speaker,
+      content: content,
+      style: foundry.CONST.CHAT_MESSAGE_STYLES.OTHER,
+      flags: {
+        dasu: {
+          healingPrep: {
+            itemId: this.id,
+            amount: healingAmount,
+            type: healingType,
+            targets: currentTargets.map((t) => ({
+              actorId: t.actor?.id,
+              tokenId: t.id,
+              name: t.actor?.name,
+            })),
+          },
+        },
+      },
+    };
+
+    return await ChatMessage.create(chatData);
+  }
+
+  /**
+   * Create a chat message for healing application results
+   * Creates a summary message showing healing applied to multiple targets
+   * @param {Array} results - Array of healing results
+   * @param {Object} results[].targetId - Target actor ID
+   * @param {Object} results[].targetName - Target actor name
+   * @param {Object} results[].appliedHealing - Amount of healing actually applied
+   * @param {Object} results[].healingType - Type of healing (hp, wp, both)
+   * @returns {Promise<ChatMessage>} The created chat message
+   * @private
+   */
+  async _createHealingChatMessage(results) {
+    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+
+    // Calculate totals for summary
+    const totalTargets = results.length;
+    const totalHealing = results.reduce(
+      (sum, result) => sum + result.appliedHealing,
+      0
+    );
+    const healingType = results[0]?.healingType || 'hp';
+
+    // Build the content with improved structure matching damage results
+    let content = "<div class='dasu healing-results'>";
+
+    // Header with item info
+    content += "<header class='healing-header'>";
+    content += `<img src='${this.img}' alt='${this.name}' class='item-image'/>`;
+    content += `<h3>${this.name}</h3>`;
+    content += "<span class='item-type'>Restorative</span>";
+    content += '</header>';
+
+    // Individual target results
+    content += "<div class='healing-targets'>";
+    for (const result of results) {
+      const isMaxHealing =
+        result.appliedHealing === 0 && result.totalHealing > 0;
+      const healingText = result.error
+        ? 'Failed to apply'
+        : result.appliedHealing > 0
+        ? `${result.appliedHealing} ${result.healingType.toUpperCase()}`
+        : isMaxHealing
+        ? 'Already at maximum'
+        : 'No healing';
+
+      const targetClass = result.error
+        ? 'error'
+        : result.appliedHealing > 0
+        ? 'success'
+        : 'no-healing';
+
+      content += `<div class='healing-target ${targetClass}'>`;
+      content += "<div class='target-info'>";
+      content += `<div class='target-name'>${result.targetName}</div>`;
+      if (result.appliedHealing > 0) {
+        content += "<div class='healing-summary'>";
+        content += `<span class='healing-value'>${result.appliedHealing}</span>`;
+        content += `<span class='resource-target'>${result.healingType.toUpperCase()}</span>`;
+        content += '</div>';
+      }
+      content += '</div>';
+      content += `<div class='healing-amount'>${healingText}</div>`;
+      if (result.error) {
+        content += `<div class='error-message'>${result.error}</div>`;
+      }
+      content += '</div>';
+    }
+    content += '</div>';
+
+    // Description if present
+    if (this.system.description) {
+      content += `<div class='healing-description'>${this.system.description}</div>`;
+    }
+
+    // Summary footer (matching damage results pattern)
+    content += "<div class='healing-summary-footer'>";
+    content += "<div class='summary-stats'>";
+    content += `<div class='total-targets'>Targets: ${totalTargets}</div>`;
+    content += `<div class='total-healing'>Total: ${totalHealing} ${healingType.toUpperCase()}</div>`;
+    content += '</div>';
+    content += '</div>';
+
+    content += '</div>';
+
+    // Create the chat message
+    const chatData = {
+      user: game.user.id,
+      speaker: speaker,
+      content: content,
+      style: foundry.CONST.CHAT_MESSAGE_STYLES.OTHER,
+      flags: {
+        dasu: {
+          healingResults: results,
+          sourceItem: {
+            id: this.id,
+            name: this.name,
+            type: this.type,
+          },
+        },
+      },
+    };
+
+    return await ChatMessage.create(chatData);
   }
 }
 

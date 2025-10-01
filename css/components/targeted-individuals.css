@@ -1,0 +1,287 @@
+/* DASU Targeted Individuals Roll Card Styles */
+
+.dasu.roll-card.targets {
+  background: var(--color-bg-secondary);
+  font-family: var(--font-primary);
+  font-size: 0.7rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.2s ease;
+  margin-top: 2px;
+  border: 1px solid var(--dasu-c-primary);
+}
+
+.dasu.roll-card.targets:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Header */
+.targets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-bg-primary);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 8px,
+    rgba(0, 0, 0, 0.06) 8px,
+    rgba(0, 0, 0, 0.06) 16px
+  );
+  padding: 1px 4px;
+  min-height: 16px;
+}
+
+.section-title {
+  margin: 0;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* Targets list */
+.targets-list {
+  padding: 2px 4px;
+  background: var(--color-bg-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Target entries */
+.target-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 4px;
+  border: 1px solid transparent;
+  background: var(--color-bg-primary);
+  transition: all 0.2s ease;
+  gap: 4px;
+}
+
+.target-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 4px;
+}
+
+/* Framework for descriptions (for future specific mechanics) */
+.target-entry.has-description {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.target-entry.has-description .target-info {
+  margin-bottom: 2px;
+}
+
+.target-description {
+  margin-top: 2px;
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  line-height: 1.2;
+  padding: 3px 6px;
+  border-left: 2px solid var(--dasu-c-primary);
+  background: var(--color-bg-secondary);
+}
+
+.target-name {
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: var(--dasu-c-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.target-result {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 4px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border: 1px solid;
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 40px;
+  min-height: 14px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-primary);
+  background: none;
+}
+
+/* Result color coding */
+.target-result.target-crit {
+  background: var(--dasu-c-primary);
+  border-color: var(--dasu-c-primary);
+  color: var(--color-text-primary);
+}
+
+.target-result.target-hit {
+  background: var(--dasu-c-success);
+  border-color: var(--dasu-c-success);
+  color: var(--dasu-c-white);
+}
+
+.target-result.target-miss {
+  background: var(--dasu-c-tan);
+  border-color: var(--dasu-c-beige);
+  color: var(--color-text-secondary);
+}
+
+.target-result.target-fumble {
+  background: var(--color-hp);
+  border-color: var(--color-hp);
+  color: var(--dasu-c-white);
+}
+
+.target-result.target-unknown {
+  background: var(--color-text-secondary);
+  border-color: var(--color-text-secondary);
+  color: var(--dasu-c-white);
+}
+
+.border-crit {
+  border-color: var(--dasu-c-primary);
+}
+.border-hit {
+  border-color: var(--dasu-c-success);
+}
+.border-miss {
+  border-color: var(--color-danger);
+}
+.border-fumble {
+  border-color: var(--color-hp);
+}
+.border-unknown {
+  border-color: var(--color-text-secondary);
+}
+
+.bg-crit {
+  background: linear-gradient(
+    135deg,
+    rgba(181, 141, 54, 0.1) 0%,
+    rgba(181, 141, 54, 0.05) 100%
+  );
+}
+.bg-hit {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.1) 0%,
+    rgba(76, 175, 80, 0.05) 100%
+  );
+}
+.bg-miss {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 115, 85, 0.1) 0%,
+    rgba(139, 115, 85, 0.05) 100%
+  );
+}
+.bg-fumble {
+  background: linear-gradient(
+    135deg,
+    rgba(244, 67, 54, 0.1) 0%,
+    rgba(244, 67, 54, 0.05) 100%
+  );
+}
+.bg-unknown {
+  background: rgba(97, 97, 97, 0.05);
+}
+
+/* Result button hover effects */
+.target-result:hover {
+  opacity: 1;
+}
+
+.target-result:active {
+  transform: scale(0.95);
+}
+
+/* Button */
+.apply-targeted-btn {
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 0;
+  color: var(--color-text-primary);
+  padding: 1px 6px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-primary);
+  min-height: 14px;
+  flex-shrink: 0;
+}
+
+.apply-targeted-btn:hover {
+  background: var(--color-primary-highlight);
+  border-color: var(--color-primary-highlight);
+}
+
+.apply-targeted-btn:disabled {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+/* Effects */
+.target-entry:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.target-entry {
+  animation: target-appear 0.3s ease-out;
+}
+
+@keyframes target-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* No targets styling */
+.target-entry.no-targets {
+  background: var(--color-bg-primary);
+  border: 1px dashed var(--color-border);
+  opacity: 0.7;
+}
+
+.target-entry.no-targets .target-name {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.target-result.add-targets {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+  font-style: normal;
+}
+
+.target-result.add-targets:hover {
+  background: var(--color-primary-highlight);
+  border-color: var(--color-primary-highlight);
+}

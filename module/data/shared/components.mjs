@@ -1,3 +1,5 @@
+import { ResistancesDataModel } from '../actors/resistances-data-model.mjs';
+
 export class SharedActorComponents {
   static getAttributesSchema() {
     const fields = foundry.data.fields;
@@ -81,25 +83,7 @@ export class SharedActorComponents {
 
   static getResistancesSchema() {
     const fields = foundry.data.fields;
-
-    // Create a function to generate a new resistance field instance
-    const createResistanceField = () =>
-      new fields.StringField({
-        required: true,
-        initial: 'normal',
-        choices: ['weak', 'normal', 'resist', 'nullify', 'drain'],
-      });
-
-    return new fields.SchemaField({
-      p: createResistanceField(),
-      f: createResistanceField(),
-      i: createResistanceField(),
-      el: createResistanceField(),
-      w: createResistanceField(),
-      ea: createResistanceField(),
-      l: createResistanceField(),
-      d: createResistanceField(),
-    });
+    return new fields.EmbeddedDataField(ResistancesDataModel, {});
   }
 
   static getAptitudesSchema() {

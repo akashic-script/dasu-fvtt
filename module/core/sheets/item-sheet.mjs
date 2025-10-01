@@ -278,6 +278,13 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
             `DASU.Item.Ability.CATEGORIES.${category}`
           );
         });
+        // Add attribute options for attribute tick
+        context.attributeOptions = [
+          { value: 'pow', label: 'DASU.Attributes.pow.label' },
+          { value: 'dex', label: 'DASU.Attributes.dex.label' },
+          { value: 'will', label: 'DASU.Attributes.will.label' },
+          { value: 'sta', label: 'DASU.Attributes.sta.label' },
+        ];
         // Add enriched description for ProseMirror
         context.enrichedDescription =
           await foundry.applications.ux.TextEditor.implementation.enrichHTML(
