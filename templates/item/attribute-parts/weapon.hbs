@@ -16,6 +16,16 @@
       <input type='text' name='system.toHit' value='{{system.toHit}}' data-dtype='Number' />
     </div>
   </div>
+  <div class='resource'>
+    <label class='resource-label'>{{localize 'DASU.FIELDS.govern.label'}}</label>
+    <select name='system.govern' data-dtype='String'>
+      <option value="none" {{#if (eq system.govern "none")}}selected{{/if}}>{{localize 'DASU.Attributes.none.label'}}</option>
+      <option value="pow" {{#if (eq system.govern "pow")}}selected{{/if}}>{{localize 'DASU.Attributes.pow.label'}}</option>
+      <option value="dex" {{#if (eq system.govern "dex")}}selected{{/if}}>{{localize 'DASU.Attributes.dex.label'}}</option>
+      <option value="will" {{#if (eq system.govern "will")}}selected{{/if}}>{{localize 'DASU.Attributes.will.label'}}</option>
+      <option value="sta" {{#if (eq system.govern "sta")}}selected{{/if}}>{{localize 'DASU.Attributes.sta.label'}}</option>
+    </select>
+  </div>
   <div class='grid grid-2col'>
     <div class='resource'>
       <label class='resource-label'>{{localize 'DASU.Item.Weapon.FIELDS.damage.value.label'}}</label>

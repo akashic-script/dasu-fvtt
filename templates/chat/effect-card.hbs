@@ -1,0 +1,63 @@
+{{!-- DASU Effect Chat Card Template --}}
+<div class="dasu effect-card" data-effect-id="{{effect.id}}">
+
+  {{!-- Header --}}
+  <header class="effect-header">
+    <div class="effect-title">
+      <img class="effect-image" src="{{effect.img}}" alt="{{effect.name}}" />
+      <div class="title-info">
+        <h3 class="effect-name">{{effect.name}}</h3>
+        {{#if effect.stackCount}}
+          <span class="stack-indicator">x{{effect.stackCount}}</span>
+        {{/if}}
+      </div>
+    </div>
+    <div class="effect-status-indicator">
+      {{#if effect.disabled}}
+        <span class="disabled-badge">{{localize "DASU.Effect.Disabled"}}</span>
+      {{/if}}
+    </div>
+  </header>
+
+  {{!-- Effect Details --}}
+  <div class="effect-details">
+    {{#if effect.description}}
+      <div class="effect-description">
+        {{{effect.description}}}
+      </div>
+    {{/if}}
+
+    {{!-- Duration and Source --}}
+    <div class="effect-meta">
+      {{#if effect.sourceName}}
+        <div class="meta-item">
+          <span class="meta-label">{{localize "DASU.Effect.Source"}}:</span>
+          <span class="meta-value">{{effect.sourceName}}</span>
+        </div>
+      {{/if}}
+      {{#if effect.duration.label}}
+        <div class="meta-item">
+          <span class="meta-label">{{localize "DASU.Effect.Duration"}}:</span>
+          <span class="meta-value">{{#if effect.specialDurationLabel}}{{effect.specialDurationLabel}}{{else}}{{effect.duration.label}}{{/if}}</span>
+        </div>
+      {{/if}}
+    </div>
+
+    {{!-- Traits (Changes) --}}
+    {{#if effect.changes.length}}
+      <div class="effect-traits">
+        <h4 class="traits-header">{{localize "DASU.Effect.Changes"}}</h4>
+        <ul class="traits-list">
+          {{#each effect.changes as |change|}}
+            <li class="trait-item">
+              <span class="trait-key">{{change.key}}</span>
+              <span class="trait-mode">{{change.mode}}</span>
+              <span class="trait-value">{{change.value}}</span>
+            </li>
+          {{/each}}
+        </ul>
+      </div>
+    {{/if}}
+  </div>
+
+</div>

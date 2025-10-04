@@ -1,0 +1,157 @@
+/* DASU System-Style Resistance Display */
+.sheet-header .resistances-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  margin: 0;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.resistance-display {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3px;
+  min-width: 32px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 3px 4px;
+  border-radius: 0;
+  background: var(--color-secondary-bg);
+  border: 1px solid transparent;
+  position: relative;
+}
+
+/* Column layout for edit mode */
+.resistance-display.resistance-edit-mode {
+  flex-direction: column;
+  gap: 2px;
+  min-width: 28px;
+  padding: 2px 3px;
+}
+
+.resistance-display:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary-highlight);
+  box-shadow: 0 0 4px rgba(181, 141, 54, 0.3);
+}
+
+.resistance-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 0;
+  border: 1px solid var(--color-border);
+  transition: all 0.2s ease;
+  object-fit: contain;
+  background: var(--color-bg-primary);
+  filter: brightness(1.1) contrast(1.2);
+}
+
+.resistance-icon:not([src*='.png']),
+.resistance-icon[src=''] {
+  background: var(--color-text-muted);
+  position: relative;
+}
+
+.resistance-icon:not([src*='.png'])::before,
+.resistance-icon[src='']::before {
+  content: '?';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.resistance-display:hover .resistance-icon {
+  border-color: var(--color-secondary-highlight);
+}
+
+.resistance-value {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-align: center;
+  min-height: 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+  font-family: 'PT Sans Narrow', sans-serif;
+  padding: 0 0.125rem;
+}
+
+.resistance-select {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  min-width: 24px;
+  width: 100%;
+  padding: 1px 2px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: 'PT Sans Narrow', sans-serif;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resistance-select:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary-highlight);
+}
+
+.resistance-select:focus {
+  outline: none;
+  box-shadow: 0 0 4px rgba(181, 141, 54, 0.5);
+  border-color: var(--color-primary-highlight);
+}
+
+/* DASU System resistance state colors */
+.resistance-display .resistance-value {
+  /* Default using system text color */
+  color: var(--color-text-primary);
+}
+
+/* Resistance state-based coloring using system colors */
+.resistance-display[data-tooltip*='Weak'] .resistance-value {
+  color: var(--color-danger);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.resistance-display[data-tooltip*='Resist'] .resistance-value {
+  color: var(--color-success);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.resistance-display[data-tooltip*='Nullify'] .resistance-value {
+  color: var(--color-info);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.resistance-display[data-tooltip*='Drain'] .resistance-value {
+  color: var(--color-secondary);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* Enhanced icon styling for system consistency */
+.resistance-icon {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.resistance-display:hover .resistance-icon {
+  filter: brightness(1.2) contrast(1.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}

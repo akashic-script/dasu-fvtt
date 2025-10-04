@@ -2,9 +2,57 @@
    Resource Styles
    ========================= */
 .resource-label {
+  display: block;
+  margin: 0.25rem 0;
   font-weight: bold;
+  font-size: 0.9rem;
+  font: 600 0.85em var(--font-primary);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
+/* Form Elements Styling */
+.resource input[type='text'],
+.resource input[type='number'],
+.resource select,
+.resource textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.resource input[type='text']:focus,
+.resource input[type='number']:focus,
+.resource select:focus,
+.resource textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.resource textarea {
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.resource input[type='checkbox'] {
+  margin-right: 0.5rem;
+  transform: scale(1.1);
+}
+
+.resource input[type='checkbox'] + label {
+  font-weight: 500;
+  color: var(--dasu-c-dark);
+  cursor: pointer;
+}
 .ability-score,
 .ability-mod {
   flex: 0 0 44px;
@@ -229,7 +277,6 @@
 }
 
 .skill {
-  padding: 0.35rem;
   border: 1px solid var(--color-border);
   min-height: auto;
 }
@@ -444,12 +491,15 @@
    Attribute Controls
    ========================= */
 .attribute-controls {
+  display: flex;
+  flex-direction: row;
   gap: 0.25rem;
   align-items: center;
   justify-content: center;
   padding: 0.25rem;
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
+  width: 100%;
 }
 
 .attribute-decrease,
@@ -577,14 +627,16 @@
 }
 
 .crit-threshold-display {
-  font-size: 0.8em;
+  font-size: 0.75em;
   color: var(--color-primary);
   font-weight: 600;
   background: var(--color-bg-primary);
-  padding: 0.15rem 0.3rem;
+  padding: 0.1rem 0.25rem;
   border: 1px solid var(--color-primary);
   text-align: center;
   border-radius: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .crit-controls {
@@ -600,7 +652,7 @@
 }
 
 .crit-section .resource-label {
-  flex: 1;
+  flex: 2;
   text-align: left;
   font-size: 0.9em;
   margin-right: 0.5rem;
@@ -705,4 +757,83 @@
   color: var(--color-text-primary);
   text-shadow: 0 1px 2px var(--color-bg-dim);
   font-size: 0.85rem;
+}
+
+/* =========================
+   Temporary HP Styles
+   ========================= */
+.temp-hp-section {
+  display: flex;
+  align-items: self-end;
+  height: 0.6rem;
+  min-height: 0.6rem;
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    rgba(79, 195, 247, 0.08) 0%,
+    rgba(79, 195, 247, 0.15) 50%,
+    rgba(79, 195, 247, 0.08) 100%
+  );
+  border-radius: 1px;
+  margin-bottom: 0.05rem;
+}
+
+/* Hide visual elements when empty but preserve space */
+.temp-hp-section.empty {
+  background: transparent;
+  visibility: hidden;
+}
+
+.temp-hp-bar {
+  flex: 1;
+  height: 2px;
+  background: rgba(79, 195, 247, 0.15);
+  position: relative;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.temp-hp-bar .temp-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #4fc3f7 0%, #81d4fa 50%, #4fc3f7 100%);
+  box-shadow: 0 0 6px rgba(79, 195, 247, 0.9), 0 0 3px rgba(79, 195, 247, 0.6);
+  transition: width 0.3s ease;
+  border-radius: 1px;
+}
+
+.temp-value {
+  color: #4fc3f7;
+  font-weight: 600;
+  font-size: 0.65em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  line-height: 1;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 0 2px rgba(79, 195, 247, 0.5);
+  white-space: nowrap;
+  padding: 0.1rem 0.3rem;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 195, 247, 0.2) 0%,
+    rgba(79, 195, 247, 0.1) 100%
+  );
+  border-radius: 0;
+  border: 1px solid rgba(79, 195, 247, 0.3);
+}
+
+.temp-value i {
+  font-size: 0.9em;
+  color: #81d4fa;
+  filter: drop-shadow(0 0 2px rgba(79, 195, 247, 0.8));
+}
+
+.bar-outer {
+  position: relative;
+}
+
+.bar-meter {
+  position: relative;
 }

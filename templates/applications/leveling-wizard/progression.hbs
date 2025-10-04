@@ -100,8 +100,8 @@
 
                     <!-- Collapsed view: Only allocated attributes -->
                     <div class="point-allocations attribute-allocations-collapsed">
-                      {{#each pointAllocations.ap as |points attrName|}}
-                        {{#if (and (gt points 0) (not (eq attrName "spent")) (not (eq attrName "available")) (isValidAttribute attrName))}}
+                      {{#each pointAllocations.ap.attributes as |points attrName|}}
+                        {{#if (gt points 0)}}
                           <div class="inline-allocation attribute-allocation compact">
                             <span class="attr-name">
                               {{#if (eq attrName "pow")}}{{localize "DASU.Actor.levelingWizard.progression.attributeAbbr.pow"}}

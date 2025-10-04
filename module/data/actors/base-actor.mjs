@@ -54,4 +54,22 @@ export default class BaseActorDataModel extends foundry.abstract.TypeDataModel {
       }),
     };
   }
+
+  /**
+   * Provide roll data for formulas
+   * Includes shorthand attribute tick values (@str, @dex, @pow, @will, etc.)
+   * @returns {Object} Roll data object
+   */
+  getRollData() {
+    const data = { ...this };
+
+    // Add shorthand attribute tick values for formulas
+    if (this.attributes) {
+      for (const [key, attr] of Object.entries(this.attributes)) {
+        data[key] = attr.tick ?? 0;
+      }
+    }
+
+    return data;
+  }
 }

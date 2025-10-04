@@ -62,12 +62,22 @@
   <div class='separator'></div>
   
   <div class='resource'>
-    <label class='resource-label'>{{localize 'DASU.Item.Tactic.FIELDS.govern.label'}}</label>
+    <label class='resource-label'>{{localize 'DASU.FIELDS.govern.label'}}</label>
     <select name='system.govern' data-dtype='String'>
+      <option value="none" {{#if (eq system.govern "none")}}selected{{/if}}>{{localize 'DASU.Attributes.none.label'}}</option>
       <option value="pow" {{#if (eq system.govern "pow")}}selected{{/if}}>{{localize 'DASU.Attributes.pow.label'}}</option>
       <option value="dex" {{#if (eq system.govern "dex")}}selected{{/if}}>{{localize 'DASU.Attributes.dex.label'}}</option>
       <option value="will" {{#if (eq system.govern "will")}}selected{{/if}}>{{localize 'DASU.Attributes.will.label'}}</option>
       <option value="sta" {{#if (eq system.govern "sta")}}selected{{/if}}>{{localize 'DASU.Attributes.sta.label'}}</option>
+    </select>
+  </div>
+
+  <div class='resource'>
+    <label class='resource-label'>{{localize 'DASU.Item.Tactic.FIELDS.resourceTarget.label'}}</label>
+    <select name='system.resourceTarget' data-dtype='String'>
+      <option value="hp" {{#if (eq system.resourceTarget "hp")}}selected{{/if}}>HP</option>
+      <option value="wp" {{#if (eq system.resourceTarget "wp")}}selected{{/if}}>WP</option>
+      <option value="both" {{#if (eq system.resourceTarget "both")}}selected{{/if}}>Both</option>
     </select>
   </div>
 

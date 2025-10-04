@@ -1,0 +1,574 @@
+/* DASU Healing Messages Chat Styles */
+
+.dasu.healing-prep,
+.dasu.healing-results {
+  background: var(--color-bg-secondary);
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--dasu-c-success);
+  border-radius: 0;
+  margin: 4px 0;
+}
+
+/* Header */
+.healing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-bg-primary);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 8px,
+    rgba(76, 175, 80, 0.1) 8px,
+    rgba(76, 175, 80, 0.1) 16px
+  );
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--dasu-c-success);
+}
+
+.healing-header .item-image {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--dasu-c-success);
+  margin-right: 8px;
+}
+
+.healing-header h3 {
+  margin: 0;
+  color: var(--dasu-c-success);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  flex: 1;
+}
+
+.healing-header .item-type {
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 0;
+  background: var(--dasu-c-success);
+  color: var(--dasu-c-white);
+}
+
+/* Target Results */
+.healing-targets {
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.healing-target {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--dasu-c-success);
+  border-radius: 0;
+  padding: 6px;
+  transition: all 0.2s ease;
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.1) 0%,
+    rgba(76, 175, 80, 0.05) 100%
+  );
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.healing-target:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.healing-target.error {
+  border-left-color: var(--color-hp);
+  background: linear-gradient(
+    135deg,
+    rgba(244, 67, 54, 0.1) 0%,
+    rgba(244, 67, 54, 0.05) 100%
+  );
+}
+
+.healing-target.no-healing {
+  border-left-color: var(--color-text-secondary);
+  background: linear-gradient(
+    135deg,
+    rgba(128, 128, 128, 0.1) 0%,
+    rgba(128, 128, 128, 0.05) 100%
+  );
+}
+
+.healing-target .target-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.healing-target .target-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--dasu-c-primary);
+  margin: 0;
+}
+
+.healing-target .healing-summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.healing-target .healing-value {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--dasu-c-success);
+}
+
+.healing-target .resource-target {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.healing-target .healing-amount {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--dasu-c-success);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-align: right;
+}
+
+.healing-target .healing-amount::before {
+  content: '♥';
+  font-size: 0.9rem;
+  margin-right: 2px;
+}
+
+.healing-target.error .healing-amount {
+  color: var(--color-hp);
+}
+
+.healing-target.error .healing-amount::before {
+  content: '⚠';
+}
+
+.healing-target.no-healing .healing-amount {
+  color: var(--color-text-secondary);
+}
+
+.healing-target.no-healing .healing-amount::before {
+  content: '○';
+}
+
+.healing-target .error-message {
+  font-size: 0.65rem;
+  color: var(--color-hp);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* Description */
+.healing-description {
+  background: var(--color-bg-primary);
+  padding: 4px 8px;
+  border-top: 1px solid var(--dasu-c-success);
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Healing icon animation */
+.healing-target .healing-amount::before {
+  animation: healPulse 2s ease-in-out infinite;
+}
+
+@keyframes healPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* Success states */
+.healing-target.success .healing-amount {
+  color: var(--dasu-c-success);
+}
+
+/* Summary Footer */
+.healing-summary-footer {
+  background: var(--color-bg-primary);
+  padding: 4px 8px;
+  border-top: 1px solid var(--dasu-c-success);
+  font-size: 0.65rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.healing-summary-footer .summary-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.healing-summary-footer .total-targets,
+.healing-summary-footer .total-healing {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.healing-summary-footer .total-targets {
+  color: var(--color-text-secondary);
+}
+
+.healing-summary-footer .total-healing {
+  color: var(--dasu-c-success);
+}
+
+/* No healing applied state - remove unused selectors */
+.healing-target.no-healing .healing-amount {
+  color: var(--color-text-secondary);
+}
+
+/* Healing Preparation Message Styles */
+.healing-prep .healing-info {
+  padding: 8px;
+  background: var(--color-bg-primary);
+  border-bottom: 1px solid var(--dasu-c-success);
+}
+
+.healing-prep .healing-amount-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.healing-prep .healing-amount-display .healing-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--dasu-c-success);
+}
+
+.healing-prep .healing-amount-display .resource-type {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.healing-prep .healing-description {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.healing-prep .target-info {
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--dasu-c-success);
+  font-size: 0.7rem;
+}
+
+.healing-prep .current-targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.healing-prep .current-targets strong {
+  color: var(--dasu-c-primary);
+  margin-right: 6px;
+}
+
+.healing-prep .target-name {
+  background: var(--dasu-c-success);
+  color: var(--dasu-c-white);
+  padding: 2px 6px;
+  border-radius: 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.healing-prep .no-targets {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Healing Action Buttons */
+.healing-actions {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: var(--color-bg-primary);
+}
+
+.healing-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-primary);
+  background: var(--color-bg-primary);
+  flex: 1;
+}
+
+.healing-action-btn i {
+  font-size: 0.8rem;
+}
+
+.healing-action-btn.apply-self {
+  border-color: var(--dasu-c-success);
+  color: var(--dasu-c-success);
+}
+
+.healing-action-btn.apply-self:hover {
+  background: var(--dasu-c-success);
+  color: var(--dasu-c-white);
+}
+
+.healing-action-btn.apply-targeted {
+  border-color: var(--dasu-c-primary);
+  color: var(--dasu-c-primary);
+}
+
+.healing-action-btn.apply-targeted:hover {
+  background: var(--dasu-c-primary);
+  color: var(--color-text-primary);
+}
+
+.healing-action-btn:disabled {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.healing-action-btn:disabled:hover {
+  transform: none;
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+}
+
+/* Healing Application Messages (like damage application) */
+.dasu.healing-applied {
+  background: var(--color-bg-secondary);
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.2s ease;
+  border: 1px solid var(--dasu-c-success);
+  border-radius: 0;
+  margin: 2px 0;
+}
+
+.dasu.healing-applied:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.dasu.healing-applied.error {
+  border-color: var(--color-hp);
+}
+
+.dasu.healing-applied.no-change {
+  border-color: var(--color-text-secondary);
+}
+
+/* Healing content */
+.healing-applied-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 6px;
+  background: var(--color-bg-secondary);
+  gap: 8px;
+}
+
+.healing-text {
+  flex: 1;
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+/* Edited message styles */
+.edited-content {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.disabled-button {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+.edited-indicator {
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+  padding: 2px 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+}
+
+.healing-text .healing-icon {
+  font-size: 0.9rem;
+  margin-right: 4px;
+  color: var(--dasu-c-success);
+}
+
+.dasu.healing-applied.error .healing-text .healing-icon {
+  color: var(--color-hp);
+}
+
+.dasu.healing-applied.no-change .healing-text .healing-icon {
+  color: var(--color-text-secondary);
+}
+
+.healing-text .healing-amount {
+  color: var(--dasu-c-success);
+  font-weight: 700;
+}
+
+.healing-text .source-item {
+  font-style: italic;
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+}
+
+/* Small healing action buttons */
+.healing-actions-small {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.healing-actions-small .healing-action-btn {
+  padding: 2px 6px;
+  font-size: 0.6rem;
+  min-width: 32px;
+  min-height: 16px;
+  flex: none;
+}
+
+.healing-actions-small .healing-action-btn i {
+  font-size: 0.7rem;
+  margin-right: 2px;
+}
+
+.healing-actions-small .healing-action-btn.undo {
+  border-color: var(--dasu-c-success);
+  color: var(--dasu-c-success);
+}
+
+.healing-actions-small .healing-action-btn.undo:hover {
+  background: var(--dasu-c-success);
+  color: var(--dasu-c-white);
+}
+
+.healing-actions-small .healing-action-btn.redo {
+  border-color: var(--dasu-c-success);
+  color: var(--dasu-c-success);
+}
+
+.healing-actions-small .healing-action-btn.redo:hover {
+  background: var(--dasu-c-success);
+  color: var(--dasu-c-white);
+}
+
+.healing-actions-small .healing-action-btn.edit {
+  background: var(--color-bg-primary);
+  border-color: var(--color-secondary);
+  color: var(--color-text-primary);
+}
+
+.healing-actions-small .healing-action-btn.edit:hover {
+  background: var(--color-secondary-highlight);
+  color: var(--color-text-primary);
+}
+
+/* Quick healing message styles */
+.dasu.healing-quick {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--dasu-c-success);
+  border-radius: 0;
+  padding: 8px;
+  margin: 4px 0;
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+}
+
+.dasu.healing-quick .healing-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dasu.healing-quick .healing-header i {
+  color: var(--dasu-c-success);
+  font-size: 1rem;
+}
+
+.dasu.healing-quick .healing-title {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: var(--dasu-c-success);
+  font-size: 0.8rem;
+}
+
+.dasu.healing-quick .healing-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dasu.healing-quick .target-name {
+  font-size: 0.85rem;
+  color: var(--dasu-c-primary);
+}
+
+.dasu.healing-quick .healing-breakdown {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  font-family: monospace;
+}
+
+.dasu.healing-quick .healing-applied {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--dasu-c-success);
+  margin-top: 2px;
+}

@@ -1,0 +1,90 @@
+<form class="healing-edit-form">
+  <div class="form-header">
+    <h3>{{localize "DASU.Healing.EditDialog.Title" name=targetActor.name}}</h3>
+    <div class="current-status">
+      {{#if isGM}}
+        <span class="status-item">{{localize "DASU.Actor.Stats.hp.label"}}: {{currentHp}}/{{maxHp}}</span>
+        <span class="status-item">{{localize "DASU.Actor.Stats.wp.label"}}: {{currentWp}}/{{maxWp}}</span>
+      {{else}}
+        <span class="status-item">{{localize "DASU.Actor.Stats.hp.label"}}: XX/XX</span>
+        <span class="status-item">{{localize "DASU.Actor.Stats.wp.label"}}: XX/XX</span>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="form-body">
+    <div class="form-section">
+      <h4>{{localize "DASU.Healing.EditDialog.HealingSource"}}</h4>
+      <div class="source-info">
+        <span class="source-actor">{{sourceActor.name}}</span>
+        {{#if sourceItem}}
+          <span class="source-item">{{localize "DASU.Healing.EditDialog.Using" item=sourceItem.name}}</span>
+        {{/if}}
+        <span class="original-healing">{{localize "DASU.Healing.EditDialog.Original" amount=originalHealing}}</span>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h4>{{localize "DASU.Healing.EditDialog.HealingConfiguration"}}</h4>
+      <div class="form-columns">
+        <div class="form-column">
+          <div class="form-group">
+            <label for="healMod" data-tooltip="{{localize "DASU.Healing.EditDialog.HealingModifierHint"}}">{{localize "DASU.Healing.EditDialog.HealingModifier"}}</label>
+            <input type="number" name="healMod" id="healMod" value="{{healingData.healMod}}" min="-20" max="20" step="1">
+          </div>
+
+          <div class="form-group">
+            <label for="healType">{{localize "DASU.Healing.EditDialog.HealType"}}</label>
+            <select name="healType" id="healType">
+              {{#each healTypeOptions}}
+                <option value="{{value}}" {{#if (eq value ../healingData.healType)}}selected{{/if}}>
+                  {{label}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-column">
+          <div class="form-group">
+            <label for="govern" data-tooltip="{{localize "DASU.Healing.EditDialog.AttributeTickHint"}}">{{localize "DASU.Healing.EditDialog.GoverningAttribute"}}</label>
+            <select name="govern" id="govern">
+              <option value="">{{localize "DASU.Healing.EditDialog.NoGoverningAttribute"}}</option>
+              {{#each attributeOptions}}
+                <option value="{{value}}" {{#if (eq value ../healingData.govern)}}selected{{/if}}>
+                  {{label}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section preview-section">
+      <h4>{{localize "DASU.Healing.EditDialog.Preview"}}</h4>
+      <div class="healing-preview">
+        <div class="preview-content">
+          <span class="preview-icon">♥</span>
+          <div class="preview-calculation">
+            <div class="healing-breakdown">
+              {{#if previewHealing.breakdown}}
+                {{previewHealing.breakdown}}
+              {{else}}
+                {{localize "DASU.Healing.EditDialog.BaseHealing"}} {{previewHealing.baseHealing}}
+              {{/if}}
+            </div>
+            <div class="final-result">
+              <strong>{{localize "DASU.Healing.EditDialog.Healing"}}: {{previewHealing.finalHealing}} {{healingData.healType}}</strong>
+            </div>
+          </div>
+        </div>
+        {{#unless (eq previewHealing.finalHealing originalHealing)}}
+          <div class="preview-change">
+            {{localize "DASU.Healing.EditDialog.Change" amount=(subtract previewHealing.finalHealing originalHealing)}}
+          </div>
+        {{/unless}}
+      </div>
+    </div>
+  </div>
+</form>

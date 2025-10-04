@@ -42,12 +42,16 @@
   
   <div class="wizard-controls">
     <div class="control-group">
+      <div class="class-name-badge {{#unless className}}no-class{{/unless}}">
+        <i class="fas fa-scroll"></i>
+        <span>{{#if className}}{{className}}{{else}}{{localize "DASU.Actor.levelingWizard.noClass"}}{{/if}}</span>
+      </div>
       <button type="button" class="control-btn" data-action="scrollToCurrent">
         <i class="fas fa-crosshairs"></i>
         <span>Go to Current Level</span>
       </button>
     </div>
-    
+
     <div class="progression-summary">
 
       {{#if nextLevelData}}

@@ -1,0 +1,31 @@
+<div class="dasu roll-card targets">
+  <header class="targets-header">
+    <h4 class="section-title">{{localize "DASU.Checks.TargetedIndividuals"}}</h4>
+    <button type="button" class="apply-targeted-btn" data-action="{{#if isRestorative}}applyTargetedHealing{{else}}applyTargeted{{/if}}">
+      {{#if isRestorative}}{{localize "DASU.Checks.ApplyTargetedHealing"}}{{else}}{{localize "DASU.Checks.ApplyTargeted"}}{{/if}}
+    </button>
+  </header>
+
+  <div class="targets-list">
+    {{#if hasTargets}}
+      {{#each targets}}
+      <div class="target-entry {{resultClass}} {{borderClass}} {{bgClass}}{{#if description}} has-description{{/if}}">
+        <div class="target-info">
+          <span class="target-name">{{name}}</span>
+          <button type="button" class="target-result {{resultClass}}" data-action="{{#if ../isRestorative}}applyHealing{{else}}applyDamage{{/if}}" data-actor-id="{{actorId}}" data-token-id="{{tokenId}}" data-result="{{result}}">{{resultText}}</button>
+        </div>
+        {{#if description}}
+        <div class="target-description">{{description}}</div>
+        {{/if}}
+      </div>
+      {{/each}}
+    {{else}}
+      <div class="target-entry no-targets">
+        <div class="target-info">
+          <span class="target-name">{{localize "DASU.Checks.NoTargetsSelected"}}</span>
+          <button type="button" class="target-result add-targets" data-action="addTargets">{{localize "DASU.Checks.AddTargets"}}</button>
+        </div>
+      </div>
+    {{/if}}
+  </div>
+</div>

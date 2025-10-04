@@ -1,3 +1,5 @@
+import { ResistancesDataModel } from '../actors/resistances-data-model.mjs';
+
 export class SharedActorComponents {
   static getAttributesSchema() {
     const fields = foundry.data.fields;
@@ -47,12 +49,13 @@ export class SharedActorComponents {
         multiplier: new fields.NumberField({ required: true, initial: 1 }),
       });
 
-    // Create a function for hp/wp with current
+    // Create a function for hp/wp with current and temp
     const createResourceStatSchema = () =>
       new fields.SchemaField({
         mod: new fields.NumberField({ required: true, initial: 0 }),
         multiplier: new fields.NumberField({ required: true, initial: 1 }),
         current: new fields.NumberField({ required: true, initial: 0, min: 0 }),
+        temp: new fields.NumberField({ required: true, initial: 0, min: 0 }),
       });
 
     // Create a function for crit with specific mod range
@@ -81,25 +84,7 @@ export class SharedActorComponents {
 
   static getResistancesSchema() {
     const fields = foundry.data.fields;
-
-    // Create a function to generate a new resistance field instance
-    const createResistanceField = () =>
-      new fields.StringField({
-        required: true,
-        initial: 'normal',
-        choices: ['weak', 'normal', 'resist', 'nullify', 'drain'],
-      });
-
-    return new fields.SchemaField({
-      p: createResistanceField(),
-      f: createResistanceField(),
-      i: createResistanceField(),
-      el: createResistanceField(),
-      w: createResistanceField(),
-      ea: createResistanceField(),
-      l: createResistanceField(),
-      d: createResistanceField(),
-    });
+    return new fields.EmbeddedDataField(ResistancesDataModel, {});
   }
 
   static getAptitudesSchema() {
@@ -135,16 +120,15 @@ export class SharedActorComponents {
   }
 
   static prepareDerivedResources(system) {
-    // Defensive: ensure all required fields exist
-    const pow = system.attributes?.pow?.tick ?? 0;
-    const dex = system.attributes?.dex?.tick ?? 0;
-    const will = system.attributes?.will?.tick ?? 0;
-    const sta = system.attributes?.sta?.tick ?? 0;
-    const hpMod = system.stats?.hp?.mod ?? 0;
-    const wpMod = system.stats?.wp?.mod ?? 0;
-    const avoidMod = system.stats?.avoid?.mod ?? 0;
-    const defMod = system.stats?.def?.mod ?? 0;
-    const critMod = system.stats?.crit?.mod ?? 0;
+    const pow = Number(system.attributes?.pow?.tick) || 0;
+    const dex = Number(system.attributes?.dex?.tick) || 0;
+    const will = Number(system.attributes?.will?.tick) || 0;
+    const sta = Number(system.attributes?.sta?.tick) || 0;
+    const hpMod = Number(system.stats?.hp?.mod) || 0;
+    const wpMod = Number(system.stats?.wp?.mod) || 0;
+    const avoidMod = Number(system.stats?.avoid?.mod) || 0;
+    const defMod = Number(system.stats?.def?.mod) || 0;
+    const critMod = Number(system.stats?.crit?.mod) || 0;
 
     // HP: (Stamina + Power) * 10 + HP mod
     system.stats = system.stats || {};

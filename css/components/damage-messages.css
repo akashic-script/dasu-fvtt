@@ -1,0 +1,183 @@
+/* DASU Damage Application Chat Message Styles */
+.dasu.damage-applied {
+  background: var(--color-bg-secondary);
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.2s ease;
+  border: 1px solid var(--dasu-c-primary);
+  border-radius: 0;
+  margin: 2px 0;
+}
+
+.dasu.damage-applied:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Damage content */
+.damage-applied-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 6px;
+  background: var(--color-bg-secondary);
+  gap: 8px;
+}
+
+.damage-text {
+  flex: 1;
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.damage-amount.temp {
+  color: #4fc3f7;
+  font-weight: bold;
+  text-shadow: 0 0 2px rgba(79, 195, 247, 0.5);
+}
+
+/* Edited message styles */
+.edited-content {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.disabled-button {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+.edited-indicator {
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+  padding: 2px 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+}
+
+.damage-text .damage-icon {
+  font-size: 0.9rem;
+  margin-right: 4px;
+}
+
+.damage-text .target-name,
+.damage-text .damage-amount {
+  font-weight: 700;
+}
+
+.damage-text .target-name {
+  color: var(--dasu-c-primary);
+}
+.damage-text .damage-amount {
+  color: var(--color-primary);
+}
+
+.damage-text .source-item,
+.damage-text .damage-modifiers {
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+.damage-text .damage-modifiers {
+  font-size: 0.7rem;
+}
+
+/* Damage action buttons */
+.damage-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.damage-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  border: 1px solid;
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 32px;
+  min-height: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-primary);
+  background: var(--color-bg-primary);
+}
+
+.damage-action-btn i {
+  font-size: 0.7rem;
+  margin-right: 2px;
+}
+
+/* Undo button */
+.damage-action-btn.undo {
+  border-color: var(--color-hp);
+  color: var(--color-hp);
+}
+
+.damage-action-btn.undo:hover {
+  background: var(--color-hp);
+  color: var(--dasu-c-white);
+}
+
+/* Redo button */
+.damage-action-btn.redo {
+  border-color: var(--color-hp);
+  color: var(--color-hp);
+}
+
+.damage-action-btn.redo:hover {
+  background: var(--color-hp);
+  color: var(--dasu-c-white);
+}
+
+/* Edit button */
+.damage-action-btn.edit {
+  background: var(--color-bg-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.damage-action-btn.edit:hover {
+  background: var(--color-primary-highlight);
+  color: var(--color-text-primary);
+}
+
+/* Disabled state */
+.damage-action-btn:disabled {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.damage-action-btn:disabled:hover {
+  transform: none;
+}
+
+/* Healing variant */
+.dasu.damage-applied.healing {
+  border-color: var(--dasu-c-success);
+}
+
+.dasu.damage-applied.healing .damage-text .damage-amount {
+  color: var(--dasu-c-success);
+}
+
+/* Critical hit variant */
+.dasu.damage-applied.critical {
+  border-color: var(--dasu-c-primary);
+  background: linear-gradient(
+    135deg,
+    rgba(181, 141, 54, 0.05) 0%,
+    rgba(181, 141, 54, 0.02) 100%
+  );
+}

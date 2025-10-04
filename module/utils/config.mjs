@@ -414,6 +414,41 @@ DASU.damageTypes = {
   dark: 'DASU.damageTypes.dark',
 };
 
+DASU.resType = {
+  '-1': 'DASU.resistanceTypes.-1.long',
+  0: 'DASU.resistanceTypes.0.long',
+  1: 'DASU.resistanceTypes.1.long',
+  2: 'DASU.resistanceTypes.2.long',
+  3: 'DASU.resistanceTypes.3.long',
+};
+
+DASU.resTypeAbbr = {
+  '-1': 'DASU.resistanceTypes.-1.short',
+  0: 'DASU.resistanceTypes.0.short',
+  1: 'DASU.resistanceTypes.1.short',
+  2: 'DASU.resistanceTypes.2.short',
+  3: 'DASU.resistanceTypes.3.short',
+};
+
+DASU.resIcon = {
+  physical: 'systems/dasu/assets/static/resistances/physical.png',
+  fire: 'systems/dasu/assets/static/resistances/fire.png',
+  ice: 'systems/dasu/assets/static/resistances/ice.png',
+  electric: 'systems/dasu/assets/static/resistances/electric.png',
+  wind: 'systems/dasu/assets/static/resistances/wind.png',
+  earth: 'systems/dasu/assets/static/resistances/earth.png',
+  light: 'systems/dasu/assets/static/resistances/light.png',
+  dark: 'systems/dasu/assets/static/resistances/dark.png',
+};
+
+DASU.resistanceTypes = {
+  '-1': { long: 'Weak', short: 'WK' },
+  0: { long: 'Normal', short: '-' },
+  1: { long: 'Resist', short: 'RS' },
+  2: { long: 'Nullify', short: 'NU' },
+  3: { long: 'Drain', short: 'DR' },
+};
+
 DASU.spellAffinities = {
   f: 'fire',
   i: 'ice',

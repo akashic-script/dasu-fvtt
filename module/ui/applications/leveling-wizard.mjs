@@ -198,6 +198,10 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     context.hasClass = this._hasClass || false;
     context.hasClassProgression = this._hasClassProgression || false;
 
+    // Add class name if available
+    const classItems = this.actor.items.filter((item) => item.type === 'class');
+    context.className = classItems.length > 0 ? classItems[0].name : null;
+
     return context;
   }
 
@@ -1006,13 +1010,15 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
     const pointAllocations = levelingData.pointAllocations || {};
     const levelData = pointAllocations[level] || {};
 
-    // Initialize default structure
+    // Initialize default structure with separate metadata
     const result = {
       ap: {
-        pow: levelData.ap?.pow || 0,
-        dex: levelData.ap?.dex || 0,
-        will: levelData.ap?.will || 0,
-        sta: levelData.ap?.sta || 0,
+        attributes: {
+          pow: levelData.ap?.pow || 0,
+          dex: levelData.ap?.dex || 0,
+          will: levelData.ap?.will || 0,
+          sta: levelData.ap?.sta || 0,
+        },
         spent: 0,
         available: level <= this.actor.system.level ? apGained : 0,
         locked: level < this.actor.system.level,
@@ -1027,7 +1033,10 @@ export class LevelingWizard extends foundry.applications.api.HandlebarsApplicati
 
     // Calculate spent points
     result.ap.spent =
-      result.ap.pow + result.ap.dex + result.ap.will + result.ap.sta;
+      result.ap.attributes.pow +
+      result.ap.attributes.dex +
+      result.ap.attributes.will +
+      result.ap.attributes.sta;
     result.sp.spent = Object.values(result.sp.skills).reduce(
       (sum, points) => sum + points,
       0

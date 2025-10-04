@@ -1,9 +1,10 @@
-import { prepareActiveEffectCategories } from '../../utils/effects.mjs';
+import { prepareActiveEffectCategories } from '../../systems/effects/display.mjs';
 import { DASUSettings } from '../settings.mjs';
 import { registerHandlebarsHelpers } from '../../utils/helpers.mjs';
 import { LevelingWizard } from '../../ui/applications/leveling-wizard.mjs';
 import { DASURollDialog } from '../../ui/dialogs/roll-dialog.mjs';
 import { DASURecruitDialog } from '../../ui/dialogs/recruit-dialog.mjs';
+import { ResourceManagerDialog } from '../../ui/dialogs/resource-manager-dialog.mjs';
 import { DASU_STATUS_CONDITIONS } from '../../data/shared/status-conditions.mjs';
 
 registerHandlebarsHelpers();
@@ -62,6 +63,9 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       width: 700,
       height: 950,
     },
+    window: {
+      resizable: true,
+    },
     actions: {
       onEditImage: this._onEditImage,
       viewDoc: this._viewDoc,
@@ -88,6 +92,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       recruit: this._onRecruit,
       openSlotTag: this._openSlotTag,
       toggleItemSection: this._toggleItemSection,
+      manageResource: this._manageResource,
     },
     // Custom property that's merged into `this.options`
     // dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
@@ -304,6 +309,25 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     // Add HTMLField for formInput helper
     context.htmlInputField = new foundry.data.fields.HTMLField();
+
+    // Enrich resistance data for display
+    if (context.system.resistances) {
+      for (let [k, v] of Object.entries(context.system.resistances)) {
+        if (v && typeof v === 'object') {
+          v.label = game.i18n.localize(globalThis.DASU.damageTypes[k]) ?? k;
+          v.resTypeBase =
+            game.i18n.localize(globalThis.DASU.resType[v.base]) ?? v.base;
+          v.resTypeBaseAbbr =
+            game.i18n.localize(globalThis.DASU.resTypeAbbr[v.base]) ?? v.base;
+          v.resTypeCurr =
+            game.i18n.localize(globalThis.DASU.resType[v.current]) ?? v.current;
+          v.resTypeCurrAbbr =
+            game.i18n.localize(globalThis.DASU.resTypeAbbr[v.current]) ??
+            v.current;
+          v.icon = globalThis.DASU.resIcon[k];
+        }
+      }
+    }
 
     return context;
   }
@@ -776,6 +800,20 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       );
     });
 
+    // Add context menu handlers for status buttons
+    this.element
+      .querySelectorAll('[data-action="toggleStatus"]')
+      .forEach((button) => {
+        button.removeEventListener(
+          'contextmenu',
+          this._handleStatusContextMenu
+        );
+        button.addEventListener(
+          'contextmenu',
+          this._handleStatusContextMenu.bind(this)
+        );
+      });
+
     // Add change handlers for other form fields
     this.element
       .querySelectorAll('input[data-dtype], select[data-dtype]')
@@ -872,6 +910,39 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       this.render(true);
     } catch (error) {
       console.error('Error resetting skill ticks:', error);
+    }
+  }
+
+  /**
+   * Handle context menu (right-click) on status buttons
+   * @param {Event} event - The contextmenu event
+   * @private
+   */
+  async _handleStatusContextMenu(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const button = event.currentTarget;
+    const statusId = button.dataset.statusId;
+
+    if (!statusId) return;
+
+    const statusCondition = DASU_STATUS_CONDITIONS[statusId];
+    if (!statusCondition) return;
+
+    const isStackable = statusCondition.flags?.dasu?.stackable;
+
+    if (isStackable) {
+      const stackId = statusCondition.flags.dasu.stackId;
+      await this.actor.removeEffectStack(stackId);
+    } else {
+      // For non-stackable effects, right-click removes the effect
+      const existingEffect = this.actor.effects.find(
+        (effect) => effect.statuses && effect.statuses.has(statusId)
+      );
+      if (existingEffect) {
+        await existingEffect.delete();
+      }
     }
   }
 
@@ -1706,7 +1777,18 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    */
   static async _deleteDoc(_event, target) {
     const doc = this._getEmbeddedDocument(target);
-    await doc.delete();
+
+    // Check if this is a stackable effect
+    const isStackable = doc.flags?.dasu?.stackable;
+    const stackId = doc.flags?.dasu?.stackId;
+
+    if (isStackable && stackId) {
+      // For stackable effects, remove one stack instead of deleting entirely
+      await this.actor.removeEffectStack(stackId);
+    } else {
+      // For non-stackable effects, delete as normal
+      await doc.delete();
+    }
   }
 
   /**
@@ -1718,7 +1800,18 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   static async _deleteDocNoConfirm(_event, target) {
     try {
       const doc = this._getEmbeddedDocument(target);
-      await doc.delete();
+
+      // Check if this is a stackable effect
+      const isStackable = doc.flags?.dasu?.stackable;
+      const stackId = doc.flags?.dasu?.stackId;
+
+      if (isStackable && stackId) {
+        // For stackable effects, remove one stack instead of deleting entirely
+        await this.actor.removeEffectStack(stackId);
+      } else {
+        // For non-stackable effects, delete as normal
+        await doc.delete();
+      }
       ui.notifications.info(
         game.i18n.format('DOCUMENT.Deleted', {
           type: doc.documentName,
@@ -1918,33 +2011,138 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @private
    */
-  static async _toggleStatus(_event, target) {
+  static async _toggleStatus(event, target) {
     const statusId = target.dataset.statusId;
     const actor = this.actor;
 
     if (!statusId || !actor) return;
 
-    // Check if status condition is currently active
-    const existingEffect = actor.effects.find(
-      (effect) => effect.statuses && effect.statuses.has(statusId)
-    );
+    const statusCondition = DASU_STATUS_CONDITIONS[statusId];
+    if (!statusCondition) return;
 
-    if (existingEffect) {
-      // Remove the status condition
-      await existingEffect.delete();
+    // Check for Ctrl+click to show custom dialog
+    if (event.ctrlKey || event.metaKey) {
+      const { StatusEffectDialog } = await import(
+        '../../ui/dialogs/status-effect-dialog.mjs'
+      );
+      await StatusEffectDialog.show({
+        statusId,
+        statusCondition,
+        actor,
+      });
+      return;
+    }
+
+    const isStackable = statusCondition.flags?.dasu?.stackable;
+    const isRightClick = event.button === 2;
+
+    if (isStackable) {
+      // Handle stackable effects
+      const stackId = statusCondition.flags.dasu.stackId;
+
+      if (isRightClick) {
+        // Right-click: Remove one stack
+        await actor.removeEffectStack(stackId);
+      } else {
+        // Left-click: Add one stack
+        const effectData = {
+          name: game.i18n.localize(statusCondition.name),
+          img: statusCondition.img,
+          statuses: [statusId],
+          tint: statusCondition.tint,
+          origin: actor.uuid,
+          duration: foundry.utils.deepClone(statusCondition.duration || {}),
+          flags: foundry.utils.deepClone(statusCondition.flags || {}),
+        };
+
+        // Add description if it exists
+        if (statusCondition.description) {
+          effectData.description = game.i18n.localize(
+            statusCondition.description
+          );
+        }
+
+        // Add changes if they exist
+        if (statusCondition.changes) {
+          effectData.changes = foundry.utils.deepClone(statusCondition.changes);
+        }
+
+        // Link rounds to combat (NOT turns - those use custom tracking)
+        if (game.combat && effectData.duration?.rounds) {
+          effectData.duration.combat = game.combat.id;
+          effectData.duration.startRound = game.combat.round;
+          effectData.duration.startTurn = game.combat.turn;
+        }
+
+        // Set up custom turn tracking
+        if (game.combat && effectData.duration?.turns) {
+          effectData.flags.dasu = effectData.flags.dasu || {};
+          effectData.flags.dasu.remainingTurns = effectData.duration.turns;
+          effectData.flags.dasu.linkedCombat = game.combat.id;
+          // Nullify duration.turns to prevent Foundry from auto-processing
+          effectData.duration.turns = null;
+        }
+
+        console.log(
+          'DASU | Actor sheet creating stackable effect:',
+          effectData
+        );
+        await actor.addStackableEffect(effectData);
+      }
     } else {
-      // Add the status condition
-      const statusCondition = DASU_STATUS_CONDITIONS[statusId];
-      if (statusCondition) {
-        await actor.createEmbeddedDocuments('ActiveEffect', [
-          {
-            name: game.i18n.localize(statusCondition.name),
-            img: statusCondition.img,
-            statuses: [statusId],
-            tint: statusCondition.tint,
-            origin: actor.uuid,
-          },
-        ]);
+      // Handle non-stackable effects (original behavior)
+      const existingEffect = actor.effects.find(
+        (effect) => effect.statuses && effect.statuses.has(statusId)
+      );
+
+      if (existingEffect) {
+        // Remove the status condition
+        await existingEffect.delete();
+      } else {
+        // Add the status condition
+        const effectData = {
+          name: game.i18n.localize(statusCondition.name),
+          img: statusCondition.img,
+          statuses: [statusId],
+          tint: statusCondition.tint,
+          origin: actor.uuid,
+          duration: foundry.utils.deepClone(statusCondition.duration || {}),
+          flags: foundry.utils.deepClone(statusCondition.flags || {}),
+        };
+
+        // Add description if it exists
+        if (statusCondition.description) {
+          effectData.description = game.i18n.localize(
+            statusCondition.description
+          );
+        }
+
+        // Add changes if they exist
+        if (statusCondition.changes) {
+          effectData.changes = foundry.utils.deepClone(statusCondition.changes);
+        }
+
+        // Link rounds to combat (NOT turns - those use custom tracking)
+        if (game.combat && effectData.duration?.rounds) {
+          effectData.duration.combat = game.combat.id;
+          effectData.duration.startRound = game.combat.round;
+          effectData.duration.startTurn = game.combat.turn;
+        }
+
+        // Set up custom turn tracking
+        if (game.combat && effectData.duration?.turns) {
+          effectData.flags.dasu = effectData.flags.dasu || {};
+          effectData.flags.dasu.remainingTurns = effectData.duration.turns;
+          effectData.flags.dasu.linkedCombat = game.combat.id;
+          // Nullify duration.turns to prevent Foundry from auto-processing
+          effectData.duration.turns = null;
+        }
+
+        console.log(
+          'DASU | Actor sheet creating non-stackable effect:',
+          effectData
+        );
+        await actor.createEmbeddedDocuments('ActiveEffect', [effectData]);
       }
     }
   }
@@ -2140,6 +2338,16 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           }
         }
         break;
+      case 'effect':
+        const effectElement = target.closest('[data-effect-id]');
+        if (effectElement) {
+          const effectId = effectElement.dataset.effectId;
+          const effect = this.actor.effects.get(effectId);
+          if (effect) {
+            return this._sendEffectToChat(effect);
+          }
+        }
+        break;
       case 'daemon-attribute':
         // Handle daemon attribute checks
         const daemonActorId = dataset.actorId;
@@ -2240,6 +2448,89 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           type: 'daemon-card',
           daemonId: daemon.id,
           summonerId: this.actor.id,
+        },
+      },
+    };
+
+    return ChatMessage.create(chatData);
+  }
+
+  /**
+   * Send an active effect to chat as a message card
+   * @param {ActiveEffect} effect - The effect to send to chat
+   * @returns {Promise<ChatMessage>} The created chat message
+   */
+  async _sendEffectToChat(effect) {
+    // Prepare duration label using custom tracking
+    const remainingTurns = effect.flags?.dasu?.remainingTurns;
+    const remainingRounds = effect.flags?.dasu?.remainingRounds;
+    let durationLabel = effect.duration?.label || 'None';
+
+    if (remainingTurns !== undefined) {
+      const turnLabel =
+        remainingTurns === 1
+          ? game.i18n.localize('DASU.Effect.Turn')
+          : game.i18n.localize('DASU.Effect.Turns');
+      durationLabel = `${remainingTurns} ${turnLabel}`;
+    } else if (remainingRounds !== undefined) {
+      const roundLabel =
+        remainingRounds === 1
+          ? game.i18n.localize('DASU.Effect.Round')
+          : game.i18n.localize('DASU.Effect.Rounds');
+      durationLabel = `${remainingRounds} ${roundLabel}`;
+    }
+
+    // Prepare effect data with enriched description
+    const effectData = {
+      id: effect.id,
+      name: effect.name,
+      img: effect.img,
+      description:
+        await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+          effect.description || '',
+          {
+            relativeTo: effect,
+            rollData: this.actor.getRollData(),
+          }
+        ),
+      disabled: effect.disabled,
+      sourceName: effect.sourceName || effect.parent?.name || 'Unknown',
+      duration: {
+        ...effect.duration,
+        label: durationLabel,
+      },
+      specialDurationLabel: effect.flags?.dasu?.specialDuration?.label,
+      stackCount: effect.flags?.dasu?.stacks?.count,
+      changes: effect.changes.map((change) => ({
+        key: change.key,
+        mode: change.mode,
+        value: change.value,
+      })),
+    };
+
+    // Prepare template data
+    const templateData = {
+      effect: effectData,
+      timestamp: Date.now(),
+    };
+
+    // Render the effect card template
+    const content = await foundry.applications.handlebars.renderTemplate(
+      'systems/dasu/templates/chat/effect-card.hbs',
+      templateData
+    );
+
+    // Create the chat message
+    const chatData = {
+      user: game.user.id,
+      speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+      content: content,
+      style: foundry.CONST.CHAT_MESSAGE_STYLES.OTHER,
+      flags: {
+        dasu: {
+          type: 'effect-card',
+          effectId: effect.id,
+          actorId: this.actor.id,
         },
       },
     };
@@ -2570,6 +2861,19 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     if (this._mutationObserver) {
       this._mutationObserver.disconnect();
       this._mutationObserver = null;
+    }
+
+    // Clean up context menu
+    if (this._itemContextMenu) {
+      try {
+        // Only try to close if the context menu's element still exists
+        if (this._itemContextMenu.element) {
+          this._itemContextMenu.close();
+        }
+      } catch (e) {
+        // Silently ignore errors during cleanup
+      }
+      this._itemContextMenu = null;
     }
 
     // Clean up daemon item hook listeners
@@ -4051,6 +4355,19 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /**
+   * Open the resource manager dialog
+   * @param {Event} event - Click event
+   * @param {HTMLElement} target - Target element
+   */
+  static async _manageResource(event, target) {
+    const resourceType =
+      target.dataset.resource || target.closest('.bar-meter')?.dataset.resource;
+    if (!resourceType) return;
+
+    await ResourceManagerDialog.open(this.actor, resourceType);
+  }
+
+  /**
    * Open the leveling wizard for this actor
    * @param {Event} event - Button click event
    * @param {HTMLButtonElement} target - Button element
@@ -4585,11 +4902,15 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @private
    */
   _setupItemContextMenus() {
+    // Safety check: ensure element exists and is attached to DOM
+    if (!this.element || !this.element.isConnected) {
+      return;
+    }
+
     // Check if we have any context menu toggles
     const toggles = this.element.querySelectorAll('.context-menu-toggle');
 
     if (toggles.length === 0) {
-      console.warn('No context menu toggles found');
       return;
     }
 
@@ -4680,126 +5001,244 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       },
     ];
 
+    // Allow modules to add custom options via hook
+    // Hook signature: (menuOptions, sheet, actor)
+    const customMenuOptions = [];
+    Hooks.callAll(
+      'getItemContextMenuOptions',
+      customMenuOptions,
+      this,
+      this.actor
+    );
+
+    // Store custom options separately - we'll add them dynamically in onOpen callback
+    // This prevents Foundry's ContextMenu from pre-sizing the menu for items that might be
+    // conditionally hidden, avoiding empty space in the menu
+    const customOptions = customMenuOptions.map((opt) => ({
+      name: opt.name,
+      icon: opt.icon,
+      className: opt.className,
+      condition: opt.condition,
+      callback: opt.callback,
+    }));
+
+    // Clean up existing context menu if it exists
+    if (this._itemContextMenu) {
+      try {
+        // Only try to close if the context menu's element still exists and is connected
+        if (this._itemContextMenu.element?.isConnected) {
+          this._itemContextMenu.close();
+        }
+      } catch (e) {
+        // Silently ignore errors during cleanup
+      }
+      this._itemContextMenu = null;
+    }
+
     // Initialize Foundry ContextMenu for all context menu toggles
     try {
-      new foundry.applications.ux.ContextMenu.implementation(
-        this.element,
-        '.context-menu-toggle',
-        menuOptions,
-        {
-          eventName: 'click',
-          jQuery: false,
-          onOpen: () => {
-            // Use the stored values from the click listener
-            const currentItemId = sheet._lastClickedItemId;
+      this._itemContextMenu =
+        new foundry.applications.ux.ContextMenu.implementation(
+          this.element,
+          '.context-menu-toggle',
+          menuOptions,
+          {
+            eventName: 'click',
+            jQuery: false,
+            onOpen: () => {
+              // Use the stored values from the click listener
+              const currentItemId = sheet._lastClickedItemId;
 
-            // Wait for menu DOM to be available, then add attributes and event listeners
-            setTimeout(() => {
-              try {
-                // Try to find the menu element in the DOM
-                const contextMenu = document.querySelector('#context-menu');
-                if (!contextMenu) {
-                  console.warn('Context menu element not found in DOM');
-                  return;
-                }
-
-                // Add data-action attributes and event listeners to menu items
-                const menuItems = contextMenu.querySelectorAll('.context-item');
-
-                menuItems.forEach((item, index) => {
-                  // Add data-action attribute based on menu option index
-                  const actions = ['toggleFavorite', 'copyDoc', 'deleteDoc'];
-                  item.setAttribute('data-action', actions[index]);
-
-                  // Add item ID reference
-                  if (currentItemId) {
-                    item.setAttribute('data-item-id', currentItemId);
-
-                    // Update favorite icon based on current item state
-                    if (actions[index] === 'toggleFavorite') {
-                      const targetItem = sheet.actor.items.get(currentItemId);
-                      if (targetItem) {
-                        const iconElement = item.querySelector('i');
-                        if (iconElement) {
-                          // Use solid star if favorited, outline star if not
-                          iconElement.className = targetItem.system.favorite
-                            ? 'fas fa-star fa-fw'
-                            : 'fal fa-star fa-fw';
-                        }
-                        // Add favorited class to the menu item for special styling
-                        item.classList.toggle(
-                          'favorited',
-                          targetItem.system.favorite
-                        );
-                      }
-                    }
+              // Wait for menu DOM to be available, then add attributes and event listeners
+              // Use requestAnimationFrame for better timing
+              requestAnimationFrame(() => {
+                try {
+                  // Try to find the menu element in the DOM
+                  const contextMenu = document.querySelector('#context-menu');
+                  if (!contextMenu) {
+                    return;
                   }
 
-                  // Add click event listener
-                  item.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
+                  // Add data-action attributes and event listeners to built-in menu items
+                  const menuItems =
+                    contextMenu.querySelectorAll('.context-item');
 
-                    const action = item.getAttribute('data-action');
-                    const itemId = item.getAttribute('data-item-id');
+                  const actions = ['toggleFavorite', 'copyDoc', 'deleteDoc'];
 
-                    const targetItem = itemId
-                      ? sheet.actor.items.get(itemId)
-                      : null;
-                    if (targetItem) {
-                      switch (action) {
-                        case 'toggleFavorite':
-                          sheet._toggleItemFavorite(targetItem);
-                          break;
-                        case 'copyDoc':
-                          if (sheet.isEditable && sheet._isEditMode()) {
-                            sheet._copyItem(targetItem);
+                  menuItems.forEach((item, index) => {
+                    // Add data-action attribute based on menu option index
+                    item.setAttribute('data-action', actions[index]);
+
+                    // Add item ID reference
+                    if (currentItemId) {
+                      item.setAttribute('data-item-id', currentItemId);
+
+                      // Update favorite icon based on current item state
+                      if (actions[index] === 'toggleFavorite') {
+                        const targetItem = sheet.actor.items.get(currentItemId);
+                        if (targetItem) {
+                          const iconElement = item.querySelector('i');
+                          if (iconElement) {
+                            // Use solid star if favorited, outline star if not
+                            iconElement.className = targetItem.system.favorite
+                              ? 'fas fa-star fa-fw'
+                              : 'fal fa-star fa-fw';
                           }
-                          break;
-                        case 'deleteDoc':
-                          if (sheet.isEditable && sheet._isEditMode()) {
-                            sheet._deleteItem(targetItem);
-                          }
-                          break;
+                          // Add favorited class to the menu item for special styling
+                          item.classList.toggle(
+                            'favorited',
+                            targetItem.system.favorite
+                          );
+                        }
                       }
                     }
 
-                    // Close the context menu after action
-                    if (contextMenu) {
-                      contextMenu.remove();
+                    // Add click event listener with capture and once
+                    item.addEventListener(
+                      'click',
+                      (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        event.stopImmediatePropagation();
+
+                        const action = item.getAttribute('data-action');
+                        const itemId = item.getAttribute('data-item-id');
+
+                        const targetItem = itemId
+                          ? sheet.actor.items.get(itemId)
+                          : null;
+
+                        if (!targetItem) {
+                          ui.notifications.warn('Item not found');
+                          return;
+                        }
+
+                        switch (action) {
+                          case 'toggleFavorite':
+                            sheet._toggleItemFavorite(targetItem);
+                            break;
+                          case 'copyDoc':
+                            // Context menu copy works outside edit mode
+                            if (sheet.isEditable) {
+                              sheet._copyItem(targetItem);
+                            } else {
+                              ui.notifications.warn(
+                                'You do not have permission to copy items'
+                              );
+                            }
+                            break;
+                          case 'deleteDoc':
+                            // Context menu delete works outside edit mode (with confirmation)
+                            if (sheet.isEditable) {
+                              sheet._deleteItem(targetItem);
+                            } else {
+                              ui.notifications.warn(
+                                'You do not have permission to delete items'
+                              );
+                            }
+                            break;
+                        }
+
+                        // Close the context menu after action
+                        if (contextMenu) {
+                          contextMenu.remove();
+                        }
+                      },
+                      { capture: true }
+                    );
+                  });
+
+                  // Dynamically add custom menu items from hooks
+                  // Items are only created if their condition passes, preventing empty space
+                  customOptions.forEach((customOpt, customIndex) => {
+                    // Evaluate condition - skip if it returns false
+                    if (customOpt.condition) {
+                      try {
+                        const shouldShow = customOpt.condition(currentItemId);
+                        if (!shouldShow) return;
+                      } catch (error) {
+                        console.error(
+                          'Error evaluating custom menu condition:',
+                          error
+                        );
+                        return;
+                      }
+                    }
+
+                    // Create the menu item element
+                    const li = document.createElement('li');
+                    li.className = 'context-item';
+                    if (customOpt.className) {
+                      li.classList.add(customOpt.className);
+                    }
+                    li.setAttribute('data-action', `custom-${customIndex}`);
+                    if (currentItemId) {
+                      li.setAttribute('data-item-id', currentItemId);
+                    }
+
+                    li.innerHTML = `${customOpt.icon}<span>${customOpt.name}</span>`;
+
+                    // Add click handler for custom action
+                    li.addEventListener(
+                      'click',
+                      (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        event.stopImmediatePropagation();
+
+                        const itemId = li.getAttribute('data-item-id');
+                        const targetItem = itemId
+                          ? sheet.actor.items.get(itemId)
+                          : null;
+
+                        if (customOpt.callback) {
+                          customOpt.callback(itemId, targetItem);
+                        }
+
+                        if (contextMenu) {
+                          contextMenu.remove();
+                        }
+                      },
+                      { capture: true }
+                    );
+
+                    // Append to menu
+                    const menuElement =
+                      contextMenu.querySelector('menu.context-items');
+                    if (menuElement) {
+                      menuElement.appendChild(li);
                     }
                   });
-                });
-              } catch (error) {
-                console.error('Error setting up context menu items:', error);
+                } catch (error) {
+                  console.error('Error setting up context menu items:', error);
+                }
+              });
+
+              // Add active state to clicked toggle
+              if (sheet._lastClickedToggle) {
+                sheet._lastClickedToggle.classList.add('active');
               }
-            }, 10); // Small delay to ensure DOM is ready
 
-            // Add active state to clicked toggle
-            if (sheet._lastClickedToggle) {
-              sheet._lastClickedToggle.classList.add('active');
-            }
+              // Apply standardized theming
+              setTimeout(() => {
+                this._applyContextMenuTheme('standard');
+              }, 1);
+            },
+            onClose: () => {
+              // Remove active state from clicked toggle
+              if (sheet._lastClickedToggle) {
+                sheet._lastClickedToggle.classList.remove('active');
+              }
 
-            // Apply standardized theming
-            setTimeout(() => {
-              this._applyContextMenuTheme('standard');
-            }, 1);
-          },
-          onClose: () => {
-            // Remove active state from clicked toggle
-            if (sheet._lastClickedToggle) {
-              sheet._lastClickedToggle.classList.remove('active');
-            }
+              // Clear the current clicked toggle reference
+              sheet._lastClickedToggle = null;
 
-            // Clear the current clicked toggle reference
-            sheet._lastClickedToggle = null;
-
-            // Remove context menu theming
-            this._removeContextMenuTheme();
-          },
-          fixed: true,
-        }
-      );
+              // Remove context menu theming
+              this._removeContextMenuTheme();
+            },
+            fixed: true,
+          }
+        );
     } catch (error) {
       console.error('Error creating context menu:', error);
     }

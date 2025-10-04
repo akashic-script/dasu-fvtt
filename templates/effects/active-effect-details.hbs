@@ -1,0 +1,91 @@
+{{!-- DASU Active Effect Details Tab --}}
+{{!-- This template extends the default Active Effect details tab with stackable options --}}
+<fieldset class="dasu-effect-details">
+
+  {{!-- Disabled Checkbox --}}
+  <div class="form-group">
+    <label class="checkbox">
+      <input type="checkbox" name="disabled" {{checked disabled}} />
+      {{localize "EFFECT.Disabled"}}
+    </label>
+    <p class="hint">{{localize "EFFECT.DisabledHint"}}</p>
+  </div>
+
+  {{!-- Transfer Checkbox --}}
+  {{#if (or isEmbedded isItem)}}
+  <div class="form-group">
+    <label class="checkbox">
+      <input type="checkbox" name="transfer" {{checked transfer}} />
+      {{localize "EFFECT.Transfer"}}
+    </label>
+    <p class="hint">{{localize "EFFECT.TransferHint"}}</p>
+  </div>
+  {{/if}}
+
+  {{!-- Statuses --}}
+  <div class="form-group statuses">
+    <label>{{localize "EFFECT.Statuses"}}</label>
+    <multi-select name="statuses">
+      {{selectOptions statusOptions selected=statuses valueAttr="id" labelAttr="label"}}
+    </multi-select>
+    <p class="hint">{{localize "EFFECT.StatusesHint"}}</p>
+  </div>
+
+  <hr>
+
+  {{!-- Stackable Effect Checkbox --}}
+  <div class="form-group">
+    <label class="checkbox">
+      <input type="checkbox" name="flags.dasu.stackable" {{checked dasuFlags.stackable}} />
+      {{localize "DASU.Effect.Stackable"}}
+    </label>
+    <p class="hint">{{localize "DASU.Effect.StackableHint"}}</p>
+  </div>
+
+  {{!-- Stack Options (only visible when stackable is checked) --}}
+  <div class="stack-options" style="display: {{#if isStackable}}block{{else}}none{{/if}};">
+
+    {{!-- Stack ID --}}
+    <div class="form-group">
+      <label for="flags.dasu.stackId">{{localize "DASU.Effect.StackId"}}</label>
+      <input type="text" name="flags.dasu.stackId" value="{{dasuFlags.stackId}}" placeholder="unique-stack-id" />
+      <p class="hint">{{localize "DASU.Effect.StackIdHint"}}</p>
+    </div>
+
+    {{!-- Max Stacks --}}
+    <div class="form-group">
+      <label for="flags.dasu.maxStacks">{{localize "DASU.Effect.MaxStacks"}}</label>
+      <input type="number" name="flags.dasu.maxStacks" value="{{dasuFlags.maxStacks}}" min="1" placeholder="Unlimited" />
+      <p class="hint">{{localize "DASU.Effect.MaxStacksHint"}}</p>
+    </div>
+
+    {{!-- Stack Mode --}}
+    <div class="form-group">
+      <label for="flags.dasu.stackMode">{{localize "DASU.Effect.StackMode"}}</label>
+      <select name="flags.dasu.stackMode">
+        {{selectOptions stackModeOptions selected=dasuFlags.stackMode localize=true}}
+      </select>
+      <p class="hint">{{localize "DASU.Effect.StackModeHint"}}</p>
+    </div>
+
+    {{!-- Show Stack Count Badge --}}
+    <div class="form-group">
+      <label class="checkbox">
+        <input type="checkbox" name="flags.dasu.showStackCount" {{checked dasuFlags.showStackCount}} />
+        {{localize "DASU.Effect.ShowStackCount"}}
+      </label>
+      <p class="hint">{{localize "DASU.Effect.ShowStackCountHint"}}</p>
+    </div>
+
+    {{!-- Current Stacks (read-only display) --}}
+    {{#if currentStackCount}}
+    <div class="form-group">
+      <label>{{localize "DASU.Effect.CurrentStacks"}}</label>
+      <input type="number" value="{{currentStackCount}}" disabled />
+      <p class="hint">{{localize "DASU.Effect.CurrentStacksHint"}}</p>
+    </div>
+    {{/if}}
+
+  </div>
+
+</fieldset>

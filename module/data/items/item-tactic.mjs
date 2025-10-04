@@ -8,7 +8,8 @@ export default class TacticDataModel extends BaseItemDataModel {
       ...baseSchema,
       govern: new fields.StringField({
         required: true,
-        choices: ['pow', 'dex', 'will', 'sta'],
+        choices: ['none', 'pow', 'dex', 'will', 'sta'],
+        initial: 'pow',
       }),
       damage: new fields.SchemaField({
         value: new fields.NumberField({ required: true, initial: 0 }),
@@ -25,12 +26,17 @@ export default class TacticDataModel extends BaseItemDataModel {
             'dark',
             'untyped',
           ],
-          initial: 'untyped',
+          initial: 'physical',
         }),
       }),
       toLand: new fields.NumberField({ required: true, initial: 0 }),
       isInfinity: new fields.BooleanField({ required: false, initial: false }),
       cost: new fields.NumberField({ required: true, initial: 0 }),
+      resourceTarget: new fields.StringField({
+        required: true,
+        choices: ['hp', 'wp', 'both'],
+        initial: 'hp',
+      }),
       effect: new fields.StringField({ required: false, blank: true }),
     };
   }

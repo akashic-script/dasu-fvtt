@@ -1,0 +1,37 @@
+{{!-- DASU Effect Duration Update Chat Card --}}
+<div class="dasu effect-duration-update" data-effect-uuid="{{effect.uuid}}">
+  <header class="effect-header">
+    <div class="effect-title">
+      <img class="effect-image clickable" src="{{effect.img}}" alt="{{effect.name}}" data-action="openEffect" />
+      <div class="title-info">
+        <h3 class="effect-name">{{effect.name}}</h3>
+        {{#if expired}}
+          <span class="duration-badge expired">{{localize "DASU.Effect.Expired"}}</span>
+        {{else if remainingTurns}}
+          <span class="duration-badge">{{remainingTurns}} {{#if (eq remainingTurns 1)}}{{localize "DASU.Effect.Turn"}}{{else}}{{localize "DASU.Effect.Turns"}}{{/if}}</span>
+        {{else if remainingRounds}}
+          <span class="duration-badge">{{remainingRounds}} {{#if (eq remainingRounds 1)}}{{localize "DASU.Effect.Round"}}{{else}}{{localize "DASU.Effect.Rounds"}}{{/if}}</span>
+        {{/if}}
+      </div>
+    </div>
+  </header>
+
+  <div class="effect-message">
+    {{#if expired}}
+      <p class="effect-expired">
+        <i class="fas fa-times-circle"></i>
+        {{localize "DASU.Effect.DurationExpired"}}
+      </p>
+    {{else if remainingTurns}}
+      <p class="effect-continuing">
+        <i class="fas fa-hourglass-half"></i>
+        {{localize "DASU.Effect.DurationRemaining"}}: <strong>{{remainingTurns}}</strong> {{#if (eq remainingTurns 1)}}{{localize "DASU.Effect.Turn"}}{{else}}{{localize "DASU.Effect.Turns"}}{{/if}}
+      </p>
+    {{else if remainingRounds}}
+      <p class="effect-continuing">
+        <i class="fas fa-hourglass-half"></i>
+        {{localize "DASU.Effect.DurationRemaining"}}: <strong>{{remainingRounds}}</strong> {{#if (eq remainingRounds 1)}}{{localize "DASU.Effect.Round"}}{{else}}{{localize "DASU.Effect.Rounds"}}{{/if}}
+      </p>
+    {{/if}}
+  </div>
+</div>

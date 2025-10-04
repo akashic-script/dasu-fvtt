@@ -5,8 +5,14 @@
 .bars-container {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
   flex: 1;
+}
+
+.bar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .bar-meter {
@@ -20,13 +26,9 @@
   gap: 0;
   font-family: inherit;
   position: relative;
-  transition: none;
-  height: 2rem;
-  min-height: 2rem;
-}
-
-.bar-meter:hover {
-  box-shadow: 0 3px 8px var(--color-bg-dim);
+  transition: all 0.2s ease;
+  height: 1.5rem;
+  min-height: 1.5rem;
 }
 
 .bar-meter .bar-label {
@@ -52,6 +54,17 @@
   z-index: 2;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
   line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bar-meter .bar-label:hover {
+  background: linear-gradient(
+    180deg,
+    var(--color-primary) 0%,
+    var(--color-bg-primary) 100%
+  );
+  border-right-color: var(--color-primary);
 }
 
 .bar-meter .bar-outer {

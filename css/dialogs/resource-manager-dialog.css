@@ -1,0 +1,89 @@
+/* Resource Manager Dialog Styles */
+.resource-manager-dialog .window-content {
+  padding: 1rem;
+}
+
+.resource-manager-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.resource-manager-form .form-section {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding: 0;
+}
+
+.resource-manager-form .form-section .section-header {
+  background: var(--color-bg-primary);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--color-primary);
+  position: relative;
+  overflow: visible;
+}
+
+.resource-manager-form .form-section .section-header h3 {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.resource-manager-form .form-group {
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+}
+
+.resource-manager-form .form-group:first-of-type {
+  padding-top: 1rem;
+}
+
+.resource-manager-form .form-group:last-of-type {
+  padding-bottom: 1rem;
+  margin-bottom: 0;
+}
+
+.resource-manager-form .form-group label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+  color: var(--color-text-primary);
+}
+
+.resource-manager-form .form-group input[type='number'] {
+  width: 100%;
+  padding: 0.5rem;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 1em;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.resource-manager-form .form-group input[type='number']:hover {
+  border-color: var(--color-primary);
+}
+
+.resource-manager-form .form-group input[type='number']:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+  border-color: var(--color-primary);
+}
+
+.resource-manager-form .form-group .hint {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.85em;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}

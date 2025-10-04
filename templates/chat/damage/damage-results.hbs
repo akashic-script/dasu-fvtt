@@ -1,0 +1,128 @@
+<div class="dasu damage-results">
+  {{!-- Header --}}
+  <header class="damage-header">
+    <h3 class="damage-title">{{localize "DASU.Damage.ResultsTitle"}}</h3>
+    <div class="damage-source">
+      {{#if damageData.source.item}}
+        <span class="source-item">{{damageData.source.item.name}}</span>
+      {{/if}}
+      <span class="damage-type {{damageData.damageType}}">
+        {{#if (eq damageData.damageType "physical")}}{{localize "DASU.DAMAGE_TYPES.Physical"}}{{/if}}
+        {{#if (eq damageData.damageType "fire")}}{{localize "DASU.DAMAGE_TYPES.Fire"}}{{/if}}
+        {{#if (eq damageData.damageType "ice")}}{{localize "DASU.DAMAGE_TYPES.Ice"}}{{/if}}
+        {{#if (eq damageData.damageType "electric")}}{{localize "DASU.DAMAGE_TYPES.Electric"}}{{/if}}
+        {{#if (eq damageData.damageType "wind")}}{{localize "DASU.DAMAGE_TYPES.Wind"}}{{/if}}
+        {{#if (eq damageData.damageType "earth")}}{{localize "DASU.DAMAGE_TYPES.Earth"}}{{/if}}
+        {{#if (eq damageData.damageType "light")}}{{localize "DASU.DAMAGE_TYPES.Light"}}{{/if}}
+        {{#if (eq damageData.damageType "dark")}}{{localize "DASU.DAMAGE_TYPES.Dark"}}{{/if}}
+      </span>
+    </div>
+  </header>
+
+  {{!-- Individual Target Results --}}
+  <div class="damage-targets">
+    {{#each results}}
+    <div class="damage-target-result {{#if isHealing}}healing{{else}}damage{{/if}}">
+      {{!-- Target Header --}}
+      <div class="target-header">
+        <div class="target-info">
+          <img src="{{targetImg}}" alt="{{targetName}}" class="target-portrait" />
+          <div class="target-details">
+            <h4 class="target-name">{{targetName}}</h4>
+            <span class="hit-result {{hitResult}}">
+              {{#if (eq hitResult "hit")}}{{localize "DASU.Checks.TargetResult.Hit"}}{{/if}}
+              {{#if (eq hitResult "miss")}}{{localize "DASU.Checks.TargetResult.Miss"}}{{/if}}
+              {{#if (eq hitResult "crit")}}{{localize "DASU.Checks.TargetResult.Critical"}}{{/if}}
+              {{#if (eq hitResult "fumble")}}{{localize "DASU.Checks.TargetResult.Fumble"}}{{/if}}
+            </span>
+          </div>
+        </div>
+
+        <div class="damage-summary">
+          {{#if isHealing}}
+            <span class="healing-value">+{{finalDamage}}</span>
+            <span class="resource-target">{{resourceTarget}}</span>
+          {{else}}
+            <span class="damage-value">{{finalDamage}}</span>
+            <span class="resource-target">{{resourceTarget}}</span>
+          {{/if}}
+        </div>
+      </div>
+
+      {{!-- Resistance Information --}}
+      {{#if resistance}}
+      <div class="resistance-details">
+        <div class="resistance-display">
+          <span class="resistance-label">
+            {{#if (eq ../damageType "physical")}}{{localize "DASU.DAMAGE_TYPES.Physical"}}{{/if}}
+            {{#if (eq ../damageType "fire")}}{{localize "DASU.DAMAGE_TYPES.Fire"}}{{/if}}
+            {{#if (eq ../damageType "ice")}}{{localize "DASU.DAMAGE_TYPES.Ice"}}{{/if}}
+            {{#if (eq ../damageType "electric")}}{{localize "DASU.DAMAGE_TYPES.Electric"}}{{/if}}
+            {{#if (eq ../damageType "wind")}}{{localize "DASU.DAMAGE_TYPES.Wind"}}{{/if}}
+            {{#if (eq ../damageType "earth")}}{{localize "DASU.DAMAGE_TYPES.Earth"}}{{/if}}
+            {{#if (eq ../damageType "light")}}{{localize "DASU.DAMAGE_TYPES.Light"}}{{/if}}
+            {{#if (eq ../damageType "dark")}}{{localize "DASU.DAMAGE_TYPES.Dark"}}{{/if}}
+            {{localize "DASU.Damage.Resistance"}}:
+          </span>
+          <span class="resistance-value {{resistance.type}}">
+            {{#if (eq resistance.type "weak")}}{{localize "DASU.RESISTANCE.Weak"}}{{/if}}
+            {{#if (eq resistance.type "normal")}}{{localize "DASU.RESISTANCE.Normal"}}{{/if}}
+            {{#if (eq resistance.type "resist")}}{{localize "DASU.RESISTANCE.Resist"}}{{/if}}
+            {{#if (eq resistance.type "nullify")}}{{localize "DASU.RESISTANCE.Nullify"}}{{/if}}
+            {{#if (eq resistance.type "drain")}}{{localize "DASU.RESISTANCE.Drain"}}{{/if}}
+          </span>
+        </div>
+
+        {{#if (ne originalDamage finalDamage)}}
+          <div class="damage-calculation">
+            <span class="original-damage">{{originalDamage}}</span>
+            <i class="fas fa-arrow-right"></i>
+            <span class="final-damage">{{finalDamage}}</span>
+            {{#if resistance.multiplier}}
+              <span class="multiplier">{{#if (eq resistance.multiplier -1)}}(Drain){{else}}(×{{resistance.multiplier}}){{/if}}</span>
+            {{/if}}
+          </div>
+        {{/if}}
+      </div>
+      {{/if}}
+
+      {{!-- Critical Hit Indicator --}}
+      {{#if wasCritical}}
+      <div class="critical-indicator">
+        <i class="fas fa-star"></i>
+        <span>{{localize "DASU.Damage.CriticalHit"}}</span>
+      </div>
+      {{/if}}
+
+      {{!-- Action Buttons --}}
+      <div class="damage-actions">
+        <button class="damage-action-btn edit" data-action="editDamageResult" data-target-id="{{targetId}}">
+          <i class="fas fa-edit"></i>
+          {{localize "DASU.Damage.Edit"}}
+        </button>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+
+  {{!-- Additional Sections from Hooks --}}
+  {{#each sections}}
+    {{#if this.partial}}
+      {{> (lookup this "partial") this.data}}
+    {{else}}
+      <div class="damage-section" data-order="{{this.order}}">
+        {{{this.content}}}
+      </div>
+    {{/if}}
+  {{/each}}
+
+  {{!-- Summary Footer --}}
+  {{#if (gt results.length 1)}}
+  <footer class="damage-summary-footer">
+    <div class="summary-stats">
+      <span class="total-targets">{{results.length}} {{localize "DASU.Damage.Targets"}}</span>
+      <span class="total-damage">{{localize "DASU.Damage.TotalDamage"}}: {{sum results "finalDamage"}}</span>
+    </div>
+  </footer>
+  {{/if}}
+</div>

@@ -1,0 +1,317 @@
+/* =========================
+   Effect Chat Card Styles
+   ========================= */
+
+/* Effect Card - matching daemon-card style */
+.dasu.effect-card {
+  background: var(--color-bg-secondary);
+  border-radius: 0;
+  margin: 2px 0;
+  font-family: var(--font-primary);
+  font-size: 0.9em;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Header - compact like daemon-card */
+.effect-card .effect-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--dasu-c-primary);
+  background: var(--color-bg-primary);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+  padding: 8px 12px;
+  min-height: 28px;
+}
+
+.effect-card .effect-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.effect-card .effect-image {
+  width: 20px;
+  height: auto;
+  border-radius: 0;
+  border: 2px solid var(--dasu-c-primary);
+  position: relative;
+}
+
+.effect-card .title-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.effect-card .title-info h3.effect-name {
+  margin: 0;
+  color: var(--dasu-c-primary);
+  font-weight: 600;
+  font-size: 1em;
+  line-height: 1.1;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.effect-card .stack-indicator {
+  font-size: 0.85em;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Status Indicator */
+.effect-card .effect-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.effect-card .disabled-badge {
+  background: var(--color-bg-secondary);
+  border-radius: 0;
+  padding: 3px 6px;
+  font-weight: 600;
+  color: var(--color-text-dark-inactive);
+  text-transform: uppercase;
+  font-size: 0.7em;
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
+/* Effect Details */
+.effect-card .effect-details {
+  background: var(--color-bg-secondary);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.effect-card .effect-description {
+  color: var(--color-text-primary);
+  font-size: 0.95em;
+  line-height: 1.4;
+  padding: 6px;
+  background: var(--color-bg-primary);
+  border-left: 2px solid var(--dasu-c-primary);
+}
+
+/* Meta Information */
+.effect-card .effect-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9em;
+}
+
+.effect-card .meta-item {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.effect-card .meta-label {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.effect-card .meta-value {
+  color: var(--color-text-primary);
+  font-weight: 400;
+}
+
+/* Traits (Changes) */
+.effect-card .effect-traits {
+  margin-top: 4px;
+}
+
+.effect-card .traits-header {
+  margin: 0 0 6px 0;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--color-text-highlight);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.effect-card .traits-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.effect-card .trait-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--color-bg-primary);
+  padding: 4px 8px;
+  font-size: 0.85em;
+  border-left: 2px solid var(--color-border);
+}
+
+.effect-card .trait-key {
+  flex: 1;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  font-family: monospace;
+  font-size: 0.95em;
+}
+
+.effect-card .trait-mode {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding: 2px 6px;
+  background: var(--color-bg-secondary);
+  border-radius: 0;
+  font-size: 0.85em;
+  min-width: 30px;
+  text-align: center;
+}
+
+.effect-card .trait-value {
+  font-weight: 600;
+  color: var(--dasu-c-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* ========================================
+   EFFECT DURATION UPDATE CARDS
+   ======================================== */
+
+.effect-duration-update {
+  background: var(--color-bg-secondary);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.effect-duration-update .effect-header {
+  background: var(--color-bg-primary);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--dasu-c-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.effect-duration-update .effect-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.effect-duration-update .effect-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.effect-duration-update .effect-image {
+  width: 20px;
+  height: auto;
+  border: 2px solid var(--dasu-c-primary);
+  flex-shrink: 0;
+}
+
+.effect-duration-update .effect-image.clickable {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.effect-duration-update .effect-image.clickable:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.4);
+  transform: scale(1.05);
+}
+
+.effect-duration-update .title-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.effect-duration-update .effect-name {
+  margin: 0;
+  color: var(--color-text-primary);
+  font: 600 0.95em var(--font-primary);
+  letter-spacing: 0.3px;
+}
+
+.effect-duration-update .duration-badge {
+  padding: 3px 8px;
+  background: var(--dasu-c-primary);
+  color: var(--color-text-primary);
+  font: 600 0.75em var(--font-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.effect-duration-update .duration-badge.expired {
+  background: var(--color-danger);
+}
+
+.effect-duration-update .effect-message {
+  padding: 10px 12px;
+}
+
+.effect-duration-update .effect-message p {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 0.9em var(--font-primary);
+  color: var(--color-text-primary);
+}
+
+.effect-duration-update .effect-expired {
+  color: var(--color-danger);
+}
+
+.effect-duration-update .effect-message i {
+  font-size: 1.1em;
+  flex-shrink: 0;
+}
+
+.effect-duration-update .effect-message strong {
+  color: var(--dasu-c-primary);
+  font-weight: 600;
+}

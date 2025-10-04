@@ -1,0 +1,473 @@
+/**
+ * Enricher Styles
+ * Uniform styling for all inline text enrichers (effect, damage, healing)
+ * Flat design with color-coded borders
+ */
+
+/* ==========================================================================
+   Base Enricher Link Styles
+   ========================================================================== */
+
+/* Shared base styles for all enricher links AND default Foundry content-links */
+.effect-link,
+.dasu-damage-link,
+.dasu-healing-link,
+.content-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  min-height: 1.75rem;
+  border-radius: 0;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary) !important;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Hover state - consistent across all enrichers */
+.effect-link:hover,
+.dasu-damage-link:hover,
+.dasu-healing-link:hover,
+.content-link:hover {
+  background: var(--color-bg-primary);
+  text-decoration: none;
+  filter: brightness(1.1);
+}
+
+/* Active state - consistent across all enrichers */
+.effect-link:active,
+.dasu-damage-link:active,
+.dasu-healing-link:active,
+.content-link:active {
+  filter: brightness(0.95);
+}
+
+/* Icon sizing - consistent across all enrichers */
+.effect-link i,
+.dasu-damage-link i,
+.dasu-healing-link i,
+.content-link i {
+  font-size: 0.75rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Image icons (for damage type icons) - consistent sizing */
+.dasu-damage-link img.damage-type-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  object-fit: contain;
+  filter: brightness(1.1) contrast(1.2);
+  transition: filter 0.15s ease;
+  border: none;
+}
+
+.dasu-damage-link:hover img.damage-type-icon {
+  filter: brightness(1.3) contrast(1.3);
+}
+
+/* Disabled state - consistent across all enrichers */
+.effect-link:disabled,
+.dasu-damage-link:disabled,
+.dasu-healing-link:disabled,
+.content-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Focus states for accessibility - consistent across all enrichers */
+.effect-link:focus,
+.dasu-damage-link:focus,
+.dasu-healing-link:focus,
+.content-link:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Default Content Links (Actor, Item, JournalEntry, etc.)
+   ========================================================================== */
+
+.content-link {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary) !important;
+}
+
+.content-link:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary) !important;
+}
+
+/* Type-specific colors */
+.content-link[data-type='Actor'] {
+  border-color: #4caf50;
+  color: #66bb6a !important;
+}
+
+.content-link[data-type='Actor']:hover {
+  border-color: #66bb6a;
+  color: #81c784 !important;
+}
+
+.content-link[data-type='Item'] {
+  border-color: #2196f3;
+  color: #42a5f5 !important;
+}
+
+.content-link[data-type='Item']:hover {
+  border-color: #42a5f5;
+  color: #64b5f6 !important;
+}
+
+.content-link[data-type='JournalEntry'],
+.content-link[data-type='JournalEntryPage'] {
+  border-color: #ff9800;
+  color: #ffa726 !important;
+}
+
+.content-link[data-type='JournalEntry']:hover,
+.content-link[data-type='JournalEntryPage']:hover {
+  border-color: #ffa726;
+  color: #ffb74d !important;
+}
+
+/* ==========================================================================
+   Effect Enricher Border
+   ========================================================================== */
+
+.effect-link {
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary) !important;
+}
+
+.effect-link:hover {
+  border-color: var(--color-secondary-highlight);
+  color: var(--color-secondary-highlight) !important;
+}
+
+/* Effect state indicators */
+.effect-link.effect-state-on i {
+  color: gold;
+  text-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
+}
+
+.effect-link.effect-state-off {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.effect-link.effect-state-toggle i {
+  background: linear-gradient(to right, gray, gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ==========================================================================
+   Damage Enricher Border
+   ========================================================================== */
+
+.dasu-damage-link {
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger) !important;
+}
+
+.dasu-damage-link:hover {
+  border-color: #f87171;
+  color: #f87171 !important;
+}
+
+/* Damage type variants - keep border color but adjust text color */
+.dasu-damage-link[data-damage-type='fire'] {
+  border-color: #ff5722;
+  color: #ff5722 !important;
+}
+
+.dasu-damage-link[data-damage-type='fire']:hover {
+  border-color: #ff6f43;
+  color: #ff6f43 !important;
+}
+
+.dasu-damage-link[data-damage-type='ice'] {
+  border-color: #03a9f4;
+  color: #03a9f4 !important;
+}
+
+.dasu-damage-link[data-damage-type='ice']:hover {
+  border-color: #29b6f6;
+  color: #29b6f6 !important;
+}
+
+.dasu-damage-link[data-damage-type='electric'] {
+  border-color: #ff9800;
+  color: #ff9800 !important;
+}
+
+.dasu-damage-link[data-damage-type='electric']:hover {
+  border-color: #ffb74d;
+  color: #ffb74d !important;
+}
+
+.dasu-damage-link[data-damage-type='wind'] {
+  border-color: #8bc34a;
+  color: #8bc34a !important;
+}
+
+.dasu-damage-link[data-damage-type='wind']:hover {
+  border-color: #aed581;
+  color: #aed581 !important;
+}
+
+.dasu-damage-link[data-damage-type='earth'] {
+  border-color: #795548;
+  color: #a1887f !important;
+}
+
+.dasu-damage-link[data-damage-type='earth']:hover {
+  border-color: #8d6e63;
+  color: #bcaaa4 !important;
+}
+
+.dasu-damage-link[data-damage-type='light'] {
+  border-color: #ffeb3b;
+  color: #fff176 !important;
+}
+
+.dasu-damage-link[data-damage-type='light']:hover {
+  border-color: #fff176;
+  color: #fff59d !important;
+}
+
+.dasu-damage-link[data-damage-type='dark'] {
+  border-color: #5c6bc0;
+  color: #7986cb !important;
+}
+
+.dasu-damage-link[data-damage-type='dark']:hover {
+  border-color: #7986cb;
+  color: #9fa8da !important;
+}
+
+.dasu-damage-link[data-damage-type='untyped'],
+.dasu-damage-link[data-damage-type='physical'] {
+  border-color: #9e9e9e;
+  color: #bdbdbd !important;
+}
+
+.dasu-damage-link[data-damage-type='untyped']:hover,
+.dasu-damage-link[data-damage-type='physical']:hover {
+  border-color: #bdbdbd;
+  color: #e0e0e0 !important;
+}
+
+/* ==========================================================================
+   Healing Enricher Border
+   ========================================================================== */
+
+.dasu-healing-link {
+  border: 1px solid var(--dasu-c-success);
+  color: var(--dasu-c-success) !important;
+}
+
+.dasu-healing-link:hover {
+  border-color: #34d399;
+  color: #34d399 !important;
+  background: var(--color-bg-primary);
+  filter: brightness(1.1);
+}
+
+/* ==========================================================================
+   Resource Target Variants (applies to damage and healing)
+   ========================================================================== */
+
+/* WP targeting - add subtle purple glow */
+.dasu-damage-link[data-resource-target='wp'],
+.dasu-healing-link[data-resource-target='wp'] {
+  box-shadow: 0 0 0 1px rgba(138, 43, 226, 0.3) inset;
+}
+
+/* Both resources - add subtle gold glow */
+.dasu-damage-link[data-resource-target='both'],
+.dasu-healing-link[data-resource-target='both'] {
+  box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.3) inset;
+}
+
+/* ==========================================================================
+   Enricher Containers
+   ========================================================================== */
+
+.dasu-damage-enricher,
+.dasu-healing-enricher {
+  display: inline;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Context-specific Styles
+   ========================================================================== */
+
+/* In journal/description context */
+.editor-content .effect-link,
+.editor-content .dasu-damage-link,
+.editor-content .dasu-healing-link,
+.editor-content .content-link,
+.item-description .effect-link,
+.item-description .dasu-damage-link,
+.item-description .dasu-healing-link,
+.item-description .content-link,
+.journal-entry-content .effect-link,
+.journal-entry-content .dasu-damage-link,
+.journal-entry-content .dasu-healing-link,
+.journal-entry-content .content-link {
+  margin: 0 0.125rem;
+}
+
+/* In chat messages - slightly smaller */
+.chat-message .effect-link,
+.chat-message .dasu-damage-link,
+.chat-message .dasu-healing-link,
+.chat-message .content-link {
+  font-size: 0.8125rem;
+  padding: 0.1875rem 0.5rem;
+  min-height: 1.5rem;
+}
+
+.chat-message .dasu-damage-link img.damage-type-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* ==========================================================================
+   Chat Message Results
+   ========================================================================== */
+
+/* Quick healing/damage/effect messages - uniform structure */
+.dasu.healing-quick,
+.dasu.damage-quick,
+.dasu.effect-result {
+  padding: 0.5rem;
+  border-radius: 0;
+  background: var(--color-bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Headers - uniform style */
+.dasu.healing-quick .enricher-header,
+.dasu.damage-quick .enricher-header,
+.dasu.effect-result .enricher-header,
+.dasu.healing-quick .healing-header,
+.dasu.damage-quick .damage-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Icon colors - type specific */
+.dasu.healing-quick .enricher-header i,
+.dasu.healing-quick .healing-header i {
+  color: var(--dasu-c-success);
+}
+
+.dasu.damage-quick .enricher-header i,
+.dasu.damage-quick .damage-header i {
+  color: var(--color-danger);
+}
+
+.dasu.effect-result .enricher-header i {
+  color: var(--color-secondary);
+}
+
+/* Content - uniform style */
+.dasu.healing-quick .enricher-content,
+.dasu.damage-quick .enricher-content,
+.dasu.effect-result .enricher-content,
+.dasu.healing-quick .healing-details,
+.dasu.damage-quick .damage-details {
+  margin-left: 1.5rem;
+}
+
+/* Target names - uniform style */
+.dasu.healing-quick .target-name,
+.dasu.damage-quick .target-name,
+.dasu.effect-result .target-name {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  color: var(--color-text-primary);
+}
+
+/* Breakdowns - uniform style */
+.dasu.healing-quick .healing-breakdown,
+.dasu.damage-quick .damage-breakdown,
+.dasu.effect-result .effect-breakdown {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.25rem;
+  font-style: italic;
+}
+
+/* Applied text - uniform style */
+.dasu.healing-quick .healing-applied,
+.dasu.damage-quick .damage-applied,
+.dasu.effect-result .effect-applied {
+  font-size: 0.9rem;
+  padding: 0.25rem 0;
+}
+
+/* Strong text colors - type specific */
+.dasu.healing-quick .healing-applied strong,
+.dasu.healing-quick .enricher-content strong {
+  color: var(--dasu-c-success);
+}
+
+.dasu.damage-quick .damage-applied strong,
+.dasu.damage-quick .enricher-content strong {
+  color: var(--color-danger);
+}
+
+.dasu.effect-result .effect-applied strong,
+.dasu.effect-result .enricher-content strong {
+  color: var(--color-secondary);
+}
+
+/* ==========================================================================
+   Flavor Text (dice results in chat messages)
+   ========================================================================== */
+
+.flavor-text {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-left: 0.25rem;
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+  .effect-link,
+  .dasu-damage-link,
+  .dasu-healing-link {
+    background: none;
+    color: black !important;
+    border: 1px solid black;
+    box-shadow: none;
+  }
+}

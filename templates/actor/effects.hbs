@@ -6,7 +6,7 @@
 >
   <fieldset class="status-effects">
     <div class="status-header">
-      <legend>{{localize "DASU.Actor.StatusConditions"}}</legend>
+      <legend data-tooltip="{{localize 'DASU.Actor.StatusConditionsTooltip'}}" style="cursor: help;">{{localize "DASU.Actor.StatusConditions"}}</legend>
       <div class="status-actions">
         <button type="button" class="status-action-btn" data-action="clearTemporary" data-tooltip="{{localize 'DASU.Actor.StatusActions.ClearTemporary'}}">
           {{localize "DASU.Actor.StatusActions.ClearTemporary"}}
@@ -68,15 +68,22 @@
             data-document-class='ActiveEffect'
           >
             <div class='item-name flexrow'>
-              <img class='effect-image' src='{{effect.img}}' height="24" width="24"/>
+              <div class='effect-image-container'>
+                <a class='rollable' data-action='roll' data-roll-type='effect'>
+                  <img class='effect-image' src='{{effect.img}}' height="24" width="24" data-tooltip='{{effect.name}}'/>
+                </a>
+              </div>
               <div>{{effect.name}}
+                {{#if effect.stackCount}}
+                  <span class='stack-indicator'> x{{effect.stackCount}}</span>
+                {{/if}}
                 {{#if effect.transfer}}
                   <i class="fas fa-share-square" style="color:#a3f" data-tooltip="{{localize 'DASU.Effect.TransferredFromItem'}}"></i>
                 {{/if}}
               </div>
             </div>
             <div class='effect-source'>{{effect.sourceName}}</div>
-            <div class='effect-duration'>{{effect.duration.label}}</div>
+            <div class='effect-duration'>{{#if effect.specialDurationLabel}}{{effect.specialDurationLabel}}{{else}}{{effect.duration.label}}{{/if}}</div>
             <div class='item-controls flexrow'>
               {{#if @root.editable}}
               <a

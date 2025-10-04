@@ -10,30 +10,50 @@
   {{! -- Name and Bars -- }}
   <div class="sheet-header-center">
     <div class="document-name">
-      <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
+      <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'DASU.Actor.Header.NamePlaceholder'}}"/>
     </div>
     <div class="sheet-header-bars">
       {{!-- Resource Bars --}}
       <div class="bars-container">
-        {{!-- HP Bar --}}
-        <div class="bar-meter hp-bar">
-          <span class="bar-label">HP</span>
-          <div class="bar-outer">
-            <div class="bar-inner" style="width: {{percent system.stats.hp.current system.stats.hp.max}}%;"></div>
+        {{!-- HP Bar with Temp --}}
+        <div class="bar-group">
+          <div class="temp-hp-section {{#unless system.stats.hp.temp}}empty{{/unless}}">
+            <div class="temp-hp-bar">
+              <div class="temp-fill" style="width: {{percent system.stats.hp.temp system.stats.hp.max}}%;"></div>
+            </div>
+            {{#if system.stats.hp.temp}}
+              <span class="temp-value" data-tooltip="Temporary HP"><i class="fas fa-shield-alt"></i>{{system.stats.hp.temp}}</span>
+            {{/if}}
           </div>
-          <span class="bar-value">
-            <input type="text" name="system.stats.hp.current" value="{{system.stats.hp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.hp.max}}
-          </span>
+          <div class="bar-meter hp-bar">
+            <span class="bar-label" data-action="manageResource" data-resource="hp">{{localize 'DASU.Actor.Stats.hp.label'}}</span>
+            <div class="bar-outer">
+              <div class="bar-inner" style="width: {{percent system.stats.hp.current system.stats.hp.max}}%;"></div>
+            </div>
+            <span class="bar-value">
+              <input type="text" name="system.stats.hp.current" value="{{system.stats.hp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.hp.max}}
+            </span>
+          </div>
         </div>
-        {{!-- WP Bar --}}
-        <div class="bar-meter wp-bar">
-          <span class="bar-label">WP</span>
-          <div class="bar-outer">
-            <div class="bar-inner" style="width: {{percent system.stats.wp.current system.stats.wp.max}}%;"></div>
+        {{!-- WP Bar with Temp --}}
+        <div class="bar-group">
+          <div class="temp-hp-section {{#unless system.stats.wp.temp}}empty{{/unless}}">
+            <div class="temp-hp-bar">
+              <div class="temp-fill" style="width: {{percent system.stats.wp.temp system.stats.wp.max}}%;"></div>
+            </div>
+            {{#if system.stats.wp.temp}}
+              <span class="temp-value" data-tooltip="Temporary WP"><i class="fas fa-shield-alt"></i>{{system.stats.wp.temp}}</span>
+            {{/if}}
           </div>
-          <span class="bar-value">
-            <input type="text" name="system.stats.wp.current" value="{{system.stats.wp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.wp.max}}
-          </span>
+          <div class="bar-meter wp-bar">
+            <span class="bar-label" data-action="manageResource" data-resource="wp">{{localize 'DASU.Actor.Stats.wp.label'}}</span>
+            <div class="bar-outer">
+              <div class="bar-inner" style="width: {{percent system.stats.wp.current system.stats.wp.max}}%;"></div>
+            </div>
+            <span class="bar-value">
+              <input type="text" name="system.stats.wp.current" value="{{system.stats.wp.current}}" data-dtype="Number" class="bar-input" /> / {{system.stats.wp.max}}
+            </span>
+          </div>
         </div>
       </div>
       {{!-- Defense Stats --}}
@@ -48,11 +68,6 @@
           <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stats.def.tooltip'}}">{{localize 'DASU.Actor.Stats.def.label'}}</span>
           <span class="stat-value">{{system.stats.def.value}}</span>
         </div>
-        {{!-- Crit Threshold Stat --}}
-        {{!-- <div class="stat-display">
-          <span class="stat-label" data-tooltip="Critical Threshold: Need to roll double dice at or above this number to achieve a critical hit. Lower is better.">CRIT</span>
-          <span class="stat-value">{{system.stats.crit.value}}</span>
-        </div> --}}
       </div>
     </div>
   </div>
@@ -61,7 +76,7 @@
   <div class="sheet-header-right">
     <div class="level-box">
       <div class="level-row">
-        <span class="level-label">Level</span>
+        <span class="level-label">{{localize 'DASU.Level'}}</span>
         {{#if (and actor.type (eq actor.type 'summoner'))}}
           {{!-- Summoner: Show level as text with leveling wizard button --}}
           <span class="level-value">{{system.level}}</span>
@@ -80,7 +95,7 @@
         {{/if}}
       </div>
       <div class="merit-row">
-        <span class="merit-label">Merit</span>
+        <span class="merit-label">{{localize 'DASU.Actor.Header.Merit'}}</span>
         <input type="text" name="system.merit" value="{{system.merit}}" data-dtype="Number" class="merit-input" />
       </div>
     </div>
@@ -91,6 +106,29 @@
           <span>{{localize 'DASU.Initiative'}}</span>
         </button>
       </div>
+    {{/if}}
+  </div>
+
+  {{! -- Resistances Row -- }}
+  <div class="resistances-row">
+    {{#if system.resistances}}
+      {{#each system.resistances as |resistance key|}}
+        <div class="resistance-display {{#if @root.isEditMode}}resistance-edit-mode{{/if}}" data-resistance="{{key}}" data-tooltip="{{resistance.label}}: {{resistance.resTypeCurr}}">
+          <img class="resistance-icon"
+               src="systems/dasu/assets/static/resistances/{{key}}.png"
+               alt="{{key}}" />
+          {{#if @root.isEditMode}}
+            <select name="system.resistances.{{key}}.base"
+                    class="resistance-select"
+                    data-dtype="Number"
+                    data-tooltip="{{resistance.label}}: {{resistance.resTypeBase}}">
+              {{selectOptions @root.config.resTypeAbbr selected=resistance.base localize=true}}
+            </select>
+          {{else}}
+            <span class="resistance-value">{{resistance.resTypeCurrAbbr}}</span>
+          {{/if}}
+        </div>
+      {{/each}}
     {{/if}}
   </div>
 </header>

@@ -1,0 +1,424 @@
+/* DASU Damage Results Chat Styles */
+
+.dasu.damage-results {
+  background: var(--color-bg-secondary);
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--dasu-c-primary);
+  margin: 4px 0;
+}
+
+/* Header */
+.damage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-bg-primary);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 8px,
+    rgba(0, 0, 0, 0.06) 8px,
+    rgba(0, 0, 0, 0.06) 16px
+  );
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--dasu-c-primary);
+}
+
+.damage-title {
+  margin: 0;
+  color: var(--dasu-c-primary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.damage-source {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.source-item {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.damage-type {
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 2px;
+  background: var(--dasu-c-dark);
+  color: var(--dasu-c-white);
+}
+
+/* Damage type colors */
+.damage-type.physical {
+  background: var(--dasu-c-tan);
+  color: var(--color-text-primary);
+}
+.damage-type.fire {
+  background: #ff4444;
+}
+.damage-type.ice {
+  background: #44aaff;
+}
+.damage-type.electric {
+  background: #ffaa00;
+  color: var(--color-text-primary);
+}
+.damage-type.wind {
+  background: #88cc88;
+  color: var(--color-text-primary);
+}
+.damage-type.earth {
+  background: #aa7744;
+}
+.damage-type.light {
+  background: #ffff88;
+  color: var(--color-text-primary);
+}
+.damage-type.dark {
+  background: #442244;
+}
+
+/* Target Results */
+.damage-targets {
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.damage-target-result {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 6px;
+  transition: all 0.2s ease;
+}
+
+.damage-target-result:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.damage-target-result.healing {
+  border-left: 3px solid var(--dasu-c-success);
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.1) 0%,
+    rgba(76, 175, 80, 0.05) 100%
+  );
+}
+
+.damage-target-result.damage {
+  border-left: 3px solid var(--color-hp);
+}
+
+/* Target Header */
+.target-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.target-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.target-portrait {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+}
+
+.target-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.target-name {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--dasu-c-primary);
+}
+
+.hit-result {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.hit-result.hit {
+  background: var(--dasu-c-success);
+  color: var(--dasu-c-white);
+}
+.hit-result.crit {
+  background: var(--dasu-c-primary);
+  color: var(--color-text-primary);
+}
+.hit-result.miss {
+  background: var(--dasu-c-tan);
+  color: var(--color-text-secondary);
+}
+.hit-result.fumble {
+  background: var(--color-hp);
+  color: var(--dasu-c-white);
+}
+
+/* Damage Summary */
+.damage-summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+}
+
+.damage-value,
+.healing-value {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.damage-value {
+  color: var(--color-hp);
+}
+
+.healing-value {
+  color: var(--dasu-c-success);
+}
+
+.resource-target {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.05em;
+}
+
+/* Resistance Details */
+.resistance-details {
+  background: var(--color-bg-secondary);
+  padding: 4px 6px;
+  border-radius: 2px;
+  margin: 4px 0;
+  font-size: 0.7rem;
+}
+
+.resistance-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resistance-label {
+  color: var(--color-text-secondary);
+}
+
+.resistance-value {
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+}
+
+.resistance-value.weak {
+  background: #ff4444;
+  color: white;
+}
+.resistance-value.normal {
+  background: var(--dasu-c-dark);
+  color: white;
+}
+.resistance-value.resist {
+  background: var(--dasu-c-tan);
+  color: var(--color-text-primary);
+}
+.resistance-value.nullify {
+  background: var(--color-text-secondary);
+  color: white;
+}
+.resistance-value.drain {
+  background: var(--dasu-c-success);
+  color: white;
+}
+
+.damage-calculation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  color: var(--color-text-secondary);
+}
+
+.original-damage {
+  text-decoration: line-through;
+}
+
+.final-damage {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.multiplier {
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+/* Critical Hit Indicator */
+.critical-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--dasu-c-primary);
+  font-size: 0.65rem;
+  font-weight: 600;
+  margin: 2px 0;
+}
+
+.critical-indicator i {
+  color: var(--dasu-c-primary);
+}
+
+/* Action Buttons */
+.damage-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 4px;
+}
+
+.damage-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-primary);
+  background: var(--color-bg-primary);
+}
+
+.damage-action-btn.apply {
+  background: var(--dasu-c-success);
+  border-color: var(--dasu-c-success);
+  color: var(--dasu-c-white);
+}
+
+.damage-action-btn.apply:hover {
+  background: #4caf50;
+  border-color: #4caf50;
+}
+
+.damage-action-btn.undo {
+  border-color: var(--color-hp);
+  color: var(--color-hp);
+}
+
+.damage-action-btn.undo:hover {
+  background: var(--color-hp);
+  color: var(--dasu-c-white);
+}
+
+.damage-action-btn.redo {
+  border-color: var(--color-hp);
+  color: var(--color-hp);
+}
+
+.damage-action-btn.redo:hover {
+  background: var(--color-hp);
+  color: var(--dasu-c-white);
+}
+
+.damage-action-btn.edit {
+  background: var(--color-bg-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.damage-action-btn.edit:hover {
+  background: var(--color-primary-highlight);
+  color: var(--color-text-primary);
+}
+
+.damage-action-btn:disabled {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+.damage-action-btn i {
+  font-size: 0.6rem;
+}
+
+/* Summary Footer */
+.damage-summary-footer {
+  background: var(--color-bg-primary);
+  padding: 4px 8px;
+  border-top: 1px solid var(--dasu-c-primary);
+  font-size: 0.65rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.total-targets,
+.total-damage {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.total-targets {
+  color: var(--color-text-secondary);
+}
+
+.total-damage {
+  color: var(--dasu-c-primary);
+}
+
+.damage-action-btn.apply-all {
+  background: var(--dasu-c-primary);
+  border-color: var(--dasu-c-primary);
+  color: var(--color-text-primary);
+}
+
+.damage-action-btn.apply-all:hover {
+  background: var(--color-primary-highlight);
+  border-color: var(--color-primary-highlight);
+}
