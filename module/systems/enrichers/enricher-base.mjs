@@ -227,6 +227,35 @@ export function registerEnricherClickHandler(selector, handler) {
 }
 
 /**
+ * Register a context menu (right-click) handler for enricher links
+ * Uses event delegation for efficient handling
+ *
+ * @param {string} selector - CSS selector for enricher links
+ * @param {Function} handler - Context menu handler function
+ */
+export function registerEnricherContextMenuHandler(selector, handler) {
+  Hooks.once('ready', () => {
+    document.addEventListener('contextmenu', (event) => {
+      const link = event.target.closest(selector);
+      if (link) {
+        // Create wrapper event that delegates to original but overrides currentTarget
+        const enricherEvent = new Proxy(event, {
+          get(target, prop) {
+            if (prop === 'currentTarget') {
+              return link;
+            }
+            const value = target[prop];
+            // Bind methods to the original event object
+            return typeof value === 'function' ? value.bind(target) : value;
+          },
+        });
+        handler(enricherEvent);
+      }
+    });
+  });
+}
+
+/**
  * Create a complete enricher initialization function
  * This factory creates consistent initialization functions for all enrichers
  *
@@ -236,10 +265,18 @@ export function registerEnricherClickHandler(selector, handler) {
  * @param {Function} config.enricher - Enricher function
  * @param {string} config.selector - CSS selector for click handler
  * @param {Function} config.clickHandler - Click handler function
+ * @param {Function} [config.contextMenuHandler] - Optional context menu handler function
  * @returns {Function} Initialization function
  */
 export function createEnricherInitializer(config) {
-  const { name, pattern, enricher, selector, clickHandler } = config;
+  const {
+    name,
+    pattern,
+    enricher,
+    selector,
+    clickHandler,
+    contextMenuHandler,
+  } = config;
 
   return function initialize() {
     // Register the enricher
@@ -247,6 +284,11 @@ export function createEnricherInitializer(config) {
 
     // Register click handler
     registerEnricherClickHandler(selector, clickHandler);
+
+    // Register context menu handler if provided
+    if (contextMenuHandler) {
+      registerEnricherContextMenuHandler(selector, contextMenuHandler);
+    }
 
     console.log(`DASU | ${name} enricher initialized`);
   };

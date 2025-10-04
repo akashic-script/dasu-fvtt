@@ -1,0 +1,88 @@
+{{! Header Section }}
+<div class="dialog-header combat-header">
+  <div class="header-background"></div>
+  <div class="effect-info">
+    <div class="portrait-frame">
+      <img src="{{statusImg}}" alt="{{statusName}}" class="effect-portrait">
+      <div class="portrait-overlay"></div>
+    </div>
+    <div>
+      <h3 class="effect-name">{{statusName}}</h3>
+      <p class="effect-description">{{statusDescription}}</p>
+    </div>
+  </div>
+  <div class="header-accent"></div>
+</div>
+
+{{! Content Section }}
+<div class="effect-config">
+  {{! Effect Targets Section }}
+  <div class="form-group">
+    <label data-tooltip="{{localize 'DASU.Effect.TargetsHint'}}">{{localize "DASU.Effect.Targets"}}</label>
+    <div class="effect-targets-list" data-targets="true">
+      {{#if targets}}
+        {{#each targets as |target|}}
+          <div class="target-item" data-actor-uuid="{{target.uuid}}">
+            <img src="{{target.img}}" alt="{{target.name}}" class="target-avatar">
+            <span class="target-name">{{target.name}}</span>
+            <button type="button" data-action="removeTarget" class="remove-target-btn">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        {{/each}}
+      {{else}}
+        <div class="drop-placeholder">
+          <i class="fas fa-bullseye"></i>
+          <p>{{localize "DASU.Effect.TargetsPlaceholder"}}</p>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+
+  {{! Source Actor Section }}
+  <div class="form-group">
+    <label data-tooltip="{{localize 'DASU.Effect.SourceHint'}}">{{localize "DASU.Effect.Source"}}</label>
+    <div class="source-actor-drop">
+      {{#if sourceActor}}
+        <div class="source-actor-display">
+          <img src="{{sourceActor.img}}" alt="{{sourceActor.name}}" class="source-avatar">
+          <span>{{sourceActor.name}}</span>
+          <button type="button" data-action="clearSource" class="clear-source-btn">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      {{else}}
+        <div class="drop-placeholder">
+          <i class="fas fa-user"></i>
+          <p>{{localize "DASU.Effect.SourcePlaceholder"}}</p>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+
+  {{! Duration Section }}
+  <div class="form-group">
+    <label>{{localize "DASU.Effect.CombatDuration"}}</label>
+    <div class="duration-fields">
+      <div class="duration-input">
+        <label for="turns">{{localize "DASU.Effect.Turns"}}</label>
+        <input type="number" name="turns" id="turns" value="{{duration.turns}}" min="0" step="1">
+        <p class="hint" style="font-size: 0.7em; margin-top: 2px;">{{localize "DASU.Effect.TurnsHint"}}</p>
+      </div>
+      <div class="duration-input">
+        <label for="rounds">{{localize "DASU.Effect.Rounds"}}</label>
+        <input type="number" name="rounds" id="rounds" value="{{duration.rounds}}" min="0" step="1">
+        <p class="hint" style="font-size: 0.7em; margin-top: 2px;">{{localize "DASU.Effect.RoundsHint"}}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="specialDuration" data-tooltip="{{localize 'DASU.Effect.SpecialDurationHint'}}">{{localize "DASU.Effect.SpecialDurationLabel"}}</label>
+    <select name="specialDuration" id="specialDuration">
+      {{#each specialDurationOptions as |label value|}}
+        <option value="{{value}}" {{#if (eq ../specialDuration value)}}selected{{/if}}>{{localize label}}</option>
+      {{/each}}
+    </select>
+  </div>
+</div>

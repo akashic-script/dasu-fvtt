@@ -13,7 +13,9 @@
  * [[/heal 2d6]] - Roll 2d6 healing (defaults to HP)
  * [[/heal 1d8 hp]] - Roll 1d8 to restore HP
  * [[/heal 2d4 wp]] - Roll 2d4 to restore WP
- * [[/heal @will wp]] - Restore WP equal to Willpower tick
+ * [[/heal @will wp]] - Restore WP equal to Willpower tick (current actor)
+ * [[/heal @origin.pow hp]] - Restore HP equal to origin's POW tick
+ * [[/heal @target.will wp]] - Restore WP equal to target's WILL tick
  * [[/heal 2d6 both]] - Roll 2d6 to restore both HP and WP
  * [[/heal 1d6 hp & 1d4 wp]] - Multiple healing instances
  *
@@ -40,6 +42,74 @@ import {
  * Valid resource targets for healing
  */
 const RESOURCE_TARGETS = ['hp', 'wp', 'both'];
+
+/**
+ * Parse stack references in a formula and replace with actual counts
+ * Syntax: stacks:stack-id or @stacks:stack-id
+ *
+ * @param {string} formula - The healing formula
+ * @param {Actor} source - The source actor
+ * @param {Actor} target - The target actor
+ * @returns {string} Formula with stack references replaced
+ * @private
+ */
+function _parseStackModifiers(formula, source, target) {
+  if (!formula) return formula;
+
+  const stackPattern = /@?stacks:([a-z0-9-_]+)/gi;
+
+  return formula.replace(stackPattern, (match, stackId) => {
+    // Check source actor for stacks (for buffs on healer)
+    let stackCount = source?.getEffectStackCount?.(stackId) || 0;
+
+    // Check target actor for stacks (for debuffs on heal recipient)
+    if (stackCount === 0 && target) {
+      stackCount = target?.getEffectStackCount?.(stackId) || 0;
+    }
+
+    return stackCount.toString();
+  });
+}
+
+/**
+ * Parse attribute references in a formula and replace with actual values
+ * Syntax: @origin.attribute or @target.attribute (where attribute is pow, dex, will, sta)
+ * Also supports full path: @origin.system.attributes.pow.tick
+ *
+ * @param {string} formula - The healing formula
+ * @param {Actor} source - The source actor (origin)
+ * @param {Actor} target - The target actor
+ * @returns {string} Formula with attribute references replaced
+ * @private
+ */
+function _parseAttributeReferences(formula, source, target) {
+  if (!formula) return formula;
+
+  // Pattern for attribute shortcuts: @origin.pow or @target.pow
+  const shortPattern = /@(origin|target)\.(pow|dex|will|sta)/gi;
+
+  // Pattern for full paths: @origin.system.attributes.pow.tick
+  const fullPattern =
+    /@(origin|target)\.system\.attributes\.(pow|dex|will|sta)\.tick/gi;
+
+  let result = formula;
+
+  // Replace full paths first
+  result = result.replace(fullPattern, (match, actorRef, attr) => {
+    const actor = actorRef === 'origin' ? source : target;
+    const value = actor?.system?.attributes?.[attr]?.tick ?? 0;
+    return value.toString();
+  });
+
+  // Replace shortcuts
+  result = result.replace(shortPattern, (match, actorRef, attr) => {
+    const actor = actorRef === 'origin' ? source : target;
+    const value = actor?.system?.attributes?.[attr]?.tick ?? 0;
+    return value.toString();
+  });
+
+  return result;
+}
 
 /**
  * Parse a single healing instance from tokens
@@ -381,14 +451,7 @@ async function _onHealingLinkClick(event) {
   }
 
   try {
-    // Evaluate the formula with roll data
-    const rollData = sourceActor.getRollData();
-    const roll = new Roll(formula, rollData);
-    await roll.evaluate();
-
-    const baseHealing = roll.total;
-
-    // Get targets
+    // Get targets first (needed for stack parsing)
     const targets = getTargets();
     let healTargets = targets;
 
@@ -399,6 +462,30 @@ async function _onHealingLinkClick(event) {
         ? [selfToken]
         : [{ actor: sourceActor, id: 'actor-only' }];
     }
+
+    // Get primary target for attribute and stack parsing
+    const primaryTarget = healTargets[0]?.actor || sourceActor;
+
+    // Parse attribute references (@origin.pow, @target.dex, etc.)
+    let parsedFormula = _parseAttributeReferences(
+      formula,
+      sourceActor,
+      primaryTarget
+    );
+
+    // Parse stack references in formula
+    parsedFormula = _parseStackModifiers(
+      parsedFormula,
+      sourceActor,
+      primaryTarget
+    );
+
+    // Evaluate the formula with roll data
+    const rollData = sourceActor.getRollData();
+    const roll = new Roll(parsedFormula, rollData);
+    await roll.evaluate();
+
+    const baseHealing = roll.total;
 
     // Apply healing or temp HP to all targets
     for (const target of healTargets) {

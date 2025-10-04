@@ -4,8 +4,10 @@ import { DASUItem } from './core/documents/item.mjs';
 // Import sheet classes.
 import { DASUActorSheet } from './core/sheets/actor-sheet.mjs';
 import { DASUItemSheet } from './core/sheets/item-sheet.mjs';
+import { DASUActiveEffectConfig } from './ui/sheets/active-effect-config.mjs';
 // Import DataModel classes
 import * as models from './data/shared/_module.mjs';
+import { DASUActiveEffectData } from './data/effects/active-effect-data.mjs';
 // Import config
 import DASUConfig from './utils/config.mjs';
 // Import settings
@@ -20,9 +22,14 @@ import { registerHandlebarsHelpers } from './utils/helpers.mjs';
 import Checks from './systems/rolling/index.mjs';
 import { DASURollDialog } from './ui/dialogs/roll-dialog.mjs';
 // Import enrichers
-import { registerEffectEnricher } from './systems/enrichers/effect-enricher.mjs';
 import { initializeHealingEnricher } from './systems/rolling/healing/enricher.mjs';
 import { initializeDamageEnricher } from './systems/rolling/damage/enricher.mjs';
+// Import effects system
+import {
+  initializeEffects,
+  initializeTokenHudEffects,
+  registerEffectEnricher,
+} from './systems/effects/index.mjs';
 
 const collections = foundry.documents.collections;
 const sheets = foundry.appv1.sheets;
@@ -56,6 +63,12 @@ globalThis.DASU = {
 Hooks.once('init', function () {
   // Add custom constants for configuration.
   CONFIG.DASU = globalThis.DASU;
+
+  // Override Combat.prototype.updateCombatantActors to prevent Foundry's default duration system
+  // This method updates ALL actor effects on EVERY turn - we use custom per-actor tracking instead
+  Combat.prototype.updateCombatantActors = function () {
+    // Do nothing - our custom system in the updateCombat hook handles duration tracking
+  };
 
   // Register Checks system
   game.dasu = game.dasu || {};
@@ -322,6 +335,23 @@ Hooks.once('init', function () {
   // if the transfer property on the Active Effect is true.
   CONFIG.ActiveEffect.legacyTransferral = false;
 
+  // Register Active Effect data model for DASU flags
+  if (!CONFIG.ActiveEffect.dataModels) {
+    CONFIG.ActiveEffect.dataModels = {};
+  }
+  CONFIG.ActiveEffect.dataModels.dasu = DASUActiveEffectData;
+
+  // Register custom Active Effect configuration sheet
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(
+    ActiveEffect,
+    'dasu',
+    DASUActiveEffectConfig,
+    {
+      makeDefault: true,
+      label: 'DASU.Sheet.ActiveEffect',
+    }
+  );
+
   // Register sheet application classes
   collections.Actors.unregisterSheet('core', sheets.ActorSheet);
   collections.Actors.registerSheet('dasu', DASUActorSheet, {
@@ -341,7 +371,7 @@ Hooks.once('init', function () {
   // Note: Localization will be applied when ready hook fires
   CONFIG.DASU_STATUS_CONDITIONS = DASU_STATUS_CONDITIONS;
 
-  // Register enrichers
+  // Register enrichers (must happen in init hook before content is enriched)
   registerEffectEnricher();
   initializeHealingEnricher();
   initializeDamageEnricher();
@@ -349,6 +379,9 @@ Hooks.once('init', function () {
 
 // Initialize event handlers when ready
 Hooks.once('ready', function () {
+  // Initialize effects system
+  initializeEffects();
+
   // Import and initialize healing event handlers
   import('./systems/rolling/healing/event-handlers.mjs').then((module) => {
     if (module.initializeHealingEventHandlers) {
@@ -393,6 +426,42 @@ Hooks.on('preUpdateActor', (actor, updateData, options, userId) => {
 });
 
 /* -------------------------------------------- */
+/*  Active Effect Stack Tracking Hooks          */
+/* -------------------------------------------- */
+
+Hooks.on('createActiveEffect', async (effect, options, userId) => {
+  if (!effect.parent || effect.parent.documentName !== 'Actor') return;
+
+  const actor = effect.parent;
+  const stackId = effect.flags.dasu?.stackId;
+  const isStackable = effect.flags.dasu?.stackable;
+
+  if (isStackable && stackId) {
+    const stackCount = actor.getEffectStackCount(stackId);
+
+    // Update stack count on the newly created effect
+    if (effect.flags.dasu.currentStacks !== stackCount) {
+      await effect.update({ 'flags.dasu.currentStacks': stackCount });
+    }
+  }
+});
+
+Hooks.on('deleteActiveEffect', async (effect, options, userId) => {
+  if (!effect.parent || effect.parent.documentName !== 'Actor') return;
+
+  const actor = effect.parent;
+  const stackId = effect.flags.dasu?.stackId;
+  const isStackable = effect.flags.dasu?.stackable;
+
+  if (isStackable && stackId) {
+    const stackCount = actor.getEffectStackCount(stackId);
+
+    // Update remaining stacks
+    await actor._updateStackCounts(stackId, stackCount);
+  }
+});
+
+/* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */
 
@@ -424,6 +493,333 @@ Hooks.once('ready', function () {
   Hooks.on('hotbarDrop', (bar, data, slot) => createDocMacro(data, slot));
 
   // Context menu hooks are now handled by individual modules in the rolling system
+});
+
+/* -------------------------------------------- */
+/*  Combat Hooks                                */
+/* -------------------------------------------- */
+
+/**
+ * Convert duration.rounds and duration.turns to custom tracking when effect is created
+ * This hook handles effects created outside the EffectProcessor pipeline
+ * (e.g., through Foundry's native UI or other modules)
+ */
+Hooks.on('preCreateActiveEffect', (effect, data, options, userId) => {
+  // Only process if there's an active combat
+  if (!game.combat) return;
+  if (options.dasuProcessed) return;
+
+  if (data.duration?.rounds && !data.flags?.dasu?.remainingRounds) {
+    effect.updateSource({
+      'flags.dasu.remainingRounds': data.duration.rounds,
+      'flags.dasu.linkedCombat': game.combat.id,
+    });
+  }
+
+  if (data.duration?.turns && !data.flags?.dasu?.remainingTurns) {
+    effect.updateSource({
+      'flags.dasu.remainingTurns': data.duration.turns,
+      'flags.dasu.linkedCombat': game.combat.id,
+      'flags.dasu.startRound': game.combat.round,
+      'flags.dasu.startTurn': game.combat.turn,
+      'flags.dasu.hasDecrementedOnce': false,
+    });
+  }
+});
+
+Hooks.on('preUpdateActiveEffect', (effect, changes, options, userId) => {
+  if (
+    effect.flags?.dasu?.remainingTurns !== undefined ||
+    effect.flags?.dasu?.remainingRounds !== undefined
+  ) {
+    if (changes.duration) {
+      delete changes.duration;
+
+      if (Object.keys(changes).length === 0) {
+        return false;
+      }
+    }
+  }
+});
+
+Hooks.on('updateCombat', async (combat, updateData, options, userId) => {
+  if (!('turn' in updateData) && !('round' in updateData)) {
+    return;
+  }
+
+  if (!game.user.isGM) {
+    return;
+  }
+
+  const isRoundChange = 'round' in updateData;
+  const isTurnChange = 'turn' in updateData;
+
+  if (isRoundChange) {
+    await _handleRoundBasedEffects(combat);
+
+    // Only process all combatants' turn effects if "Next Round" was clicked (round changed without turn change)
+    if (!isTurnChange) {
+      await _handleAllCombatantsTurnEffects(combat);
+    }
+  }
+
+  if (isTurnChange) {
+    await _handleTurnBasedEffects(combat);
+  }
+});
+
+async function _handleRoundBasedEffects(combat) {
+  const allChatMessages = [];
+
+  for (const combatant of combat.combatants) {
+    const actor = combatant.actor;
+    if (!actor) continue;
+
+    const effectsToDelete = [];
+
+    for (const effect of actor.effects) {
+      const remainingRounds = effect.getFlag('dasu', 'remainingRounds');
+      const linkedCombat = effect.getFlag('dasu', 'linkedCombat');
+
+      if (remainingRounds === undefined || linkedCombat !== combat.id) {
+        continue;
+      }
+
+      const newRemaining = Math.max(0, remainingRounds - 1);
+
+      if (newRemaining <= 0) {
+        effectsToDelete.push(effect.id);
+
+        allChatMessages.push({
+          actor,
+          effect,
+          remainingRounds: 0,
+          expired: true,
+        });
+      } else {
+        await effect.setFlag('dasu', 'remainingRounds', newRemaining);
+
+        allChatMessages.push({
+          actor,
+          effect,
+          remainingRounds: newRemaining,
+          expired: false,
+        });
+      }
+    }
+
+    if (effectsToDelete.length > 0) {
+      await actor.deleteEmbeddedDocuments('ActiveEffect', effectsToDelete);
+    }
+  }
+
+  // Batch send all chat messages at once
+  for (const messageData of allChatMessages) {
+    const content = await foundry.applications.handlebars.renderTemplate(
+      'systems/dasu/templates/chat/effect-duration-update.hbs',
+      messageData
+    );
+
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor: messageData.actor }),
+      content,
+      flags: {
+        dasu: {
+          type: 'effect-duration-update',
+          effectId: messageData.effect.id,
+        },
+      },
+    });
+  }
+}
+
+async function _handleAllCombatantsTurnEffects(combat) {
+  const allChatMessages = [];
+
+  for (const combatant of combat.combatants) {
+    const actor = combatant.actor;
+    if (!actor) continue;
+
+    const effectsToDelete = [];
+
+    for (const effect of actor.effects) {
+      const remainingTurns = effect.getFlag('dasu', 'remainingTurns');
+      const linkedCombat = effect.getFlag('dasu', 'linkedCombat');
+      const startRound = effect.getFlag('dasu', 'startRound');
+      const hasDecrementedOnce = effect.getFlag('dasu', 'hasDecrementedOnce');
+
+      if (remainingTurns === undefined || linkedCombat !== combat.id) {
+        continue;
+      }
+
+      if (!hasDecrementedOnce) {
+        await effect.setFlag('dasu', 'hasDecrementedOnce', true);
+
+        allChatMessages.push({
+          actor,
+          effect,
+          remainingTurns: remainingTurns,
+          expired: false,
+        });
+        continue;
+      }
+
+      const newRemaining = Math.max(0, remainingTurns - 1);
+
+      if (newRemaining <= 0) {
+        effectsToDelete.push(effect.id);
+
+        allChatMessages.push({
+          actor,
+          effect,
+          remainingTurns: 0,
+          expired: true,
+        });
+      } else {
+        await effect.setFlag('dasu', 'remainingTurns', newRemaining);
+
+        allChatMessages.push({
+          actor,
+          effect,
+          remainingTurns: newRemaining,
+          expired: false,
+        });
+      }
+    }
+
+    if (effectsToDelete.length > 0) {
+      await actor.deleteEmbeddedDocuments('ActiveEffect', effectsToDelete);
+    }
+  }
+
+  // Batch send all chat messages at once
+  for (const messageData of allChatMessages) {
+    const content = await foundry.applications.handlebars.renderTemplate(
+      'systems/dasu/templates/chat/effect-duration-update.hbs',
+      messageData
+    );
+
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor: messageData.actor }),
+      content,
+      flags: {
+        dasu: {
+          type: 'effect-duration-update',
+          effectId: messageData.effect.id,
+        },
+      },
+    });
+  }
+}
+
+async function _handleTurnBasedEffects(combat) {
+  const combatant = combat.combatant;
+  if (!combatant?.actor) {
+    return;
+  }
+
+  const actor = combatant.actor;
+
+  const effectsToDelete = [];
+  const chatMessages = [];
+
+  for (const effect of actor.effects) {
+    const remainingTurns = effect.getFlag('dasu', 'remainingTurns');
+    const linkedCombat = effect.getFlag('dasu', 'linkedCombat');
+    const startRound = effect.getFlag('dasu', 'startRound');
+    const hasDecrementedOnce = effect.getFlag('dasu', 'hasDecrementedOnce');
+
+    if (remainingTurns === undefined || linkedCombat !== combat.id) {
+      continue;
+    }
+
+    if (!hasDecrementedOnce && startRound === combat.round) {
+      await effect.setFlag('dasu', 'hasDecrementedOnce', true);
+
+      chatMessages.push({
+        effect,
+        remainingTurns: remainingTurns,
+        expired: false,
+      });
+      continue;
+    }
+
+    const newRemaining = Math.max(0, remainingTurns - 1);
+
+    if (newRemaining <= 0) {
+      effectsToDelete.push(effect.id);
+
+      chatMessages.push({
+        effect,
+        remainingTurns: 0,
+        expired: true,
+      });
+    } else {
+      await effect.setFlag('dasu', 'remainingTurns', newRemaining);
+
+      chatMessages.push({
+        effect,
+        remainingTurns: newRemaining,
+        expired: false,
+      });
+    }
+  }
+
+  if (effectsToDelete.length > 0) {
+    await actor.deleteEmbeddedDocuments('ActiveEffect', effectsToDelete);
+  }
+
+  // Send chat messages for duration updates
+  for (const messageData of chatMessages) {
+    const content = await foundry.applications.handlebars.renderTemplate(
+      'systems/dasu/templates/chat/effect-duration-update.hbs',
+      messageData
+    );
+
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor }),
+      content,
+      flags: {
+        dasu: {
+          type: 'effect-duration-update',
+          effectId: messageData.effect.id,
+        },
+      },
+    });
+  }
+}
+
+/**
+ * Remove active effects with special duration "removeOnCombatEnd" when combat is deleted
+ */
+Hooks.on('deleteCombat', async (combat, options, userId) => {
+  // Only run this on the GM's client to avoid duplicate deletions
+  if (!game.user.isGM) return;
+
+  // Get all actors that were in the combat
+  const actorIds = new Set();
+  for (const combatant of combat.combatants) {
+    if (combatant.actor) {
+      actorIds.add(combatant.actor.id);
+    }
+  }
+
+  // For each actor, remove effects with removeOnCombatEnd flag
+  for (const actorId of actorIds) {
+    const actor = game.actors.get(actorId);
+    if (!actor) continue;
+
+    const effectsToRemove = [];
+    for (const effect of actor.effects) {
+      if (effect.flags?.dasu?.specialDuration === 'removeOnCombatEnd') {
+        effectsToRemove.push(effect.id);
+      }
+    }
+
+    if (effectsToRemove.length > 0) {
+      await actor.deleteEmbeddedDocuments('ActiveEffect', effectsToRemove);
+    }
+  }
 });
 
 /* -------------------------------------------- */
@@ -537,5 +933,36 @@ Hooks.on('updateItem', async (item, changes, options, userId) => {
   }
   if (updated && item.actor.sheet) {
     item.actor.sheet.render(false);
+  }
+});
+
+// --- Handle clicks on effect duration update chat cards ---
+Hooks.on('renderChatMessageHTML', (message, html) => {
+  const card = html.querySelector('.effect-duration-update');
+  if (!card) return;
+
+  const effectUuid = card.dataset.effectUuid;
+  if (!effectUuid) return;
+
+  // Handle click on effect image to open config
+  const effectImage = card.querySelector('[data-action="openEffect"]');
+  if (effectImage) {
+    effectImage.addEventListener('click', async (event) => {
+      event.preventDefault();
+
+      const effect = await fromUuid(effectUuid);
+      if (!effect) {
+        ui.notifications.warn('Effect not found');
+        return;
+      }
+
+      // Check permission
+      if (!effect.parent?.testUserPermission(game.user, 'OWNER')) {
+        ui.notifications.warn('You do not have permission to edit this effect');
+        return;
+      }
+
+      effect.sheet.render(true);
+    });
   }
 });

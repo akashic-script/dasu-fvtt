@@ -4,6 +4,9 @@ import { DASUSettings } from '../settings.mjs';
 
 /* global CONST */
 
+// Global WeakSet to track actors currently resolving @origin references
+const _resolvingActors = new WeakSet();
+
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
  * @extends {Actor}
@@ -13,12 +16,9 @@ export class DASUActor extends Actor {
   prepareData() {
     super.prepareData();
 
-    if (this.type === 'daemon') {
-      // this.system.prepareDaemonData(this.items); // Removed: no such method exists
-    } else if (this.type === 'summoner') {
+    if (this.type === 'summoner') {
       const summonerData = this.system.prepareSummonerData(this.items);
 
-      // Initialize core skills if needed
       if (summonerData.needsCoreSkillInit) {
         Hooks.once('ready', () => {
           this.initializeCoreSkills();
@@ -57,8 +57,6 @@ export class DASUActor extends Actor {
       changed.system = changed.system || {};
       changed.system.dsid = slugify(changed.name);
     }
-
-    // No AP recalculation needed; AP is now always derived.
   }
 
   /**
@@ -204,11 +202,8 @@ export class DASUActor extends Actor {
     const apEarned = startingAP + globalThis.DASU.calculateAP(level, apFormula);
     const apSpent = totalTicks - startingTicks;
 
-    // Debug output
-    // console.log({ attribute, newTick, oldTick, totalTicks, apEarned, apSpent });
-
     if (newTick < oldTick) {
-      // Always allow decreasing
+      /* empty */
     } else {
       if (newTick > 6) {
         ui.notifications.warn('Cannot increase above 6 ticks.');
@@ -234,6 +229,70 @@ export class DASUActor extends Actor {
 
   /**
    * @override
+   * Apply all ActiveEffect documents to the Actor data.
+   * Override to support @origin references in effect values.
+   */
+  applyActiveEffects() {
+    // Prevent infinite recursion
+    if (_resolvingActors.has(this)) {
+      return super.applyActiveEffects();
+    }
+
+    _resolvingActors.add(this);
+
+    try {
+      // First, resolve any @origin references in effect changes
+      for (const effect of this.allApplicableEffects()) {
+        if (!effect.origin) continue;
+
+        for (const change of effect.changes) {
+          if (
+            typeof change.value === 'string' &&
+            change.value.includes('@origin')
+          ) {
+            // Parse the origin UUID to get actor ID
+            const match = effect.origin.match(/Actor\.([^.]+)/);
+            if (!match) continue;
+
+            const actorId = match[1];
+
+            // Try to get the actor from the game's collection (already loaded)
+            let originDoc = game.actors.get(actorId);
+
+            // If not found in collection, it might be a synthetic token actor
+            // In that case, use source data only to avoid recursion
+            if (!originDoc) {
+              // For token actors, we can't safely resolve without causing recursion
+              // Skip this effect change
+              continue;
+            }
+
+            // Extract the path after @origin.
+            const pathMatch = change.value.match(/@origin\.(.+)/);
+            if (pathMatch) {
+              const path = pathMatch[1];
+
+              // Get value from source data to avoid triggering prepareData
+              const value = foundry.utils.getProperty(originDoc._source, path);
+
+              if (value !== undefined) {
+                // Directly modify the change object to replace @origin reference
+                change.value = String(value);
+              }
+            }
+          }
+        }
+      }
+
+      // Now apply effects normally with resolved values
+      return super.applyActiveEffects();
+    } finally {
+      _resolvingActors.delete(this);
+    }
+  }
+
+  /**
+   * @override
    * Augment the actor source data with additional dynamic data that isn't
    * handled by the actor's DataModel. Data calculated in this step should be
    * available both inside and outside of summoner sheets (such as if an actor
@@ -247,12 +306,9 @@ export class DASUActor extends Actor {
     const flags = actorData.flags.dasu || {};
 
     if (['daemon', 'summoner'].includes(this.type)) {
-      // SharedActorComponents.prepareDerivedAttributes(this.system); // removed, no longer needed
       SharedActorComponents.prepareDerivedResources(this.system);
-      // SharedActorComponents.getAttributePointsGetter(this.system); // remove if not used
     }
 
-    // Handle custom resistance method effects after all standard effects are applied
     this._applyResistanceMethodEffects();
   }
 
@@ -435,13 +491,9 @@ export class DASUActor extends Actor {
       }
     }
 
-    // Apply the updates
     if (Object.keys(updates).length > 0) {
       await this.update(updates);
     }
-
-    // Chat message creation is handled by the damage system
-    // Individual messages are created for each target with more detail
 
     return {
       applied: appliedDamage,
@@ -469,9 +521,6 @@ export class DASUActor extends Actor {
       return { applied: 0, resourceTarget, actor: this };
     }
 
-    // Get current values - handle different actor types
-    // For daemon actors, HP is stored in system.stats.hp.current
-    // For summoner actors, HP might be in system.hp.current or system.stats.hp.current
     const currentHp =
       this.system.stats?.hp?.current ?? this.system.hp?.current ?? 0;
     const currentWp =
@@ -479,18 +528,13 @@ export class DASUActor extends Actor {
     const maxHp = this.system.stats?.hp?.max ?? this.system.hp?.max ?? 20;
     const maxWp = this.system.stats?.wp?.max ?? this.system.wp?.max ?? 20;
 
-    // Debug disabled
-
     const updates = {};
     let appliedHealing = 0;
 
-    // Apply HP healing
     if (resourceTarget === 'hp' || resourceTarget === 'both') {
       const newHp = Math.min(maxHp, currentHp + healing);
       appliedHealing += newHp - currentHp;
 
-      // Use correct path based on actor data structure
-      // Prioritize system.stats.hp.current for daemons
       if (this.system.stats?.hp?.current !== undefined) {
         updates['system.stats.hp.current'] = newHp;
       } else {
@@ -498,13 +542,10 @@ export class DASUActor extends Actor {
       }
     }
 
-    // Apply WP healing
     if (resourceTarget === 'wp' || resourceTarget === 'both') {
       const newWp = Math.min(maxWp, currentWp + healing);
       appliedHealing += newWp - currentWp;
 
-      // Use correct path based on actor data structure
-      // Prioritize system.stats.wp.current for daemons
       if (this.system.stats?.wp?.current !== undefined) {
         updates['system.stats.wp.current'] = newWp;
       } else {
@@ -512,13 +553,9 @@ export class DASUActor extends Actor {
       }
     }
 
-    // Apply the updates
     if (Object.keys(updates).length > 0) {
       await this.update(updates);
     }
-
-    // Chat message creation is handled by the damage system
-    // Individual messages are created for each target with more detail
 
     return {
       applied: appliedHealing,
@@ -585,6 +622,235 @@ export class DASUActor extends Actor {
     });
 
     return this;
+  }
+
+  /* -------------------------------------------- */
+  /*  Stackable Effect Methods                    */
+  /* -------------------------------------------- */
+
+  /**
+   * Get the current stack count for a specific effect
+   * @param {string} stackId - The stack identifier
+   * @returns {number} Number of active stacks
+   */
+  getEffectStackCount(stackId) {
+    if (!stackId) return 0;
+
+    return this.effects.filter(
+      (e) => e.flags.dasu?.stackId === stackId && !e.disabled
+    ).length;
+  }
+
+  /**
+   * Get all stacks of a specific effect
+   * @param {string} stackId - The stack identifier
+   * @returns {ActiveEffect[]} Array of effect instances
+   */
+  getEffectStacks(stackId) {
+    if (!stackId) return [];
+
+    return this.effects.filter(
+      (e) => e.flags.dasu?.stackId === stackId && !e.disabled
+    );
+  }
+
+  /**
+   * Add a stackable effect with automatic stack limit checking
+   * @param {object} effectData - The effect data to add
+   * @returns {ActiveEffect|null} The created effect or null if limit reached
+   */
+  async addStackableEffect(effectData) {
+    const stackId = effectData.flags?.dasu?.stackId;
+    const maxStacks = effectData.flags?.dasu?.maxStacks;
+    const isStackable = effectData.flags?.dasu?.stackable;
+
+    if (!isStackable || !stackId) {
+      // Non-stackable effect, create normally
+      const [effect] = await this.createEmbeddedDocuments('ActiveEffect', [
+        effectData,
+      ]);
+      return effect;
+    }
+
+    // Check current stack count
+    const currentStacks = this.getEffectStackCount(stackId);
+
+    if (maxStacks && currentStacks >= maxStacks) {
+      ui.notifications.warn(
+        `Maximum stacks (${maxStacks}) reached for ${effectData.name}`
+      );
+      Hooks.call('dasu.effectStackLimitReached', this, effectData, maxStacks);
+      return null;
+    }
+
+    // Create the new stack
+    const [effect] = await this.createEmbeddedDocuments('ActiveEffect', [
+      effectData,
+    ]);
+
+    // Update currentStacks on all instances
+    const newStackCount = currentStacks + 1;
+    await this._updateStackCounts(stackId, newStackCount);
+
+    Hooks.call('dasu.effectStackAdded', this, effect, newStackCount);
+
+    return effect;
+  }
+
+  /**
+   * Remove one stack of an effect
+   * @param {string} stackId - The stack identifier
+   * @returns {Promise<void>}
+   */
+  async removeEffectStack(stackId) {
+    const stacks = this.getEffectStacks(stackId);
+
+    if (stacks.length === 0) return;
+
+    // Remove the oldest stack (first in array)
+    const stackToRemove = stacks[0];
+    await stackToRemove.delete();
+
+    const remainingStacks = stacks.length - 1;
+    await this._updateStackCounts(stackId, remainingStacks);
+
+    Hooks.call('dasu.effectStackRemoved', this, stackToRemove, remainingStacks);
+  }
+
+  /**
+   * Update currentStacks count on all instances of a stack
+   * @private
+   * @param {string} stackId - The stack identifier
+   * @param {number} count - The new stack count
+   */
+  async _updateStackCounts(stackId, count) {
+    const stacks = this.getEffectStacks(stackId);
+    const updates = stacks.map((e) => ({
+      _id: e.id,
+      'flags.dasu.currentStacks': count,
+    }));
+
+    if (updates.length > 0) {
+      await this.updateEmbeddedDocuments('ActiveEffect', updates);
+    }
+  }
+
+  /**
+   * Override toggleStatusEffect to ensure flags are copied from status conditions
+   * @override
+   */
+  async toggleStatusEffect(statusId, options = {}) {
+    // Get the status condition definition
+    const statusCondition = CONFIG.DASU_STATUS_CONDITIONS?.[statusId];
+
+    // If this is a stackable status and we're adding it, use the stackable method
+    if (statusCondition?.flags?.dasu?.stackable && options.active !== false) {
+      const effectData = {
+        name: game.i18n.localize(statusCondition.name),
+        icon: statusCondition.img,
+        statuses: [statusId],
+        duration: foundry.utils.deepClone(statusCondition.duration || {}),
+        flags: foundry.utils.deepClone(statusCondition.flags || {}),
+      };
+
+      if (statusCondition.tint) {
+        effectData.tint = statusCondition.tint;
+      }
+
+      // If there's an active combat and duration has rounds, link it to the combat
+      // Note: turns use custom tracking and shouldn't be linked to combat
+      if (game.combat && effectData.duration?.rounds) {
+        effectData.duration.combat = game.combat.id;
+        effectData.duration.startRound = game.combat.round;
+        effectData.duration.startTurn = game.combat.turn;
+      }
+
+      // If using turn-based duration, set up custom tracking
+      if (game.combat && effectData.duration?.turns) {
+        effectData.flags.dasu = effectData.flags.dasu || {};
+        effectData.flags.dasu.remainingTurns = effectData.duration.turns;
+        effectData.flags.dasu.linkedCombat = game.combat.id;
+        effectData.flags.dasu.startRound = game.combat.round;
+        effectData.flags.dasu.startTurn = game.combat.turn;
+        effectData.flags.dasu.hasDecrementedOnce = false;
+        effectData.duration.turns = null;
+      }
+
+      console.log('DASU | Creating stackable effect with data:', effectData);
+      const result = await this.addStackableEffect(effectData);
+      console.log('DASU | Created effect:', result);
+      return result;
+    }
+
+    // For non-stackable effects, we need to handle custom turn tracking too
+    console.log('DASU | toggleStatusEffect for non-stackable:', {
+      statusId,
+      hasStatusCondition: !!statusCondition,
+      optionsActive: options.active,
+      hasDefaultDuration: !!statusCondition?.duration,
+      hasTurns: !!statusCondition?.duration?.turns,
+    });
+
+    if (statusCondition && options.active !== false) {
+      // Check if we're adding the effect
+      const hasEffect = this.effects.some((e) => e.statuses.has(statusId));
+      console.log('DASU | Effect check:', { hasEffect, statusId });
+
+      if (!hasEffect && statusCondition.duration?.turns) {
+        // Create effect with custom turn tracking
+        const effectData = {
+          name: game.i18n.localize(statusCondition.name),
+          icon: statusCondition.img,
+          statuses: [statusId],
+          duration: foundry.utils.deepClone(statusCondition.duration || {}),
+          flags: foundry.utils.deepClone(statusCondition.flags || {}),
+        };
+
+        if (statusCondition.tint) {
+          effectData.tint = statusCondition.tint;
+        }
+
+        if (statusCondition.description) {
+          effectData.description = game.i18n.localize(
+            statusCondition.description
+          );
+        }
+
+        if (statusCondition.changes) {
+          effectData.changes = foundry.utils.deepClone(statusCondition.changes);
+        }
+
+        // Link rounds to combat
+        if (game.combat && effectData.duration?.rounds) {
+          effectData.duration.combat = game.combat.id;
+          effectData.duration.startRound = game.combat.round;
+          effectData.duration.startTurn = game.combat.turn;
+        }
+
+        // Set up custom turn tracking
+        if (game.combat && effectData.duration?.turns) {
+          effectData.flags.dasu = effectData.flags.dasu || {};
+          effectData.flags.dasu.remainingTurns = effectData.duration.turns;
+          effectData.flags.dasu.linkedCombat = game.combat.id;
+          effectData.flags.dasu.startRound = game.combat.round;
+          effectData.flags.dasu.startTurn = game.combat.turn;
+          effectData.flags.dasu.hasDecrementedOnce = false;
+          effectData.duration.turns = null;
+        }
+
+        console.log(
+          'DASU | Creating non-stackable effect with custom turn tracking:',
+          effectData
+        );
+        const [effect] = await this.createEmbeddedDocuments('ActiveEffect', [
+          effectData,
+        ]);
+        return effect;
+      }
+    }
+
+    // For removal or effects without custom tracking, use default behavior
+    return await super.toggleStatusEffect(statusId, options);
   }
 
   /**

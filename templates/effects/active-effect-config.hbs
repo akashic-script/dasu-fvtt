@@ -1,0 +1,181 @@
+{{!-- DASU Active Effect Configuration Sheet --}}
+<form class="{{cssClass}}" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{effect.icon}}" data-edit="icon" title="{{effect.name}}" />
+    <div class="header-fields">
+      <h1 class="charname">
+        <input name="name" type="text" value="{{effect.name}}" placeholder="{{localize 'EFFECT.Name'}}" />
+      </h1>
+    </div>
+  </header>
+
+  {{!-- Navigation Tabs --}}
+  <nav class="sheet-tabs tabs" data-group="primary">
+    <a class="item" data-tab="details">{{localize "DASU.Effect.Details"}}</a>
+    <a class="item" data-tab="effects">{{localize "DASU.Effect.Effects"}}</a>
+    <a class="item" data-tab="duration">{{localize "DASU.Effect.Duration"}}</a>
+  </nav>
+
+  {{!-- Sheet Body --}}
+  <section class="sheet-body">
+
+    {{!-- Details Tab --}}
+    <div class="tab" data-group="primary" data-tab="details">
+
+      {{!-- Basic Effect Settings --}}
+      <div class="form-group">
+        <label for="disabled">
+          <input type="checkbox" name="disabled" {{checked effect.disabled}} />
+          {{localize "EFFECT.Disabled"}}
+        </label>
+        <p class="hint">{{localize "EFFECT.DisabledHint"}}</p>
+      </div>
+
+      {{!-- Transfer to Actor --}}
+      <div class="form-group">
+        <label for="transfer">
+          <input type="checkbox" name="transfer" {{checked effect.transfer}} />
+          {{localize "EFFECT.Transfer"}}
+        </label>
+        <p class="hint">{{localize "EFFECT.TransferHint"}}</p>
+      </div>
+
+      <hr>
+
+      {{!-- Stackable Effect Checkbox --}}
+      <div class="form-group">
+        <label for="flags.dasu.stackable">
+          <input type="checkbox" name="flags.dasu.stackable" {{checked dasuFlags.stackable}} />
+          {{localize "DASU.Effect.Stackable"}}
+        </label>
+        <p class="hint">{{localize "DASU.Effect.StackableHint"}}</p>
+      </div>
+
+      {{!-- Stack Options (only visible when stackable is checked) --}}
+      <div class="stack-options" style="display: {{#if isStackable}}block{{else}}none{{/if}};">
+
+        {{!-- Stack ID --}}
+        <div class="form-group">
+          <label for="flags.dasu.stackId">{{localize "DASU.Effect.StackId"}}</label>
+          <input type="text" name="flags.dasu.stackId" value="{{dasuFlags.stackId}}" placeholder="unique-stack-id" />
+          <p class="hint">{{localize "DASU.Effect.StackIdHint"}}</p>
+        </div>
+
+        {{!-- Max Stacks --}}
+        <div class="form-group">
+          <label for="flags.dasu.maxStacks">{{localize "DASU.Effect.MaxStacks"}}</label>
+          <input type="number" name="flags.dasu.maxStacks" value="{{dasuFlags.maxStacks}}" min="1" placeholder="Unlimited" />
+          <p class="hint">{{localize "DASU.Effect.MaxStacksHint"}}</p>
+        </div>
+
+        {{!-- Stack Mode --}}
+        <div class="form-group">
+          <label for="flags.dasu.stackMode">{{localize "DASU.Effect.StackMode"}}</label>
+          <select name="flags.dasu.stackMode">
+            {{#each stackModeOptions as |label key|}}
+              <option value="{{key}}" {{selected key ../dasuFlags.stackMode}}>{{localize label}}</option>
+            {{/each}}
+          </select>
+          <p class="hint">{{localize "DASU.Effect.StackModeHint"}}</p>
+        </div>
+
+        {{!-- Show Stack Count Badge --}}
+        <div class="form-group">
+          <label for="flags.dasu.showStackCount">
+            <input type="checkbox" name="flags.dasu.showStackCount" {{checked dasuFlags.showStackCount}} />
+            {{localize "DASU.Effect.ShowStackCount"}}
+          </label>
+          <p class="hint">{{localize "DASU.Effect.ShowStackCountHint"}}</p>
+        </div>
+
+        {{!-- Current Stacks (read-only display) --}}
+        {{#if currentStackCount}}
+        <div class="form-group">
+          <label>{{localize "DASU.Effect.CurrentStacks"}}</label>
+          <input type="number" value="{{currentStackCount}}" disabled />
+          <p class="hint">{{localize "DASU.Effect.CurrentStacksHint"}}</p>
+        </div>
+        {{/if}}
+
+      </div>
+
+    </div>
+
+    {{!-- Effects Tab --}}
+    <div class="tab" data-group="primary" data-tab="effects">
+      <p class="notes">{{localize "EFFECT.ChangeHint"}}</p>
+
+      <ol class="changes-list">
+        {{#each effect.changes as |change i|}}
+        <li class="effect-change flexrow" data-index="{{i}}">
+          <div class="effect-controls">
+            <a class="effect-control" data-action="deleteChange" data-index="{{i}}" data-tooltip="EFFECT.ChangeDelete">
+              <i class="fas fa-trash"></i>
+            </a>
+          </div>
+          <input type="text" name="changes.{{i}}.key" value="{{change.key}}" placeholder="{{localize 'EFFECT.ChangeKey'}}" />
+          <select name="changes.{{i}}.mode">
+            {{#select change.mode}}
+            <option value="0">{{localize "EFFECT.ModeCustom"}}</option>
+            <option value="1">{{localize "EFFECT.ModeMultiply"}}</option>
+            <option value="2">{{localize "EFFECT.ModeAdd"}}</option>
+            <option value="3">{{localize "EFFECT.ModeDowngrade"}}</option>
+            <option value="4">{{localize "EFFECT.ModeUpgrade"}}</option>
+            <option value="5">{{localize "EFFECT.ModeOverride"}}</option>
+            {{/select}}
+          </select>
+          <input type="text" name="changes.{{i}}.value" value="{{change.value}}" placeholder="{{localize 'EFFECT.ChangeValue'}}" />
+        </li>
+        {{/each}}
+      </ol>
+
+      <div class="form-group">
+        <button type="button" class="add-change">
+          <i class="fas fa-plus"></i> {{localize "EFFECT.ChangeAdd"}}
+        </button>
+      </div>
+    </div>
+
+    {{!-- Duration Tab --}}
+    <div class="tab" data-group="primary" data-tab="duration">
+
+      <div class="form-group">
+        <label for="duration.rounds">{{localize "EFFECT.DurationRounds"}}</label>
+        <input type="number" name="duration.rounds" value="{{effect.duration.rounds}}" placeholder="{{localize 'Unlimited'}}" />
+      </div>
+
+      <div class="form-group">
+        <label for="duration.seconds">{{localize "EFFECT.DurationSeconds"}}</label>
+        <input type="number" name="duration.seconds" value="{{effect.duration.seconds}}" placeholder="{{localize 'Unlimited'}}" />
+      </div>
+
+      <div class="form-group">
+        <label for="duration.turns">{{localize "EFFECT.DurationTurns"}}</label>
+        <input type="number" name="duration.turns" value="{{effect.duration.turns}}" placeholder="{{localize 'Unlimited'}}" />
+      </div>
+
+      <div class="form-group">
+        <label for="duration.startRound">{{localize "EFFECT.DurationStartRound"}}</label>
+        <input type="number" name="duration.startRound" value="{{effect.duration.startRound}}" />
+      </div>
+
+      <div class="form-group">
+        <label for="duration.startTime">{{localize "EFFECT.DurationStartTime"}}</label>
+        <input type="number" name="duration.startTime" value="{{effect.duration.startTime}}" />
+      </div>
+
+      <div class="form-group">
+        <label for="duration.startTurn">{{localize "EFFECT.DurationStartTurn"}}</label>
+        <input type="number" name="duration.startTurn" value="{{effect.duration.startTurn}}" />
+      </div>
+
+    </div>
+
+  </section>
+
+  <footer class="sheet-footer">
+    <button type="submit" name="submit">
+      <i class="fas fa-save"></i> {{localize "EFFECT.Submit"}}
+    </button>
+  </footer>
+</form>

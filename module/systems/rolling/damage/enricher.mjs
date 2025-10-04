@@ -12,7 +12,9 @@
  * [[/damage 2d6]] - Roll 2d6 damage (defaults to physical, HP)
  * [[/damage 1d8 fire]] - Roll 1d8 fire damage to HP
  * [[/damage 2d4 dark wp]] - Roll 2d4 dark damage to WP
- * [[/damage @pow light]] - Deal light damage equal to Power tick
+ * [[/damage @pow light]] - Deal light damage equal to Power tick (current actor)
+ * [[/damage @origin.pow fire]] - Deal fire damage equal to origin's POW tick
+ * [[/damage @target.dex ice]] - Deal ice damage equal to target's DEX tick
  * [[/damage 2d6 fire hp]] - Roll 2d6 fire damage explicitly to HP
  * [[/damage 1d6 fire hp & 1d4 dark wp]] - Multiple damage instances
  *
@@ -61,6 +63,74 @@ const DAMAGE_TYPES = [
 const RESOURCE_TARGETS = ['hp', 'wp', 'both'];
 
 /**
+ * Parse stack references in a formula and replace with actual counts
+ * Syntax: @stacks:stack-id
+ *
+ * @param {string} formula - The damage formula
+ * @param {Actor} source - The source actor
+ * @param {Actor} target - The target actor
+ * @returns {string} Formula with stack references replaced
+ * @private
+ */
+function _parseStackModifiers(formula, source, target) {
+  if (!formula) return formula;
+
+  const stackPattern = /@stacks:([a-z0-9-_]+)/gi;
+
+  return formula.replace(stackPattern, (match, stackId) => {
+    // Check source actor for stacks (for buffs on attacker)
+    let stackCount = source?.getEffectStackCount?.(stackId) || 0;
+
+    // Check target actor for stacks (for debuffs on defender)
+    if (stackCount === 0 && target) {
+      stackCount = target?.getEffectStackCount?.(stackId) || 0;
+    }
+
+    return stackCount.toString();
+  });
+}
+
+/**
+ * Parse attribute references in a formula and replace with actual values
+ * Syntax: @origin.attribute or @target.attribute (where attribute is pow, dex, will, sta)
+ * Also supports full path: @origin.system.attributes.pow.tick
+ *
+ * @param {string} formula - The damage formula
+ * @param {Actor} source - The source actor (origin)
+ * @param {Actor} target - The target actor
+ * @returns {string} Formula with attribute references replaced
+ * @private
+ */
+function _parseAttributeReferences(formula, source, target) {
+  if (!formula) return formula;
+
+  // Pattern for attribute shortcuts: @origin.pow or @target.pow
+  const shortPattern = /@(origin|target)\.(pow|dex|will|sta)/gi;
+
+  // Pattern for full paths: @origin.system.attributes.pow.tick
+  const fullPattern =
+    /@(origin|target)\.system\.attributes\.(pow|dex|will|sta)\.tick/gi;
+
+  let result = formula;
+
+  // Replace full paths first
+  result = result.replace(fullPattern, (match, actorRef, attr) => {
+    const actor = actorRef === 'origin' ? source : target;
+    const value = actor?.system?.attributes?.[attr]?.tick ?? 0;
+    return value.toString();
+  });
+
+  // Replace shortcuts
+  result = result.replace(shortPattern, (match, actorRef, attr) => {
+    const actor = actorRef === 'origin' ? source : target;
+    const value = actor?.system?.attributes?.[attr]?.tick ?? 0;
+    return value.toString();
+  });
+
+  return result;
+}
+
+/**
  * Parse a single damage instance from tokens
  *
  * @param {string} instanceText - Text for this damage instance
@@ -74,23 +144,36 @@ function _parseDamageInstance(instanceText) {
     return null;
   }
 
-  const formula = tokens[0];
+  // Find where the formula ends by looking for damage type or resource keywords
+  let formulaEndIndex = 0;
   let damageType = 'physical';
   let resourceTarget = 'hp';
 
-  // Process remaining tokens for type and resource
-  for (let i = 1; i < tokens.length; i++) {
+  // Scan tokens to find damage types and resources
+  for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
+    const lowerToken = token.toLowerCase();
 
-    if (DAMAGE_TYPES.includes(token.toLowerCase())) {
-      damageType = token.toLowerCase();
-    } else if (RESOURCE_TARGETS.includes(token.toLowerCase())) {
-      resourceTarget = token.toLowerCase();
-    } else if (token.includes('/') || token.toLowerCase() === 'prompt') {
+    if (DAMAGE_TYPES.includes(lowerToken)) {
+      damageType = lowerToken;
+      if (formulaEndIndex === 0) formulaEndIndex = i;
+    } else if (RESOURCE_TARGETS.includes(lowerToken)) {
+      resourceTarget = lowerToken;
+      if (formulaEndIndex === 0) formulaEndIndex = i;
+    } else if (token.includes('/') || lowerToken === 'prompt') {
       // Multiple damage types (e.g., "fire/ice") or prompt
-      damageType = token.toLowerCase();
+      damageType = lowerToken;
+      if (formulaEndIndex === 0) formulaEndIndex = i;
     }
   }
+
+  // If no damage type or resource found, all tokens are part of the formula
+  if (formulaEndIndex === 0) {
+    formulaEndIndex = tokens.length;
+  }
+
+  // Reconstruct the formula from the tokens before the damage type
+  const formula = tokens.slice(0, formulaEndIndex).join(' ');
 
   return {
     formula,
@@ -178,13 +261,47 @@ function _getDamageTypeIcon(damageType) {
  * @param {Object} instance - Damage instance data
  * @param {string|null} customLabel - Optional custom label
  * @param {string|null} sourceActorUuid - UUID of the source actor
+ * @param {Actor|null} sourceActor - The source actor (if available during enrichment)
  * @returns {HTMLElement} Damage link element
  * @private
  */
-function _createDamageInstanceLink(instance, customLabel, sourceActorUuid) {
+function _createDamageInstanceLink(
+  instance,
+  customLabel,
+  sourceActorUuid,
+  sourceActor
+) {
   const { formula, damageType, resourceTarget } = instance;
 
-  const labelText = customLabel || _generateDamageLabel(instance);
+  let displayFormula = formula;
+  let labelText = customLabel || _generateDamageLabel(instance);
+
+  // If we have the source actor, try to pre-calculate the formula
+  if (sourceActor && !customLabel) {
+    try {
+      // Parse the formula with source actor data
+      let parsedFormula = _parseAttributeReferences(formula, sourceActor, null);
+      parsedFormula = _parseStackModifiers(parsedFormula, sourceActor, null);
+
+      // Try to evaluate if it's a simple formula (no dice rolls)
+      if (!parsedFormula.includes('d')) {
+        const rollData = sourceActor.getRollData();
+        const roll = new Roll(parsedFormula, rollData);
+        roll.evaluateSync();
+        displayFormula = roll.total.toString();
+
+        // Update label with calculated value
+        const typeText = damageType !== 'physical' ? ` ${damageType}` : '';
+        const resourceText =
+          resourceTarget !== 'hp' ? ` (${resourceTarget.toUpperCase()})` : '';
+        labelText = `${displayFormula}${typeText}${resourceText}`;
+      }
+    } catch (error) {
+      // If calculation fails, use original formula
+      console.debug('Could not pre-calculate damage formula:', error);
+    }
+  }
+
   const tooltip = `Deal ${formula} ${damageType} damage to ${resourceTarget.toUpperCase()}`;
 
   const iconSrc = _getDamageTypeIcon(damageType);
@@ -215,14 +332,20 @@ function _createDamageInstanceLink(instance, customLabel, sourceActorUuid) {
  *
  * @param {Object} damageData - Parsed damage data
  * @param {string|null} sourceActorUuid - UUID of the source actor
+ * @param {Actor|null} sourceActor - The source actor (if available during enrichment)
  * @returns {HTMLElement} Container with all damage links
  * @private
  */
-function _createDamageLinks(damageData, sourceActorUuid) {
+function _createDamageLinks(damageData, sourceActorUuid, sourceActor) {
   const { customLabel, damageInstances } = damageData;
 
   const links = damageInstances.map((instance) =>
-    _createDamageInstanceLink(instance, customLabel, sourceActorUuid)
+    _createDamageInstanceLink(
+      instance,
+      customLabel,
+      sourceActorUuid,
+      sourceActor
+    )
   );
 
   return createEnricherContainer('dasu-damage-enricher', links);
@@ -246,6 +369,11 @@ async function _onDamageLinkClick(event) {
   // Try to get source actor from stored UUID first
   let sourceActor = sourceActorUuid ? await fromUuid(sourceActorUuid) : null;
 
+  // Ensure we have the actor, not a token document
+  if (sourceActor?.actor) {
+    sourceActor = sourceActor.actor;
+  }
+
   // Fallback to context-based lookup
   if (!sourceActor) {
     sourceActor = getSourceActor(link);
@@ -259,15 +387,30 @@ async function _onDamageLinkClick(event) {
   }
 
   try {
+    // Get targets first (needed for stack and attribute parsing)
+    const targets = getTargets();
+    const primaryTarget = targets[0]?.actor || null;
+
+    // Parse attribute references (@origin.pow, @target.dex, etc.)
+    let parsedFormula = _parseAttributeReferences(
+      formula,
+      sourceActor,
+      primaryTarget
+    );
+
+    // Parse stack references in formula
+    parsedFormula = _parseStackModifiers(
+      parsedFormula,
+      sourceActor,
+      primaryTarget
+    );
+
     // Evaluate the formula with roll data
     const rollData = sourceActor.getRollData();
-    const roll = new Roll(formula, rollData);
+    const roll = new Roll(parsedFormula, rollData);
     await roll.evaluate();
 
     const baseDamage = roll.total;
-
-    // Get targets
-    const targets = getTargets();
 
     if (targets.length === 0) {
       ui.notifications.warn(
@@ -334,11 +477,22 @@ async function enrichDamageMatch(match, options) {
   const damageData = _parseDamageEnricher(match);
   if (!damageData) return null;
 
-  // Store the relativeTo document UUID for later retrieval
-  const sourceActor = options?.relativeTo;
+  // Get the source actor from options
+  let sourceActor = options?.relativeTo;
+
+  // If relativeTo is an ActiveEffect, get its parent actor
+  if (sourceActor instanceof ActiveEffect) {
+    sourceActor = sourceActor.parent;
+  }
+
+  // Extract actual actor if we got a token document
+  if (sourceActor?.actor) {
+    sourceActor = sourceActor.actor;
+  }
+
   const sourceActorUuid = sourceActor?.uuid;
 
-  return _createDamageLinks(damageData, sourceActorUuid);
+  return _createDamageLinks(damageData, sourceActorUuid, sourceActor);
 }
 
 /**

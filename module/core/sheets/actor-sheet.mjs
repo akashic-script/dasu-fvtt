@@ -1,4 +1,4 @@
-import { prepareActiveEffectCategories } from '../../utils/effects.mjs';
+import { prepareActiveEffectCategories } from '../../systems/effects/display.mjs';
 import { DASUSettings } from '../settings.mjs';
 import { registerHandlebarsHelpers } from '../../utils/helpers.mjs';
 import { LevelingWizard } from '../../ui/applications/leveling-wizard.mjs';
@@ -800,6 +800,20 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       );
     });
 
+    // Add context menu handlers for status buttons
+    this.element
+      .querySelectorAll('[data-action="toggleStatus"]')
+      .forEach((button) => {
+        button.removeEventListener(
+          'contextmenu',
+          this._handleStatusContextMenu
+        );
+        button.addEventListener(
+          'contextmenu',
+          this._handleStatusContextMenu.bind(this)
+        );
+      });
+
     // Add change handlers for other form fields
     this.element
       .querySelectorAll('input[data-dtype], select[data-dtype]')
@@ -896,6 +910,39 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       this.render(true);
     } catch (error) {
       console.error('Error resetting skill ticks:', error);
+    }
+  }
+
+  /**
+   * Handle context menu (right-click) on status buttons
+   * @param {Event} event - The contextmenu event
+   * @private
+   */
+  async _handleStatusContextMenu(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const button = event.currentTarget;
+    const statusId = button.dataset.statusId;
+
+    if (!statusId) return;
+
+    const statusCondition = DASU_STATUS_CONDITIONS[statusId];
+    if (!statusCondition) return;
+
+    const isStackable = statusCondition.flags?.dasu?.stackable;
+
+    if (isStackable) {
+      const stackId = statusCondition.flags.dasu.stackId;
+      await this.actor.removeEffectStack(stackId);
+    } else {
+      // For non-stackable effects, right-click removes the effect
+      const existingEffect = this.actor.effects.find(
+        (effect) => effect.statuses && effect.statuses.has(statusId)
+      );
+      if (existingEffect) {
+        await existingEffect.delete();
+      }
     }
   }
 
@@ -1730,7 +1777,18 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    */
   static async _deleteDoc(_event, target) {
     const doc = this._getEmbeddedDocument(target);
-    await doc.delete();
+
+    // Check if this is a stackable effect
+    const isStackable = doc.flags?.dasu?.stackable;
+    const stackId = doc.flags?.dasu?.stackId;
+
+    if (isStackable && stackId) {
+      // For stackable effects, remove one stack instead of deleting entirely
+      await this.actor.removeEffectStack(stackId);
+    } else {
+      // For non-stackable effects, delete as normal
+      await doc.delete();
+    }
   }
 
   /**
@@ -1742,7 +1800,18 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   static async _deleteDocNoConfirm(_event, target) {
     try {
       const doc = this._getEmbeddedDocument(target);
-      await doc.delete();
+
+      // Check if this is a stackable effect
+      const isStackable = doc.flags?.dasu?.stackable;
+      const stackId = doc.flags?.dasu?.stackId;
+
+      if (isStackable && stackId) {
+        // For stackable effects, remove one stack instead of deleting entirely
+        await this.actor.removeEffectStack(stackId);
+      } else {
+        // For non-stackable effects, delete as normal
+        await doc.delete();
+      }
       ui.notifications.info(
         game.i18n.format('DOCUMENT.Deleted', {
           type: doc.documentName,
@@ -1942,33 +2011,138 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @private
    */
-  static async _toggleStatus(_event, target) {
+  static async _toggleStatus(event, target) {
     const statusId = target.dataset.statusId;
     const actor = this.actor;
 
     if (!statusId || !actor) return;
 
-    // Check if status condition is currently active
-    const existingEffect = actor.effects.find(
-      (effect) => effect.statuses && effect.statuses.has(statusId)
-    );
+    const statusCondition = DASU_STATUS_CONDITIONS[statusId];
+    if (!statusCondition) return;
 
-    if (existingEffect) {
-      // Remove the status condition
-      await existingEffect.delete();
+    // Check for Ctrl+click to show custom dialog
+    if (event.ctrlKey || event.metaKey) {
+      const { StatusEffectDialog } = await import(
+        '../../ui/dialogs/status-effect-dialog.mjs'
+      );
+      await StatusEffectDialog.show({
+        statusId,
+        statusCondition,
+        actor,
+      });
+      return;
+    }
+
+    const isStackable = statusCondition.flags?.dasu?.stackable;
+    const isRightClick = event.button === 2;
+
+    if (isStackable) {
+      // Handle stackable effects
+      const stackId = statusCondition.flags.dasu.stackId;
+
+      if (isRightClick) {
+        // Right-click: Remove one stack
+        await actor.removeEffectStack(stackId);
+      } else {
+        // Left-click: Add one stack
+        const effectData = {
+          name: game.i18n.localize(statusCondition.name),
+          img: statusCondition.img,
+          statuses: [statusId],
+          tint: statusCondition.tint,
+          origin: actor.uuid,
+          duration: foundry.utils.deepClone(statusCondition.duration || {}),
+          flags: foundry.utils.deepClone(statusCondition.flags || {}),
+        };
+
+        // Add description if it exists
+        if (statusCondition.description) {
+          effectData.description = game.i18n.localize(
+            statusCondition.description
+          );
+        }
+
+        // Add changes if they exist
+        if (statusCondition.changes) {
+          effectData.changes = foundry.utils.deepClone(statusCondition.changes);
+        }
+
+        // Link rounds to combat (NOT turns - those use custom tracking)
+        if (game.combat && effectData.duration?.rounds) {
+          effectData.duration.combat = game.combat.id;
+          effectData.duration.startRound = game.combat.round;
+          effectData.duration.startTurn = game.combat.turn;
+        }
+
+        // Set up custom turn tracking
+        if (game.combat && effectData.duration?.turns) {
+          effectData.flags.dasu = effectData.flags.dasu || {};
+          effectData.flags.dasu.remainingTurns = effectData.duration.turns;
+          effectData.flags.dasu.linkedCombat = game.combat.id;
+          // Nullify duration.turns to prevent Foundry from auto-processing
+          effectData.duration.turns = null;
+        }
+
+        console.log(
+          'DASU | Actor sheet creating stackable effect:',
+          effectData
+        );
+        await actor.addStackableEffect(effectData);
+      }
     } else {
-      // Add the status condition
-      const statusCondition = DASU_STATUS_CONDITIONS[statusId];
-      if (statusCondition) {
-        await actor.createEmbeddedDocuments('ActiveEffect', [
-          {
-            name: game.i18n.localize(statusCondition.name),
-            img: statusCondition.img,
-            statuses: [statusId],
-            tint: statusCondition.tint,
-            origin: actor.uuid,
-          },
-        ]);
+      // Handle non-stackable effects (original behavior)
+      const existingEffect = actor.effects.find(
+        (effect) => effect.statuses && effect.statuses.has(statusId)
+      );
+
+      if (existingEffect) {
+        // Remove the status condition
+        await existingEffect.delete();
+      } else {
+        // Add the status condition
+        const effectData = {
+          name: game.i18n.localize(statusCondition.name),
+          img: statusCondition.img,
+          statuses: [statusId],
+          tint: statusCondition.tint,
+          origin: actor.uuid,
+          duration: foundry.utils.deepClone(statusCondition.duration || {}),
+          flags: foundry.utils.deepClone(statusCondition.flags || {}),
+        };
+
+        // Add description if it exists
+        if (statusCondition.description) {
+          effectData.description = game.i18n.localize(
+            statusCondition.description
+          );
+        }
+
+        // Add changes if they exist
+        if (statusCondition.changes) {
+          effectData.changes = foundry.utils.deepClone(statusCondition.changes);
+        }
+
+        // Link rounds to combat (NOT turns - those use custom tracking)
+        if (game.combat && effectData.duration?.rounds) {
+          effectData.duration.combat = game.combat.id;
+          effectData.duration.startRound = game.combat.round;
+          effectData.duration.startTurn = game.combat.turn;
+        }
+
+        // Set up custom turn tracking
+        if (game.combat && effectData.duration?.turns) {
+          effectData.flags.dasu = effectData.flags.dasu || {};
+          effectData.flags.dasu.remainingTurns = effectData.duration.turns;
+          effectData.flags.dasu.linkedCombat = game.combat.id;
+          // Nullify duration.turns to prevent Foundry from auto-processing
+          effectData.duration.turns = null;
+        }
+
+        console.log(
+          'DASU | Actor sheet creating non-stackable effect:',
+          effectData
+        );
+        await actor.createEmbeddedDocuments('ActiveEffect', [effectData]);
       }
     }
   }
@@ -2164,6 +2338,16 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           }
         }
         break;
+      case 'effect':
+        const effectElement = target.closest('[data-effect-id]');
+        if (effectElement) {
+          const effectId = effectElement.dataset.effectId;
+          const effect = this.actor.effects.get(effectId);
+          if (effect) {
+            return this._sendEffectToChat(effect);
+          }
+        }
+        break;
       case 'daemon-attribute':
         // Handle daemon attribute checks
         const daemonActorId = dataset.actorId;
@@ -2264,6 +2448,89 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           type: 'daemon-card',
           daemonId: daemon.id,
           summonerId: this.actor.id,
+        },
+      },
+    };
+
+    return ChatMessage.create(chatData);
+  }
+
+  /**
+   * Send an active effect to chat as a message card
+   * @param {ActiveEffect} effect - The effect to send to chat
+   * @returns {Promise<ChatMessage>} The created chat message
+   */
+  async _sendEffectToChat(effect) {
+    // Prepare duration label using custom tracking
+    const remainingTurns = effect.flags?.dasu?.remainingTurns;
+    const remainingRounds = effect.flags?.dasu?.remainingRounds;
+    let durationLabel = effect.duration?.label || 'None';
+
+    if (remainingTurns !== undefined) {
+      const turnLabel =
+        remainingTurns === 1
+          ? game.i18n.localize('DASU.Effect.Turn')
+          : game.i18n.localize('DASU.Effect.Turns');
+      durationLabel = `${remainingTurns} ${turnLabel}`;
+    } else if (remainingRounds !== undefined) {
+      const roundLabel =
+        remainingRounds === 1
+          ? game.i18n.localize('DASU.Effect.Round')
+          : game.i18n.localize('DASU.Effect.Rounds');
+      durationLabel = `${remainingRounds} ${roundLabel}`;
+    }
+
+    // Prepare effect data with enriched description
+    const effectData = {
+      id: effect.id,
+      name: effect.name,
+      img: effect.img,
+      description:
+        await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+          effect.description || '',
+          {
+            relativeTo: effect,
+            rollData: this.actor.getRollData(),
+          }
+        ),
+      disabled: effect.disabled,
+      sourceName: effect.sourceName || effect.parent?.name || 'Unknown',
+      duration: {
+        ...effect.duration,
+        label: durationLabel,
+      },
+      specialDurationLabel: effect.flags?.dasu?.specialDuration?.label,
+      stackCount: effect.flags?.dasu?.stacks?.count,
+      changes: effect.changes.map((change) => ({
+        key: change.key,
+        mode: change.mode,
+        value: change.value,
+      })),
+    };
+
+    // Prepare template data
+    const templateData = {
+      effect: effectData,
+      timestamp: Date.now(),
+    };
+
+    // Render the effect card template
+    const content = await foundry.applications.handlebars.renderTemplate(
+      'systems/dasu/templates/chat/effect-card.hbs',
+      templateData
+    );
+
+    // Create the chat message
+    const chatData = {
+      user: game.user.id,
+      speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+      content: content,
+      style: foundry.CONST.CHAT_MESSAGE_STYLES.OTHER,
+      flags: {
+        dasu: {
+          type: 'effect-card',
+          effectId: effect.id,
+          actorId: this.actor.id,
         },
       },
     };

@@ -46,7 +46,7 @@
               </div>
             </div>
             <div class='effect-source'>{{effect.sourceName}}</div>
-            <div class='effect-duration'>{{effect.duration.label}}</div>
+            <div class='effect-duration'>{{#if effect.specialDurationLabel}}{{effect.specialDurationLabel}}{{else}}{{effect.duration.label}}{{/if}}</div>
             <div class='item-controls flexrow'>
               {{#if @root.editable}}
               <a

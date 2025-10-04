@@ -4,6 +4,9 @@
       "Actor": "DASU Actor Sheet",
       "Item": "DASU Item Sheet"
     },
+    "Sheet": {
+      "ActiveEffect": "DASU Active Effect"
+    },
     "Attributes": {
       "none": { "label": "No Attribute" },
       "pow": { "label": "Power" },
@@ -239,6 +242,7 @@
         "Anathema": "Anathema"
       },
       "StatusConditions": "Status Conditions",
+      "StatusConditionsTooltip": "Left Click: Toggle On/Off<br>Right Click: Toggle Off<br>Ctrl+Click: Open Dialog",
       "StatusActions": {
         "ClearTemporary": "Clear Temp",
         "ClearAll": "Clear All"
@@ -284,10 +288,56 @@
       "Duration": "Duration",
       "Inactive": "Inactive Effects",
       "Passive": "Passive Effects",
-      "Source": "Source",
+      "Source": "Effect Source",
+      "SourceActor": "Source Actor",
+      "SourceHint": "The actor who applied this effect. Drag and drop an actor token or sheet here.",
+      "SourcePlaceholder": "Drag an Actor here to set as source",
+      "OpenSourceActor": "Open Source Actor Sheet",
+      "NoPermissionToView": "You do not have permission to view this actor",
+      "CannotOpenSourceActor": "Cannot open source actor sheet",
+      "Targets": "Effect Target(s)",
+      "TargetsHint": "Actors that will receive this effect. Drag and drop actors or tokens here.",
+      "TargetsPlaceholder": "Target tokens or drag actors here",
       "Temporary": "Temporary Effects",
       "Toggle": "Toggle Effect",
-      "TransferredFromItem": "Transferred from Item"
+      "TransferredFromItem": "Transferred from Item",
+      "Details": "Details",
+      "Effects": "Effects",
+      "Stackable": "Effect Stackable",
+      "StackableHint": "When enabled, multiple instances of this effect can be applied simultaneously",
+      "StackId": "Stack ID",
+      "StackIdHint": "Unique identifier to group related stackable effects (e.g., 'poison-dot', 'strength-buff')",
+      "MaxStacks": "Maximum Stacks",
+      "MaxStacksHint": "Maximum number of stacks allowed (leave empty for unlimited)",
+      "CurrentStacks": "Current Stacks",
+      "CurrentStacksHint": "Number of active stacks of this effect on the actor",
+      "StackModeLabel": "Stack Aggregation Mode",
+      "StackModeHint": "How multiple stack values are combined when calculating effect totals",
+      "StackMode": {
+        "Add": "Add (Sum all stacks)",
+        "Multiply": "Multiply (Multiply values)",
+        "Max": "Maximum (Highest value only)",
+        "Min": "Minimum (Lowest value only)"
+      },
+      "ShowStackCount": "Show Stack Count Badge",
+      "ShowStackCountHint": "Display a badge with the current number of stacks on the effect icon",
+      "CombatDuration": "Combat Duration",
+      "SpecialDurationLabel": "Special Duration",
+      "SpecialDurationHint": "Special conditions for when this effect should be removed",
+      "TurnsHint": "Decrements at start of this actor's turn",
+      "RoundsHint": "Decrements at start of each round",
+      "SpecialDuration": {
+        "None": "None (Use standard duration)",
+        "RemoveOnCombatEnd": "Remove when combat ends"
+      },
+      "Turns": "Turns",
+      "Turn": "Turn",
+      "Rounds": "Rounds",
+      "Round": "Round",
+      "CombatEnd": "Combat End",
+      "Expired": "Expired",
+      "DurationExpired": "Effect expired",
+      "DurationRemaining": "Remaining"
     },
     "Filter": {
       "Afflictions": "Afflictions",

@@ -120,16 +120,15 @@ export class SharedActorComponents {
   }
 
   static prepareDerivedResources(system) {
-    // Defensive: ensure all required fields exist
-    const pow = system.attributes?.pow?.tick ?? 0;
-    const dex = system.attributes?.dex?.tick ?? 0;
-    const will = system.attributes?.will?.tick ?? 0;
-    const sta = system.attributes?.sta?.tick ?? 0;
-    const hpMod = system.stats?.hp?.mod ?? 0;
-    const wpMod = system.stats?.wp?.mod ?? 0;
-    const avoidMod = system.stats?.avoid?.mod ?? 0;
-    const defMod = system.stats?.def?.mod ?? 0;
-    const critMod = system.stats?.crit?.mod ?? 0;
+    const pow = Number(system.attributes?.pow?.tick) || 0;
+    const dex = Number(system.attributes?.dex?.tick) || 0;
+    const will = Number(system.attributes?.will?.tick) || 0;
+    const sta = Number(system.attributes?.sta?.tick) || 0;
+    const hpMod = Number(system.stats?.hp?.mod) || 0;
+    const wpMod = Number(system.stats?.wp?.mod) || 0;
+    const avoidMod = Number(system.stats?.avoid?.mod) || 0;
+    const defMod = Number(system.stats?.def?.mod) || 0;
+    const critMod = Number(system.stats?.crit?.mod) || 0;
 
     // HP: (Stamina + Power) * 10 + HP mod
     system.stats = system.stats || {};

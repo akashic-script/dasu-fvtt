@@ -1,4 +1,4 @@
-import { prepareActiveEffectCategories } from '../../utils/effects.mjs';
+import { prepareActiveEffectCategories } from '../../systems/effects/display.mjs';
 import DASU from '../../utils/config.mjs';
 import { registerHandlebarsHelpers } from '../../utils/helpers.mjs';
 registerHandlebarsHelpers();
