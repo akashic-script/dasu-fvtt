@@ -129,6 +129,11 @@ export class ResourceManagerDialog {
             <p class="hint">Add/subtract from current ${label} (${resource.current}/${resource.max})</p>
           </div>
 
+          <div class="form-group quick-set-buttons">
+            <button type="button" class="quick-set-btn" data-action="setFull">Full ${label}</button>
+            <button type="button" class="quick-set-btn" data-action="setHalf">Half ${label}</button>
+          </div>
+
           <div class="form-group">
             <label for="adjust-temp">Temp ${label} Adjustment</label>
             <input type="number" id="adjust-temp" name="adjustTemp" value="0" placeholder="e.g., 10 or -5" data-dtype="Number" />
@@ -145,11 +150,59 @@ export class ResourceManagerDialog {
       },
       content,
       classes: ['dasu', 'resource-manager-dialog'],
+      render: (_event, dialog) => {
+        // Add event handlers for quick-set buttons
+        const fullBtn = dialog.element.querySelector('[data-action="setFull"]');
+        const halfBtn = dialog.element.querySelector('[data-action="setHalf"]');
+
+        if (fullBtn) {
+          fullBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const maxValue = actor.system.stats[resourceType].max;
+
+            // Apply the adjustment directly
+            await actor.update({
+              [`system.stats.${resourceType}.current`]: maxValue,
+            });
+
+            ui.notifications.info(
+              `${actor.name} restored to full ${label} (${maxValue})`
+            );
+
+            // Re-open the dialog
+            dialog.close();
+            ResourceManagerDialog.open(actor, resourceType);
+          });
+        }
+
+        if (halfBtn) {
+          halfBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const maxValue = actor.system.stats[resourceType].max;
+            const halfValue = Math.floor(maxValue / 2);
+
+            // Apply the adjustment directly
+            await actor.update({
+              [`system.stats.${resourceType}.current`]: halfValue,
+            });
+
+            ui.notifications.info(
+              `${actor.name} set to half ${label} (${halfValue})`
+            );
+
+            // Re-open the dialog
+            dialog.close();
+            ResourceManagerDialog.open(actor, resourceType);
+          });
+        }
+      },
       buttons: [
         {
           action: 'apply',
           label: 'Apply',
-          callback: async (event, button, dialog) => {
+          callback: async (_event, _button, dialog) => {
             // Get form element from dialog
             const form = dialog.element.querySelector('form');
             if (!form) {
@@ -177,7 +230,7 @@ export class ResourceManagerDialog {
           label: 'Confirm',
           icon: 'fa-solid fa-check',
           default: true,
-          callback: async (event, button, dialog) => {
+          callback: async (_event, _button, dialog) => {
             // Get form element from dialog
             const form = dialog.element.querySelector('form');
             if (!form) {

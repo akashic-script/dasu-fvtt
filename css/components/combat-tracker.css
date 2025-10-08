@@ -8,46 +8,46 @@ li.combatant[data-disposition] {
 }
 
 /* Player Characters - Blue tint */
-li.combatant[data-disposition="1"] {
+li.combatant[data-disposition='1'] {
   background-color: rgba(76, 134, 247, 0.1);
 }
 
-li.combatant[data-disposition="1"]:hover {
+li.combatant[data-disposition='1']:hover {
   background-color: rgba(76, 134, 247, 0.15);
 }
 
 /* Friendly NPCs - Green tint */
-li.combatant[data-disposition="0"] {
+li.combatant[data-disposition='0'] {
   background-color: rgba(52, 211, 153, 0.1);
 }
 
-li.combatant[data-disposition="0"]:hover {
+li.combatant[data-disposition='0']:hover {
   background-color: rgba(52, 211, 153, 0.15);
 }
 
 /* Hostile/Enemy NPCs - Red tint */
-li.combatant[data-disposition="-1"] {
+li.combatant[data-disposition='-1'] {
   background-color: rgba(239, 68, 68, 0.1);
 }
 
-li.combatant[data-disposition="-1"]:hover {
+li.combatant[data-disposition='-1']:hover {
   background-color: rgba(239, 68, 68, 0.15);
 }
 
 /* Active Combatant - Stronger highlight */
-li.combatant.active[data-disposition="1"] {
+li.combatant.active[data-disposition='1'] {
   background-color: rgba(76, 134, 247, 0.2);
   border-left: 3px solid rgb(76, 134, 247);
   border-radius: 0;
 }
 
-li.combatant.active[data-disposition="0"] {
+li.combatant.active[data-disposition='0'] {
   background-color: rgba(52, 211, 153, 0.2);
   border-left: 3px solid rgb(52, 211, 153);
   border-radius: 0;
 }
 
-li.combatant.active[data-disposition="-1"] {
+li.combatant.active[data-disposition='-1'] {
   background-color: rgba(239, 68, 68, 0.2);
   border-left: 3px solid rgb(239, 68, 68);
   border-radius: 0;
