@@ -2676,10 +2676,46 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       return false;
     }
 
-    // Add daemon to stocks
+    // Find or create "Recruited" folder
+    let recruitedFolder = game.folders.find(
+      (f) => f.name === 'Recruited' && f.type === 'Actor'
+    );
+    if (!recruitedFolder) {
+      recruitedFolder = await Folder.create({
+        name: 'Recruited',
+        type: 'Actor',
+        parent: null,
+      });
+    }
+
+    // Clone the daemon into the Recruited folder
+    let clonedDaemon;
+    if (actor.pack) {
+      // If from compendium, create a new actor in the world
+      const actorData = actor.toObject();
+      clonedDaemon = await Actor.create({
+        ...actorData,
+        folder: recruitedFolder.id,
+        'prototypeToken.disposition': 1,
+        'prototypeToken.actorLink': true,
+      });
+    } else {
+      // If from world, clone normally
+      clonedDaemon = await actor.clone(
+        {
+          name: actor.name,
+          folder: recruitedFolder.id,
+          'prototypeToken.disposition': 1,
+          'prototypeToken.actorLink': true,
+        },
+        { save: true }
+      );
+    }
+
+    // Add cloned daemon to stocks
     const newStock = {
       references: {
-        actor: actor.id,
+        actor: clonedDaemon.id,
         isSummoned: false,
       },
     };
@@ -2687,7 +2723,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     const updatedStocks = [...stocks, newStock];
     await this.actor.update({ 'system.stocks': updatedStocks });
 
-    ui.notifications.info(`Added ${actor.name} to your stocks`);
+    ui.notifications.info(`Added ${clonedDaemon.name} to your stocks`);
 
     // Refresh the sheet to show the new daemon
     this.render(true);

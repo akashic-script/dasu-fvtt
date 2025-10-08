@@ -103,11 +103,47 @@ export class DASURecruitDialog extends foundry.applications.api.HandlebarsApplic
     }
 
     try {
-      // Add this daemon to the selected summoner's stock
+      // Find or create "Recruited" folder
+      let recruitedFolder = game.folders.find(
+        (f) => f.name === 'Recruited' && f.type === 'Actor'
+      );
+      if (!recruitedFolder) {
+        recruitedFolder = await Folder.create({
+          name: 'Recruited',
+          type: 'Actor',
+          parent: null,
+        });
+      }
+
+      // Clone the daemon into the Recruited folder
+      let clonedDaemon;
+      if (this.daemon.pack) {
+        // If from compendium, create a new actor in the world
+        const daemonData = this.daemon.toObject();
+        clonedDaemon = await Actor.create({
+          ...daemonData,
+          folder: recruitedFolder.id,
+          'prototypeToken.disposition': 1,
+          'prototypeToken.actorLink': true,
+        });
+      } else {
+        // If from world, clone normally
+        clonedDaemon = await this.daemon.clone(
+          {
+            name: this.daemon.name,
+            folder: recruitedFolder.id,
+            'prototypeToken.disposition': 1,
+            'prototypeToken.actorLink': true,
+          },
+          { save: true }
+        );
+      }
+
+      // Add the cloned daemon to the selected summoner's stock
       const currentStocks = selectedSummoner.system.stocks || [];
       const newStock = {
         references: {
-          actor: this.daemon.id,
+          actor: clonedDaemon.id,
           isSummoned: false,
         },
       };
@@ -118,7 +154,7 @@ export class DASURecruitDialog extends foundry.applications.api.HandlebarsApplic
 
       ui.notifications.info(
         game.i18n.format('DASU.Actor.Recruit.Success', {
-          daemonName: this.daemon.name,
+          daemonName: clonedDaemon.name,
           summonerName: selectedSummoner.name,
         })
       );
