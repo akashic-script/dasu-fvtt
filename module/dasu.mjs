@@ -24,6 +24,7 @@ import { DASURollDialog } from './ui/dialogs/roll-dialog.mjs';
 // Import enrichers
 import { initializeHealingEnricher } from './systems/rolling/healing/enricher.mjs';
 import { initializeDamageEnricher } from './systems/rolling/damage/enricher.mjs';
+import { initializeCostEnricher } from './systems/rolling/cost/enricher.mjs';
 // Import effects system
 import {
   initializeEffects,
@@ -375,6 +376,7 @@ Hooks.once('init', function () {
   registerEffectEnricher();
   initializeHealingEnricher();
   initializeDamageEnricher();
+  initializeCostEnricher();
 });
 
 // Initialize event handlers when ready

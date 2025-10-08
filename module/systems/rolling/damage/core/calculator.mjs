@@ -47,20 +47,35 @@ export class DamageCalculator {
     // Get attribute tick - prioritize modifier override (dialog selection) over item's govern field
     // If govern is null, empty string, or 'none', don't add attribute tick
     const governField = sourceItem?.system?.govern;
-    const attributeTick =
-      modifiers.attributeTick ||
-      (governField !== null && governField !== '' && governField !== 'none'
-        ? governField
-        : null) ||
-      'pow';
 
-    // Check if we should skip attribute tick (for enrichers with null/empty govern, or 'none' selection)
+    // Check if modifiers explicitly set attributeTick (including empty string)
+    const hasExplicitAttributeTick = 'attributeTick' in modifiers;
+
+    let attributeTick;
+    if (hasExplicitAttributeTick) {
+      // Use the explicit value from modifiers (could be null, '', or a value)
+      attributeTick = modifiers.attributeTick;
+    } else if (
+      governField !== null &&
+      governField !== '' &&
+      governField !== 'none'
+    ) {
+      // Use item's govern field if valid
+      attributeTick = governField;
+    } else {
+      // Default fallback
+      attributeTick = 'pow';
+    }
+
+    // Check if we should skip attribute tick
     const shouldSkipAttributeTick =
-      governField === null || governField === '' || governField === 'none';
+      attributeTick === null ||
+      attributeTick === '' ||
+      attributeTick === 'none';
 
     // Safely get tick value with fallback
     let tickValue = 0;
-    if (!shouldSkipAttributeTick && attributeTick && attributeTick !== 'none') {
+    if (!shouldSkipAttributeTick) {
       tickValue = 1; // Default tick value
       if (sourceActor.system?.attributes?.[attributeTick]?.tick) {
         tickValue = sourceActor.system.attributes[attributeTick].tick;

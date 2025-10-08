@@ -588,6 +588,48 @@ async function onUndoHealingClick(event, button) {
 }
 
 /**
+ * Handle undo cost button clicks (restore resources after cost was paid)
+ * @param {Event} event - The click event
+ * @param {HTMLElement} button - The button that was clicked
+ * @private
+ */
+async function onUndoCostClick(event, button) {
+  event.preventDefault();
+
+  const targetId = button.dataset.targetId;
+  const amount = parseInt(button.dataset.amount);
+  const resource = button.dataset.resource;
+
+  if (!amount || amount <= 0) {
+    ui.notifications.warn('No cost to undo');
+    return;
+  }
+
+  try {
+    const targetActor = _findTargetActor(targetId);
+    if (!targetActor) {
+      ui.notifications.error('Target actor not found');
+      return;
+    }
+
+    // Reverse the cost by applying healing
+    await targetActor.applyHealing(amount, resource, {
+      suppressChat: true,
+    });
+
+    ui.notifications.info(
+      `Restored ${amount} ${resource.toUpperCase()} for ${targetActor.name}`
+    );
+
+    // Disable the undo button after use
+    button.disabled = true;
+    button.classList.add('disabled-button');
+  } catch (error) {
+    ui.notifications.error(`Failed to undo cost: ${error.message}`);
+  }
+}
+
+/**
  * Handle redo healing button clicks
  * Reapplies healing that was undone
  * @param {Event} event - The click event
@@ -776,6 +818,9 @@ function _handleHealingButtonClick(event) {
       break;
     case 'undoHealing':
       onUndoHealingClick(event, button);
+      break;
+    case 'undoCost':
+      onUndoCostClick(event, button);
       break;
     case 'redoHealing':
       onRedoHealingClick(event, button);

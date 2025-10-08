@@ -22,6 +22,7 @@
 @import 'components/damage-messages.css';
 @import 'components/damage-results.css';
 @import 'components/healing-messages.css';
+@import 'components/cost-messages.css';
 @import 'components/token-hud-effects.css';
 @import 'applications/leveling-wizard.css';
 @import 'applications/recruit-dialog.css';
@@ -29,6 +30,7 @@
 @import 'dialogs/shared-edit-dialog.css';
 @import 'dialogs/resource-manager-dialog.css';
 @import 'dialogs/status-effect-dialog.css';
+@import 'dialogs/cost-edit-dialog.css';
 @import 'item-sheet-consistency.css';
 @import 'chat/shared-components.css';
 @import 'chat/initiative-card.css';

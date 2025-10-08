@@ -12,6 +12,9 @@
  * - [[/effect effectId down]] - Remove stack (stackable effects)
  * - [[/effect effectId + 3t]] - Add stack with 3 turns
  * - [[/effect effectId -]] - Remove stack (shorthand)
+ * - [[/effect bleeding 5t & infected 3t]] - Multiple effects with & separator
+ * - [[/effect bleeding + 3t & infected + 2t]] - Multiple stackable effects
+ * - [[/effect prompt]] - Opens dialog to customize effect before applying
  *
  * States: on, off, toggle, up (+), down (-)
  * Durations: Nt (turns), Nr (rounds), combat-end (ce)
@@ -27,13 +30,18 @@
  * [[/effect burning combat-end]]
  * [[/effect bleeding up]]
  * [[/effect bleeding + 2r]]
+ * [[/effect bleeding 5t & infected 3t]]
+ * [[/effect bleeding + 3t & infected + 2t]]
+ * [[/effect prompt]]
  */
 /* global canvas */
 import {
   createEnricherLink,
+  createEnricherContainer,
   createEnricherInitializer,
   getTargets,
   getControlledTokens,
+  parseMultipleInstances,
   validateEnricherValue,
   wrapEnricher,
   getSourceActor,
@@ -83,14 +91,35 @@ function _parseDuration(str) {
 }
 
 /**
- * Parse effect enricher match
+ * Parse a single effect instance from text
  *
- * @param {RegExpMatchArray} match - Regex match result
- * @returns {Object} Parsed effect data
+ * @param {string} instanceText - Text for a single effect instance
+ * @returns {Object|null} Parsed effect data or null if invalid
  * @private
  */
-function _parseEffectEnricher(match) {
-  const [, effectId, stateOrDuration = 'toggle', optionalDuration] = match;
+function _parseEffectInstance(instanceText) {
+  // Parse the instance text using a simple pattern: effectId [stateOrDuration] [optionalDuration]
+  const tokens = instanceText.trim().split(/\s+/);
+
+  if (tokens.length === 0) {
+    return null;
+  }
+
+  const effectId = tokens[0];
+
+  // Check for prompt mode
+  if (effectId.toLowerCase() === 'prompt') {
+    return {
+      isPrompt: true,
+      effectId: 'prompt',
+      state: 'toggle',
+      duration: null,
+      effect: null,
+    };
+  }
+
+  const stateOrDuration = tokens[1] || 'toggle';
+  const optionalDuration = tokens[2];
 
   // Validate effect exists in status conditions
   const effect = Object.values(CONFIG.DASU_STATUS_CONDITIONS || {}).find(
@@ -140,6 +169,31 @@ function _parseEffectEnricher(match) {
 }
 
 /**
+ * Parse effect enricher match (supports multiple instances with &)
+ *
+ * @param {RegExpMatchArray} match - Regex match result
+ * @returns {Array<Object>|null} Array of parsed effect data or null if all invalid
+ * @private
+ */
+function _parseEffectEnricher(match) {
+  const content = match[1].trim();
+
+  // Split by & for multiple effect instances
+  const instanceTexts = parseMultipleInstances(content);
+
+  const effectInstances = instanceTexts
+    .map((text) => _parseEffectInstance(text))
+    .filter((instance) => instance !== null);
+
+  if (effectInstances.length === 0) {
+    console.warn('No valid effect instances found in enricher:', match[0]);
+    return null;
+  }
+
+  return effectInstances;
+}
+
+/**
  * Create effect enricher link element
  *
  * @param {Object} effectData - Parsed effect data
@@ -147,7 +201,22 @@ function _parseEffectEnricher(match) {
  * @private
  */
 function _createEffectLink(effectData) {
-  const { effectId, state, duration, effect } = effectData;
+  const { effectId, state, duration, effect, isPrompt } = effectData;
+
+  // Handle prompt mode
+  if (isPrompt) {
+    return createEnricherLink({
+      cssClass: 'effect-link effect-prompt',
+      iconClass: 'fa-edit',
+      labelText: 'Status Effect',
+      tooltip: 'Open dialog to select and apply status effect',
+      dataset: {
+        effectId: 'prompt',
+        state: 'toggle',
+        isPrompt: 'true',
+      },
+    });
+  }
 
   const effectName = game.i18n.localize(effect.name || effect.label);
 
@@ -443,10 +512,17 @@ async function _onEffectLinkClick(event) {
   const duration = link.dataset.duration
     ? JSON.parse(link.dataset.duration)
     : null;
+  const isPrompt = link.dataset.isPrompt === 'true';
 
-  // Check for Ctrl+Click to open dialog
-  if (event.ctrlKey || event.metaKey) {
-    await _openEffectDialog(effectId, state, duration, link);
+  // Check for prompt mode or Ctrl+Click to open dialog
+  if (isPrompt || event.ctrlKey || event.metaKey) {
+    await _openEffectDialog(
+      isPrompt ? null : effectId,
+      state,
+      duration,
+      link,
+      isPrompt
+    );
     return;
   }
 
@@ -505,21 +581,31 @@ async function _onEffectLinkClick(event) {
 /**
  * Open status effect dialog with prepopulated fields
  *
- * @param {string} effectId - Effect ID
+ * @param {string|null} effectId - Effect ID (null for prompt mode)
  * @param {string} state - State (toggle, on, off, up, down)
  * @param {Object|null} duration - Duration data
  * @param {HTMLElement} link - The enricher link element
+ * @param {boolean} isPrompt - True if called from prompt mode
  * @private
  */
-async function _openEffectDialog(effectId, state, duration, link) {
-  // Get the effect configuration
-  const effect = Object.values(CONFIG.DASU_STATUS_CONDITIONS || {}).find(
-    (condition) => condition.id === effectId
-  );
+async function _openEffectDialog(
+  effectId,
+  state,
+  duration,
+  link,
+  isPrompt = false
+) {
+  // Get the effect configuration if not in prompt mode
+  let effect = null;
+  if (effectId && !isPrompt) {
+    effect = Object.values(CONFIG.DASU_STATUS_CONDITIONS || {}).find(
+      (condition) => condition.id === effectId
+    );
 
-  if (!effect) {
-    console.warn(`Unknown effect ID: ${effectId}`);
-    return;
+    if (!effect) {
+      console.warn(`Unknown effect ID: ${effectId}`);
+      return;
+    }
   }
 
   // Determine source actor from context
@@ -659,10 +745,20 @@ async function _onEffectLinkContextMenu(event) {
  * @returns {Promise<HTMLElement|null>} Enriched element or null
  */
 async function enrichEffectMatch(match, options) {
-  const effectData = _parseEffectEnricher(match);
-  if (!effectData) return null;
+  const effectInstances = _parseEffectEnricher(match);
+  if (!effectInstances) return null;
 
-  return _createEffectLink(effectData);
+  // If only one instance, return single link
+  if (effectInstances.length === 1) {
+    return _createEffectLink(effectInstances[0]);
+  }
+
+  // Multiple instances: create links and wrap in container
+  const links = effectInstances.map((effectData) =>
+    _createEffectLink(effectData)
+  );
+
+  return createEnricherContainer('dasu-effect-enricher', links);
 }
 
 /**
@@ -671,8 +767,7 @@ async function enrichEffectMatch(match, options) {
  */
 export const registerEffectEnricher = createEnricherInitializer({
   name: 'Effect',
-  pattern:
-    /\[\[\/effect\s+([^\s\]]+)(?:\s+([^\s\]]+))?(?:\s+([^\s\]]+))?\]\]/gi,
+  pattern: /\[\[\/effect\s+([^\]]+)\]\]/gi,
   enricher: wrapEnricher(enrichEffectMatch, 'effect'),
   selector: '.effect-link',
   clickHandler: _onEffectLinkClick,

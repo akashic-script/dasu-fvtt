@@ -8,6 +8,11 @@
  * [[/heal formula [resource]]]
  * [[/healing formula [resource]]]
  * [[/heal formula resource & formula resource]] - Multiple instances
+ * [[/heal prompt]] - Opens dialog to customize healing before applying
+ *
+ * Modifier Keys:
+ * - Left-click: Apply immediately
+ * - Ctrl+Click: Open dialog with prepopulated fields
  *
  * @example
  * [[/heal 2d6]] - Roll 2d6 healing (defaults to HP)
@@ -18,12 +23,14 @@
  * [[/heal @target.will wp]] - Restore WP equal to target's WILL tick
  * [[/heal 2d6 both]] - Roll 2d6 to restore both HP and WP
  * [[/heal 1d6 hp & 1d4 wp]] - Multiple healing instances
+ * [[/heal prompt]] - Opens dialog to customize healing before applying
  *
  * Healing Formula:
  * Final Healing = Base Healing + Governing Attribute Tick
  * Critical healing doubles the final amount.
  */
 /* global canvas, CONST */
+import { HealingEditDialog } from '../../../ui/dialogs/healing-edit-dialog.mjs';
 import {
   getSourceActor,
   parseMultipleInstances,
@@ -125,6 +132,36 @@ function _parseHealingInstance(instanceText) {
     return null;
   }
 
+  // Check for prompt mode with optional parameters: [[/heal prompt 5 hp]]
+  if (tokens[0].toLowerCase() === 'prompt') {
+    // If only "prompt", use defaults
+    if (tokens.length === 1) {
+      return {
+        isPrompt: true,
+        formula: '0',
+        resourceTarget: 'hp',
+        isTemp: false,
+      };
+    }
+
+    // Parse the rest as normal healing parameters
+    const formula = tokens[1];
+    const resourceTarget = validateEnricherValue(
+      tokens[2],
+      RESOURCE_TARGETS,
+      'hp',
+      'Invalid healing resource target:'
+    );
+    const isTemp = tokens[3] && tokens[3].toLowerCase() === 'temp';
+
+    return {
+      isPrompt: true,
+      formula,
+      resourceTarget,
+      isTemp,
+    };
+  }
+
   const formula = tokens[0];
   const resourceTarget = validateEnricherValue(
     tokens[1],
@@ -202,7 +239,28 @@ function _generateHealingLabel(instance) {
  * @private
  */
 function _createHealingInstanceLink(instance, customLabel, sourceActorUuid) {
-  const { formula, resourceTarget, isTemp } = instance;
+  const { formula, resourceTarget, isTemp, isPrompt } = instance;
+
+  // Handle prompt mode
+  if (isPrompt) {
+    return createEnricherLink({
+      cssClass: 'dasu-healing-link healing-prompt',
+      iconClass: 'fa-edit',
+      labelText:
+        customLabel ||
+        (formula !== '0'
+          ? `Healing: ${formula} ${resourceTarget.toUpperCase()}`
+          : 'Healing'),
+      tooltip: 'Open dialog to customize healing before applying',
+      dataset: {
+        formula: formula || '0',
+        resourceTarget: resourceTarget || 'hp',
+        isTemp: isTemp ? 'true' : 'false',
+        isPrompt: 'true',
+        sourceActorUuid: sourceActorUuid || '',
+      },
+    });
+  }
 
   const labelText = customLabel || _generateHealingLabel(instance);
   const healType = isTemp ? 'Grant temporary' : 'Heal';
@@ -421,6 +479,70 @@ async function _applyTempHP(
 }
 
 /**
+ * Open healing edit dialog for customizing healing before applying
+ *
+ * @param {Actor} sourceActor - Source actor
+ * @param {string} formula - Healing formula
+ * @param {string} resourceTarget - Resource target (hp, wp, both)
+ * @param {HTMLElement} link - The enricher link element
+ * @private
+ */
+async function _openHealingDialog(sourceActor, formula, resourceTarget, link) {
+  // Get targets
+  const targets = getTargets();
+  let healTargets = targets;
+
+  // If no targets, apply to self
+  if (healTargets.length === 0) {
+    const selfToken = sourceActor.getActiveTokens()[0];
+    healTargets = selfToken
+      ? [selfToken]
+      : [{ actor: sourceActor, id: 'actor-only' }];
+  }
+
+  // Parse and evaluate formula for each target
+  for (const target of healTargets) {
+    const targetActor = target.actor;
+    if (!targetActor) continue;
+
+    // Parse attribute references and stacks
+    let parsedFormula = _parseAttributeReferences(
+      formula,
+      sourceActor,
+      targetActor
+    );
+    parsedFormula = _parseStackModifiers(
+      parsedFormula,
+      sourceActor,
+      targetActor
+    );
+
+    // Evaluate the formula
+    const rollData = sourceActor.getRollData();
+    const roll = new Roll(parsedFormula, rollData);
+    await roll.evaluate();
+
+    const baseHealing = roll.total;
+
+    // Get token ID for unlinked tokens
+    const tokenId = target.id !== 'actor-only' ? target.id : null;
+
+    // Open dialog for this target
+    await HealingEditDialog.create({
+      targetActor,
+      tokenId,
+      sourceActor,
+      sourceItem: null,
+      originalHealing: baseHealing,
+      originalResourceTarget: resourceTarget,
+      govern: resourceTarget === 'wp' ? 'will' : 'pow',
+      healMod: 0,
+      healType: resourceTarget,
+    });
+  }
+}
+
+/**
  * Handle healing link clicks
  *
  * @param {Event} event - Click event
@@ -434,6 +556,7 @@ async function _onHealingLinkClick(event) {
   const resourceTarget = link.dataset.resourceTarget;
   const isTemp = link.dataset.isTemp === 'true';
   const sourceActorUuid = link.dataset.sourceActorUuid;
+  const isPrompt = link.dataset.isPrompt === 'true';
 
   // Try to get source actor from stored UUID first
   let sourceActor = sourceActorUuid ? await fromUuid(sourceActorUuid) : null;
@@ -447,6 +570,12 @@ async function _onHealingLinkClick(event) {
     ui.notifications.warn(
       'No source actor found for healing. Select a token to set the source actor, then target tokens to apply healing.'
     );
+    return;
+  }
+
+  // Check for prompt mode or Ctrl+Click to open dialog (not for temp HP)
+  if ((isPrompt || event.ctrlKey || event.metaKey) && !isTemp) {
+    await _openHealingDialog(sourceActor, formula, resourceTarget, link);
     return;
   }
 

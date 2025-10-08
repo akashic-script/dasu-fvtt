@@ -1,0 +1,87 @@
+<form class="cost-edit-form">
+  <div class="form-header">
+    <h3>Cost Payment: {{targetActor.name}}</h3>
+    <div class="current-status">
+      {{#if isGM}}
+        <span class="status-item">HP: {{currentHp}}/{{maxHp}}</span>
+        <span class="status-item">WP: {{currentWp}}/{{maxWp}}</span>
+      {{else}}
+        <span class="status-item">HP: XX/XX</span>
+        <span class="status-item">WP: XX/XX</span>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="form-body">
+    <div class="form-section">
+      <h4>Cost Source</h4>
+      <div class="source-info">
+        <span class="source-actor">{{sourceActor.name}}</span>
+        {{#if sourceItem}}
+          <span class="source-item">using {{sourceItem.name}}</span>
+        {{/if}}
+        <span class="original-cost">Original Cost: {{originalCost}}</span>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h4>Cost Configuration</h4>
+      <div class="form-columns">
+        <div class="form-column">
+          <div class="form-group">
+            <label for="costMod" data-tooltip="Adjust the cost amount (positive increases cost, negative decreases)">Cost Modifier</label>
+            <input type="number" name="costMod" id="costMod" value="{{costData.costMod}}" min="-20" max="20" step="1">
+          </div>
+
+          <div class="form-group">
+            <label for="costType">Resource Type</label>
+            <select name="costType" id="costType">
+              {{#each costTypeOptions}}
+                <option value="{{value}}" {{#if (eq value ../costData.costType)}}selected{{/if}}>
+                  {{label}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section preview-section">
+      <h4>Preview</h4>
+      <div class="cost-preview">
+        {{#if previewCost}}
+          <div class="preview-breakdown">
+            <div class="preview-line">
+              <span class="preview-label">Base Cost:</span>
+              <span class="preview-value">{{previewCost.baseCost}}</span>
+            </div>
+            {{#unless (eq previewCost.costMod 0)}}
+              <div class="preview-line">
+                <span class="preview-label">Modifier:</span>
+                <span class="preview-value">{{#if (gt previewCost.costMod 0)}}+{{/if}}{{previewCost.costMod}}</span>
+              </div>
+            {{/unless}}
+            <div class="preview-line preview-total">
+              <span class="preview-label">Final Cost:</span>
+              <span class="preview-value cost-amount">{{previewCost.finalCost}}</span>
+            </div>
+            <hr class="preview-divider">
+            {{#if (or (eq previewCost.costType "hp") (eq previewCost.costType "both"))}}
+              <div class="preview-line">
+                <span class="preview-label">HP:</span>
+                <span class="preview-value">{{previewCost.currentHp}} → {{previewCost.newHp}} <span class="cost-change">(-{{previewCost.hpPaid}})</span></span>
+              </div>
+            {{/if}}
+            {{#if (or (eq previewCost.costType "wp") (eq previewCost.costType "both"))}}
+              <div class="preview-line">
+                <span class="preview-label">WP:</span>
+                <span class="preview-value">{{previewCost.currentWp}} → {{previewCost.newWp}} <span class="cost-change">(-{{previewCost.wpPaid}})</span></span>
+              </div>
+            {{/if}}
+          </div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</form>

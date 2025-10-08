@@ -7,6 +7,11 @@
  * Syntax:
  * [[/damage formula [type] [resource]]]
  * [[/damage formula type resource & formula type resource]] - Multiple instances
+ * [[/damage prompt]] - Opens dialog to customize damage before applying
+ *
+ * Modifier Keys:
+ * - Left-click: Apply immediately
+ * - Ctrl+Click: Open dialog with prepopulated fields
  *
  * @example
  * [[/damage 2d6]] - Roll 2d6 damage (defaults to physical, HP)
@@ -17,6 +22,7 @@
  * [[/damage @target.dex ice]] - Deal ice damage equal to target's DEX tick
  * [[/damage 2d6 fire hp]] - Roll 2d6 fire damage explicitly to HP
  * [[/damage 1d6 fire hp & 1d4 dark wp]] - Multiple damage instances
+ * [[/damage prompt]] - Opens dialog to customize damage before applying
  *
  * Damage Formula:
  * Base Damage from formula, modified by resistances:
@@ -29,6 +35,7 @@
  */
 
 import { Damage } from './index.mjs';
+import { DamageEditDialog } from '../../../ui/dialogs/damage-edit-dialog.mjs';
 import {
   getSourceActor,
   parseMultipleInstances,
@@ -142,6 +149,44 @@ function _parseDamageInstance(instanceText) {
 
   if (tokens.length === 0) {
     return null;
+  }
+
+  // Check for prompt mode with optional parameters: [[/damage prompt 5 fire]]
+  if (tokens[0].toLowerCase() === 'prompt') {
+    // If only "prompt", use defaults
+    if (tokens.length === 1) {
+      return {
+        isPrompt: true,
+        formula: '0',
+        damageType: 'physical',
+        resourceTarget: 'hp',
+      };
+    }
+
+    // Parse the rest as normal damage parameters
+    const formula = tokens[1];
+    let damageType = 'physical';
+    let resourceTarget = 'hp';
+
+    // Check if token 2 is a damage type
+    if (tokens[2] && DAMAGE_TYPES.includes(tokens[2].toLowerCase())) {
+      damageType = tokens[2].toLowerCase();
+      // Check if token 3 is a resource target
+      if (tokens[3] && RESOURCE_TARGETS.includes(tokens[3].toLowerCase())) {
+        resourceTarget = tokens[3].toLowerCase();
+      }
+    }
+    // Check if token 2 is a resource target
+    else if (tokens[2] && RESOURCE_TARGETS.includes(tokens[2].toLowerCase())) {
+      resourceTarget = tokens[2].toLowerCase();
+    }
+
+    return {
+      isPrompt: true,
+      formula,
+      damageType,
+      resourceTarget,
+    };
   }
 
   // Find where the formula ends by looking for damage type or resource keywords
@@ -271,7 +316,26 @@ function _createDamageInstanceLink(
   sourceActorUuid,
   sourceActor
 ) {
-  const { formula, damageType, resourceTarget } = instance;
+  const { formula, damageType, resourceTarget, isPrompt } = instance;
+
+  // Handle prompt mode
+  if (isPrompt) {
+    return createEnricherLink({
+      cssClass: 'dasu-damage-link damage-prompt',
+      iconClass: 'fa-edit',
+      labelText:
+        customLabel ||
+        (formula !== '0' ? `Damage: ${formula} ${damageType}` : 'Damage'),
+      tooltip: 'Open dialog to customize damage before applying',
+      dataset: {
+        formula: formula || '0',
+        damageType: damageType || 'physical',
+        resourceTarget: resourceTarget || 'hp',
+        isPrompt: 'true',
+        sourceActorUuid: sourceActorUuid || '',
+      },
+    });
+  }
 
   let displayFormula = formula;
   let labelText = customLabel || _generateDamageLabel(instance);
@@ -352,6 +416,85 @@ function _createDamageLinks(damageData, sourceActorUuid, sourceActor) {
 }
 
 /**
+ * Open damage edit dialog for customizing damage before applying
+ *
+ * @param {Actor} sourceActor - Source actor
+ * @param {string} formula - Damage formula
+ * @param {string} damageType - Damage type
+ * @param {string} resourceTarget - Resource target (hp, wp, both)
+ * @param {HTMLElement} link - The enricher link element
+ * @private
+ */
+async function _openDamageDialog(
+  sourceActor,
+  formula,
+  damageType,
+  resourceTarget,
+  link
+) {
+  // Get targets
+  const targets = getTargets();
+
+  if (targets.length === 0) {
+    ui.notifications.warn(
+      'No targets selected. Please select targets to customize damage.'
+    );
+    return;
+  }
+
+  // Parse and evaluate formula for each target
+  for (const target of targets) {
+    const targetActor = target.actor;
+    if (!targetActor) continue;
+
+    // Parse attribute references and stacks
+    let parsedFormula = _parseAttributeReferences(
+      formula,
+      sourceActor,
+      targetActor
+    );
+    parsedFormula = _parseStackModifiers(
+      parsedFormula,
+      sourceActor,
+      targetActor
+    );
+
+    // Evaluate the formula
+    const rollData = sourceActor.getRollData();
+    const roll = new Roll(parsedFormula, rollData);
+    await roll.evaluate();
+
+    const baseDamage = roll.total;
+
+    // Create mock item with rolled damage value and govern: null to prevent attribute tick addition
+    const mockItem = {
+      name: 'Enricher Damage',
+      system: {
+        damage: { value: baseDamage },
+        govern: null, // Prevents attribute tick from being added to damage
+      },
+    };
+
+    // Open dialog for this target
+    await DamageEditDialog.create({
+      targetActor,
+      tokenId: target.id,
+      sourceActor,
+      sourceItem: mockItem,
+      originalDamage: baseDamage,
+      originalResourceTarget: resourceTarget,
+      damageType,
+      govern: null, // Enricher damage doesn't add attribute tick
+      damageMod: 0,
+      ignoreResist: false,
+      ignoreWeak: false,
+      ignoreNullify: false,
+      ignoreDrain: false,
+    });
+  }
+}
+
+/**
  * Handle damage link clicks
  *
  * @param {Event} event - Click event
@@ -365,6 +508,7 @@ async function _onDamageLinkClick(event) {
   const damageType = link.dataset.damageType;
   const resourceTarget = link.dataset.resourceTarget;
   const sourceActorUuid = link.dataset.sourceActorUuid;
+  const isPrompt = link.dataset.isPrompt === 'true';
 
   // Try to get source actor from stored UUID first
   let sourceActor = sourceActorUuid ? await fromUuid(sourceActorUuid) : null;
@@ -382,6 +526,18 @@ async function _onDamageLinkClick(event) {
   if (!sourceActor) {
     ui.notifications.warn(
       'No source actor found for damage. Select a token to set the source actor, then target tokens to apply damage.'
+    );
+    return;
+  }
+
+  // Check for prompt mode or Ctrl+Click to open dialog
+  if (isPrompt || event.ctrlKey || event.metaKey) {
+    await _openDamageDialog(
+      sourceActor,
+      formula,
+      damageType,
+      resourceTarget,
+      link
     );
     return;
   }

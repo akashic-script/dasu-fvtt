@@ -173,7 +173,8 @@ export class HealingEditDialog {
             sourceItem,
             originalHealing,
             healingData,
-            originalMessageId
+            originalMessageId,
+            originalResourceTarget
           );
         }
         return { applied: false };
@@ -308,6 +309,7 @@ export class HealingEditDialog {
    * @param {number} originalHealing - Original healing amount
    * @param {Object} healingData - Original healing data
    * @param {string} originalMessageId - ID of original healing message to update
+   * @param {string} originalResourceTarget - Original resource target (hp, wp, both)
    * @returns {Promise<Object>} Submit result
    * @private
    */
@@ -318,7 +320,8 @@ export class HealingEditDialog {
     sourceItem,
     originalHealing,
     healingData,
-    originalMessageId
+    originalMessageId,
+    originalResourceTarget
   ) {
     try {
       const formData = result.formData;
@@ -337,7 +340,12 @@ export class HealingEditDialog {
       // Calculate the difference to apply
       const healingDifference = newHealingAmount - originalHealing;
 
-      if (healingDifference !== 0) {
+      // Check if there are any changes (amount or resource type)
+      const resourceTypeChanged =
+        newHealingData.healType !== originalResourceTarget;
+      const hasChanges = healingDifference !== 0 || resourceTypeChanged;
+
+      if (hasChanges) {
         // Apply the healing difference
         if (healingDifference > 0) {
           // Apply additional healing

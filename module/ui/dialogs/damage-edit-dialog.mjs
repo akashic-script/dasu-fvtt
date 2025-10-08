@@ -20,13 +20,15 @@ export class DamageEditDialog {
     const originalMessageId = options.originalMessageId || null;
 
     // Default damage data
+    // Check if govern was explicitly passed (including null)
+    const hasExplicitGovern = 'govern' in options;
     const damageData = {
       damageType: options.damageType || 'physical',
-      govern:
-        options.govern ||
-        options.attributeTick ||
-        sourceItem?.system?.govern ||
-        'pow',
+      govern: hasExplicitGovern
+        ? options.govern === null
+          ? ''
+          : options.govern
+        : options.attributeTick || sourceItem?.system?.govern || 'pow',
       damageMod: options.damageMod || 0,
       ignoreResist: options.ignoreResist || false,
       ignoreWeak: options.ignoreWeak || false,

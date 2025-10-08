@@ -42,7 +42,7 @@
           <div class="form-group">
             <label for="govern" data-tooltip="{{localize "DASU.Damage.EditDialog.AttributeTickHint"}}">{{localize "DASU.Damage.EditDialog.GoverningAttribute"}}</label>
             <select name="govern" id="govern">
-              <option value="">{{localize "DASU.Damage.EditDialog.NoGoverningAttribute"}}</option>
+              <option value="">{{localize "DASU.Attributes.none.label"}}</option>
               {{#each attributeOptions}}
                 <option value="{{value}}" {{#if (eq value ../damageData.govern)}}selected{{/if}}>
                   {{label}}
