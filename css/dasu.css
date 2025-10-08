@@ -24,6 +24,7 @@
 @import 'components/healing-messages.css';
 @import 'components/cost-messages.css';
 @import 'components/token-hud-effects.css';
+@import 'components/combat-tracker.css';
 @import 'applications/leveling-wizard.css';
 @import 'applications/recruit-dialog.css';
 @import 'applications/combat-dialog.css';

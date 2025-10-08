@@ -31,6 +31,8 @@ import {
   initializeTokenHudEffects,
   registerEffectEnricher,
 } from './systems/effects/index.mjs';
+// Import combat tracker enhancements
+import { initializeCombatTracker } from './core/combat-tracker.mjs';
 
 const collections = foundry.documents.collections;
 const sheets = foundry.appv1.sheets;
@@ -383,6 +385,9 @@ Hooks.once('init', function () {
 Hooks.once('ready', function () {
   // Initialize effects system
   initializeEffects();
+
+  // Initialize combat tracker enhancements
+  initializeCombatTracker();
 
   // Import and initialize healing event handlers
   import('./systems/rolling/healing/event-handlers.mjs').then((module) => {
