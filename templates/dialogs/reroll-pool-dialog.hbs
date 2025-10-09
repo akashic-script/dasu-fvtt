@@ -1,0 +1,30 @@
+<form class="reroll-form">
+  <div class="form-section">
+    <h4>{{localize "DASU.Reroll.Dialog.CurrentRoll"}}</h4>
+    <div class="dice-container pool">
+      {{#each rollResults}}
+        <div class="die {{#if (gte this 4)}}success{{/if}}">{{this}}</div>
+      {{/each}}
+    </div>
+    <div class="pool-summary">
+      <div class="successes">
+        <span class="label">{{localize "DASU.Reroll.Dialog.Successes"}}:</span>
+        <span class="value">{{successCount}}</span>
+      </div>
+      {{#if isCritical}}
+        <div class="critical-badge">{{localize "DASU.Reroll.Dialog.Critical"}}</div>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="form-section pool-info">
+    <div class="info-row">
+      <span class="label">{{localize "DASU.Reroll.Dialog.TotalDice"}}:</span>
+      <span class="value">{{totalDice}}</span>
+    </div>
+    <div class="info-row">
+      <span class="label">{{localize "DASU.Reroll.Dialog.CritThreshold"}}:</span>
+      <span class="value">{{critThreshold}}</span>
+    </div>
+  </div>
+</form>

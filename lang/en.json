@@ -768,7 +768,30 @@
       }
     },
     "ContextMenu": {
-      "Retarget": "Retarget"
+      "Retarget": "Retarget",
+      "Reroll": "Reroll"
+    },
+    "Reroll": {
+      "Dialog": {
+        "Title": "Reroll Check",
+        "CurrentRoll": "Current Roll Results",
+        "RerollOptions": "Reroll Options",
+        "RerollDie1": "Reroll Die 1",
+        "RerollDie2": "Reroll Die 2",
+        "RerollDie3": "Reroll Die 3",
+        "RerollAll": "Reroll All Dice",
+        "AdjustModifier": "Adjust Modifier",
+        "NewModifier": "New Modifier",
+        "AdvantageState": "Advantage State",
+        "Normal": "Normal",
+        "Advantage": "Advantage",
+        "Disadvantage": "Disadvantage",
+        "Reroll": "Reroll",
+        "Successes": "Successes",
+        "Critical": "CRITICAL",
+        "TotalDice": "Total Dice",
+        "CritThreshold": "Crit Threshold"
+      }
     },
     "Traits": {
       "Rank": "Rank:",

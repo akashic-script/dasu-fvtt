@@ -32,6 +32,7 @@
 @import 'dialogs/resource-manager-dialog.css';
 @import 'dialogs/status-effect-dialog.css';
 @import 'dialogs/cost-edit-dialog.css';
+@import 'dialogs/reroll-dialog.css';
 @import 'item-sheet-consistency.css';
 @import 'chat/shared-components.css';
 @import 'chat/initiative-card.css';

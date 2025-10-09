@@ -1,0 +1,76 @@
+<form class="reroll-form">
+  <div class="form-section">
+    <h4>{{localize "DASU.Reroll.Dialog.CurrentRoll"}}</h4>
+    <div class="dice-container">
+      {{#each rollResults}}
+        <div class="die">{{this}}</div>
+      {{/each}}
+      {{#if (ne currentMod 0)}}
+        <div class="modifier">
+          <span class="{{#if (gt currentMod 0)}}bonus{{else}}penalty{{/if}}">{{#if (gt currentMod 0)}}+{{/if}}{{currentMod}}</span>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h4>{{localize "DASU.Reroll.Dialog.RerollOptions"}}</h4>
+    <div class="reroll-checkboxes">
+      {{#if hasDie1}}
+        <label class="reroll-option">
+          <input type="checkbox" name="reroll-die1" data-die-index="0">
+          <span class="die-checkbox">{{lookup rollResults 0}}</span>
+          <span class="reroll-label">{{localize "DASU.Reroll.Dialog.RerollDie1"}}</span>
+        </label>
+      {{/if}}
+      {{#if hasDie2}}
+        <label class="reroll-option">
+          <input type="checkbox" name="reroll-die2" data-die-index="1">
+          <span class="die-checkbox">{{lookup rollResults 1}}</span>
+          <span class="reroll-label">{{localize "DASU.Reroll.Dialog.RerollDie2"}}</span>
+        </label>
+      {{/if}}
+      {{#if hasDie3}}
+        <label class="reroll-option">
+          <input type="checkbox" name="reroll-die3" data-die-index="2">
+          <span class="die-checkbox">{{lookup rollResults 2}}</span>
+          <span class="reroll-label">{{localize "DASU.Reroll.Dialog.RerollDie3"}}</span>
+        </label>
+      {{/if}}
+      <label class="reroll-option">
+        <input type="checkbox" name="reroll-all">
+        <span class="both-icon">{{#if hasAdvantageOrDisadvantage}}⚄⚄{{else}}⚄⚄{{/if}}</span>
+        <span class="reroll-label">{{localize "DASU.Reroll.Dialog.RerollAll"}}</span>
+      </label>
+      <label class="reroll-option">
+        <input type="checkbox" name="reroll-mod">
+        <span class="mod-icon">±</span>
+        <span class="reroll-label">{{localize "DASU.Reroll.Dialog.AdjustModifier"}}</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="form-section modifier-group" style="display: none;">
+    <div class="form-group">
+      <label for="new-modifier">{{localize "DASU.Reroll.Dialog.NewModifier"}}</label>
+      <input type="number" name="new-modifier" id="new-modifier" value="{{currentMod}}" min="-20" max="20" step="1">
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="form-group">
+      <label for="advantage-state">{{localize "DASU.Reroll.Dialog.AdvantageState"}}</label>
+      <select name="advantage-state" id="advantage-state">
+        <option value="{{advantageStates.normal}}" {{#if isNormal}}selected{{/if}}>
+          {{localize "DASU.Reroll.Dialog.Normal"}}
+        </option>
+        <option value="{{advantageStates.advantage}}" {{#if isAdvantage}}selected{{/if}}>
+          {{localize "DASU.Reroll.Dialog.Advantage"}}
+        </option>
+        <option value="{{advantageStates.disadvantage}}" {{#if isDisadvantage}}selected{{/if}}>
+          {{localize "DASU.Reroll.Dialog.Disadvantage"}}
+        </option>
+      </select>
+    </div>
+  </div>
+</form>

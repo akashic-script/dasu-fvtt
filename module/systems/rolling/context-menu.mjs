@@ -47,6 +47,7 @@ export class ContextMenuManager {
             const context = this._buildContext(li);
             await option.callback(context);
           } catch (error) {
+            console.error(`Failed to execute ${option.name}:`, error);
             ui.notifications.error(`Failed to execute ${option.name}`);
           }
         },

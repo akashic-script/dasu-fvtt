@@ -26,6 +26,7 @@ import { DisplayCheck } from './checks/display-check.mjs';
 import { TargetedIndividuals } from './checks/targeted-individuals.mjs';
 import { TargetedProcessing } from './checks/targeted-processing.mjs';
 import { Retarget } from './retarget.mjs';
+import { Reroll } from './reroll.mjs';
 import { contextMenu } from './context-menu.mjs';
 import { initializeDamageSystem } from './damage/index.mjs';
 import { initializeHealingEventHandlers } from './healing/event-handlers.mjs';
@@ -153,6 +154,9 @@ contextMenu.initialize();
 
 // Initialize retarget module (uses context menu framework)
 Retarget.initialize();
+
+// Initialize reroll module (uses context menu framework)
+Reroll.initialize();
 
 // Initialize damage system
 initializeDamageSystem();

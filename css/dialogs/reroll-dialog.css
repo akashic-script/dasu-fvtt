@@ -1,0 +1,302 @@
+/* Reroll Dialog Styles */
+
+.dasu.reroll-dialog {
+  font-family: var(--font-primary);
+  width: 400px;
+  max-width: 400px;
+}
+
+.reroll-dialog .window-content {
+  background: var(--color-bg-secondary);
+  padding: 0;
+}
+
+.reroll-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+}
+
+.reroll-form .form-section {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  padding: 6px;
+  border-radius: 0;
+}
+
+.reroll-form .form-section h4 {
+  margin: 0 0 6px 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 3px;
+  color: var(--color-primary);
+}
+
+/* Dice container styling (matches chat card) */
+.reroll-form .dice-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+.reroll-form .dice-container .die {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--color-bg-primary);
+  border: 2px solid var(--dasu-c-primary);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--dasu-c-primary);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.reroll-form .dice-container .die.selected {
+  background: var(--dasu-c-primary);
+  color: var(--color-text-light);
+  border-color: var(--dasu-c-primary);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 8px var(--dasu-c-primary);
+  transform: scale(1.05);
+}
+
+.reroll-form .dice-container .modifier {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 40px;
+  padding: 0 6px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.reroll-form .dice-container .modifier .bonus {
+  color: var(--dasu-c-success);
+}
+
+.reroll-form .dice-container .modifier .penalty {
+  color: var(--dasu-c-danger);
+}
+
+/* Reroll checkboxes */
+.reroll-checkboxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.reroll-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reroll-option:hover {
+  background: var(--color-bg-primary);
+  border-color: var(--dasu-c-primary);
+}
+
+.reroll-option input[type='checkbox'] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.reroll-option input[type='checkbox']:checked ~ .die-checkbox,
+.reroll-option input[type='checkbox']:checked ~ .both-icon,
+.reroll-option input[type='checkbox']:checked ~ .mod-icon {
+  background: var(--dasu-c-primary);
+  border-color: var(--dasu-c-primary);
+  color: var(--color-text-light);
+}
+
+.die-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--color-bg-primary);
+  border: 2px solid var(--color-border);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.both-icon,
+.mod-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--color-bg-primary);
+  border: 2px solid var(--color-border);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.reroll-label {
+  flex: 1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+/* Modifier group */
+.modifier-group {
+  margin-top: 4px;
+}
+
+.modifier-group .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modifier-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.modifier-group input[type='number'] {
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-secondary);
+  font-family: var(--font-primary);
+  font-size: 0.9rem;
+}
+
+.modifier-group input[type='number']:focus {
+  outline: none;
+  border-color: var(--dasu-c-primary);
+  box-shadow: 0 0 0 1px var(--dasu-c-primary);
+}
+
+/* Advantage state select */
+.form-section select {
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-secondary);
+  font-family: var(--font-primary);
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.form-section select:focus {
+  outline: none;
+  border-color: var(--dasu-c-primary);
+  box-shadow: 0 0 0 1px var(--dasu-c-primary);
+}
+
+.form-section .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-section .form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Pool reroll specific styling */
+.reroll-dialog.pool-reroll .dice-container.pool {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.reroll-dialog.pool-reroll .dice-container .die.success {
+  border-color: var(--dasu-c-success);
+  color: var(--dasu-c-success);
+}
+
+.reroll-dialog.pool-reroll .pool-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  margin-top: 6px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.reroll-dialog.pool-reroll .pool-summary .successes {
+  display: flex;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.reroll-dialog.pool-reroll .pool-summary .successes .value {
+  color: var(--dasu-c-success);
+}
+
+.reroll-dialog.pool-reroll .pool-summary .critical-badge {
+  padding: 4px 8px;
+  background: var(--dasu-c-danger);
+  color: var(--color-text-light);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.reroll-dialog.pool-reroll .pool-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reroll-dialog.pool-reroll .pool-info .info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.reroll-dialog.pool-reroll .pool-info .info-row .label {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.reroll-dialog.pool-reroll .pool-info .info-row .value {
+  font-weight: 700;
+  color: var(--dasu-c-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .dasu.reroll-dialog {
+    min-width: 350px;
+  }
+}
