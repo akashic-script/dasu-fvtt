@@ -3583,6 +3583,9 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
       item.addEventListener('dragstart', (event) => {
         this._isDragging = true;
+        // Call the hotbar macro drag handler first
+        this._onDragStart(event);
+        // Then call the sort handler
         if (this._boundHandleSortStart) this._boundHandleSortStart(event);
       });
       item.addEventListener('dragend', (_event) => {
@@ -3699,6 +3702,29 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         }, 0);
       }
     }
+  }
+
+  /**
+   * Handle the beginning of a drag workflow for Items within the Actor
+   * @param {DragEvent} event   The originating drag event
+   * @protected
+   */
+  _onDragStart(event) {
+    const li = event.currentTarget;
+    if ('link' in event.target.dataset) return;
+
+    let dragData;
+
+    // Owned Items
+    if (li.dataset.itemId) {
+      const item = this.actor.items.get(li.dataset.itemId);
+      dragData = item.toDragData();
+    }
+
+    if (!dragData) return;
+
+    // Set data transfer
+    event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
   }
 
   /* =========================

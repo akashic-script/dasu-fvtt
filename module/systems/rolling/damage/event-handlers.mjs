@@ -391,6 +391,7 @@ export class DamageEventHandlers {
         let resourceTarget = 'hp';
 
         // Try to get source info from message flags if available
+        let isCritical = false;
         if (messageId) {
           const message = game.messages.get(messageId);
           if (message?.flags?.dasu) {
@@ -406,6 +407,7 @@ export class DamageEventHandlers {
             if (damageResult) {
               originalDamage =
                 damageResult.appliedDamage || damageResult.finalDamage || 0;
+              isCritical = damageResult.wasCritical || false;
             }
           }
         }
@@ -445,6 +447,7 @@ export class DamageEventHandlers {
             damageType,
             originalResourceTarget: resourceTarget,
             originalMessageId: messageId, // Pass message ID for updating
+            isCritical: isCritical,
           });
         } catch (error) {
           ui.notifications.error('Failed to process damage edit dialog');

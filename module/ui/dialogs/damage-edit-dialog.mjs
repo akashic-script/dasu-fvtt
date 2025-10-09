@@ -18,6 +18,7 @@ export class DamageEditDialog {
     const originalDamage = options.originalDamage;
     const originalResourceTarget = options.originalResourceTarget;
     const originalMessageId = options.originalMessageId || null;
+    const isCritical = options.isCritical || false;
 
     // Default damage data
     // Check if govern was explicitly passed (including null)
@@ -62,7 +63,8 @@ export class DamageEditDialog {
         targetActor,
         sourceActor,
         sourceItem,
-        damageData
+        damageData,
+        isCritical
       ),
       damageTypes: [
         {
@@ -163,6 +165,7 @@ export class DamageEditDialog {
           _targetTokenId: targetTokenId,
           _sourceActor: sourceActor,
           _sourceItem: sourceItem,
+          _isCritical: isCritical,
         });
 
         // Setup form change handlers for live preview
@@ -192,7 +195,8 @@ export class DamageEditDialog {
             originalDamage,
             originalResourceTarget,
             damageData,
-            originalMessageId
+            originalMessageId,
+            isCritical
           );
         }
         return { applied: false };
@@ -223,7 +227,8 @@ export class DamageEditDialog {
       dialog._targetActor,
       dialog._sourceActor,
       dialog._sourceItem,
-      currentData
+      currentData,
+      dialog._isCritical
     );
 
     // Update preview content
@@ -280,6 +285,7 @@ export class DamageEditDialog {
    * @param {string} originalResourceTarget - Original resource target
    * @param {Object} damageData - Current damage configuration
    * @param {string} originalMessageId - ID of original damage message to update
+   * @param {boolean} isCritical - Whether the original damage was a critical hit
    */
   static async _handleSubmit(
     result,
@@ -290,7 +296,8 @@ export class DamageEditDialog {
     originalDamage,
     originalResourceTarget,
     damageData,
-    originalMessageId
+    originalMessageId,
+    isCritical = false
   ) {
     if (result.action === 'apply') {
       // Update damage data with form values
@@ -304,7 +311,8 @@ export class DamageEditDialog {
         targetActor,
         sourceActor,
         sourceItem,
-        updatedDamageData
+        updatedDamageData,
+        isCritical
       );
 
       try {
@@ -562,6 +570,7 @@ export class DamageEditDialog {
    * @param {Actor} sourceActor - Source actor
    * @param {Item} sourceItem - Source item
    * @param {Object} damageData - Damage configuration
+   * @param {boolean} isCritical - Whether the original damage was a critical hit
    * @returns {Object} Preview damage result
    * @private
    */
@@ -569,7 +578,8 @@ export class DamageEditDialog {
     targetActor,
     sourceActor,
     sourceItem,
-    damageData
+    damageData,
+    isCritical = false
   ) {
     try {
       // Create modifiers object
@@ -607,7 +617,7 @@ export class DamageEditDialog {
           baseDamage,
           targetActor,
           damageData.damageType,
-          false
+          isCritical
         );
         finalDamage = resistanceResult.damage;
       } else {
@@ -616,7 +626,7 @@ export class DamageEditDialog {
           baseDamage,
           targetActor,
           damageData.damageType,
-          false
+          isCritical
         );
 
         // Override specific resistance types based on ignore flags

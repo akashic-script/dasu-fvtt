@@ -82,18 +82,7 @@ export class DamageProcessor {
       if (targetData.result === 'miss') {
         finalDamage = 0;
       } else {
-        // Apply critical hit modifier
-        if (isCritical) {
-          finalDamage *= 2;
-        }
-
-        // Apply bonus damage
-        finalDamage += modifiers.bonus || 0;
-
-        // Apply multiplier
-        finalDamage *= modifiers.multiplier || 1;
-
-        // Apply resistance if not ignored
+        // Apply resistance (which handles crit multiplier for weak resistance)
         if (!modifiers.ignoreResistance) {
           resistanceResult = DamageCalculator.applyResistance(
             finalDamage,
@@ -102,7 +91,16 @@ export class DamageProcessor {
             isCritical
           );
           finalDamage = resistanceResult.damage;
+        } else if (isCritical) {
+          // If ignoring resistance, still apply crit multiplier
+          finalDamage *= 2;
         }
+
+        // Apply bonus damage
+        finalDamage += modifiers.bonus || 0;
+
+        // Apply multiplier
+        finalDamage *= modifiers.multiplier || 1;
       }
 
       // Ensure minimum damage of 0

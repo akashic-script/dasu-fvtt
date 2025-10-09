@@ -5,13 +5,17 @@
  * - Base Damage = Governing Attribute Tick + Weapon/Item Damage
  * - Governing attribute is determined by item's 'govern' field, falls back to POW
  * - Resistance modifies final damage based on target's resistance values
- * - Critical hits double damage before resistance calculations
+ * - Critical hits are applied during resistance calculations:
+ *   - Normal (0): 2x on crit
+ *   - Weak (-1): 4x on crit, 2x normally
+ *   - Resist (1): 1x on crit, 0.5x normally
+ *   - Drain (3): -2x on crit, -1x normally
  *
  * @example
  * // Calculate base damage
- * const baseDamage = DamageCalculator.calculateBaseDamage(sourceActor, weapon, { isCritical: true });
+ * const baseDamage = DamageCalculator.calculateBaseDamage(sourceActor, weapon);
  *
- * // Apply resistance
+ * // Apply resistance with crit
  * const result = DamageCalculator.applyResistance(baseDamage, targetActor, 'fire', true);
  */
 
@@ -94,11 +98,6 @@ export class DamageCalculator {
     // Calculate base damage using DASU formula: Weapon Damage + Governing Attribute Tick (if applicable)
     let baseDamage = weaponDamage + tickValue;
 
-    // Apply critical hit multiplier (doubles damage)
-    if (modifiers.isCritical) {
-      baseDamage *= 2;
-    }
-
     // Apply additional modifiers
     baseDamage += modifiers.bonus || 0;
     baseDamage *= modifiers.multiplier || 1;
@@ -170,21 +169,23 @@ export class DamageCalculator {
         };
 
       case 0: // Normal
+        const normalMultiplier = isCritical ? 2 : 1;
         return {
-          damage: baseDamage,
+          damage: baseDamage * normalMultiplier,
           isHealing: false,
           value: resistanceValue,
           type: 'normal',
-          multiplier: 1,
+          multiplier: normalMultiplier,
         };
 
       case 1: // Resist
+        const resistMultiplier = isCritical ? 1 : 0.5;
         return {
-          damage: Math.floor(baseDamage / 2),
+          damage: Math.floor(baseDamage * resistMultiplier),
           isHealing: false,
           value: resistanceValue,
           type: 'resist',
-          multiplier: 0.5,
+          multiplier: resistMultiplier,
         };
 
       case 2: // Nullify
@@ -197,12 +198,13 @@ export class DamageCalculator {
         };
 
       case 3: // Drain
+        const drainMultiplier = isCritical ? -2 : -1;
         return {
-          damage: baseDamage,
+          damage: Math.floor(baseDamage * Math.abs(drainMultiplier)),
           isHealing: true,
           value: resistanceValue,
           type: 'drain',
-          multiplier: -1,
+          multiplier: drainMultiplier,
         };
 
       default:
