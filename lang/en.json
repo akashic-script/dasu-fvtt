@@ -233,7 +233,11 @@
         },
         "ticks": {
           "tooltip": "Skill Ticks (1-6)"
-        }
+        },
+        "SpecialtiesActive": "Specialties Active",
+        "AddSpecialties": "Add Specialties",
+        "SpecialtiesPlaceholder": "Enter skill specialties...",
+        "UseSpecialties": "Use Specialties (+1 dice)"
       },
       "Triad": {
         "Header": "Moral Triad",
@@ -717,7 +721,14 @@
       "Restores": "Restores",
       "vsDefense": "vs Defense",
       "vsAvoid": "vs Avoid",
-      "NeverMiss": "Never Miss"
+      "NeverMiss": "Never Miss",
+      "BaseDice": "Base Dice",
+      "Modifier": "Modifier",
+      "DiceRolled": "Dice Rolled",
+      "Critical": "Critical",
+      "Yes": "Yes",
+      "TotalRoll": "Total Roll",
+      "PayCost": "Pay Cost"
     },
     "Healing": {
       "EditDialog": {
@@ -758,6 +769,9 @@
       "ApplyTargeted": "Apply Targeted",
       "ApplyTargetedHealing": "Apply Targeted Healing",
       "NoTargetsSelected": "Nothing is targeted",
+      "Breakdown": "Breakdown",
+      "DiceBreakdown": "Dice Breakdown",
+      "TotalSuccesses": "Total Successes",
       "AddTargets": "Add Targets",
       "TargetResult": {
         "Hit": "HIT",
@@ -770,6 +784,17 @@
     "ContextMenu": {
       "Retarget": "Retarget",
       "Reroll": "Reroll"
+    },
+    "SkillManager": {
+      "Title": "Manage {name}",
+      "EditSettings": "Edit Skill Settings",
+      "Modifier": "Skill Modifier",
+      "ModifierHint": "Permanent modifier to skill dice pool (e.g., +1 or -1)",
+      "Specialties": "Specialties",
+      "SpecialtiesPlaceholder": "Enter skill specialties...",
+      "SpecialtiesHint": "Describe areas of expertise within this skill. When applicable, adds +1 dice to rolls.",
+      "ManageSkill": "Manage Skill",
+      "EditSkill": "Edit Skill Settings"
     },
     "Reroll": {
       "Dialog": {
@@ -790,7 +815,8 @@
         "Successes": "Successes",
         "Critical": "CRITICAL",
         "TotalDice": "Total Dice",
-        "CritThreshold": "Crit Threshold"
+        "CritThreshold": "Crit Threshold",
+        "ClickDiceHint": "Click dice above to select which ones to reroll"
       }
     },
     "Traits": {

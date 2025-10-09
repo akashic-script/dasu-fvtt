@@ -621,9 +621,11 @@ async function onUndoCostClick(event, button) {
       `Restored ${amount} ${resource.toUpperCase()} for ${targetActor.name}`
     );
 
-    // Disable the undo button after use
-    button.disabled = true;
-    button.classList.add('disabled-button');
+    // Replace undo button with redo button
+    button.innerHTML = '<i class="fas fa-redo"></i>Redo';
+    button.dataset.action = 'redoCost';
+    button.classList.remove('undo');
+    button.classList.add('redo');
   } catch (error) {
     ui.notifications.error(`Failed to undo cost: ${error.message}`);
   }
@@ -672,6 +674,50 @@ async function onRedoHealingClick(event, button) {
     button.classList.add('undo');
   } catch (error) {
     ui.notifications.error(`Failed to redo healing: ${error.message}`);
+  }
+}
+
+/**
+ * Handle redo cost button clicks (re-pay cost after it was undone)
+ * @param {Event} event - The click event
+ * @param {HTMLElement} button - The button that was clicked
+ * @private
+ */
+async function onRedoCostClick(event, button) {
+  event.preventDefault();
+
+  const targetId = button.dataset.targetId;
+  const amount = parseInt(button.dataset.amount);
+  const resource = button.dataset.resource;
+
+  if (!amount || amount <= 0) {
+    ui.notifications.warn('No cost to redo');
+    return;
+  }
+
+  try {
+    const targetActor = _findTargetActor(targetId);
+    if (!targetActor) {
+      ui.notifications.error('Target actor not found');
+      return;
+    }
+
+    // Re-apply the cost by applying damage
+    await targetActor.applyDamage(amount, 'none', resource, {
+      suppressChat: true,
+    });
+
+    ui.notifications.info(
+      `Re-paid ${amount} ${resource.toUpperCase()} for ${targetActor.name}`
+    );
+
+    // Replace redo button with undo button
+    button.innerHTML = '<i class="fas fa-undo"></i>Undo';
+    button.dataset.action = 'undoCost';
+    button.classList.remove('redo');
+    button.classList.add('undo');
+  } catch (error) {
+    ui.notifications.error(`Failed to redo cost: ${error.message}`);
   }
 }
 
@@ -824,6 +870,9 @@ function _handleHealingButtonClick(event) {
       break;
     case 'redoHealing':
       onRedoHealingClick(event, button);
+      break;
+    case 'redoCost':
+      onRedoCostClick(event, button);
       break;
     case 'editHealing':
       onEditHealingClick(event, button);

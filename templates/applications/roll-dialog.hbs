@@ -63,7 +63,7 @@
           <select name="selectedSkill" id="selectedSkill" required>
             <option value="">{{localize 'DASU.ChooseSkill'}}</option>
             {{#each skills}}
-              <option value="{{name}}" {{#if (eq ../rollData.selectedSkill name)}}selected{{/if}}>
+              <option value="{{name}}" {{#if (eq ../rollData.selectedSkill name)}}selected{{/if}} data-specialties="{{specialties}}">
                 {{name}} ({{ticks}} {{localize 'DASU.Ticks'}})
               </option>
             {{/each}}
@@ -81,7 +81,22 @@
             {{/each}}
           </select>
         </div>
+
       </div>
+
+      {{!-- Specialties Section (separate row) --}}
+      {{#if selectedSkillHasSpecialties}}
+        <div class="form-group specialties-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="useSpecialties" id="useSpecialties" {{#if rollData.useSpecialties}}checked{{/if}} />
+            <span>{{localize 'DASU.Actor.Skills.UseSpecialties'}}</span>
+          </label>
+        </div>
+        <div class="specialties-display-row">
+          <small class="specialties-text">{{selectedSkillSpecialties}}</small>
+        </div>
+      {{/if}}
+    </div>
     {{else if (eq rollData.rollType "initiative")}}
       {{!-- Initiative: Choose between DEX tick or any skill tick --}}
       <div class="initiative-selection">

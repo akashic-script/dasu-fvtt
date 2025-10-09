@@ -943,33 +943,166 @@ Hooks.on('updateItem', async (item, changes, options, userId) => {
   }
 });
 
-// --- Handle clicks on effect duration update chat cards ---
+// --- Handle clicks on effect duration update chat cards and dice selection ---
 Hooks.on('renderChatMessageHTML', (message, html) => {
-  const card = html.querySelector('.effect-duration-update');
-  if (!card) return;
+  // html is already an HTMLElement in V13
+  const htmlElement = html;
 
-  const effectUuid = card.dataset.effectUuid;
-  if (!effectUuid) return;
+  const card = htmlElement.querySelector('.effect-duration-update');
+  if (card) {
+    const effectUuid = card.dataset.effectUuid;
+    if (effectUuid) {
+      // Handle click on effect image to open config
+      const effectImage = card.querySelector('[data-action="openEffect"]');
+      if (effectImage) {
+        effectImage.addEventListener('click', async (event) => {
+          event.preventDefault();
 
-  // Handle click on effect image to open config
-  const effectImage = card.querySelector('[data-action="openEffect"]');
-  if (effectImage) {
-    effectImage.addEventListener('click', async (event) => {
-      event.preventDefault();
+          const effect = await fromUuid(effectUuid);
+          if (!effect) {
+            ui.notifications.warn('Effect not found');
+            return;
+          }
 
-      const effect = await fromUuid(effectUuid);
-      if (!effect) {
-        ui.notifications.warn('Effect not found');
+          // Check permission
+          if (!effect.parent?.testUserPermission(game.user, 'OWNER')) {
+            ui.notifications.warn(
+              'You do not have permission to edit this effect'
+            );
+            return;
+          }
+
+          effect.sheet.render(true);
+        });
+      }
+    }
+  }
+
+  // --- Handle breakdown toggle button ---
+  const breakdownToggle = htmlElement.querySelector(
+    '[data-action="toggleBreakdown"]'
+  );
+  if (breakdownToggle) {
+    breakdownToggle.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const card = breakdownToggle.closest('.check-card, .roll-card');
+      if (card) {
+        const breakdownSection = card.querySelector('.breakdown-section');
+        if (breakdownSection) {
+          const isHidden = breakdownSection.style.display === 'none';
+          breakdownSection.style.display = isHidden ? 'block' : 'none';
+          // Rotate the icon
+          const icon = breakdownToggle.querySelector('i');
+          if (icon) {
+            icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+          }
+        }
+      }
+    });
+  }
+
+  // --- Handle pay cost button ---
+  const payCostButton = htmlElement.querySelector('[data-action="payCost"]');
+  if (payCostButton) {
+    payCostButton.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      const card = payCostButton.closest('.roll-card');
+      if (!card) return;
+
+      const actorId = card.dataset.actorId;
+      const cost = Number(payCostButton.dataset.cost);
+      const costType = payCostButton.dataset.costType;
+
+      if (!actorId || !cost) return;
+
+      const actor = game.actors.get(actorId);
+      if (!actor || !actor.system.stats) return;
+
+      // Determine which resource to reduce
+      let updatePath;
+      let currentValue;
+      let resourceTarget = costType;
+
+      if (costType === 'wp' && actor.system.stats.wp) {
+        updatePath = 'system.stats.wp.current';
+        currentValue = actor.system.stats.wp.current;
+      } else if (costType === 'sp' && actor.system.stats.hp) {
+        // SP (Stamina Points) maps to HP
+        updatePath = 'system.stats.hp.current';
+        currentValue = actor.system.stats.hp.current;
+        resourceTarget = 'hp';
+      } else if (costType === 'mp' && actor.system.stats.wp) {
+        // MP (Mana Points) also maps to WP
+        updatePath = 'system.stats.wp.current';
+        currentValue = actor.system.stats.wp.current;
+        resourceTarget = 'wp';
+      } else {
+        ui.notifications.warn(
+          'Unable to pay cost: resource not found on actor'
+        );
         return;
       }
 
-      // Check permission
-      if (!effect.parent?.testUserPermission(game.user, 'OWNER')) {
-        ui.notifications.warn('You do not have permission to edit this effect');
-        return;
-      }
+      const actualCost = Math.min(cost, currentValue);
+      const newValue = Math.max(0, currentValue - cost);
+      await actor.update({ [updatePath]: newValue });
 
-      effect.sheet.render(true);
+      // Get token ID for unlinked tokens
+      const token = actor.getActiveTokens()[0];
+      const tokenId = token ? token.id : null;
+
+      // Build chat message content
+      const icon = '<i class="fas fa-coins"></i>';
+      const targetAttrs = `data-actor-id="${actor.id}"${
+        tokenId ? ` data-token-id="${tokenId}"` : ''
+      }`;
+
+      const costText = actualCost > 0 ? 'paid' : 'attempted to pay';
+
+      const content = `
+    <div class='dasu cost-applied'>
+      <div class='cost-applied-content'>
+        <div class='cost-text'>
+          <span class='cost-icon'>${icon}</span>
+          <strong class="target-name clickable" ${targetAttrs}>${
+        actor.name
+      }</strong> ${costText}
+          ${
+            actualCost > 0
+              ? ` <strong class='cost-amount'>${actualCost}</strong> ${costType.toUpperCase()}`
+              : ''
+          }
+        </div>
+        <div class='cost-actions-small'>
+          <button class='cost-action-btn undo' data-action='undoCost' data-target-id='${
+            actor.id
+          }' data-amount='${actualCost}' data-resource='${resourceTarget}'>
+            <i class='fas fa-undo'></i>Undo
+          </button>
+        </div>
+      </div>
+    </div>
+      `;
+
+      // Create chat message
+      await ChatMessage.create({
+        content,
+        speaker: ChatMessage.getSpeaker({ actor }),
+        style: foundry.CONST.CHAT_MESSAGE_STYLES.OTHER,
+        flavor: `<span class="flavor-text">cost paid (${cost}: = ${actualCost})</span>`,
+        flags: {
+          dasu: {
+            costApplication: {
+              targetId: actor.id,
+              targetName: actor.name,
+              appliedCost: actualCost,
+              costType: resourceTarget,
+              baseCost: cost,
+            },
+            enricherCost: true,
+          },
+        },
+      });
     });
   }
 });

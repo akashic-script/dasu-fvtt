@@ -157,6 +157,28 @@
             {{/each}}
           </div>
 
+          {{!-- Defense Stats --}}
+          <div class="skills-section attributes grid grid-2col">
+            {{!-- Defense Stat --}}
+            <div class="attribute flexrow flex-group-center">
+              <div class="attribute-header flexrow flex-group-center">
+                <div class="attribute-name">{{localize 'DASU.Actor.Stats.def.label'}}</div>
+                <div class="tick-button attribute-value" data-tooltip="Defense: 7 + (POW {{system.attributes.pow.tick}} + WILL {{system.attributes.will.tick}}) / 2{{#if system.stats.def.mod}} + {{system.stats.def.mod}} mod{{/if}}">
+                  {{system.stats.def.value}}
+                </div>
+              </div>
+            </div>
+            {{!-- Avoid Stat --}}
+            <div class="attribute flexrow flex-group-center">
+              <div class="attribute-header flexrow flex-group-center">
+                <div class="attribute-name">{{localize 'DASU.Actor.Stats.avoid.label'}}</div>
+                <div class="tick-button attribute-value" data-tooltip="Avoid: 7 + (DEX {{system.attributes.dex.tick}} + STA {{system.attributes.sta.tick}}) / 2{{#if system.stats.avoid.mod}} + {{system.stats.avoid.mod}} mod{{/if}}">
+                  {{system.stats.avoid.value}}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {{! Critical Modifier Section for Summoners }}
           <div class="crit-section">
             <div class="crit-header flexrow">
@@ -198,26 +220,45 @@
             {{! Skills Grid }}
             <div class='skills'>
               {{#each skills as |skill index|}}
-                <div class='skill flexcol'>
+                <div class='skill flexcol' data-skill-index='{{index}}'>
                   {{! Skill Name and Governing Attribute - Left Aligned }}
                   <div class='skill-header flexrow flex-group-center'>
                     <div class='skill-name'>{{skill.name}} ({{uppercase skill.govern}})</div>
-                    
+
+                    {{! Skill Settings Button - Edit Mode Only }}
+                    {{#if @root.isEditMode}}
+                      <button type='button'
+                              class='skill-settings-btn {{#if (or skill.specialties (ne skill.mod 0))}}active{{/if}}'
+                              data-action='manageSkill'
+                              data-skill-index='{{index}}'
+                              data-tooltip='{{#if (or skill.specialties (ne skill.mod 0))}}{{localize "DASU.SkillManager.EditSkill"}}{{else}}{{localize "DASU.SkillManager.ManageSkill"}}{{/if}}'>
+                        <i class='fas fa-cog'></i>
+                      </button>
+                    {{/if}}
+
                     {{! Tick Number - Right Aligned }}
-                    <div class='tick-button rollable' 
-                         data-action='roll' 
-                         data-roll='{{skill.ticks}}d6 + {{lookup system.attributes skill.govern "tick"}}d6'
-                         data-label='{{skill.name}} Check ({{localize (concat "DASU.Actor.Attributes.list." skill.govern ".label")}}: {{lookup system.attributes skill.govern "tick"}} tick | Skill: {{skill.ticks}} tick)'>
-                      {{skill.ticks}}
+                    <div class='tick-button rollable'
+                         data-action='roll'
+                         data-roll='{{skill.ticks}}d6 + {{lookup system.attributes skill.govern "tick"}}d6{{#if (ne skill.mod 0)}} + {{skill.mod}}d6{{/if}}'
+                         data-label='{{skill.name}} Check ({{localize (concat "DASU.Actor.Attributes.list." skill.govern ".label")}}: {{lookup system.attributes skill.govern "tick"}} tick | Skill: {{skill.ticks}} tick{{#if (ne skill.mod 0)}} | Mod: {{skill.mod}}{{/if}})'
+                         data-skill-index='{{index}}'>
+                      {{add skill.ticks skill.mod}}
                     </div>
                   </div>
-                  
+
+                  {{! Specialties Display Row }}
+                  {{#if skill.specialties}}
+                    <div class='skill-specialties-display flexrow flex-group-center'>
+                      <span class='specialties-text'>{{skill.specialties}}</span>
+                    </div>
+                  {{/if}}
+
                   {{! Tick Boxes (1-6) - Only show in edit mode }}
                   {{#if @root.isEditMode}}
                     <div class='skill-ticks flexrow'>
                       {{#each (range 1 6) as |tick|}}
-                        <input type='radio' 
-                               value='{{tick}}' 
+                        <input type='radio'
+                               value='{{tick}}'
                                {{#if (eq skill.ticks tick)}}checked{{/if}}
                                {{#if (lte tick skill.ticks)}}filled{{/if}}
                                class='skill-tick-radio{{#if (lte tick skill.ticks)}} filled{{/if}}'

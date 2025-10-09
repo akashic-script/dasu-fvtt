@@ -61,48 +61,7 @@
 }
 
 .stats-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
-  justify-content: center;
-  min-width: fit-content;
-  margin: 0.25rem auto;
-}
-
-.stat-display {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: var(--color-bg-primary);
-  border: 2px solid var(--color-border);
-  border-radius: 0;
-  padding: 0.4rem 0.6rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  /* margin-bottom: 8px; */
-  min-width: 3.5rem;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.stat-display .stat-label {
-  font-size: 0.75rem;
-  font-weight: bold;
-  color: var(--color-white);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin: 0;
-}
-
-.stat-display .stat-value {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: var(--color-primary);
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  margin: 0;
+  margin-top: 0.5rem;
 }
 
 .sheet-tabs {
@@ -630,7 +589,7 @@
 .dasu.actor .skill {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.25rem;
   padding: 2px 4px;
   background: var(--color-bg-primary);
   border: 1px solid var(--color-border);
@@ -644,17 +603,69 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  gap: 8px;
+  gap: 6px;
 }
 
 .dasu.actor .skill-name {
   flex: 1;
+  min-width: 0;
   font-weight: 600;
   color: var(--color-text-primary);
   text-transform: uppercase;
   letter-spacing: 0.3px;
   font-size: 0.85em;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Skill Settings Button */
+.dasu.actor .skill-settings-btn {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.dasu.actor .skill-settings-btn:hover {
+  background: var(--color-bg-primary);
+  border-color: var(--dasu-c-primary);
+  color: var(--dasu-c-primary);
+}
+
+.dasu.actor .skill-settings-btn.active {
+  background: var(--dasu-c-primary);
+  border-color: var(--dasu-c-primary);
+  color: var(--color-text-light);
+}
+
+.dasu.actor .skill-settings-btn i {
+  font-size: 0.7em;
+}
+
+/* Skill Specialties Display */
+.dasu.actor .skill-specialties-display {
+  padding: 0.25rem 0.5rem;
+  background: var(--color-bg-dim);
+  border-left: 2px solid var(--dasu-c-primary);
+  font-size: 0.8rem;
+  color: var(--color-text-primary);
+  text-align: start;
+}
+
+.dasu.actor .skill-specialties-display .specialties-text {
+  flex: 1;
 }
 
 /* =========================

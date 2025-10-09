@@ -15,28 +15,8 @@
 
   <div class="form-section">
     <h4>{{localize "DASU.Reroll.Dialog.RerollOptions"}}</h4>
+    <p class="hint">{{localize "DASU.Reroll.Dialog.ClickDiceHint"}}</p>
     <div class="reroll-checkboxes">
-      {{#if hasDie1}}
-        <label class="reroll-option">
-          <input type="checkbox" name="reroll-die1" data-die-index="0">
-          <span class="die-checkbox">{{lookup rollResults 0}}</span>
-          <span class="reroll-label">{{localize "DASU.Reroll.Dialog.RerollDie1"}}</span>
-        </label>
-      {{/if}}
-      {{#if hasDie2}}
-        <label class="reroll-option">
-          <input type="checkbox" name="reroll-die2" data-die-index="1">
-          <span class="die-checkbox">{{lookup rollResults 1}}</span>
-          <span class="reroll-label">{{localize "DASU.Reroll.Dialog.RerollDie2"}}</span>
-        </label>
-      {{/if}}
-      {{#if hasDie3}}
-        <label class="reroll-option">
-          <input type="checkbox" name="reroll-die3" data-die-index="2">
-          <span class="die-checkbox">{{lookup rollResults 2}}</span>
-          <span class="reroll-label">{{localize "DASU.Reroll.Dialog.RerollDie3"}}</span>
-        </label>
-      {{/if}}
       <label class="reroll-option">
         <input type="checkbox" name="reroll-all">
         <span class="both-icon">{{#if hasAdvantageOrDisadvantage}}⚄⚄{{else}}⚄⚄{{/if}}</span>

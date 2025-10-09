@@ -5,6 +5,7 @@ import { LevelingWizard } from '../../ui/applications/leveling-wizard.mjs';
 import { DASURollDialog } from '../../ui/dialogs/roll-dialog.mjs';
 import { DASURecruitDialog } from '../../ui/dialogs/recruit-dialog.mjs';
 import { ResourceManagerDialog } from '../../ui/dialogs/resource-manager-dialog.mjs';
+import { SkillManagerDialog } from '../../ui/dialogs/skill-manager-dialog.mjs';
 import { DASU_STATUS_CONDITIONS } from '../../data/shared/status-conditions.mjs';
 
 registerHandlebarsHelpers();
@@ -93,6 +94,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       openSlotTag: this._openSlotTag,
       toggleItemSection: this._toggleItemSection,
       manageResource: this._manageResource,
+      manageSkill: this._manageSkill,
     },
     // Custom property that's merged into `this.options`
     // dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
@@ -4427,6 +4429,21 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     if (!resourceType) return;
 
     await ResourceManagerDialog.open(this.actor, resourceType);
+  }
+
+  /**
+   * Open skill manager dialog
+   * @param {Event} event - Button click event
+   * @param {HTMLElement} target - Button element
+   */
+  static async _manageSkill(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const skillIndex = parseInt(target.dataset.skillIndex);
+    if (isNaN(skillIndex)) return;
+
+    await SkillManagerDialog.open(this.actor, skillIndex);
   }
 
   /**

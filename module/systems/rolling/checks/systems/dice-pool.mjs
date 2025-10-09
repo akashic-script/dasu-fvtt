@@ -80,18 +80,33 @@ export class DicePoolSystem {
     }
 
     // Store results
-    result.primary = {
-      attribute: check.primary,
-      dice: check.additionalData.primaryDice,
-      result: check.additionalData.primaryDice,
-    };
-
-    if (check.secondary) {
+    if (check.type === 'skill' && check.additionalData.skill) {
+      // For skill checks: primary = skill, secondary = governing attribute
+      result.primary = {
+        attribute: check.additionalData.skill.name,
+        dice: check.additionalData.primaryDice,
+        result: check.additionalData.primaryDice,
+      };
       result.secondary = {
-        attribute: check.secondary,
+        attribute: check.primary,
         dice: check.additionalData.secondaryDice,
         result: check.additionalData.secondaryDice,
       };
+    } else {
+      // For attribute checks
+      result.primary = {
+        attribute: check.primary,
+        dice: check.additionalData.primaryDice,
+        result: check.additionalData.primaryDice,
+      };
+
+      if (check.secondary) {
+        result.secondary = {
+          attribute: check.secondary,
+          dice: check.additionalData.secondaryDice,
+          result: check.additionalData.secondaryDice,
+        };
+      }
     }
 
     result.finalResult = successes;

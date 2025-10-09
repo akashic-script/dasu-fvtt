@@ -104,13 +104,26 @@ async function showD6RerollDialog(context) {
           default: true,
           callback: (_, __, dialog) => {
             const form = dialog.element.querySelector('form');
-            if (form) {
-              const formData = new foundry.applications.ux.FormDataExtended(
-                form
-              );
-              return { action: 'reroll', formData: formData.object };
-            }
-            return { action: 'cancel' };
+            if (!form) return { action: 'cancel' };
+
+            const formData = new foundry.applications.ux.FormDataExtended(form);
+
+            // Get selected dice indices
+            const diceContainer =
+              dialog.element.querySelector('.dice-container');
+            const selectedDice = diceContainer
+              ? Array.from(diceContainer.querySelectorAll('.die.selected'))
+              : [];
+            const selectedIndices = selectedDice.map((die) => {
+              return Array.from(die.parentElement.children).indexOf(die);
+            });
+
+            return {
+              action: 'reroll',
+              formData: formData.object,
+              selectedIndices:
+                selectedIndices.length > 0 ? selectedIndices : null,
+            };
           },
         },
       ],
@@ -120,6 +133,20 @@ async function showD6RerollDialog(context) {
         const diceElements = diceContainer
           ? Array.from(diceContainer.querySelectorAll('.die'))
           : [];
+
+        // Add click handlers to dice for selection
+        diceElements.forEach((die, index) => {
+          die.addEventListener('click', (event) => {
+            event.stopPropagation();
+            // Toggle selected state
+            die.classList.toggle('selected');
+
+            // Store selected dice count
+            const selectedDice =
+              diceContainer.querySelectorAll('.die.selected');
+            diceContainer.dataset.selectedCount = selectedDice.length;
+          });
+        });
 
         // Show/hide modifier input based on checkbox
         const rerollModCheckbox = dialog.element.querySelector(
@@ -137,70 +164,15 @@ async function showD6RerollDialog(context) {
         const rerollAllCheckbox = dialog.element.querySelector(
           '[name="reroll-all"]'
         );
-        const die1Checkbox = dialog.element.querySelector(
-          '[name="reroll-die1"]'
-        );
-        const die2Checkbox = dialog.element.querySelector(
-          '[name="reroll-die2"]'
-        );
-        const die3Checkbox = dialog.element.querySelector(
-          '[name="reroll-die3"]'
-        );
 
         if (rerollAllCheckbox) {
           rerollAllCheckbox.addEventListener('change', (e) => {
             if (e.target.checked) {
-              if (die1Checkbox) {
-                die1Checkbox.checked = false;
-                die1Checkbox.disabled = true;
-              }
-              if (die2Checkbox) {
-                die2Checkbox.checked = false;
-                die2Checkbox.disabled = true;
-              }
-              if (die3Checkbox) {
-                die3Checkbox.checked = false;
-                die3Checkbox.disabled = true;
-              }
               // Highlight all dice
               diceElements.forEach((die) => die.classList.add('selected'));
             } else {
-              if (die1Checkbox) die1Checkbox.disabled = false;
-              if (die2Checkbox) die2Checkbox.disabled = false;
-              if (die3Checkbox) die3Checkbox.disabled = false;
               // Remove highlight from all dice
               diceElements.forEach((die) => die.classList.remove('selected'));
-            }
-          });
-        }
-
-        // Handle individual die checkboxes
-        if (die1Checkbox && diceElements[0]) {
-          die1Checkbox.addEventListener('change', (e) => {
-            if (e.target.checked) {
-              diceElements[0].classList.add('selected');
-            } else {
-              diceElements[0].classList.remove('selected');
-            }
-          });
-        }
-
-        if (die2Checkbox && diceElements[1]) {
-          die2Checkbox.addEventListener('change', (e) => {
-            if (e.target.checked) {
-              diceElements[1].classList.add('selected');
-            } else {
-              diceElements[1].classList.remove('selected');
-            }
-          });
-        }
-
-        if (die3Checkbox && diceElements[2]) {
-          die3Checkbox.addEventListener('change', (e) => {
-            if (e.target.checked) {
-              diceElements[2].classList.add('selected');
-            } else {
-              diceElements[2].classList.remove('selected');
             }
           });
         }
@@ -211,10 +183,10 @@ async function showD6RerollDialog(context) {
 
     if (result?.action === 'reroll') {
       const formData = result.formData;
+      const selectedIndices = result.selectedIndices;
+
       await performReroll(message, checkResult, sourceActor, item, {
-        rerollDie1: formData['reroll-die1'] || false,
-        rerollDie2: formData['reroll-die2'] || false,
-        rerollDie3: formData['reroll-die3'] || false,
+        selectedIndices,
         rerollAll: formData['reroll-all'] || false,
         rerollMod: formData['reroll-mod'] || false,
         newModifier: parseInt(formData['new-modifier']) || currentMod,
@@ -242,6 +214,7 @@ async function showPoolRerollDialog(context) {
     const totalDice =
       checkResult.additionalData.totalDice || rollResults.length;
     const critThreshold = checkResult.additionalData.critThreshold || 7;
+    const currentMod = 0; // Pool checks don't have modifiers by default
 
     const templateContext = {
       rollResults,
@@ -250,6 +223,7 @@ async function showPoolRerollDialog(context) {
       successCount: checkResult.finalResult || 0,
       isCritical: checkResult.critical || false,
       hasRollResults: rollResults.length > 0,
+      currentMod,
     };
 
     // Render the content
@@ -279,16 +253,98 @@ async function showPoolRerollDialog(context) {
           icon: 'fas fa-dice',
           label: game.i18n.localize('DASU.Reroll.Dialog.RerollAll'),
           default: true,
-          callback: () => ({ action: 'reroll' }),
+          callback: (_, __, dialog) => {
+            const form = dialog.element.querySelector('form');
+            if (!form) return { action: 'cancel' };
+
+            const formData = new foundry.applications.ux.FormDataExtended(form);
+
+            // Get selected dice indices
+            const diceContainer =
+              dialog.element.querySelector('.dice-container');
+            const selectedDice = diceContainer
+              ? Array.from(diceContainer.querySelectorAll('.die.selected'))
+              : [];
+            const selectedIndices = selectedDice.map((die) => {
+              return Array.from(die.parentElement.children).indexOf(die);
+            });
+
+            return {
+              action: 'reroll',
+              formData: formData.object,
+              selectedIndices:
+                selectedIndices.length > 0 ? selectedIndices : null,
+            };
+          },
         },
       ],
+      render: (_, dialog) => {
+        // Add click handlers to dice for selection
+        const diceContainer = dialog.element.querySelector('.dice-container');
+        const diceElements = diceContainer
+          ? Array.from(diceContainer.querySelectorAll('.die'))
+          : [];
+
+        diceElements.forEach((die) => {
+          die.addEventListener('click', (event) => {
+            event.stopPropagation();
+            // Toggle selected state
+            die.classList.toggle('selected');
+
+            // Store selected dice count
+            const selectedDice =
+              diceContainer.querySelectorAll('.die.selected');
+            diceContainer.dataset.selectedCount = selectedDice.length;
+          });
+        });
+
+        // Show/hide modifier input based on checkbox
+        const rerollModCheckbox = dialog.element.querySelector(
+          '[name="reroll-mod"]'
+        );
+        const modifierGroup = dialog.element.querySelector('.modifier-group');
+
+        if (rerollModCheckbox && modifierGroup) {
+          rerollModCheckbox.addEventListener('change', (e) => {
+            modifierGroup.style.display = e.target.checked ? 'block' : 'none';
+          });
+        }
+
+        // Handle "reroll all" checkbox
+        const rerollAllCheckbox = dialog.element.querySelector(
+          '[name="reroll-all"]'
+        );
+
+        if (rerollAllCheckbox) {
+          rerollAllCheckbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+              // Highlight all dice
+              diceElements.forEach((die) => die.classList.add('selected'));
+            } else {
+              // Remove highlight from all dice
+              diceElements.forEach((die) => die.classList.remove('selected'));
+            }
+          });
+        }
+      },
       close: () => null,
     };
 
     const result = await foundry.applications.api.DialogV2.wait(dialogOptions);
 
     if (result?.action === 'reroll') {
-      await performPoolReroll(message, checkResult, sourceActor, item);
+      const formData = result.formData || {};
+      const newModifier = parseInt(formData['new-modifier']) || 0;
+      const rerollMod = formData['reroll-mod'] || false;
+
+      await performPoolReroll(
+        message,
+        checkResult,
+        sourceActor,
+        item,
+        result.selectedIndices,
+        rerollMod ? newModifier : null
+      );
     }
   } catch (error) {
     console.error('Pool reroll dialog error:', error);
@@ -297,30 +353,66 @@ async function showPoolRerollDialog(context) {
 }
 
 /**
- * Perform pool reroll (rerolls all dice in the pool)
+ * Perform pool reroll (rerolls selected dice or all dice if none selected)
  * @param {ChatMessage} message - Original chat message
  * @param {Object} originalResult - Original check result
  * @param {Actor} sourceActor - The actor who made the check
  * @param {Item} item - The item used (if any)
+ * @param {Array<number>} selectedIndices - Indices of dice to reroll (null = all)
+ * @param {number} newModifier - New modifier to apply (null = no change)
  */
-async function performPoolReroll(message, originalResult, sourceActor, item) {
+async function performPoolReroll(
+  message,
+  originalResult,
+  sourceActor,
+  item,
+  selectedIndices = null,
+  newModifier = null
+) {
   try {
     const totalDice = originalResult.additionalData.totalDice;
     const critThreshold = originalResult.additionalData.critThreshold || 7;
-    const roll = new Roll(`${totalDice}d6`);
-    await roll.evaluate();
-    let successes = 0;
+    const originalRollResults = originalResult.additionalData.rollResults || [];
+
     let rollResults = [];
-    let hasCrit = false;
-    for (const die of roll.dice) {
-      for (const dieResult of die.results) {
-        const value = dieResult.result;
-        rollResults.push(value);
-        if (value >= 4 && value <= 6) {
-          successes++;
+
+    if (selectedIndices === null || selectedIndices.length === 0) {
+      // Reroll all dice
+      const roll = new Roll(`${totalDice}d6`);
+      await roll.evaluate();
+
+      for (const die of roll.dice) {
+        for (const dieResult of die.results) {
+          rollResults.push(dieResult.result);
+        }
+      }
+    } else {
+      // Reroll only selected dice
+      rollResults = [...originalRollResults];
+
+      for (const index of selectedIndices) {
+        if (index >= 0 && index < rollResults.length) {
+          const dieRoll = new Roll('1d6');
+          await dieRoll.evaluate();
+          rollResults[index] = dieRoll.total;
         }
       }
     }
+
+    // Calculate successes from dice
+    let successes = 0;
+    for (const value of rollResults) {
+      if (value >= 4 && value <= 6) {
+        successes++;
+      }
+    }
+
+    // Add flat modifier as auto-successes
+    const flatModifier = newModifier !== null ? newModifier : 0;
+    successes += flatModifier;
+
+    // Check for critical
+    let hasCrit = false;
     if (rollResults.length >= 2) {
       const diceAtOrAboveThreshold = rollResults.filter(
         (r) => r >= critThreshold
@@ -334,14 +426,30 @@ async function performPoolReroll(message, originalResult, sourceActor, item) {
         }
       }
     }
+
+    // Create a new roll object for the chat message
+    const roll = new Roll(`${totalDice}d6`);
+    await roll.evaluate();
+
+    // Override the roll results with our actual results
+    for (const term of roll.terms) {
+      if (term instanceof foundry.dice.terms.Die) {
+        term.results = rollResults.map((r) => ({ result: r, active: true }));
+        term._total = rollResults.reduce((sum, r) => sum + r, 0);
+      }
+    }
+    roll._total = rollResults.reduce((sum, r) => sum + r, 0);
+
     const updatedCheckResult = {
       ...foundry.utils.deepClone(originalResult),
       roll,
       finalResult: successes,
       critical: hasCrit,
+      isReroll: true,
       additionalData: {
         ...foundry.utils.deepClone(originalResult.additionalData),
         rollResults,
+        isReroll: true,
       },
     };
     await createNewChatMessage(message, sourceActor, item, updatedCheckResult);
@@ -362,9 +470,7 @@ async function performPoolReroll(message, originalResult, sourceActor, item) {
 async function performReroll(message, checkResult, sourceActor, item, options) {
   try {
     const {
-      rerollDie1,
-      rerollDie2,
-      rerollDie3,
+      selectedIndices,
       rerollAll,
       rerollMod,
       newModifier,
@@ -377,13 +483,9 @@ async function performReroll(message, checkResult, sourceActor, item, options) {
     const advantageChanged = advantageState !== checkResult.advantageState;
 
     // Check if any action is being taken
+    const hasSelectedDice = selectedIndices && selectedIndices.length > 0;
     const anyRerollSelected =
-      rerollDie1 ||
-      rerollDie2 ||
-      rerollDie3 ||
-      rerollAll ||
-      rerollMod ||
-      advantageChanged;
+      hasSelectedDice || rerollAll || rerollMod || advantageChanged;
 
     if (!anyRerollSelected) {
       ui.notifications.warn('No reroll options selected');
@@ -427,23 +529,16 @@ async function performReroll(message, checkResult, sourceActor, item, options) {
       return;
     }
 
-    // Reroll individual dice
-    if (rerollDie1) {
-      const dieRoll = new Roll('1d6');
-      await dieRoll.evaluate();
-      newDie1 = dieRoll.total;
-    }
+    // Reroll individual selected dice
+    if (selectedIndices && selectedIndices.length > 0) {
+      for (const index of selectedIndices) {
+        const dieRoll = new Roll('1d6');
+        await dieRoll.evaluate();
 
-    if (rerollDie2) {
-      const dieRoll = new Roll('1d6');
-      await dieRoll.evaluate();
-      newDie2 = dieRoll.total;
-    }
-
-    if (rerollDie3) {
-      const dieRoll = new Roll('1d6');
-      await dieRoll.evaluate();
-      newDie3 = dieRoll.total;
+        if (index === 0) newDie1 = dieRoll.total;
+        else if (index === 1) newDie2 = dieRoll.total;
+        else if (index === 2) newDie3 = dieRoll.total;
+      }
     }
 
     // Construct a new roll with the updated dice
@@ -551,12 +646,14 @@ async function buildUpdatedCheckResult(
     finalResult: newRoll.total,
     critical,
     targetedIndividuals,
+    isReroll: true,
     additionalData: {
       ...foundry.utils.deepClone(originalResult.additionalData),
       rollResults,
       critThreshold,
       totalBonus: modifier,
       diceWithStatus,
+      isReroll: true,
     },
   };
 }

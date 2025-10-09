@@ -41,6 +41,9 @@
       <span class="count">{{result.finalResult}}</span>
       <span class="icon">{{#if (gt result.finalResult 0)}}<i class="fas fa-check"></i>{{else}}<i class="fas fa-times"></i>{{/if}}</span>
     </div>
+    <button type="button" class="breakdown-toggle" data-action="toggleBreakdown" data-tooltip="{{localize 'DASU.Checks.Breakdown'}}">
+      <i class="fas fa-cog"></i>
+    </button>
     {{#if result.critical}}
       <div class="crit-indicator">
         <span class="crit-icon"><i class="fas fa-star"></i></span>
@@ -49,10 +52,43 @@
     {{/if}}
   </div>
 
+  {{!-- Breakdown section (hidden by default) --}}
+  <div class="breakdown-section" style="display: none;">
+    <div class="breakdown-content">
+      <h4>{{localize "DASU.Checks.DiceBreakdown"}}</h4>
+      {{#if result.primary}}
+        <div class="breakdown-item">
+          <span class="label">{{upper result.primary.attribute}}:</span>
+          <span class="value">{{result.primary.dice}}d6</span>
+        </div>
+      {{/if}}
+      {{#if result.secondary}}
+        <div class="breakdown-item">
+          <span class="label">{{upper result.secondary.attribute}}:</span>
+          <span class="value">{{result.secondary.dice}}d6</span>
+        </div>
+      {{/if}}
+      {{#if result.modifiers}}
+        {{#each result.modifiers}}
+          {{#if (neq value 0)}}
+            <div class="breakdown-item">
+              <span class="label">{{label}}:</span>
+              <span class="value">{{#if (gt value 0)}}+{{/if}}{{value}}</span>
+            </div>
+          {{/if}}
+        {{/each}}
+      {{/if}}
+      <div class="breakdown-total">
+        <span class="label">{{localize "DASU.Checks.TotalSuccesses"}}:</span>
+        <span class="value">{{result.finalResult}}</span>
+      </div>
+    </div>
+  </div>
+
   {{!-- Footer --}}
   <footer class="roll-footer">
     <div class="roll-metadata">
-      <span class="roll-type">{{#if isSkillCheck}}{{localize "DASU.Checks.SkillCheck"}}{{else}}{{localize "DASU.Checks.AttributeCheck"}}{{/if}}</span>
+      <span class="roll-type">{{#if isSkillCheck}}{{localize "DASU.Checks.SkillCheck"}}{{else}}{{localize "DASU.Checks.AttributeCheck"}}{{/if}}{{#if result.isReroll}} (Reroll){{/if}}</span>
       <span class="message-type">
         {{#if (eq rollMode "public")}}{{localize "DASU.MessageTypes.public"}}{{/if}}
         {{#if (eq rollMode "gmroll")}}{{localize "DASU.MessageTypes.gmroll"}}{{/if}}

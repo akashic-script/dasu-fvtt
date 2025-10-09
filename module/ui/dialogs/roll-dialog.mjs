@@ -70,6 +70,7 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
     const secondarySelect = htmlElement.querySelector('#secondaryAttribute');
     const initiativeSelect = htmlElement.querySelector('#initiativeType');
     const diceModInput = htmlElement.querySelector('#diceMod');
+    const specialtiesCheckbox = htmlElement.querySelector('#useSpecialties');
 
     if (skillSelect) {
       skillSelect.addEventListener('change', (event) => {
@@ -107,11 +108,23 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
         this._updateDiceDisplay();
       });
     }
+
+    if (specialtiesCheckbox) {
+      specialtiesCheckbox.addEventListener('change', () => {
+        this._updateDiceDisplay();
+      });
+    }
   }
 
   async _onSkillChange(event) {
     const skillName = event.target.value;
-    if (!skillName) return;
+    const specialtiesGroup = this.element.querySelector('.specialties-group');
+    const specialtiesText = this.element.querySelector('.specialties-text');
+
+    if (!skillName) {
+      if (specialtiesGroup) specialtiesGroup.classList.add('hidden');
+      return;
+    }
 
     // Find the selected skill and its governing attribute
     const skills = this.actor.system.skills || [];
@@ -125,6 +138,15 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
       const governingSelect = this.element.querySelector('#governingAttribute');
       if (governingSelect) {
         governingSelect.value = selectedSkill.govern;
+      }
+
+      // Show/hide specialties group based on whether skill has specialties
+      if (selectedSkill.specialties && selectedSkill.specialties.trim()) {
+        if (specialtiesGroup) specialtiesGroup.classList.remove('hidden');
+        if (specialtiesText)
+          specialtiesText.textContent = selectedSkill.specialties;
+      } else {
+        if (specialtiesGroup) specialtiesGroup.classList.add('hidden');
       }
     }
   }
@@ -164,6 +186,7 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
     if (rollType === 'skill') {
       const selectedSkill = formData.get('selectedSkill');
       const governingAttribute = formData.get('governingAttribute');
+      const useSpecialties = formData.get('useSpecialties') === 'on';
 
       if (selectedSkill && governingAttribute) {
         const skills = this.actor.system.skills || [];
@@ -171,9 +194,18 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
 
         if (skill) {
           const skillDice = skill.ticks || 0;
+          const skillMod = skill.mod || 0;
           const attributeDice = attributes[governingAttribute]?.tick || 0;
-          totalDice = skillDice + attributeDice + diceMod;
+          const specialtiesDice = useSpecialties ? 1 : 0;
+          totalDice =
+            skillDice + skillMod + attributeDice + specialtiesDice + diceMod;
           breakdown = `${skill.name}: ${skillDice}d6 + ${attributes[governingAttribute]?.label}: ${attributeDice}d6`;
+          if (skillMod !== 0) {
+            breakdown += ` + Skill Mod: ${skillMod}d6`;
+          }
+          if (useSpecialties) {
+            breakdown += ' + Specialties: 1d6';
+          }
         }
       }
     } else if (rollType === 'initiative') {
@@ -305,12 +337,17 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
       );
       if (skill) {
         const skillDice = skill.ticks || 0;
+        const skillMod = skill.mod || 0;
         // Use either the selected governing attribute or the skill's default
         const governingAttr =
           this.rollData.governingAttribute || skill.govern || 'dex';
         const attributeDice = attributes[governingAttr]?.tick || 0;
-        totalDice = skillDice + attributeDice + this.rollData.diceMod;
+        totalDice =
+          skillDice + skillMod + attributeDice + this.rollData.diceMod;
         breakdown = `${skill.name}: ${skillDice}d6 + ${attributes[governingAttr]?.label}: ${attributeDice}d6`;
+        if (skillMod !== 0) {
+          breakdown += ` + Skill Mod: ${skillMod}d6`;
+        }
       }
     } else if (this.rollData.rollType === 'initiative') {
       // Set default initiative type if not set
@@ -388,6 +425,19 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
     const isInEncounter =
       combat && combat.combatants.some((c) => c.actor?.id === this.actor.id);
 
+    // Get selected skill specialties info
+    let selectedSkillHasSpecialties = false;
+    let selectedSkillSpecialties = '';
+    if (this.rollData.rollType === 'skill' && this.rollData.selectedSkill) {
+      const selectedSkill = availableSkills.find(
+        (s) => s.name === this.rollData.selectedSkill
+      );
+      if (selectedSkill && selectedSkill.specialties) {
+        selectedSkillHasSpecialties = true;
+        selectedSkillSpecialties = selectedSkill.specialties;
+      }
+    }
+
     return {
       actor: {
         name: this.actor.name,
@@ -401,6 +451,8 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
       canRoll: totalDice > 0,
       isDaemon: this.rollData.isDaemon || false,
       isInEncounter: isInEncounter,
+      selectedSkillHasSpecialties,
+      selectedSkillSpecialties,
     };
   }
 
@@ -454,6 +506,7 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
     this.rollData.initiativeType = formData.get('initiativeType');
     this.rollData.diceMod = parseInt(formData.get('diceMod')) || 0;
     this.rollData.label = formData.get('label') || '';
+    this.rollData.useSpecialties = formData.get('useSpecialties') === 'on';
 
     try {
       // Prepare check data based on roll type
@@ -488,9 +541,13 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
             govern: this.rollData.governingAttribute,
           };
 
+          // Add skill mod + specialties bonus + any additional diceMod
+          const skillMod = selectedSkill.mod || 0;
+          const specialtiesBonus = this.rollData.useSpecialties ? 1 : 0;
+
           checkData = {
             skill: skillWithCustomAttribute,
-            diceMod: this.rollData.diceMod,
+            diceMod: skillMod + this.rollData.diceMod + specialtiesBonus,
             customLabel: this.rollData.label,
           };
         }
@@ -643,8 +700,9 @@ export class DASURollDialog extends foundry.applications.api.HandlebarsApplicati
       const label = dataset.label;
 
       if (rollFormula.includes(' + ')) {
-        // Skill check format: "3d6 + 2d6"
+        // Skill check format: "3d6 + 2d6" or "3d6 + 2d6 + 2d6"
         const skillName = label.split(' Check')[0];
+
         initialData = {
           rollType: 'skill',
           selectedSkill: skillName,

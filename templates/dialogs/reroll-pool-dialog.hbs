@@ -27,4 +27,28 @@
       <span class="value">{{critThreshold}}</span>
     </div>
   </div>
+
+  <div class="form-section">
+    <h4>{{localize "DASU.Reroll.Dialog.RerollOptions"}}</h4>
+    <p class="hint">{{localize "DASU.Reroll.Dialog.ClickDiceHint"}}</p>
+    <div class="reroll-checkboxes">
+      <label class="reroll-option">
+        <input type="checkbox" name="reroll-all">
+        <span class="both-icon">⚄⚄</span>
+        <span class="reroll-label">{{localize "DASU.Reroll.Dialog.RerollAll"}}</span>
+      </label>
+      <label class="reroll-option">
+        <input type="checkbox" name="reroll-mod">
+        <span class="mod-icon">±</span>
+        <span class="reroll-label">{{localize "DASU.Reroll.Dialog.AdjustModifier"}}</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="form-section modifier-group" style="display: none;">
+    <div class="form-group">
+      <label for="new-modifier">{{localize "DASU.Reroll.Dialog.NewModifier"}}</label>
+      <input type="number" name="new-modifier" id="new-modifier" value="{{currentMod}}" min="-20" max="20" step="1">
+    </div>
+  </div>
 </form>

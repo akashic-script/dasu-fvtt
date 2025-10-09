@@ -76,12 +76,61 @@
         </span>
       {{/if}}
     </div>
+    <button type="button" class="breakdown-toggle" data-action="toggleBreakdown" data-tooltip="{{localize 'DASU.Checks.Breakdown'}}">
+      <i class="fas fa-cog"></i>
+    </button>
     {{#if result.critical}}
       <div class="crit-indicator">
         <span class="crit-icon"><i class="fas fa-star"></i></span>
         <span class="crit-text">{{localize "DASU.Crit"}}</span>
       </div>
     {{/if}}
+  </div>
+
+  {{!-- Breakdown section (hidden by default) --}}
+  <div class="breakdown-section" style="display: none;">
+    <div class="breakdown-content">
+      <h4>{{localize "DASU.Checks.DiceBreakdown"}}</h4>
+      <div class="breakdown-item">
+        <span class="label">{{localize "DASU.RollCard.BaseDice"}}:</span>
+        <span class="value">2d6</span>
+      </div>
+      {{#if result.additionalData.totalBonus}}
+        <div class="breakdown-item">
+          <span class="label">{{localize "DASU.RollCard.Modifier"}}:</span>
+          <span class="value">+{{result.additionalData.totalBonus}}</span>
+        </div>
+      {{/if}}
+      {{#if result.additionalData.diceWithStatus}}
+        <div class="breakdown-item">
+          <span class="label">{{localize "DASU.RollCard.DiceRolled"}}:</span>
+          <span class="value">
+            {{#each result.additionalData.diceWithStatus}}
+              {{this.value}}{{#unless @last}}, {{/unless}}
+            {{/each}}
+          </span>
+        </div>
+      {{else if result.additionalData.rollResults}}
+        <div class="breakdown-item">
+          <span class="label">{{localize "DASU.RollCard.DiceRolled"}}:</span>
+          <span class="value">
+            {{#each result.additionalData.rollResults}}
+              {{this}}{{#unless @last}}, {{/unless}}
+            {{/each}}
+          </span>
+        </div>
+      {{/if}}
+      {{#if result.critical}}
+        <div class="breakdown-item">
+          <span class="label">{{localize "DASU.RollCard.Critical"}}:</span>
+          <span class="value">{{localize "DASU.RollCard.Yes"}}</span>
+        </div>
+      {{/if}}
+      <div class="breakdown-total">
+        <span class="label">{{localize "DASU.RollCard.TotalRoll"}}:</span>
+        <span class="value">{{result.finalResult}}</span>
+      </div>
+    </div>
   </div>
 
     {{!-- Item-Specific Information --}}
@@ -99,12 +148,6 @@
             <span class="damage-type">{{capitalize item.system.damage.type}}</span>
           </div>
         {{/if}}
-        {{#if item.system.cost}}
-          <div class="cost-info">
-            <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>
-            <span class="cost-value">{{item.system.cost}} {{localize "DASU.Labels.willPoints"}}</span>
-          </div>
-        {{/if}}
       </div>
     {{/if}}
 
@@ -117,8 +160,13 @@
         {{/if}}
         {{#if item.system.cost}}
           <div class="cost-info">
-            <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>
-            <span class="cost-value">{{item.system.cost}} {{upper item.system.costType}}</span>
+            <div class="cost-text">
+              <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>
+              <span class="cost-value">{{item.system.cost}} {{upper item.system.costType}}</span>
+            </div>
+            <button type="button" class="pay-cost-btn" data-action="payCost" data-cost="{{item.system.cost}}" data-cost-type="{{item.system.costType}}" data-tooltip="{{localize 'DASU.RollCard.PayCost'}}">
+              <i class="fas fa-minus-circle"></i>
+            </button>
           </div>
         {{/if}}
         {{!-- Only show damage for spell and technique categories --}}
@@ -157,8 +205,13 @@
         {{/if}}
         {{#if item.system.cost}}
           <div class="cost-info">
-            <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>
-            <span class="cost-value">{{item.system.cost}} {{localize "DASU.Labels.willPoints"}}</span>
+            <div class="cost-text">
+              <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>
+              <span class="cost-value">{{item.system.cost}} {{localize "DASU.Labels.willPoints"}}</span>
+            </div>
+            <button type="button" class="pay-cost-btn" data-action="payCost" data-cost="{{item.system.cost}}" data-cost-type="wp" data-tooltip="{{localize 'DASU.RollCard.PayCost'}}">
+              <i class="fas fa-minus-circle"></i>
+            </button>
           </div>
         {{/if}}
         {{#if item.system.damage}}
@@ -182,7 +235,7 @@
   {{!-- Footer --}}
   <footer class="roll-footer">
     <div class="roll-metadata">
-      <span class="roll-type">{{capitalize result.type}} {{localize "DASU.Checks.Roll"}}</span>
+      <span class="roll-type">{{capitalize result.type}} {{localize "DASU.Checks.Roll"}}{{#if result.isReroll}} (Reroll){{/if}}</span>
       <span class="message-type">
         {{#if (eq rollMode "public")}}{{localize "DASU.MessageTypes.public"}}{{/if}}
         {{#if (eq rollMode "gmroll")}}{{localize "DASU.MessageTypes.gmroll"}}{{/if}}
