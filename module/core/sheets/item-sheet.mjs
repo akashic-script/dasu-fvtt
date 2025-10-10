@@ -30,6 +30,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       deleteDoc: this._deleteEffect,
       toggleEffect: this._toggleEffect,
       toggleProgressionPreview: this._toggleProgressionPreview,
+      toggleDescription: this._toggleDescription,
       openEffectSource: this._openEffectSource,
     },
     form: {
@@ -1207,6 +1208,45 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
 
     // Render the sheet
     doc.sheet.render(true);
+  }
+
+  /**
+   * Toggle the description row for an effect
+   * @param {Event} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _toggleDescription(event, target) {
+    // Don't interfere with rollable elements, their children, or item controls
+    if (
+      event.target.closest('.rollable') ||
+      event.target.classList.contains('rollable') ||
+      event.target.closest('.item-controls') ||
+      event.target.closest('.effect-image-container')
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Find the effect/item row
+    const itemElement = target.closest('li.item');
+    if (!itemElement) return;
+
+    // Find the description row
+    const descriptionRow = itemElement.querySelector('.item-description-row');
+    if (!descriptionRow) return;
+
+    // Toggle the display
+    const isVisible = descriptionRow.style.display !== 'none';
+    descriptionRow.style.display = isVisible ? 'none' : 'block';
+
+    // Find the toggle icon (if it exists) and toggle its class
+    const toggleIcon = itemElement.querySelector('.description-toggle-icon');
+    if (toggleIcon) {
+      toggleIcon.classList.toggle('expanded', !isVisible);
+    }
   }
 
   /** Helper Functions */
