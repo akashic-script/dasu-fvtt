@@ -853,6 +853,75 @@ export class DASUActor extends Actor {
     return await super.toggleStatusEffect(statusId, options);
   }
 
+  /* -------------------------------------------- */
+  /*  Equipment Slot Methods                       */
+  /* -------------------------------------------- */
+
+  /**
+   * Equip a weapon to the weapon slot
+   * @param {string} weaponId - The ID of the weapon item to equip
+   * @returns {Promise<boolean>} Success status
+   */
+  async equipWeapon(weaponId) {
+    const weapon = this.items.get(weaponId);
+    if (!weapon || weapon.type !== 'weapon') {
+      ui.notifications.error('Invalid weapon');
+      return false;
+    }
+
+    // Unequip currently equipped weapon if any
+    if (this.system.equipped.weapon) {
+      await this.unequipWeapon();
+    }
+
+    await this.update({ 'system.equipped.weapon': weapon.uuid });
+
+    // Re-apply active effects to update weapon-based effects
+    this.applyActiveEffects();
+
+    ui.notifications.info(`Equipped ${weapon.name}`);
+    return true;
+  }
+
+  /**
+   * Unequip the currently equipped weapon
+   * @returns {Promise<boolean>} Success status
+   */
+  async unequipWeapon() {
+    if (!this.system.equipped.weapon) return false;
+
+    const weapon = await fromUuid(this.system.equipped.weapon);
+    await this.update({ 'system.equipped.weapon': null });
+
+    // Re-apply active effects to update weapon-based effects
+    this.applyActiveEffects();
+
+    if (weapon) {
+      ui.notifications.info(`Unequipped ${weapon.name}`);
+    }
+    return true;
+  }
+
+  /**
+   * Get the currently equipped weapon
+   * @returns {Promise<Item|null>} The equipped weapon or null
+   */
+  async getEquippedWeapon() {
+    if (!this.system.equipped.weapon) return null;
+    return await fromUuid(this.system.equipped.weapon);
+  }
+
+  /**
+   * Check if a specific weapon is equipped
+   * @param {string} weaponId - The ID of the weapon item
+   * @returns {boolean} True if the weapon is equipped
+   */
+  isWeaponEquipped(weaponId) {
+    if (!this.system.equipped.weapon) return false;
+    const weapon = this.items.get(weaponId);
+    return weapon?.uuid === this.system.equipped.weapon;
+  }
+
   /**
    *
    * @override

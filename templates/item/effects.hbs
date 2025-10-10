@@ -37,7 +37,7 @@
             data-parent-id='{{effect.parent.id}}'
             data-document-class='ActiveEffect'
           >
-            <div class='item-name flexrow'>
+            <div class='item-name'>
               <img class='effect-image' src='{{effect.img}}' height="24" width="24"/>
               <div>{{effect.name}}
                 {{#if effect.transfer}}
@@ -45,7 +45,7 @@
                 {{/if}}
               </div>
             </div>
-            <div class='effect-source'>{{effect.sourceName}}</div>
+            <div class='effect-source clickable' data-action='openEffectSource' data-parent-uuid='{{effect.parent.uuid}}'>{{effect.sourceName}}</div>
             <div class='effect-duration'>{{#if effect.specialDurationLabel}}{{effect.specialDurationLabel}}{{else}}{{effect.duration.label}}{{/if}}</div>
             <div class='item-controls flexrow'>
               {{#if @root.editable}}

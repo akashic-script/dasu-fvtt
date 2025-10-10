@@ -95,6 +95,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       toggleItemSection: this._toggleItemSection,
       manageResource: this._manageResource,
       manageSkill: this._manageSkill,
+      toggleWeaponEquip: this._toggleWeaponEquip,
+      openEffectSource: this._openEffectSource,
     },
     // Custom property that's merged into `this.options`
     // dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
@@ -593,6 +595,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       }
       // Append to weapons.
       else if (i.type === 'weapon') {
+        // Mark if this weapon is equipped
+        i.isEquipped = this.document.isWeaponEquipped(i.id);
         weapons.push(i);
       }
       // Append to tags.
@@ -2280,6 +2284,65 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     if (toggleIcon) {
       toggleIcon.classList.toggle('expanded', !isVisible);
     }
+  }
+
+  /**
+   * Toggle weapon equipped status
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _toggleWeaponEquip(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const weaponId = target.dataset.itemId;
+    if (!weaponId) return;
+
+    const actor = this.document;
+    const weapon = actor.items.get(weaponId);
+    if (!weapon || weapon.type !== 'weapon') return;
+
+    // Check if this weapon is already equipped
+    const isEquipped = actor.isWeaponEquipped(weaponId);
+
+    if (isEquipped) {
+      // Unequip the weapon
+      await actor.unequipWeapon();
+    } else {
+      // Equip the weapon
+      await actor.equipWeapon(weaponId);
+    }
+  }
+
+  /**
+   * Open the source document sheet for an effect (item or actor)
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _openEffectSource(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const parentUuid = target.dataset.parentUuid;
+    if (!parentUuid) return;
+
+    // Resolve the document from UUID
+    const doc = await fromUuid(parentUuid);
+    if (!doc) {
+      ui.notifications.warn('Source document not found');
+      return;
+    }
+
+    // Check if the user has permission to view the document
+    if (!doc.testUserPermission(game.user, 'OBSERVER')) {
+      ui.notifications.warn('You do not have permission to view this document');
+      return;
+    }
+
+    // Render the sheet
+    doc.sheet.render(true);
   }
 
   /**

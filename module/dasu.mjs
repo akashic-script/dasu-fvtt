@@ -1,6 +1,7 @@
 // Import document classes.
 import { DASUActor } from './core/documents/actor.mjs';
 import { DASUItem } from './core/documents/item.mjs';
+import { DASUActiveEffect } from './core/documents/active-effect.mjs';
 // Import sheet classes.
 import { DASUActorSheet } from './core/sheets/actor-sheet.mjs';
 import { DASUItemSheet } from './core/sheets/item-sheet.mjs';
@@ -311,6 +312,7 @@ Hooks.once('init', function () {
 
   // Define custom Document and DataModel classes
   CONFIG.Actor.documentClass = DASUActor;
+  CONFIG.ActiveEffect.documentClass = DASUActiveEffect;
 
   // Register Actor data models
   CONFIG.Actor.dataModels = {

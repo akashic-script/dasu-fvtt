@@ -479,7 +479,9 @@
           "range": { "label": "Range" },
           "toHit": { "label": "To Hit Bonus" }
         },
-        "Settings": {}
+        "Settings": {},
+        "Equip": "Equip Weapon",
+        "Unequip": "Unequip Weapon"
       },
       "Aptitude": "Aptitude",
       "Innate": "Innate",

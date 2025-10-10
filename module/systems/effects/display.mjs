@@ -65,7 +65,8 @@ export function prepareActiveEffectCategories(effects) {
       stackGroups.get(stackId).push(e);
     } else {
       // Non-stackable effects are added normally
-      if (e.disabled) categories.inactive.effects.push(e);
+      // Treat suppressed effects the same as disabled
+      if (e.disabled || e.isSuppressed) categories.inactive.effects.push(e);
       else if (e.isTemporary) categories.temporary.effects.push(e);
       else categories.passive.effects.push(e);
     }
@@ -84,7 +85,8 @@ export function prepareActiveEffectCategories(effects) {
     representative.stackEffects = stack;
 
     // Add to appropriate category
-    if (representative.disabled)
+    // Treat suppressed effects the same as disabled
+    if (representative.disabled || representative.isSuppressed)
       categories.inactive.effects.push(representative);
     else if (representative.isTemporary)
       categories.temporary.effects.push(representative);

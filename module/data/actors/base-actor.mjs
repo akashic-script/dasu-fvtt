@@ -52,6 +52,14 @@ export default class BaseActorDataModel extends foundry.abstract.TypeDataModel {
           blank: true,
         }),
       }),
+      equipped: new fields.SchemaField({
+        weapon: new fields.StringField({
+          required: false,
+          initial: null,
+          nullable: true,
+          blank: true,
+        }),
+      }),
     };
   }
 

@@ -1819,6 +1819,7 @@ nav#context-menu[class*='dasu-context-menu'] .context-item.loading i {
   text-transform: uppercase;
   letter-spacing: 0.3px;
   font-size: 0.8rem;
+  gap: 0.5rem;
 }
 
 .dasu.actor .item-controls {
@@ -1905,4 +1906,49 @@ nav#context-menu[class*='dasu-context-menu'] .context-item.loading i {
   display: flex;
   align-items: center;
   gap: 0.5em;
+}
+
+/* =========================
+   Weapon Equip Toggle
+   ========================= */
+.items-list .item-controls .weapon-equip-toggle {
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.items-list .item-controls .weapon-equip-toggle:hover {
+  color: var(--color-primary);
+  background: var(--color-bg-secondary);
+  opacity: 1;
+}
+
+.items-list .item-controls .weapon-equip-toggle.equipped {
+  color: var(--color-primary);
+  background: var(--color-primary) !important;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-highlight) 100%) !important;
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.4) !important;
+  opacity: 1 !important;
+}
+
+.items-list .item-controls .weapon-equip-toggle.equipped i {
+  color: var(--color-text-primary) !important;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+.items-list .item-controls .weapon-equip-toggle.equipped:hover {
+  background: linear-gradient(135deg, var(--color-primary-highlight) 0%, var(--color-primary) 100%) !important;
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.6) !important;
+  transform: scale(1.05);
+}
+
+/* Clickable effect source styling */
+.effect-source.clickable {
+  cursor: pointer;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.effect-source.clickable:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
 }

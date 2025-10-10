@@ -732,6 +732,12 @@
                   {{/each}}
                 </div>
                 <div class='item-controls'>
+                  <a class='item-control weapon-equip-toggle {{#if item.isEquipped}}equipped{{/if}}'
+                     data-tooltip='{{#if item.isEquipped}}{{localize "DASU.Weapon.Unequip"}}{{else}}{{localize "DASU.Weapon.Equip"}}{{/if}}'
+                     data-action='toggleWeaponEquip'
+                     data-item-id='{{item._id}}'>
+                    <i class='fas {{#if item.isEquipped}}fa-hand-fist{{else}}fa-hand-paper{{/if}}'></i>
+                  </a>
                   <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="weapon"}}' data-action='viewDoc'>
                     <i class='fas {{#if (or (eq item.flags.dasu.grantedByLeveling true) (includes item.traits "innate") item.isDaemonDerived)}}fa-eye{{else}}fa-edit{{/if}}'></i>
                   </a>

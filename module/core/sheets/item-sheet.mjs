@@ -30,6 +30,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       deleteDoc: this._deleteEffect,
       toggleEffect: this._toggleEffect,
       toggleProgressionPreview: this._toggleProgressionPreview,
+      openEffectSource: this._openEffectSource,
     },
     form: {
       submitOnChange: true,
@@ -1176,6 +1177,36 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       iconElement.className = 'fas fa-chevron-down';
       target.title = 'Show progression preview';
     }
+  }
+
+  /**
+   * Open the source document sheet for an effect (item or actor)
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _openEffectSource(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const parentUuid = target.dataset.parentUuid;
+    if (!parentUuid) return;
+
+    // Resolve the document from UUID
+    const doc = await fromUuid(parentUuid);
+    if (!doc) {
+      ui.notifications.warn('Source document not found');
+      return;
+    }
+
+    // Check if the user has permission to view the document
+    if (!doc.testUserPermission(game.user, 'OBSERVER')) {
+      ui.notifications.warn('You do not have permission to view this document');
+      return;
+    }
+
+    // Render the sheet
+    doc.sheet.render(true);
   }
 
   /** Helper Functions */
