@@ -314,4 +314,10 @@ export function registerHandlebarsHelpers() {
       return Array.from(usedSlotNumbers).sort((a, b) => a - b);
     }
   );
+
+  // Filter items by type
+  Handlebars.registerHelper('filterItems', function (items, itemType) {
+    if (!items || !itemType) return [];
+    return items.filter((item) => item.type === itemType);
+  });
 }

@@ -68,21 +68,59 @@
             {{#if @root.isEditMode}}
               <div class="crit-controls flexrow">
                 <label class="crit-label">{{localize 'DASU.Actor.Stats.crit.mod'}}:</label>
-                <input type="number" 
-                       name="system.stats.crit.mod" 
-                       value="{{system.stats.crit.mod}}" 
-                       min="0" 
-                       max="6" 
-                       data-dtype="Number" 
+                <input type="number"
+                       name="system.stats.crit.mod"
+                       value="{{system.stats.crit.mod}}"
+                       min="0"
+                       max="6"
+                       data-dtype="Number"
                        class="crit-mod-input"
                        data-tooltip="{{localize 'DASU.Actor.Stats.crit.modTooltip'}}" />
               </div>
-            {{else}}
-              <div class="crit-display flexrow">
-                <label class="crit-label">{{localize 'DASU.Actor.Stats.crit.mod'}}:</label>
-                <span class="crit-value">{{system.stats.crit.mod}}</span>
-              </div>
             {{/if}}
+          </div>
+
+          {{! Daemon Types Compact Section - Only for daemon actors }}
+          <div class='card-container' style='background: var(--color-bg-primary); border: 1px solid var(--color-border); padding: 0.2rem 0.4rem; align-items: center; min-height: 1.4rem; margin-bottom: 0.5rem;'>
+            <h4 class="section-header">{{localize 'DASU.Actor.DaemonTypes.Header'}}</h4>
+
+            {{! Archetype }}
+            <div class="triad-field flexrow">
+              <label class="resource-label">{{localize 'DASU.Item.Archetype.label'}}:</label>
+              {{#each (filterItems items "archetype") as |item|}}
+                <li data-document-class="Item" data-item-id="{{item._id}}" style="list-style: none;">
+                  <span class="field-value rollable" data-action="viewDoc" data-uuid="{{item.uuid}}" style="cursor: pointer;">{{item.name}}</span>
+                </li>
+              {{else}}
+                <span class="field-value" style="font-style: italic; opacity: 0.6;">{{localize 'DASU.Item.Archetype.empty'}}</span>
+              {{/each}}
+            </div>
+
+            {{! Subtype }}
+            <div class="triad-field flexrow">
+              <label class="resource-label">{{localize 'DASU.Item.Subtype.label'}}:</label>
+              {{#each (filterItems items "subtype") as |item|}}
+                <li data-document-class="Item" data-item-id="{{item._id}}" style="list-style: none;">
+                  <span class="field-value rollable" data-action="viewDoc" data-uuid="{{item.uuid}}" style="cursor: pointer;">{{item.name}}</span>
+                </li>
+              {{else}}
+                <span class="field-value" style="font-style: italic; opacity: 0.6;">{{localize 'DASU.Item.Subtype.empty'}}</span>
+              {{/each}}
+            </div>
+
+            {{! Roles }}
+            <div class="triad-field flexrow">
+              <label class="resource-label">{{localize 'DASU.Item.Role.label'}}:</label>
+              <span class="field-value">
+                {{#each (filterItems items "role") as |item|}}
+                  <li data-document-class="Item" data-item-id="{{item._id}}" style="list-style: none; display: inline;">
+                    <span class="rollable" data-action="viewDoc" data-uuid="{{item.uuid}}" style="cursor: pointer;">{{item.name}}{{#unless @last}}, {{/unless}}</span>
+                  </li>
+                {{else}}
+                  <span style="font-style: italic; opacity: 0.6;">{{localize 'DASU.Item.Role.empty'}}</span>
+                {{/each}}
+              </span>
+            </div>
           </div>
 
           {{! Moral Triad Section for Daemons }}
@@ -190,19 +228,14 @@
             {{#if @root.isEditMode}}
               <div class="crit-controls flexrow">
                 <label class="crit-label">{{localize 'DASU.Actor.Stats.crit.mod'}}:</label>
-                <input type="number" 
-                       name="system.stats.crit.mod" 
-                       value="{{system.stats.crit.mod}}" 
-                       min="0" 
-                       max="6" 
-                       data-dtype="Number" 
+                <input type="number"
+                       name="system.stats.crit.mod"
+                       value="{{system.stats.crit.mod}}"
+                       min="0"
+                       max="6"
+                       data-dtype="Number"
                        class="crit-mod-input"
                        data-tooltip="{{localize 'DASU.Actor.Stats.crit.modTooltip'}}" />
-              </div>
-            {{else}}
-              <div class="crit-display flexrow">
-                <label class="crit-label">{{localize 'DASU.Actor.Stats.crit.label'}}:</label>
-                <span class="crit-value">{{system.stats.crit.mod}}</span>
               </div>
             {{/if}}
           </div>
@@ -651,7 +684,7 @@
 <span class='item-name-text'>{{localize 'DASU.TYPES.Item.weapon'}}</span>
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="weapon"}}' data-action='createDoc' data-document-class='Item' data-type='weapon'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.weapon")}}' data-action='createDoc' data-document-class='Item' data-type='weapon'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -729,7 +762,7 @@
 <span class='item-name-text'>{{localize 'DASU.TYPES.Item.tag'}}</span>
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="tag"}}' data-action='createDoc' data-document-class='Item' data-type='tag'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.tag")}}' data-action='createDoc' data-document-class='Item' data-type='tag'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -788,7 +821,7 @@
               {{localize "DASU.Item.Aptitude"}}
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="ability"}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='technique'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.ability")}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='technique'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -847,7 +880,7 @@
               {{localize "DASU.Item.Aptitude"}}
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="ability"}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='spell'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.ability")}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='spell'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -906,7 +939,7 @@
               {{localize "DASU.Item.Aptitude"}}
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="ability"}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='affliction'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.ability")}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='affliction'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -965,7 +998,7 @@
               {{localize "DASU.Item.Aptitude"}}
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="ability"}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='restorative'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.ability")}}' data-action='createDoc' data-document-class='Item' data-type='ability' data-system-category='restorative'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -1021,7 +1054,7 @@
 <span class='item-name-text'>{{localize 'DASU.TYPES.Item.tactic'}}</span>
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="tactic"}}' data-action='createDoc' data-document-class='Item' data-type='tactic'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.tactic")}}' data-action='createDoc' data-document-class='Item' data-type='tactic'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -1072,7 +1105,7 @@
 <span class='item-name-text'>{{localize 'DASU.TYPES.Item.special'}}</span>
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="special"}}' data-action='createDoc' data-document-class='Item' data-type='special'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.special")}}' data-action='createDoc' data-document-class='Item' data-type='special'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -1124,7 +1157,7 @@
 <span class='item-name-text'>{{localize 'DASU.TYPES.Item.scar'}}</span>
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="scar"}}' data-action='createDoc' data-document-class='Item' data-type='scar'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.scar")}}' data-action='createDoc' data-document-class='Item' data-type='scar'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -1176,7 +1209,7 @@
 <span class='item-name-text'>{{localize 'DASU.TYPES.Item.schema'}}</span>
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="schema"}}' data-action='createDoc' data-document-class='Item' data-type='schema'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.schema")}}' data-action='createDoc' data-document-class='Item' data-type='schema'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -1285,7 +1318,7 @@
 <span class='item-name-text'>{{localize 'DASU.TYPES.Item.feature'}}</span>
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="feature"}}' data-action='createDoc' data-document-class='Item' data-type='feature'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.feature")}}' data-action='createDoc' data-document-class='Item' data-type='feature'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -1339,7 +1372,7 @@
 <span class='item-name-text'>{{localize 'DASU.TYPES.Item.class'}}</span>
             </div>
             <div class='item-controls'>
-                <a class='item-control item-create' data-tooltip='{{localize "DOCUMENT.Create" type="class"}}' data-action='createDoc' data-document-class='Item' data-type='class'>
+                <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.class")}}' data-action='createDoc' data-document-class='Item' data-type='class'>
                   <i class='fas fa-plus'></i>
                 </a>
             </div>

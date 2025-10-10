@@ -2,6 +2,136 @@
 <section class='tab biography scrollable {{tab.cssClass}}' data-group='primary' data-tab='biography'>
   <section class='grid grid-3col' style="height: 100%;">
     <aside class='sidebar grid-span-1'>
+      {{#if (eq actor.type "daemon")}}
+        {{#if @root.isEditMode}}
+          {{! Edit Mode - Full item list with controls }}
+          <div class='card-container drop-target' data-drop-target style='background: var(--color-bg-primary); border: 1px solid var(--color-border); padding: 0.5rem; margin-bottom: 0.5rem;'>
+            <h4 class="section-header" style="margin-bottom: 0.25rem;">{{localize 'DASU.Actor.DaemonTypes.Header'}}</h4>
+
+            {{! Archetype }}
+            <div class="daemon-type-slot drop-target" data-drop-target>
+              <div class="flexrow" style="align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                <label class="resource-label" style="font-weight: 600;">{{localize 'DASU.Item.Archetype.label'}}</label>
+                <div class="item-controls">
+                  <a class="item-control item-create" data-action="createDoc" data-document-class="Item" data-type="archetype" data-tooltip="{{localize 'DASU.Item.Create' name=(localize 'DASU.Item.Archetype.label')}}">
+                    <i class="fas fa-plus"></i>
+                  </a>
+                </div>
+              </div>
+              {{#each (filterItems items "archetype") as |item|}}
+                <li class="item flexrow draggable" data-document-class="Item" data-item-id="{{item._id}}" draggable="true" style="list-style: none; margin-bottom: 0.25rem;">
+                  <div class="item-image rollable" data-action="viewDoc" data-uuid="{{item.uuid}}" data-tooltip="{{item.name}}">
+                    <img src="{{item.img}}" alt="{{item.name}}" />
+                  </div>
+                  <h4 class="item-name">{{item.name}}</h4>
+                  <div class="item-controls">
+                    <a class="item-control" data-action="viewDoc" data-uuid="{{item.uuid}}" data-tooltip="{{localize 'SHEETS.ItemEdit'}}"><i class="fas fa-edit"></i></a>
+                    <a class="item-control" data-action="deleteDoc" data-uuid="{{item.uuid}}" data-tooltip="{{localize 'DASU.Delete'}}"><i class="fas fa-trash"></i></a>
+                  </div>
+                </li>
+              {{else}}
+                <div class="empty-slot" style="font-style: italic; opacity: 0.6; margin-bottom: 0.25rem;">{{localize 'DASU.Item.Archetype.empty'}}</div>
+              {{/each}}
+            </div>
+
+            {{! Subtype }}
+            <div class="daemon-type-slot drop-target" data-drop-target style="margin-top: 0.5rem;">
+              <div class="flexrow" style="align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                <label class="resource-label" style="font-weight: 600;">{{localize 'DASU.Item.Subtype.label'}}</label>
+                <div class="item-controls">
+                  <a class="item-control item-create" data-action="createDoc" data-document-class="Item" data-type="subtype" data-tooltip="{{localize 'DASU.Item.Create' name=(localize 'DASU.Item.Subtype.label')}}">
+                    <i class="fas fa-plus"></i>
+                  </a>
+                </div>
+              </div>
+              {{#each (filterItems items "subtype") as |item|}}
+                <li class="item flexrow draggable" data-document-class="Item" data-item-id="{{item._id}}" draggable="true" style="list-style: none; margin-bottom: 0.25rem;">
+                  <div class="item-image rollable" data-action="viewDoc" data-uuid="{{item.uuid}}" data-tooltip="{{item.name}}">
+                    <img src="{{item.img}}" alt="{{item.name}}" />
+                  </div>
+                  <h4 class="item-name">{{item.name}}</h4>
+                  <div class="item-controls">
+                    <a class="item-control" data-action="viewDoc" data-uuid="{{item.uuid}}" data-tooltip="{{localize 'SHEETS.ItemEdit'}}"><i class="fas fa-edit"></i></a>
+                    <a class="item-control" data-action="deleteDoc" data-uuid="{{item.uuid}}" data-tooltip="{{localize 'DASU.Delete'}}"><i class="fas fa-trash"></i></a>
+                  </div>
+                </li>
+              {{else}}
+                <div class="empty-slot" style="font-style: italic; opacity: 0.6; margin-bottom: 0.25rem;">{{localize 'DASU.Item.Subtype.empty'}}</div>
+              {{/each}}
+            </div>
+
+            {{! Roles }}
+            <div class="daemon-type-slot drop-target" data-drop-target style="margin-top: 0.5rem;">
+              <div class="flexrow" style="align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                <label class="resource-label" style="font-weight: 600;">{{localize 'DASU.Item.Role.label'}}</label>
+                <div class="item-controls">
+                  <a class="item-control item-create" data-action="createDoc" data-document-class="Item" data-type="role" data-tooltip="{{localize 'DASU.Item.Create' name=(localize 'DASU.Item.Role.label')}}">
+                    <i class="fas fa-plus"></i>
+                  </a>
+                </div>
+              </div>
+              {{#each (filterItems items "role") as |item|}}
+                <li class="item flexrow draggable" data-document-class="Item" data-item-id="{{item._id}}" draggable="true" style="list-style: none; margin-bottom: 0.25rem;">
+                  <div class="item-image rollable" data-action="viewDoc" data-uuid="{{item.uuid}}" data-tooltip="{{item.name}}">
+                    <img src="{{item.img}}" alt="{{item.name}}" />
+                  </div>
+                  <h4 class="item-name">{{item.name}}</h4>
+                  <div class="item-controls">
+                    <a class="item-control" data-action="viewDoc" data-uuid="{{item.uuid}}" data-tooltip="{{localize 'SHEETS.ItemEdit'}}"><i class="fas fa-edit"></i></a>
+                    <a class="item-control" data-action="deleteDoc" data-uuid="{{item.uuid}}" data-tooltip="{{localize 'DASU.Delete'}}"><i class="fas fa-trash"></i></a>
+                  </div>
+                </li>
+              {{else}}
+                <div class="empty-slot" style="font-style: italic; opacity: 0.6;">{{localize 'DASU.Item.Role.empty'}}</div>
+              {{/each}}
+            </div>
+          </div>
+        {{else}}
+          {{! Preview Mode - Compact view with just names }}
+          <div class='card-container' style='background: var(--color-bg-primary); border: 1px solid var(--color-border); padding: 0.2rem 0.4rem; align-items: center; min-height: 1.4rem; margin-bottom: 0.5rem;'>
+            <h4 class="section-header">{{localize 'DASU.Actor.DaemonTypes.Header'}}</h4>
+
+            {{! Archetype }}
+            <div class="triad-field flexrow">
+              <label class="resource-label">{{localize 'DASU.Item.Archetype.label'}}:</label>
+              {{#each (filterItems items "archetype") as |item|}}
+                <li data-document-class="Item" data-item-id="{{item._id}}" style="list-style: none;">
+                  <span class="field-value rollable" data-action="viewDoc" data-uuid="{{item.uuid}}" style="cursor: pointer;">{{item.name}}</span>
+                </li>
+              {{else}}
+                <span class="field-value" style="font-style: italic; opacity: 0.6;">{{localize 'DASU.Item.Archetype.empty'}}</span>
+              {{/each}}
+            </div>
+
+            {{! Subtype }}
+            <div class="triad-field flexrow">
+              <label class="resource-label">{{localize 'DASU.Item.Subtype.label'}}:</label>
+              {{#each (filterItems items "subtype") as |item|}}
+                <li data-document-class="Item" data-item-id="{{item._id}}" style="list-style: none;">
+                  <span class="field-value rollable" data-action="viewDoc" data-uuid="{{item.uuid}}" style="cursor: pointer;">{{item.name}}</span>
+                </li>
+              {{else}}
+                <span class="field-value" style="font-style: italic; opacity: 0.6;">{{localize 'DASU.Item.Subtype.empty'}}</span>
+              {{/each}}
+            </div>
+
+            {{! Roles }}
+            <div class="triad-field flexrow">
+              <label class="resource-label">{{localize 'DASU.Item.Role.label'}}:</label>
+              <span class="field-value">
+                {{#each (filterItems items "role") as |item|}}
+                  <li data-document-class="Item" data-item-id="{{item._id}}" style="list-style: none; display: inline;">
+                    <span class="rollable" data-action="viewDoc" data-uuid="{{item.uuid}}" style="cursor: pointer;">{{item.name}}{{#unless @last}}, {{/unless}}</span>
+                  </li>
+                {{else}}
+                  <span style="font-style: italic; opacity: 0.6;">{{localize 'DASU.Item.Role.empty'}}</span>
+                {{/each}}
+              </span>
+            </div>
+          </div>
+        {{/if}}
+      {{/if}}
+
       {{! Moral Triad Section }}
       <div class='card-container'
         style='background: var(--color-bg-primary); border: 1px solid var(--color-border); padding: 0.2rem 0.4rem; align-items: center; min-height: 1.4rem; margin-bottom: 0.5rem;'>

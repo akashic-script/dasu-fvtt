@@ -48,6 +48,15 @@
       },
       "class": {
         "htmlFields": ["description"]
+      },
+      "archetype": {
+        "htmlFields": ["description"]
+      },
+      "subtype": {
+        "htmlFields": ["description"]
+      },
+      "role": {
+        "htmlFields": ["description"]
       }
     }
   },

@@ -15,6 +15,9 @@ export { default as ScarDataModel } from '../items/item-scar.mjs';
 export { default as SchemaDataModel } from '../items/item-schema.mjs';
 export { default as FeatureDataModel } from '../items/item-feature.mjs';
 export { default as ClassDataModel } from '../items/item-class.mjs';
+export { default as ArchetypeDataModel } from '../items/item-archetype.mjs';
+export { default as SubtypeDataModel } from '../items/item-subtype.mjs';
+export { default as RoleDataModel } from '../items/item-role.mjs';
 
 // Shared Components
 export { SharedActorComponents } from './components.mjs';

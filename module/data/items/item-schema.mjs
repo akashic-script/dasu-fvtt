@@ -16,13 +16,16 @@ export default class SchemaDataModel extends BaseItemDataModel {
       }),
       // Replace levels array with three separate objects for each level
       level1: new fields.SchemaField({
-        description: new fields.StringField({ required: false, initial: '' }),
+        description: new fields.HTMLField({ required: false, initial: '' }),
+        cost: new fields.HTMLField({ required: false, initial: '' }),
       }),
       level2: new fields.SchemaField({
-        description: new fields.StringField({ required: false, initial: '' }),
+        description: new fields.HTMLField({ required: false, initial: '' }),
+        cost: new fields.HTMLField({ required: false, initial: '' }),
       }),
       level3: new fields.SchemaField({
-        description: new fields.StringField({ required: false, initial: '' }),
+        description: new fields.HTMLField({ required: false, initial: '' }),
+        cost: new fields.HTMLField({ required: false, initial: '' }),
       }),
       description: new fields.StringField({ required: false, initial: '' }),
       requirements: new fields.StringField({ required: false, initial: '' }),

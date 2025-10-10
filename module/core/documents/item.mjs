@@ -73,6 +73,49 @@ export class DASUItem extends Item {
         return false;
       }
     }
+
+    // Get the parent actor from options if not on this.actor yet
+    const parentActor = this.actor || options.parent;
+
+    // Prevent multiple archetype items per daemon actor
+    if (data.type === 'archetype' && parentActor?.type === 'daemon') {
+      const existingArchetypes = parentActor.items.filter(
+        (item) => item.type === 'archetype'
+      );
+      if (existingArchetypes.length > 0) {
+        ui.notifications.error(
+          `Cannot add multiple archetype items. Daemon already has: ${existingArchetypes[0].name}`
+        );
+        return false;
+      }
+    }
+
+    // Prevent multiple subtype items per daemon actor
+    if (data.type === 'subtype' && parentActor?.type === 'daemon') {
+      const existingSubtypes = parentActor.items.filter(
+        (item) => item.type === 'subtype'
+      );
+      if (existingSubtypes.length > 0) {
+        ui.notifications.error(
+          `Cannot add multiple subtype items. Daemon already has: ${existingSubtypes[0].name}`
+        );
+        return false;
+      }
+    }
+
+    // Prevent archetype/subtype/role items on non-daemon actors
+    if (
+      ['archetype', 'subtype', 'role'].includes(data.type) &&
+      parentActor &&
+      parentActor.type !== 'daemon'
+    ) {
+      ui.notifications.error(
+        `${
+          data.type.charAt(0).toUpperCase() + data.type.slice(1)
+        } items can only be added to daemon actors.`
+      );
+      return false;
+    }
   }
 
   /** @override */

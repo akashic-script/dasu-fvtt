@@ -1,0 +1,14 @@
+{{! Subtype Attributes Tab }}
+<section class='tab attributes-subtype scrollable {{tab.cssClass}}' data-group='primary' data-tab='attributes'>
+  <fieldset>
+    <legend>{{localize 'DASU.Description'}}</legend>
+    {{formInput @root.htmlInputField value=system.description name="system.description" toggled=@root.editable enriched=enrichedDescription disabled=(not @root.editable)}}
+  </fieldset>
+
+  <div class='separator'></div>
+
+  <fieldset>
+    <legend>{{localize 'DASU.Item.Subtype.benefits'}}</legend>
+    <input type="text" name="system.benefits" value="{{system.benefits}}" data-dtype="String" />
+  </fieldset>
+</section>

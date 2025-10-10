@@ -88,6 +88,18 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       template: 'systems/dasu/templates/item/attribute-parts/class.hbs',
       scrollable: [''],
     },
+    attributesArchetype: {
+      template: 'systems/dasu/templates/item/attribute-parts/archetype.hbs',
+      scrollable: [''],
+    },
+    attributesSubtype: {
+      template: 'systems/dasu/templates/item/attribute-parts/subtype.hbs',
+      scrollable: [''],
+    },
+    attributesRole: {
+      template: 'systems/dasu/templates/item/attribute-parts/role.hbs',
+      scrollable: [''],
+    },
     effects: {
       template: 'systems/dasu/templates/item/effects.hbs',
       scrollable: [''],
@@ -144,6 +156,15 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
         break;
       case 'class':
         options.parts.push('attributesClass', 'effects');
+        break;
+      case 'archetype':
+        options.parts.push('attributesArchetype', 'effects');
+        break;
+      case 'subtype':
+        options.parts.push('attributesSubtype', 'effects');
+        break;
+      case 'role':
+        options.parts.push('attributesRole', 'effects');
         break;
     }
   }
@@ -203,7 +224,8 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
 
     // Add system fields for formInput
     context.fields = this.document.schema.fields;
-    context.systemFields = this.document.system.schema.fields;
+    // TypeDataModel may not have a schema property, so provide a safe fallback
+    context.systemFields = this.document.system.schema?.fields || {};
 
     // Add HTMLField for formInput helper
     context.htmlInputField = new foundry.data.fields.HTMLField();
@@ -561,6 +583,21 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
             }
           );
         break;
+      case 'attributesArchetype':
+      case 'attributesSubtype':
+      case 'attributesRole':
+        context.tab = context.tabs[partId];
+        // Add enriched description for ProseMirror
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              secrets: this.document.isOwner,
+              rollData: this.item.getRollData(),
+              relativeTo: this.item,
+            }
+          );
+        break;
       case 'effects':
         context.tab = context.tabs[partId];
         // Prepare active effects for easier access
@@ -610,6 +647,9 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
         case 'attributesSchema':
         case 'attributesFeature':
         case 'attributesClass':
+        case 'attributesArchetype':
+        case 'attributesSubtype':
+        case 'attributesRole':
           tab.id = 'attributes';
           tab.label += 'Attributes';
           break;
@@ -1015,13 +1055,14 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
   static async _onEditImage(_event, target) {
     const attr = target.dataset.edit;
     const current = foundry.utils.getProperty(this.document, attr);
-    return foundry.applications.apps.FilePicker.browse('data', {
-      current,
+    const fp = new foundry.applications.apps.FilePicker({
       type: 'image',
+      current,
       callback: (path) => {
         this.document.update({ [attr]: path });
       },
     });
+    return fp.browse();
   }
 
   /**

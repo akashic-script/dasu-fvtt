@@ -76,6 +76,9 @@
       }
     },
     "Actor": {
+      "DaemonTypes": {
+        "Header": "Daemon Types"
+      },
       "Attributes": {
         "label": "Attributes",
         "list": {
@@ -418,6 +421,7 @@
           "title": "Schema Progression",
           "level": "Level",
           "description": "Description",
+          "cost": "Cost",
           "level1Placeholder": "Description for level 1",
           "level2Placeholder": "Description for level 2",
           "level3Placeholder": "Description for level 3",
@@ -484,7 +488,22 @@
       "MoreActions": "More actions",
       "NoDescriptionAvailable": "No description available",
       "LevelGranted": "Level-granted",
-      "DeleteWithoutConfirm": "Delete (no confirmation)"
+      "DeleteWithoutConfirm": "Delete (no confirmation)",
+      "Create": "Create {name}",
+      "Archetype": {
+        "label": "Archetype",
+        "benefits": "Benefits",
+        "empty": "No archetype assigned"
+      },
+      "Subtype": {
+        "label": "Subtype",
+        "benefits": "Benefits",
+        "empty": "No subtype assigned"
+      },
+      "Role": {
+        "label": "Roles",
+        "empty": "No roles assigned"
+      }
     },
     "Description": "Description",
     "SearchItems": "Search items...",
@@ -514,7 +533,10 @@
         "weapon": "Weapon",
         "schema": "Schema",
         "feature": "Feature",
-        "class": "Class"
+        "class": "Class",
+        "archetype": "Archetype",
+        "subtype": "Subtype",
+        "role": "Role"
       }
     },
     "FIELDS": {
@@ -925,7 +947,10 @@
       "weapon": "Weapon",
       "schema": "Schema",
       "feature": "Feature",
-      "class": "Class"
+      "class": "Class",
+      "archetype": "Archetype",
+      "subtype": "Subtype",
+      "role": "Role"
     }
   }
 }

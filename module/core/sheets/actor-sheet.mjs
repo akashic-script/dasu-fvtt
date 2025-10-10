@@ -305,6 +305,9 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     await this._prepareItems(context);
 
+    // Add all items array for filterItems helper
+    context.items = Array.from(this.actor.items);
+
     // Add system fields for formInput
     context.fields = this.document.schema.fields;
     context.systemFields = this.document.system.schema.fields;
