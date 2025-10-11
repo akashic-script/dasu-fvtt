@@ -23,9 +23,6 @@ export async function prepareActiveEffectCategories(effects) {
     },
   };
 
-  // Group stackable effects by stackId
-  const stackGroups = new Map();
-
   // Iterate over active effects, classifying them into categories
   for (const e of effects) {
     // Enrich the description for display
@@ -42,7 +39,7 @@ export async function prepareActiveEffectCategories(effects) {
     }
 
     const isStackable = e.flags?.dasu?.stackable;
-    const stackId = e.flags?.dasu?.stackId;
+    const currentStacks = e.flags?.dasu?.currentStacks;
 
     // Duration display priority:
     // 1. remainingTurns/remainingRounds (dynamic combat tracking)
@@ -77,40 +74,18 @@ export async function prepareActiveEffectCategories(effects) {
       e.specialDurationLabel = `${e.duration.rounds} ${roundLabel}`;
     }
 
-    if (isStackable && stackId) {
-      // Group stackable effects
-      if (!stackGroups.has(stackId)) {
-        stackGroups.set(stackId, []);
-      }
-      stackGroups.get(stackId).push(e);
-    } else {
-      // Non-stackable effects are added normally
-      // Treat suppressed effects the same as disabled
-      if (e.disabled || e.isSuppressed) categories.inactive.effects.push(e);
-      else if (e.isTemporary) categories.temporary.effects.push(e);
-      else categories.passive.effects.push(e);
+    // Add stack count for stackable effects (single effect with counter)
+    // Show badge when showStackCount is enabled and there's at least 1 stack
+    const showStackCount = e.flags?.dasu?.showStackCount;
+    if (isStackable && currentStacks && showStackCount) {
+      e.stackCount = currentStacks;
     }
-  }
 
-  // Process stackable effect groups
-  for (const [stackId, stack] of stackGroups.entries()) {
-    if (stack.length === 0) continue;
-
-    // Use the first effect as the representative
-    const representative = stack[0];
-
-    // Add stack count to the representative
-    representative.stackCount = stack.length;
-    representative.stackId = stackId;
-    representative.stackEffects = stack;
-
-    // Add to appropriate category
+    // Categorize the effect
     // Treat suppressed effects the same as disabled
-    if (representative.disabled || representative.isSuppressed)
-      categories.inactive.effects.push(representative);
-    else if (representative.isTemporary)
-      categories.temporary.effects.push(representative);
-    else categories.passive.effects.push(representative);
+    if (e.disabled || e.isSuppressed) categories.inactive.effects.push(e);
+    else if (e.isTemporary) categories.temporary.effects.push(e);
+    else categories.passive.effects.push(e);
   }
 
   // Sort each category

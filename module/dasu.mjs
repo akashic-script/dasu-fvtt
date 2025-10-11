@@ -435,42 +435,6 @@ Hooks.on('preUpdateActor', (actor, updateData, options, userId) => {
 });
 
 /* -------------------------------------------- */
-/*  Active Effect Stack Tracking Hooks          */
-/* -------------------------------------------- */
-
-Hooks.on('createActiveEffect', async (effect, options, userId) => {
-  if (!effect.parent || effect.parent.documentName !== 'Actor') return;
-
-  const actor = effect.parent;
-  const stackId = effect.flags.dasu?.stackId;
-  const isStackable = effect.flags.dasu?.stackable;
-
-  if (isStackable && stackId) {
-    const stackCount = actor.getEffectStackCount(stackId);
-
-    // Update stack count on the newly created effect
-    if (effect.flags.dasu.currentStacks !== stackCount) {
-      await effect.update({ 'flags.dasu.currentStacks': stackCount });
-    }
-  }
-});
-
-Hooks.on('deleteActiveEffect', async (effect, options, userId) => {
-  if (!effect.parent || effect.parent.documentName !== 'Actor') return;
-
-  const actor = effect.parent;
-  const stackId = effect.flags.dasu?.stackId;
-  const isStackable = effect.flags.dasu?.stackable;
-
-  if (isStackable && stackId) {
-    const stackCount = actor.getEffectStackCount(stackId);
-
-    // Update remaining stacks
-    await actor._updateStackCounts(stackId, stackCount);
-  }
-});
-
-/* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */
 

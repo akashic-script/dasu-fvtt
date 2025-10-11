@@ -23,14 +23,6 @@ export class DASUActiveEffectConfig extends foundry.applications.sheets
     context.dasuFlags = this.document.flags.dasu || {};
     context.isStackable = context.dasuFlags.stackable || false;
 
-    // Add stack mode options
-    context.stackModeOptions = {
-      ADD: 'DASU.Effect.StackMode.Add',
-      MULTIPLY: 'DASU.Effect.StackMode.Multiply',
-      MAX: 'DASU.Effect.StackMode.Max',
-      MIN: 'DASU.Effect.StackMode.Min',
-    };
-
     // Calculate current stack count if stackable
     if (context.isStackable && context.dasuFlags.stackId) {
       const actor = this.document.parent;
@@ -216,27 +208,6 @@ export class DASUActiveEffectConfig extends foundry.applications.sheets
             dasuFlags.maxStacks || ''
           }" min="1" placeholder="Unlimited" />
           <p class="hint">${game.i18n.localize('DASU.Effect.MaxStacksHint')}</p>
-        </div>
-
-        <div class="form-group">
-          <label for="flags.dasu.stackMode">${game.i18n.localize(
-            'DASU.Effect.StackModeLabel'
-          )}</label>
-          <select name="flags.dasu.stackMode">
-            <option value="ADD" ${
-              dasuFlags.stackMode === 'ADD' ? 'selected' : ''
-            }>${game.i18n.localize('DASU.Effect.StackMode.Add')}</option>
-            <option value="MULTIPLY" ${
-              dasuFlags.stackMode === 'MULTIPLY' ? 'selected' : ''
-            }>${game.i18n.localize('DASU.Effect.StackMode.Multiply')}</option>
-            <option value="MAX" ${
-              dasuFlags.stackMode === 'MAX' ? 'selected' : ''
-            }>${game.i18n.localize('DASU.Effect.StackMode.Max')}</option>
-            <option value="MIN" ${
-              dasuFlags.stackMode === 'MIN' ? 'selected' : ''
-            }>${game.i18n.localize('DASU.Effect.StackMode.Min')}</option>
-          </select>
-          <p class="hint">${game.i18n.localize('DASU.Effect.StackModeHint')}</p>
         </div>
 
         <div class="form-group">

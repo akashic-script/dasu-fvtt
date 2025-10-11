@@ -630,38 +630,42 @@ export class DASUActor extends Actor {
 
   /**
    * Get the current stack count for a specific effect
+   * Uses the currentStacks property from the single effect document
    * @param {string} stackId - The stack identifier
    * @returns {number} Number of active stacks
    */
   getEffectStackCount(stackId) {
     if (!stackId) return 0;
 
-    return this.effects.filter(
+    const effect = this.effects.find(
       (e) => e.flags.dasu?.stackId === stackId && !e.disabled
-    ).length;
+    );
+
+    return effect?.flags.dasu?.currentStacks || 0;
   }
 
   /**
-   * Get all stacks of a specific effect
+   * Get the stackable effect by stackId
    * @param {string} stackId - The stack identifier
-   * @returns {ActiveEffect[]} Array of effect instances
+   * @returns {ActiveEffect|null} The effect or null
    */
-  getEffectStacks(stackId) {
-    if (!stackId) return [];
+  getStackableEffect(stackId) {
+    if (!stackId) return null;
 
-    return this.effects.filter(
+    return this.effects.find(
       (e) => e.flags.dasu?.stackId === stackId && !e.disabled
     );
   }
 
   /**
    * Add a stackable effect with automatic stack limit checking
+   * DEPRECATED: Use EffectProcessor.applyEffect() instead
+   * This method is kept for backwards compatibility
    * @param {object} effectData - The effect data to add
-   * @returns {ActiveEffect|null} The created effect or null if limit reached
+   * @returns {ActiveEffect|null} The created/updated effect or null if limit reached
    */
   async addStackableEffect(effectData) {
     const stackId = effectData.flags?.dasu?.stackId;
-    const maxStacks = effectData.flags?.dasu?.maxStacks;
     const isStackable = effectData.flags?.dasu?.stackable;
 
     if (!isStackable || !stackId) {
@@ -672,29 +676,11 @@ export class DASUActor extends Actor {
       return effect;
     }
 
-    // Check current stack count
-    const currentStacks = this.getEffectStackCount(stackId);
-
-    if (maxStacks && currentStacks >= maxStacks) {
-      ui.notifications.warn(
-        `Maximum stacks (${maxStacks}) reached for ${effectData.name}`
-      );
-      Hooks.call('dasu.effectStackLimitReached', this, effectData, maxStacks);
-      return null;
-    }
-
-    // Create the new stack
-    const [effect] = await this.createEmbeddedDocuments('ActiveEffect', [
-      effectData,
-    ]);
-
-    // Update currentStacks on all instances
-    const newStackCount = currentStacks + 1;
-    await this._updateStackCounts(stackId, newStackCount);
-
-    Hooks.call('dasu.effectStackAdded', this, effect, newStackCount);
-
-    return effect;
+    // Use the EffectProcessor for proper stacking behavior
+    const EffectProcessor = (
+      await import('../../systems/effects/processor.mjs')
+    ).EffectProcessor;
+    return await EffectProcessor.applyEffect(this, effectData);
   }
 
   /**
@@ -703,35 +689,23 @@ export class DASUActor extends Actor {
    * @returns {Promise<void>}
    */
   async removeEffectStack(stackId) {
-    const stacks = this.getEffectStacks(stackId);
+    const effect = this.getStackableEffect(stackId);
 
-    if (stacks.length === 0) return;
+    if (!effect) return;
 
-    // Remove the oldest stack (first in array)
-    const stackToRemove = stacks[0];
-    await stackToRemove.delete();
+    const currentStacks = effect.flags.dasu.currentStacks || 1;
 
-    const remainingStacks = stacks.length - 1;
-    await this._updateStackCounts(stackId, remainingStacks);
-
-    Hooks.call('dasu.effectStackRemoved', this, stackToRemove, remainingStacks);
-  }
-
-  /**
-   * Update currentStacks count on all instances of a stack
-   * @private
-   * @param {string} stackId - The stack identifier
-   * @param {number} count - The new stack count
-   */
-  async _updateStackCounts(stackId, count) {
-    const stacks = this.getEffectStacks(stackId);
-    const updates = stacks.map((e) => ({
-      _id: e.id,
-      'flags.dasu.currentStacks': count,
-    }));
-
-    if (updates.length > 0) {
-      await this.updateEmbeddedDocuments('ActiveEffect', updates);
+    if (currentStacks <= 1) {
+      // Last stack - delete the effect entirely
+      await effect.delete();
+      Hooks.call('dasu.effectStackRemoved', this, effect, 0);
+    } else {
+      // Decrement stack count
+      const newStacks = currentStacks - 1;
+      await effect.update({
+        'flags.dasu.currentStacks': newStacks,
+      });
+      Hooks.call('dasu.effectStackRemoved', this, effect, newStacks);
     }
   }
 

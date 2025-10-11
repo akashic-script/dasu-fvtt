@@ -47,13 +47,14 @@ function _onRenderTokenHUD(hud, html, data) {
 function _setupStackableEffect(element, hud, statusId, statusCondition) {
   element.classList.add('stackable-effect');
 
-  // Add stack count badge
+  // Add stack count badge if showStackCount is enabled
   const actor = hud.object?.actor;
   if (actor) {
     const stackId = statusCondition.flags.dasu.stackId;
+    const showStackCount = statusCondition.flags.dasu.showStackCount;
     const stackCount = actor.getEffectStackCount?.(stackId) || 0;
 
-    if (stackCount > 0) {
+    if (stackCount > 0 && showStackCount) {
       const badge = document.createElement('span');
       badge.className = 'stack-count-badge';
       badge.textContent = stackCount;

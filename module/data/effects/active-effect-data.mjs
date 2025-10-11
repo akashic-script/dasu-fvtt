@@ -42,18 +42,6 @@ export class DASUActiveEffectData extends foundry.abstract.DataModel {
         label: 'DASU.Effect.CurrentStacks',
         hint: 'DASU.Effect.CurrentStacksHint',
       }),
-      stackMode: new fields.StringField({
-        required: true,
-        initial: 'ADD',
-        choices: {
-          ADD: 'DASU.Effect.StackMode.Add',
-          MULTIPLY: 'DASU.Effect.StackMode.Multiply',
-          MAX: 'DASU.Effect.StackMode.Max',
-          MIN: 'DASU.Effect.StackMode.Min',
-        },
-        label: 'DASU.Effect.StackMode',
-        hint: 'DASU.Effect.StackModeHint',
-      }),
       showStackCount: new fields.BooleanField({
         required: true,
         initial: true,

@@ -147,6 +147,10 @@ export class EffectProcessor {
 
   /**
    * Apply a stackable effect
+   * Uses a single effect document with stack counter
+   * - New applications increment currentStacks
+   * - Duration is MAX(remaining, new) to prevent downgrade
+   * - Origin updates to the latest caster
    * @private
    */
   static async _applyStackableEffect(actor, effectData, options) {
@@ -168,23 +172,73 @@ export class EffectProcessor {
       );
     }
 
-    // Check if we've hit max stacks
-    const maxStacks = effectData.flags.dasu.maxStacks;
-    if (maxStacks) {
-      const currentCount = actor.getEffectStackCount?.(stackId) || 0;
-      if (currentCount >= maxStacks) {
+    // Find existing effect with same stackId
+    const existing = actor.effects.find(
+      (e) => e.flags?.dasu?.stackId === stackId && e.flags?.dasu?.stackable
+    );
+
+    if (existing) {
+      // Update existing effect
+      const currentStacks = existing.flags.dasu.currentStacks || 1;
+      const maxStacks = effectData.flags.dasu.maxStacks;
+
+      // Check max stacks
+      if (maxStacks && currentStacks >= maxStacks) {
         ui.notifications.warn(
           `Cannot add more stacks of ${effectData.name} (max: ${maxStacks})`
         );
         return null;
       }
-    }
 
-    // Create a new stack
-    const [created] = await actor.createEmbeddedDocuments('ActiveEffect', [
-      effectData,
-    ]);
-    return created;
+      // Calculate new duration (MAX of remaining vs new)
+      const newDuration = effectData.flags?.dasu?.remainingTurns;
+      const currentRemaining = existing.flags?.dasu?.remainingTurns;
+      const finalDuration =
+        newDuration && currentRemaining
+          ? Math.max(newDuration, currentRemaining)
+          : newDuration || currentRemaining;
+
+      // Build update data
+      const updates = {
+        'flags.dasu.currentStacks': currentStacks + 1,
+        origin: effectData.origin, // Update to new caster
+      };
+
+      // Update duration if applicable
+      if (finalDuration !== undefined) {
+        updates['flags.dasu.remainingTurns'] = finalDuration;
+        updates['flags.dasu.startRound'] = game.combat?.round;
+        updates['flags.dasu.startTurn'] = game.combat?.turn;
+        updates['flags.dasu.hasDecrementedOnce'] = false;
+      }
+
+      // Handle round-based duration too
+      const newRounds = effectData.flags?.dasu?.remainingRounds;
+      const currentRounds = existing.flags?.dasu?.remainingRounds;
+      if (newRounds || currentRounds) {
+        const finalRounds =
+          newRounds && currentRounds
+            ? Math.max(newRounds, currentRounds)
+            : newRounds || currentRounds;
+        updates['flags.dasu.remainingRounds'] = finalRounds;
+      }
+
+      await existing.update(updates);
+      return existing;
+    } else {
+      // Create new effect with initial stack count
+      const createData = foundry.utils.deepClone(effectData);
+      createData.flags.dasu.currentStacks = 1;
+
+      // Mark this as processed by DASU to avoid duplicate duration conversion
+      const createOptions = { ...options, dasuProcessed: true };
+      const [created] = await actor.createEmbeddedDocuments(
+        'ActiveEffect',
+        [createData],
+        createOptions
+      );
+      return created;
+    }
   }
 
   /**
