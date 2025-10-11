@@ -1,0 +1,154 @@
+<div class="daemon-fusion-content">
+  <div class="fusion-instructions">
+    <i class="fas fa-info-circle"></i>
+    <p>{{localize "DASU.DaemonFusion.Instructions"}}</p>
+  </div>
+
+  {{!-- Tab Navigation --}}
+  <nav class="fusion-tabs">
+    <button type="button" class="fusion-tab {{#if activeTabIsPreview}}active{{/if}}" data-action="switchTab" data-tab="preview">
+      <i class="fas fa-eye"></i>
+      <span>{{localize "DASU.DaemonFusion.PreviewTab"}}</span>
+    </button>
+    <button type="button" class="fusion-tab {{#unless activeTabIsPreview}}active{{/unless}}" data-action="switchTab" data-tab="customize">
+      <i class="fas fa-cog"></i>
+      <span>{{localize "DASU.DaemonFusion.CustomizeTab"}}</span>
+    </button>
+  </nav>
+
+  {{!-- Preview Tab Content --}}
+  <div class="tab-content {{#if activeTabIsPreview}}active{{/if}}" data-tab="preview">
+  {{#if isEmpty}}
+    <div class="fusion-drop-zone empty">
+      <i class="fas fa-dragon"></i>
+      <p>{{localize "DASU.DaemonFusion.DropHere"}}</p>
+    </div>
+  {{else}}
+    <div class="fusion-drop-zone">
+      <div class="daemon-list">
+        {{#each daemons}}
+          <div class="daemon-card" data-daemon-id="{{this.id}}">
+            <img src="{{this.img}}" alt="{{this.name}}" class="daemon-portrait" />
+            <div class="daemon-info">
+              <div class="daemon-name">{{this.name}}</div>
+              <div class="daemon-level">{{localize "DASU.Level"}} {{this.level}}</div>
+            </div>
+            <button
+              type="button"
+              class="daemon-remove"
+              data-action="removeDaemon"
+              data-daemon-id="{{this.id}}"
+              data-tooltip="{{localize 'DASU.Remove'}}"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        {{/each}}
+      </div>
+      <div class="fusion-drop-hint">
+        <i class="fas fa-plus"></i>
+        <p>{{localize "DASU.DaemonFusion.DropMoreHere"}}</p>
+      </div>
+    </div>
+  {{/if}}
+
+  {{#if canFuse}}
+    <div class="fusion-result-preview">
+      <div class="result-header">
+        <span>{{localize "DASU.DaemonFusion.ResultPreview"}}</span>
+      </div>
+      <div class="result-card">
+        <img src="{{resultPreview.img}}" alt="{{resultPreview.name}}" class="result-portrait" />
+        <div class="result-info">
+          <div class="result-name">{{resultPreview.name}}</div>
+          <div class="result-level">{{localize "DASU.Level"}} {{resultPreview.level}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fusion-status ready">
+      <i class="fas fa-check-circle"></i>
+      <p>{{localize "DASU.DaemonFusion.ReadyToFuse"}}</p>
+    </div>
+  {{else}}
+    <div class="fusion-status warning">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{localize "DASU.DaemonFusion.NeedTwoDaemons"}}</p>
+    </div>
+  {{/if}}
+  </div>
+
+  {{!-- Customize Tab Content --}}
+  <div class="tab-content {{#unless activeTabIsPreview}}active{{/unless}}" data-tab="customize">
+    <div class="customize-section">
+      <h3>{{localize "DASU.DaemonFusion.LevelCalculation"}}</h3>
+      <select name="levelFormula" data-setting="levelFormula">
+        <option value="average" {{#if (eq settings.levelFormula "average")}}selected{{/if}}>{{localize "DASU.DaemonFusion.LevelAverage"}}</option>
+        <option value="sum" {{#if (eq settings.levelFormula "sum")}}selected{{/if}}>{{localize "DASU.DaemonFusion.LevelSum"}}</option>
+        <option value="max" {{#if (eq settings.levelFormula "max")}}selected{{/if}}>{{localize "DASU.DaemonFusion.LevelMax"}}</option>
+        <option value="maxPlus" {{#if (eq settings.levelFormula "maxPlus")}}selected{{/if}}>{{localize "DASU.DaemonFusion.LevelMaxPlus"}}</option>
+      </select>
+    </div>
+
+    <div class="customize-section">
+      <h3>{{localize "DASU.DaemonFusion.NamePattern"}}</h3>
+      <select name="namePattern" data-setting="namePattern">
+        <option value="fusedFirst" {{#if (eq settings.namePattern "fusedFirst")}}selected{{/if}}>{{localize "DASU.DaemonFusion.NameFusedFirst"}}</option>
+        <option value="combined" {{#if (eq settings.namePattern "combined")}}selected{{/if}}>{{localize "DASU.DaemonFusion.NameCombined"}}</option>
+        <option value="first" {{#if (eq settings.namePattern "first")}}selected{{/if}}>{{localize "DASU.DaemonFusion.NameFirst"}}</option>
+        <option value="last" {{#if (eq settings.namePattern "last")}}selected{{/if}}>{{localize "DASU.DaemonFusion.NameLast"}}</option>
+      </select>
+    </div>
+
+    <div class="customize-section">
+      <h3>{{localize "DASU.DaemonFusion.ImageSource"}}</h3>
+      <select name="imageSource" data-setting="imageSource">
+        <option value="first" {{#if (eq settings.imageSource "first")}}selected{{/if}}>{{localize "DASU.DaemonFusion.ImageFirst"}}</option>
+        <option value="last" {{#if (eq settings.imageSource "last")}}selected{{/if}}>{{localize "DASU.DaemonFusion.ImageLast"}}</option>
+        <option value="highest" {{#if (eq settings.imageSource "highest")}}selected{{/if}}>{{localize "DASU.DaemonFusion.ImageHighest"}}</option>
+        <option value="random" {{#if (eq settings.imageSource "random")}}selected{{/if}}>{{localize "DASU.DaemonFusion.ImageRandom"}}</option>
+      </select>
+    </div>
+
+    <div class="customize-section">
+      <h3>{{localize "DASU.DaemonFusion.AttributeHandling"}}</h3>
+      <select name="attributeFormula" data-setting="attributeFormula">
+        <option value="first" {{#if (eq settings.attributeFormula "first")}}selected{{/if}}>{{localize "DASU.DaemonFusion.AttributesFirst"}}</option>
+        <option value="average" {{#if (eq settings.attributeFormula "average")}}selected{{/if}}>{{localize "DASU.DaemonFusion.AttributesAverage"}}</option>
+        <option value="sum" {{#if (eq settings.attributeFormula "sum")}}selected{{/if}}>{{localize "DASU.DaemonFusion.AttributesSum"}}</option>
+        <option value="max" {{#if (eq settings.attributeFormula "max")}}selected{{/if}}>{{localize "DASU.DaemonFusion.AttributesMax"}}</option>
+      </select>
+    </div>
+
+    <div class="customize-section">
+      <h3>{{localize "DASU.DaemonFusion.ItemInheritance"}}</h3>
+      <select name="itemInheritance" data-setting="itemInheritance">
+        <option value="merge" {{#if (eq settings.itemInheritance "merge")}}selected{{/if}}>{{localize "DASU.DaemonFusion.ItemsMerge"}}</option>
+        <option value="first" {{#if (eq settings.itemInheritance "first")}}selected{{/if}}>{{localize "DASU.DaemonFusion.ItemsFirst"}}</option>
+        <option value="none" {{#if (eq settings.itemInheritance "none")}}selected{{/if}}>{{localize "DASU.DaemonFusion.ItemsNone"}}</option>
+      </select>
+    </div>
+
+    {{#if canFuse}}
+    <div class="customize-section">
+      <h3>{{localize "DASU.DaemonFusion.ResistanceSource"}}</h3>
+      <select name="resistanceSource" data-setting="resistanceSource">
+        {{#each daemons}}
+          <option value="{{this.id}}" {{#if (eq ../settings.resistanceSource this.id)}}selected{{/if}}>{{this.name}} ({{localize "DASU.Level"}} {{this.level}})</option>
+        {{/each}}
+      </select>
+    </div>
+    {{/if}}
+  </div>
+
+  <footer class="form-footer">
+    <button type="button" data-action="clearAll" class="secondary">
+      <i class="fas fa-trash"></i>
+      <span>{{localize "DASU.DaemonFusion.ClearAll"}}</span>
+    </button>
+    <button type="button" data-action="performFusion" class="primary">
+      <i class="fas fa-fire"></i>
+      <span>{{localize "DASU.DaemonFusion.Fuse"}}</span>
+    </button>
+  </footer>
+</div>

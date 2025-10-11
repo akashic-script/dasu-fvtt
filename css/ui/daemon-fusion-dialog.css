@@ -1,0 +1,460 @@
+/**
+ * Daemon Fusion Dialog Styles
+ */
+
+/* Base Dialog */
+.daemon-fusion {
+  padding: 0;
+  font-family: var(--font-primary);
+  min-width: 400px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.daemon-fusion .daemon-fusion-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  min-height: 300px;
+}
+
+/* Instructions Banner */
+.daemon-fusion .fusion-instructions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 0;
+  margin-bottom: 12px;
+}
+
+.daemon-fusion .fusion-instructions i {
+  font-size: 20px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.daemon-fusion .fusion-instructions p {
+  margin: 0;
+  font-size: 0.9em;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+/* Tab Navigation */
+.daemon-fusion .fusion-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 16px;
+}
+
+.daemon-fusion .fusion-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  font: 600 0.85em var(--font-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.daemon-fusion .fusion-tab:not(:first-child) {
+  border-left: none;
+}
+
+.daemon-fusion .fusion-tab:hover:not(.active) {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.daemon-fusion .fusion-tab.active {
+  background: var(--color-bg-secondary);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  border-bottom: 2px solid var(--color-bg-secondary);
+  margin-bottom: -1px;
+  position: relative;
+  z-index: 1;
+}
+
+.daemon-fusion .fusion-tab i {
+  font-size: 14px;
+}
+
+/* Tab Content */
+.daemon-fusion .tab-content {
+  display: none;
+}
+
+.daemon-fusion .tab-content.active {
+  display: block;
+}
+
+/* Customize Tab */
+.daemon-fusion .customize-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  margin-bottom: 12px;
+}
+
+.daemon-fusion .customize-section:last-child {
+  margin-bottom: 0;
+}
+
+.daemon-fusion .customize-section h3 {
+  margin: 0;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 6px;
+}
+
+.daemon-fusion .customize-section select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-family: var(--font-primary);
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.daemon-fusion .customize-section select:hover {
+  border-color: var(--color-primary);
+}
+
+.daemon-fusion .customize-section select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* Drop Zone */
+.daemon-fusion .fusion-drop-zone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 2px dashed var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg-primary);
+  min-height: 200px;
+  transition: border-color 0.2s;
+}
+
+.daemon-fusion .fusion-drop-zone:hover {
+  border-color: var(--color-primary);
+}
+
+.daemon-fusion .fusion-drop-zone.empty {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.daemon-fusion .fusion-drop-zone.empty i {
+  font-size: 64px;
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.daemon-fusion .fusion-drop-zone.empty p {
+  font-size: 1em;
+  color: var(--color-text-secondary);
+  margin: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Daemon Cards */
+.daemon-fusion .daemon-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.daemon-fusion .daemon-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  transition: all 0.2s;
+}
+
+.daemon-fusion .daemon-card:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-primary);
+}
+
+.daemon-fusion .daemon-portrait {
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  border: 2px solid var(--color-border);
+  object-fit: cover;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
+}
+
+.daemon-fusion .daemon-portrait:hover {
+  border-color: var(--color-primary);
+}
+
+.daemon-fusion .daemon-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.daemon-fusion .daemon-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
+}
+
+.daemon-fusion .daemon-name:hover {
+  color: var(--color-primary);
+}
+
+.daemon-fusion .daemon-level {
+  font-size: 0.85em;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.daemon-fusion .daemon-remove {
+  width: 32px;
+  height: 32px;
+  border-radius: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.daemon-fusion .daemon-remove:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Drop Hint */
+.daemon-fusion .fusion-drop-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px dashed var(--color-border);
+  border-radius: 0;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-secondary);
+  transition: all 0.2s;
+}
+
+.daemon-fusion .fusion-drop-hint:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.daemon-fusion .fusion-drop-hint p {
+  margin: 0;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Result Preview */
+.daemon-fusion .fusion-result-preview {
+  padding: 8px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  margin-top: 8px;
+}
+
+.daemon-fusion .result-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-size: 0.8em;
+}
+
+.daemon-fusion .result-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+.daemon-fusion .result-portrait {
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  border: 2px solid var(--color-border);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.daemon-fusion .result-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.daemon-fusion .result-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: 0.3px;
+}
+
+.daemon-fusion .result-level {
+  font-size: 0.85em;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Status Messages */
+.daemon-fusion .fusion-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 0;
+  font-size: 0.9em;
+  border: 1px solid;
+}
+
+.daemon-fusion .fusion-status i {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.daemon-fusion .fusion-status p {
+  margin: 0;
+  flex: 1;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.daemon-fusion .fusion-status.warning {
+  background: var(--color-bg-primary);
+  border-color: #fbbf24;
+  color: #fbbf24;
+}
+
+.daemon-fusion .fusion-status.ready {
+  background: var(--color-bg-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Footer Buttons */
+.daemon-fusion .form-footer {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+}
+
+.daemon-fusion .form-footer button {
+  flex: 1;
+  min-width: 100px;
+  min-height: 40px;
+  padding: 10px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: 600 0.85em var(--font-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.daemon-fusion .form-footer button.secondary {
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+}
+
+.daemon-fusion .form-footer button.secondary:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-bg-secondary);
+}
+
+.daemon-fusion .form-footer button.primary {
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+  border-color: var(--color-primary);
+  flex: 2;
+}
+
+.daemon-fusion .form-footer button.primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.daemon-fusion .form-footer button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}

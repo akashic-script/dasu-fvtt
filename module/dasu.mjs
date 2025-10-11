@@ -34,6 +34,8 @@ import {
 } from './systems/effects/index.mjs';
 // Import combat tracker enhancements
 import { initializeCombatTracker } from './core/combat-tracker.mjs';
+// Import system controls
+import { SystemControls } from './helpers/system-controls.mjs';
 
 const collections = foundry.documents.collections;
 const sheets = foundry.appv1.sheets;
@@ -60,6 +62,7 @@ globalThis.DASU = {
   },
   settings: DASUSettings,
   models,
+  SystemControls,
   // Include config from config.mjs
   ...DASUConfig,
 };
@@ -381,6 +384,12 @@ Hooks.once('init', function () {
   initializeHealingEnricher();
   initializeDamageEnricher();
   initializeCostEnricher();
+
+  // Initialize system controls
+  SystemControls.initialize();
+
+  // Import daemon fusion dialog (registers the system control button)
+  import('./ui/daemon-fusion-dialog.mjs');
 });
 
 // Initialize event handlers when ready

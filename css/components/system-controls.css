@@ -1,0 +1,43 @@
+/**
+ * System Controls Styles
+ * For custom buttons in the UI controls area
+ */
+
+.system-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.system-controls .control {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border-dark-primary, #666);
+  border-radius: 0;
+  background: var(--color-bg-btn, #333);
+  color: var(--color-text-light-primary, #ddd);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.system-controls .control:hover {
+  background: var(--color-bg-btn-hover, #555);
+  border-color: var(--color-border-highlight, #888);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.system-controls .control.toggle[aria-pressed='true'] {
+  background: var(--color-bg-btn-active, #4a4);
+  border-color: var(--color-border-highlight-success, #6c6);
+  color: white;
+}
+
+.system-controls .control i {
+  font-size: 18px;
+  pointer-events: none;
+}
