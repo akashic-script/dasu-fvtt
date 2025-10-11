@@ -551,14 +551,107 @@ Hooks.on('preUpdateActiveEffect', (effect, changes, options, userId) => {
   }
 });
 
-Hooks.on('updateCombat', async (combat, updateData, options, userId) => {
-  if (!('turn' in updateData) && !('round' in updateData)) {
-    return;
-  }
+/**
+ * Initialize duration tracking for existing effects when combat starts
+ * This handles effects that were created before combat began
+ */
+Hooks.on('createCombat', async (combat, options, userId) => {
+  // Only run on GM's client
+  if (!game.user.isGM) return;
 
-  if (!game.user.isGM) {
-    return;
+  // Get all actors in the combat
+  for (const combatant of combat.combatants) {
+    const actor = combatant.actor;
+    if (!actor) continue;
+
+    // Check each effect on the actor
+    for (const effect of actor.effects) {
+      // Skip effects that already have tracking initialized
+      if (
+        effect.flags?.dasu?.remainingTurns !== undefined ||
+        effect.flags?.dasu?.remainingRounds !== undefined ||
+        effect.flags?.dasu?.linkedCombat !== undefined
+      ) {
+        continue;
+      }
+
+      const updates = {};
+
+      // Initialize remainingRounds if duration.rounds exists
+      if (effect.duration?.rounds && effect.duration.rounds > 0) {
+        updates['flags.dasu.remainingRounds'] = effect.duration.rounds;
+        updates['flags.dasu.linkedCombat'] = combat.id;
+      }
+
+      // Initialize remainingTurns if duration.turns exists
+      if (effect.duration?.turns && effect.duration.turns > 0) {
+        updates['flags.dasu.remainingTurns'] = effect.duration.turns;
+        updates['flags.dasu.linkedCombat'] = combat.id;
+        updates['flags.dasu.startRound'] = combat.round;
+        updates['flags.dasu.startTurn'] = combat.turn;
+        updates['flags.dasu.hasDecrementedOnce'] = false;
+      }
+
+      // Apply updates if there are any
+      if (Object.keys(updates).length > 0) {
+        await effect.update(updates);
+      }
+    }
   }
+});
+
+/**
+ * Initialize duration tracking when a combatant is added to an existing combat
+ * This handles actors added to combat after it has started
+ */
+Hooks.on('createCombatant', async (combatant, options, userId) => {
+  // Only run on GM's client
+  if (!game.user.isGM) return;
+
+  const actor = combatant.actor;
+  if (!actor) return;
+
+  const combat = combatant.combat;
+  if (!combat) return;
+
+  // Check each effect on the actor
+  for (const effect of actor.effects) {
+    // Skip effects that already have tracking initialized
+    if (
+      effect.flags?.dasu?.remainingTurns !== undefined ||
+      effect.flags?.dasu?.remainingRounds !== undefined ||
+      effect.flags?.dasu?.linkedCombat !== undefined
+    ) {
+      continue;
+    }
+
+    const updates = {};
+
+    // Initialize remainingRounds if duration.rounds exists
+    if (effect.duration?.rounds && effect.duration.rounds > 0) {
+      updates['flags.dasu.remainingRounds'] = effect.duration.rounds;
+      updates['flags.dasu.linkedCombat'] = combat.id;
+    }
+
+    // Initialize remainingTurns if duration.turns exists
+    if (effect.duration?.turns && effect.duration.turns > 0) {
+      updates['flags.dasu.remainingTurns'] = effect.duration.turns;
+      updates['flags.dasu.linkedCombat'] = combat.id;
+      updates['flags.dasu.startRound'] = combat.round;
+      updates['flags.dasu.startTurn'] = combat.turn;
+      updates['flags.dasu.hasDecrementedOnce'] = false;
+    }
+
+    // Apply updates if there are any
+    if (Object.keys(updates).length > 0) {
+      await effect.update(updates);
+    }
+  }
+});
+
+Hooks.on('updateCombat', async (combat, updateData, options, userId) => {
+  if (!('turn' in updateData) && !('round' in updateData)) return;
+  if (!game.user.isGM) return;
 
   const isRoundChange = 'round' in updateData;
   const isTurnChange = 'turn' in updateData;
@@ -723,12 +816,9 @@ async function _handleAllCombatantsTurnEffects(combat) {
 
 async function _handleTurnBasedEffects(combat) {
   const combatant = combat.combatant;
-  if (!combatant?.actor) {
-    return;
-  }
+  if (!combatant?.actor) return;
 
   const actor = combatant.actor;
-
   const effectsToDelete = [];
   const chatMessages = [];
 

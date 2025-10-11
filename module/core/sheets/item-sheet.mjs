@@ -603,7 +603,9 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       case 'effects':
         context.tab = context.tabs[partId];
         // Prepare active effects for easier access
-        context.effects = prepareActiveEffectCategories(this.item.effects);
+        context.effects = await prepareActiveEffectCategories(
+          this.item.effects
+        );
         break;
       default:
     }

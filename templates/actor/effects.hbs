@@ -115,7 +115,7 @@
             </div>
             <div class='item-description-row' style='display: none;'>
               <div class='item-description-content'>
-                {{#if effect.description}}{{{effect.description}}}{{else}}<em>No description available</em>{{/if}}
+                {{#if effect.enrichedDescription}}{{{effect.enrichedDescription}}}{{else if effect.description}}{{{effect.description}}}{{else}}<em>No description available</em>{{/if}}
               </div>
             </div>
           </li>

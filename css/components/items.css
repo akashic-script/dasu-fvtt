@@ -1926,7 +1926,11 @@ nav#context-menu[class*='dasu-context-menu'] .context-item.loading i {
 .items-list .item-controls .weapon-equip-toggle.equipped {
   color: var(--color-primary);
   background: var(--color-primary) !important;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-highlight) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-highlight) 100%
+  ) !important;
   box-shadow: 0 0 8px rgba(234, 179, 8, 0.4) !important;
   opacity: 1 !important;
 }
@@ -1937,7 +1941,11 @@ nav#context-menu[class*='dasu-context-menu'] .context-item.loading i {
 }
 
 .items-list .item-controls .weapon-equip-toggle.equipped:hover {
-  background: linear-gradient(135deg, var(--color-primary-highlight) 0%, var(--color-primary) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-highlight) 0%,
+    var(--color-primary) 100%
+  ) !important;
   box-shadow: 0 0 12px rgba(234, 179, 8, 0.6) !important;
   transform: scale(1.05);
 }

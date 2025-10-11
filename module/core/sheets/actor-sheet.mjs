@@ -383,7 +383,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       case 'effects':
         context.tab = context.tabs[partId];
         // Prepare active effects
-        context.effects = prepareActiveEffectCategories(
+        context.effects = await prepareActiveEffectCategories(
           // A generator that returns all effects stored on the actor
           // as well as any items
           this.actor.allApplicableEffects()
