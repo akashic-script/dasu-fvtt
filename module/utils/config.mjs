@@ -498,5 +498,24 @@ DASU.HEAL_TYPE_OPTIONS = [
   { value: 'status', label: 'DASU.HealType.status' },
 ];
 
+// Roll Data Aliases
+DASU.rollDataAliases = {
+  // Attributes
+  pow: 'system.attributes.pow.tick',
+  dex: 'system.attributes.dex.tick',
+  will: 'system.attributes.will.tick',
+  sta: 'system.attributes.sta.tick',
+  // Stats
+  hpCurrent: 'system.stats.hp.current',
+  hpMax: 'system.stats.hp.max',
+  wpCurrent: 'system.stats.wp.current',
+  wpMax: 'system.stats.wp.max',
+  avoid: 'system.stats.avoid.value',
+  def: 'system.stats.def.value',
+  crit: 'system.stats.crit.value',
+  // Level
+  level: 'system.level',
+};
+
 // Export the DASU object
 export default DASU;

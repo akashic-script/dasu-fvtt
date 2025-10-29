@@ -109,32 +109,26 @@ function _parseStackModifiers(formula, source, target) {
  * @private
  */
 function _parseAttributeReferences(formula, source, target) {
-  if (!formula) return formula;
+  if (!formula || !formula.includes('@')) return formula;
 
-  // Pattern for attribute shortcuts: @origin.pow or @target.pow
-  const shortPattern = /@(origin|target)\.(pow|dex|will|sta)/gi;
+  const rollData = {
+    ...(source?.getRollData() ?? {}),
+    target: target?.getRollData() ?? null,
+    origin: source?.getRollData() ?? null,
+  };
 
-  // Pattern for full paths: @origin.system.attributes.pow.tick
-  const fullPattern =
-    /@(origin|target)\.system\.attributes\.(pow|dex|will|sta)\.tick/gi;
+  if (source) {
+    const sourceRollData = source.getRollData();
+    for (const key in sourceRollData) {
+      if (Object.hasOwnProperty.call(sourceRollData, key)) {
+        if (!(key in rollData)) {
+          rollData[key] = sourceRollData[key];
+        }
+      }
+    }
+  }
 
-  let result = formula;
-
-  // Replace full paths first
-  result = result.replace(fullPattern, (match, actorRef, attr) => {
-    const actor = actorRef === 'origin' ? source : target;
-    const value = actor?.system?.attributes?.[attr]?.tick ?? 0;
-    return value.toString();
-  });
-
-  // Replace shortcuts
-  result = result.replace(shortPattern, (match, actorRef, attr) => {
-    const actor = actorRef === 'origin' ? source : target;
-    const value = actor?.system?.attributes?.[attr]?.tick ?? 0;
-    return value.toString();
-  });
-
-  return result;
+  return Roll.replaceFormulaData(formula, rollData, { missing: formula });
 }
 
 /**
@@ -545,6 +539,14 @@ async function _onDamageLinkClick(event) {
   try {
     // Get targets first (needed for stack and attribute parsing)
     const targets = getTargets();
+
+    if (targets.length === 0) {
+      ui.notifications.warn(
+        'No targets selected. Please select targets to apply damage.'
+      );
+      return;
+    }
+
     const primaryTarget = targets[0]?.actor || null;
 
     // Parse attribute references (@origin.pow, @target.dex, etc.)
@@ -567,20 +569,6 @@ async function _onDamageLinkClick(event) {
     await roll.evaluate();
 
     const baseDamage = roll.total;
-
-    if (targets.length === 0) {
-      ui.notifications.warn(
-        'No targets selected. Please select targets to apply damage.'
-      );
-
-      // Still show the roll in chat
-      await roll.toMessage({
-        speaker: ChatMessage.getSpeaker({ actor: sourceActor }),
-        flavor: `${damageType} damage roll`,
-      });
-
-      return;
-    }
 
     // Build flavor text with dice results for chat message
     const diceResults = roll.dice

@@ -54,6 +54,10 @@
 
         <div class="form-column">
           <div class="form-group">
+            <label>{{localize "DASU.Damage.EditDialog.DamageBase"}}</label>
+            <span class="form-value">{{originalDamage}}</span>
+          </div>
+          <div class="form-group">
             <label for="damageMod">{{localize "DASU.Damage.EditDialog.DamageModifier"}}</label>
             <input type="number" name="damageMod" id="damageMod" value="{{damageData.damageMod}}" min="-20" max="20" step="1">
           </div>
@@ -141,4 +145,3 @@
     </div>
   </div>
 </form>
-

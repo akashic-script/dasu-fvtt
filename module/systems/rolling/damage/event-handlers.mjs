@@ -439,6 +439,11 @@ export class DamageEventHandlers {
 
         // Create and show the dialog
         try {
+          let govern = null;
+          if (sourceItem) {
+            govern = sourceItem.system.govern;
+          }
+
           await DamageEditDialog.create({
             targetActor,
             sourceActor,
@@ -448,6 +453,7 @@ export class DamageEventHandlers {
             originalResourceTarget: resourceTarget,
             originalMessageId: messageId, // Pass message ID for updating
             isCritical: isCritical,
+            govern: govern,
           });
         } catch (error) {
           ui.notifications.error('Failed to process damage edit dialog');

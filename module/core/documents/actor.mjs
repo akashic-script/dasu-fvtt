@@ -2,7 +2,7 @@ import { slugify } from '../../utils/slugify.mjs';
 import { SharedActorComponents } from '../../data/shared/components.mjs';
 import { DASUSettings } from '../settings.mjs';
 
-/* global CONST */
+/* global CONST, fromUuidSync */
 
 // Global WeakSet to track actors currently resolving @origin references
 const _resolvingActors = new WeakSet();
@@ -237,49 +237,52 @@ export class DASUActor extends Actor {
     if (_resolvingActors.has(this)) {
       return super.applyActiveEffects();
     }
-
     _resolvingActors.add(this);
 
     try {
-      // First, resolve any @origin references in effect changes
+      const rollData = this.getRollData();
+
       for (const effect of this.allApplicableEffects()) {
-        if (!effect.origin) continue;
-
         for (const change of effect.changes) {
-          if (
-            typeof change.value === 'string' &&
-            change.value.includes('@origin')
-          ) {
-            // Parse the origin UUID to get actor ID
-            const match = effect.origin.match(/Actor\.([^.]+)/);
-            if (!match) continue;
+          if (typeof change.value !== 'string' || !change.value.includes('@')) {
+            continue;
+          }
 
-            const actorId = match[1];
+          let value = change.value;
 
-            // Try to get the actor from the game's collection (already loaded)
-            let originDoc = game.actors.get(actorId);
-
-            // If not found in collection, it might be a synthetic token actor
-            // In that case, use source data only to avoid recursion
-            if (!originDoc) {
-              // For token actors, we can't safely resolve without causing recursion
-              // Skip this effect change
-              continue;
+          // Handle @origin references
+          if (value.includes('@origin') && effect.origin) {
+            const origin = fromUuidSync(effect.origin);
+            if (origin) {
+              const originRollData = origin.getRollData
+                ? origin.getRollData()
+                : {};
+              // Add @origin to the data for replaceFormulaData
+              const data = { ...rollData, origin: originRollData };
+              value = Roll.replaceFormulaData(value, data, {
+                missing: undefined,
+                warn: false,
+              });
             }
+          }
 
-            // Extract the path after @origin.
-            const pathMatch = change.value.match(/@origin\.(.+)/);
-            if (pathMatch) {
-              const path = pathMatch[1];
+          // Handle @ references to self
+          if (value.includes('@')) {
+            value = Roll.replaceFormulaData(value, rollData, {
+              missing: undefined,
+              warn: false,
+            });
+          }
 
-              // Get value from source data to avoid triggering prepareData
-              const value = foundry.utils.getProperty(originDoc._source, path);
-
-              if (value !== undefined) {
-                // Directly modify the change object to replace @origin reference
-                change.value = String(value);
-              }
+          // Evaluate the expression if it contains arithmetic
+          if (/[+\-*/()]/.test(value) && isNaN(value)) {
+            try {
+              change.value = String(Roll.safeEval(value));
+            } catch (err) {
+              // Ignore errors for dice formulas
             }
+          } else {
+            change.value = value;
           }
         }
       }
@@ -905,7 +908,21 @@ export class DASUActor extends Actor {
    * but have slightly different data preparation needs.
    */
   getRollData() {
-    return { ...super.getRollData(), ...(this.system.getRollData?.() ?? null) };
+    const data = { ...this };
+
+    // Add DASU aliases from config
+    if (globalThis.DASU?.rollDataAliases) {
+      for (const [alias, path] of Object.entries(
+        globalThis.DASU.rollDataAliases
+      )) {
+        const value = foundry.utils.getProperty(this, path);
+        if (value !== undefined) {
+          foundry.utils.setProperty(data, alias, value);
+        }
+      }
+    }
+
+    return data;
   }
 
   // Remove the levelUp method - leveling is now handled by the leveling wizard

@@ -64,7 +64,8 @@ export class DamageEditDialog {
         sourceActor,
         sourceItem,
         damageData,
-        isCritical
+        isCritical,
+        originalDamage
       ),
       damageTypes: [
         {
@@ -228,7 +229,8 @@ export class DamageEditDialog {
       dialog._sourceActor,
       dialog._sourceItem,
       currentData,
-      dialog._isCritical
+      dialog._isCritical,
+      dialog._originalDamage
     );
 
     // Update preview content
@@ -312,7 +314,8 @@ export class DamageEditDialog {
         sourceActor,
         sourceItem,
         updatedDamageData,
-        isCritical
+        isCritical,
+        originalDamage
       );
 
       try {
@@ -571,6 +574,7 @@ export class DamageEditDialog {
    * @param {Item} sourceItem - Source item
    * @param {Object} damageData - Damage configuration
    * @param {boolean} isCritical - Whether the original damage was a critical hit
+   * @param {number} originalDamage - The original damage from the roll
    * @returns {Object} Preview damage result
    * @private
    */
@@ -579,28 +583,71 @@ export class DamageEditDialog {
     sourceActor,
     sourceItem,
     damageData,
-    isCritical = false
+    isCritical = false,
+    originalDamage = 0
   ) {
     try {
-      // Create modifiers object
-      const modifiers = {
-        attributeTick: damageData.govern,
-        bonus: damageData.damageMod,
-        ignoreResistance:
-          damageData.ignoreResist ||
-          damageData.ignoreWeak ||
-          damageData.ignoreNullify ||
-          damageData.ignoreDrain,
-      };
+      let baseDamage;
+      let breakdown;
 
-      // Calculate base damage
-      let baseDamage = DamageCalculator.calculateBaseDamage(
-        sourceActor,
-        sourceItem,
-        modifiers
-      );
+      if (sourceItem?.name === 'Enricher Damage') {
+        // From enricher, use originalDamage as base
+        baseDamage = originalDamage;
+        breakdown = `Base: ${originalDamage}`;
 
-      // Apply resistance if not ignored
+        // Add attribute tick if govern is selected in the dialog
+        const attributeTick = damageData.govern;
+        const shouldSkipAttributeTick =
+          attributeTick === null ||
+          attributeTick === '' ||
+          attributeTick === 'none';
+
+        let tickValue = 0;
+        if (!shouldSkipAttributeTick && sourceActor) {
+          tickValue =
+            sourceActor.system?.attributes?.[attributeTick]?.tick ?? 0;
+        }
+        baseDamage += tickValue;
+        if (tickValue) {
+          breakdown += ` + ${tickValue} (${attributeTick})`;
+        }
+
+        // Add damage modifier from dialog
+        baseDamage += damageData.damageMod || 0;
+        if (damageData.damageMod) {
+          breakdown += ` + ${damageData.damageMod} (mod)`;
+        }
+      } else {
+        // Regular roll, recalculate from item
+        const modifiers = {
+          attributeTick: damageData.govern,
+          bonus: damageData.damageMod,
+          ignoreResistance:
+            damageData.ignoreResist ||
+            damageData.ignoreWeak ||
+            damageData.ignoreNullify ||
+            damageData.ignoreDrain,
+        };
+        baseDamage = DamageCalculator.calculateBaseDamage(
+          sourceActor,
+          sourceItem,
+          modifiers
+        );
+
+        // Create breakdown for regular roll
+        const weaponDamage = sourceItem?.system?.damage?.value || 0;
+        const tickValue =
+          baseDamage - weaponDamage - (damageData.damageMod || 0);
+        breakdown = `Weapon: ${weaponDamage}`;
+        if (tickValue) {
+          breakdown += ` + ${tickValue} (${damageData.govern})`;
+        }
+        if (damageData.damageMod) {
+          breakdown += ` + ${damageData.damageMod} (mod)`;
+        }
+      }
+
+      // Apply resistance
       let finalDamage = baseDamage;
       let resistanceResult = null;
 
@@ -645,31 +692,6 @@ export class DamageEditDialog {
         }
       }
 
-      // Create damage breakdown string
-      let breakdown = '';
-      const components = [];
-
-      // Base damage from POW tick + weapon damage
-      if (baseDamage > 0) {
-        components.push(baseDamage.toString());
-      }
-
-      // Damage modifier
-      if (damageData.damageMod !== 0) {
-        const sign = damageData.damageMod > 0 ? '+' : '';
-        components.push(`${sign}${damageData.damageMod}`);
-      }
-
-      // Build the equation
-      if (components.length > 1) {
-        breakdown = `${components.join(' ')} = ${Math.floor(
-          baseDamage + damageData.damageMod
-        )}`;
-      } else {
-        breakdown = baseDamage.toString();
-      }
-
-      // Add resistance info if applicable
       if (resistanceResult && resistanceResult.type !== 'normal') {
         const resistMultiplier = resistanceResult.multiplier || 1;
         if (resistMultiplier !== 1) {
@@ -678,7 +700,7 @@ export class DamageEditDialog {
       }
 
       return {
-        baseDamage,
+        baseDamage: baseDamage,
         finalDamage: Math.max(0, Math.floor(finalDamage)),
         resistance: resistanceResult,
         isHealing: resistanceResult?.isHealing || false,

@@ -6,6 +6,8 @@
 
 import { markMessageAsEdited } from '../../utils/chat-helpers.mjs';
 
+/* global CONST */
+
 /**
  * Healing edit dialog for retroactive modification of healing effects
  */
@@ -14,6 +16,7 @@ export class HealingEditDialog {
    * Create and display a healing edit dialog
    * @param {Object} options - Dialog options
    * @param {Actor} options.targetActor - The actor that received healing
+   * @param {string} [options.tokenId] - The token ID of the target
    * @param {Actor} options.sourceActor - The actor that provided healing
    * @param {Item} options.sourceItem - The healing item used
    * @param {number} options.originalHealing - Original healing amount applied
@@ -26,6 +29,7 @@ export class HealingEditDialog {
   static async create(options = {}) {
     // Store data
     const targetActor = options.targetActor;
+    const targetTokenId = options.tokenId || null;
     const sourceActor = options.sourceActor;
     const sourceItem = options.sourceItem;
     const originalHealing = options.originalHealing;
@@ -33,12 +37,13 @@ export class HealingEditDialog {
     const originalMessageId = options.originalMessageId || null;
 
     // Default healing data - use sourceItem's governing attribute if available
+    const hasExplicitGovern = 'govern' in options;
     const healingData = {
-      govern:
-        options.govern ||
-        options.attributeTick ||
-        sourceItem?.system?.govern ||
-        'pow',
+      govern: hasExplicitGovern
+        ? options.govern === null
+          ? ''
+          : options.govern
+        : options.attributeTick || sourceItem?.system?.govern || 'pow',
       healMod: options.healMod || 0,
       healType: options.healType || originalResourceTarget || 'hp',
     };
@@ -169,6 +174,7 @@ export class HealingEditDialog {
           return HealingEditDialog._handleSubmit(
             result,
             targetActor,
+            targetTokenId,
             sourceActor,
             sourceItem,
             originalHealing,
@@ -260,40 +266,36 @@ export class HealingEditDialog {
     healingData,
     originalHealing
   ) {
-    // Base healing from source item
-    const baseHealing = sourceItem?.system?.healed?.value || 0;
+    // Base healing from source
+    let baseHealing = originalHealing;
 
-    // Get attribute tick value (this was already applied in original, but show for reference)
+    // Get attribute tick value
     let tickValue = 0;
-    if (sourceActor && sourceItem?.system?.govern) {
-      // Get attribute tick - use item's governing attribute
-      const attributeTick = sourceItem.system.govern;
-      if (sourceActor.system?.attributes?.[attributeTick]?.tick) {
-        tickValue = sourceActor.system.attributes[attributeTick].tick;
-      } else if (sourceActor.system?.attributes?.[attributeTick]?.current) {
-        // Fallback: calculate tick from current value (DASU: 1 tick per 5 points)
-        tickValue = Math.max(
-          1,
-          Math.floor(sourceActor.system.attributes[attributeTick].current / 5)
-        );
-      }
+    const attributeTick = healingData.govern;
+    const shouldSkipAttributeTick =
+      attributeTick === null ||
+      attributeTick === '' ||
+      attributeTick === 'none';
+
+    if (!shouldSkipAttributeTick && sourceActor) {
+      tickValue = sourceActor.system?.attributes?.[attributeTick]?.tick ?? 0;
     }
 
-    // The new healing amount is the original healing + modifier
-    // (attribute tick was already included in originalHealing)
     const finalHealing = Math.max(
       0,
-      originalHealing + (healingData.healMod || 0)
+      baseHealing + tickValue + (healingData.healMod || 0)
     );
 
-    // Build breakdown text - show original healing and any modifications
-    let breakdown = `Original healing: ${originalHealing}`;
+    let breakdown = `Base: ${baseHealing}`;
+    if (tickValue) {
+      breakdown += ` + ${tickValue} (${attributeTick})`;
+    }
     if (healingData.healMod) {
       breakdown += ` + ${healingData.healMod} (mod)`;
     }
 
     return {
-      baseHealing,
+      baseHealing: originalHealing,
       finalHealing,
       healType: healingData.healType,
       breakdown,
@@ -304,6 +306,7 @@ export class HealingEditDialog {
    * Handle dialog submission
    * @param {Object} result - Form submission result
    * @param {Actor} targetActor - Target actor
+   * @param {string} targetTokenId - The token ID of the target
    * @param {Actor} sourceActor - Source actor
    * @param {Item} sourceItem - Source item
    * @param {number} originalHealing - Original healing amount
@@ -316,6 +319,7 @@ export class HealingEditDialog {
   static async _handleSubmit(
     result,
     targetActor,
+    targetTokenId,
     sourceActor,
     sourceItem,
     originalHealing,
@@ -323,78 +327,170 @@ export class HealingEditDialog {
     originalMessageId,
     originalResourceTarget
   ) {
-    try {
-      const formData = result.formData;
-      const newHealingData = foundry.utils.mergeObject(healingData, formData);
+    if (result.action === 'apply') {
+      const updatedHealingData = foundry.utils.mergeObject(
+        healingData,
+        result.formData
+      );
 
-      // Calculate new healing amount
-      const previewResult = this._calculatePreviewHealing(
+      const newHealing = HealingEditDialog._calculatePreviewHealing(
         targetActor,
         sourceActor,
         sourceItem,
-        newHealingData,
+        updatedHealingData,
         originalHealing
       );
-      const newHealingAmount = previewResult.finalHealing;
 
-      // Calculate the difference to apply
-      const healingDifference = newHealingAmount - originalHealing;
+      try {
+        let updates = {};
 
-      // Check if there are any changes (amount or resource type)
-      const resourceTypeChanged =
-        newHealingData.healType !== originalResourceTarget;
-      const hasChanges = healingDifference !== 0 || resourceTypeChanged;
+        if (
+          updatedHealingData.healType === 'hp' ||
+          updatedHealingData.healType === 'both'
+        ) {
+          const currentHp = targetActor.system.stats?.hp?.current ?? 0;
+          const maxHp = targetActor.system.stats?.hp?.max ?? 20;
 
-      if (hasChanges) {
-        // Apply the healing difference
-        if (healingDifference > 0) {
-          // Apply additional healing
-          await targetActor.applyHealing(
-            healingDifference,
-            newHealingData.healType,
-            { suppressChat: true }
-          );
-        } else {
-          // Remove excess healing by applying damage
-          await targetActor.applyDamage(
-            Math.abs(healingDifference),
-            'none',
-            newHealingData.healType,
-            { suppressChat: true }
-          );
+          const originallyTargetedHp =
+            originalResourceTarget === 'hp' ||
+            originalResourceTarget === 'both';
+          const revertedHp = originallyTargetedHp
+            ? Math.max(0, currentHp - originalHealing)
+            : currentHp;
+
+          const finalHp = Math.min(revertedHp + newHealing.finalHealing, maxHp);
+
+          if (targetActor.system.stats?.hp?.current !== undefined) {
+            updates['system.stats.hp.current'] = finalHp;
+          } else {
+            updates['system.hp.current'] = finalHp;
+          }
         }
 
-        // Note: Attribute tick is already factored into the healing calculation
-        // No need to advance the attribute separately
+        if (
+          updatedHealingData.healType === 'wp' ||
+          updatedHealingData.healType === 'both'
+        ) {
+          const currentWp = targetActor.system.stats?.wp?.current ?? 0;
+          const maxWp = targetActor.system.stats?.wp?.max ?? 20;
 
-        // Update the original message with strikethrough and disabled buttons
+          const originallyTargetedWp =
+            originalResourceTarget === 'wp' ||
+            originalResourceTarget === 'both';
+          const revertedWp = originallyTargetedWp
+            ? Math.max(0, currentWp - originalHealing)
+            : currentWp;
+
+          const finalWp = Math.min(revertedWp + newHealing.finalHealing, maxWp);
+
+          if (targetActor.system.stats?.wp?.current !== undefined) {
+            updates['system.stats.wp.current'] = finalWp;
+          } else {
+            updates['system.wp.current'] = finalWp;
+          }
+        }
+
+        if (Object.keys(updates).length > 0) {
+          await targetActor.update(updates);
+        }
+
         if (originalMessageId) {
           await HealingEditDialog._updateOriginalMessage(originalMessageId);
         }
 
-        ui.notifications.info(
-          `Updated healing for ${
-            targetActor.name
-          }: ${newHealingAmount} ${newHealingData.healType.toUpperCase()}`
-        );
+        await HealingEditDialog._createRevisedHealingMessage({
+          targetActor,
+          targetTokenId,
+          sourceActor,
+          sourceItem,
+          originalHealing,
+          newHealing: newHealing.finalHealing,
+          resourceTarget: updatedHealingData.healType,
+        });
+
+        const netChange = newHealing.finalHealing - originalHealing;
+        const resourceTargetChanged =
+          updatedHealingData.healType !== originalResourceTarget;
+
+        if (netChange !== 0 || resourceTargetChanged) {
+          ui.notifications.info(
+            `Updated healing for ${targetActor.name}: ${originalHealing} → ${
+              newHealing.finalHealing
+            } ${updatedHealingData.healType.toUpperCase()}`
+          );
+        } else {
+          ui.notifications.info('No net change in healing.');
+        }
 
         return {
           applied: true,
-          newHealing: newHealingAmount,
+          newHealing: newHealing.finalHealing,
           oldHealing: originalHealing,
-          healType: newHealingData.healType,
-          attributeTick: newHealingData.govern,
         };
-      } else {
-        ui.notifications.info('No changes to apply');
-        return { applied: false };
+      } catch (error) {
+        ui.notifications.error(
+          `Failed to apply healing changes: ${error.message}`
+        );
+        return { applied: false, error: error.message };
       }
-    } catch (error) {
-      ui.notifications.error(
-        `Failed to apply healing changes: ${error.message}`
-      );
-      return { applied: false, error: error.message };
+    } else {
+      return { applied: false };
     }
+  }
+
+  static async _createRevisedHealingMessage(messageData) {
+    const {
+      targetActor,
+      targetTokenId,
+      sourceActor,
+      sourceItem,
+      originalHealing,
+      newHealing,
+      resourceTarget,
+    } = messageData;
+
+    const icon = '♥';
+    const revisionNote =
+      originalHealing !== newHealing
+        ? ` (revised from ${originalHealing})`
+        : '';
+
+    let content = '<div class="dasu healing-applied">';
+    content += '<div class="healing-applied-content">';
+    content += '<div class="healing-text">';
+    content += `<span class="healing-icon">${icon}</span>`;
+    const targetDataAttrs = `data-actor-id="${targetActor.id}"${
+      targetTokenId ? ` data-token-id="${targetTokenId}"` : ''
+    }`;
+    content += `<span class="target-name clickable" ${targetDataAttrs}>${targetActor.name}</span> healed for `;
+    content += `<span class="healing-amount">${newHealing}</span> ${resourceTarget.toUpperCase()}`;
+
+    if (sourceItem) {
+      content += ` from <span class="source-item">${sourceItem.name}</span>`;
+    }
+
+    if (revisionNote) {
+      content += ' <span class="healing-modifiers">(revised)</span>';
+    }
+
+    content += revisionNote;
+    content += '</div>';
+    content += '</div></div>';
+
+    await ChatMessage.create({
+      content: content,
+      speaker: ChatMessage.getSpeaker({ actor: sourceActor }),
+      style: CONST.CHAT_MESSAGE_STYLES.OTHER,
+      flavor: `Healing applied${revisionNote ? ' (revised)' : ''}`,
+      flags: {
+        dasu: {
+          healingResult: {
+            targetId: targetActor.id,
+            wasRevised: true,
+          },
+        },
+      },
+    });
   }
 
   /**

@@ -737,3 +737,8 @@
   outline: 1px solid var(--dasu-c-primary);
   outline-offset: 1px;
 }
+
+.cost-buttons {
+  display: flex;
+  gap: 5px;
+}

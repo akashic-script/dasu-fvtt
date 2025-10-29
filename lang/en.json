@@ -752,7 +752,8 @@
       "Critical": "Critical",
       "Yes": "Yes",
       "TotalRoll": "Total Roll",
-      "PayCost": "Pay Cost"
+      "PayCost": "Pay Cost",
+      "PayHalfCost": "Pay Half Cost"
     },
     "Healing": {
       "EditDialog": {
@@ -773,6 +774,7 @@
         "NoGoverningAttribute": "No Flat Bonus",
         "Preview": "Preview",
         "BaseHealing": "Base Healing:",
+        "HealingBase": "Healing Base",
         "Healing": "Healing",
         "Change": "Change: {amount}"
       }
@@ -881,7 +883,8 @@
         "Change": "Change: {amount}",
         "Damage": "Damage",
         "Healing": "Healing",
-        "BaseDamage": "Base:"
+        "BaseDamage": "Base:",
+        "DamageBase": "Damage Base"
       },
       "Notifications": {
         "WeaponDataNotFound": "Could not extract weapon data from chat message",
@@ -976,12 +979,19 @@
       "ItemsNone": "No Items",
       "ResistanceSource": "Resistance Source"
     },
-    "Remove": "Remove"
+    "Remove": "Remove",
+    "Weapon": {
+      "Equip": "Equip"
+    },
+    "Delete": "Delete"
   },
   "DOCUMENT": {
     "Copy": "Copy",
     "Delete": "Delete {type}",
     "DeleteWarning": "Are you sure you want to delete {name}? This action cannot be undone."
+  },
+  "SHEETS": {
+    "ItemEdit": "Edit Item"
   },
   "TYPES": {
     "Actor": {

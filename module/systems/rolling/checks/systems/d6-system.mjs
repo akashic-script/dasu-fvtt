@@ -11,7 +11,19 @@ export class D6System {
 
     if (check.type === 'accuracy' && item) {
       // Accuracy check setup
-      check.flatBonus = this._getItemBonus(item);
+      let bonus = this._getItemBonus(item);
+
+      // Add actor bonuses
+      if (actor?.system?.stats) {
+        if (['weapon', 'ability'].includes(item.type)) {
+          bonus += actor.system.stats.toHit?.mod || 0;
+        } else if (item.type === 'tactic') {
+          bonus += actor.system.stats.toLand?.mod || 0;
+        }
+      }
+
+      check.flatBonus = bonus;
+
       // Only set advantage state if not already set (preserve dialog setting)
       if (!check.advantageState) {
         check.advantageState = AdvantageStates.NORMAL;

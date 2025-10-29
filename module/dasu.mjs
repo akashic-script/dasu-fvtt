@@ -1067,16 +1067,21 @@ Hooks.on('renderChatMessageHTML', (message, html) => {
   }
 
   // --- Handle pay cost button ---
-  const payCostButton = htmlElement.querySelector('[data-action="payCost"]');
-  if (payCostButton) {
-    payCostButton.addEventListener('click', async (event) => {
+  const costButtons = htmlElement.querySelectorAll('[data-action^="pay"]');
+  costButtons.forEach((button) => {
+    button.addEventListener('click', async (event) => {
       event.stopPropagation();
-      const card = payCostButton.closest('.roll-card');
+      const card = button.closest('.roll-card');
       if (!card) return;
 
       const actorId = card.dataset.actorId;
-      const cost = Number(payCostButton.dataset.cost);
-      const costType = payCostButton.dataset.costType;
+      let cost = Number(button.dataset.cost);
+      const costType = button.dataset.costType;
+      const action = button.dataset.action;
+
+      if (action === 'payHalfCost') {
+        cost = Math.ceil(cost / 2);
+      }
 
       if (!actorId || !cost) return;
 
@@ -1169,5 +1174,5 @@ Hooks.on('renderChatMessageHTML', (message, html) => {
         },
       });
     });
-  }
+  });
 });

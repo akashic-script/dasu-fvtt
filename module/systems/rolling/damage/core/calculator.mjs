@@ -51,20 +51,12 @@ export class DamageCalculator {
     // Get attribute tick - prioritize modifier override (dialog selection) over item's govern field
     // If govern is null, empty string, or 'none', don't add attribute tick
     const governField = sourceItem?.system?.govern;
-
-    // Check if modifiers explicitly set attributeTick (including empty string)
-    const hasExplicitAttributeTick = 'attributeTick' in modifiers;
-
     let attributeTick;
-    if (hasExplicitAttributeTick) {
+
+    if ('attributeTick' in modifiers) {
       // Use the explicit value from modifiers (could be null, '', or a value)
       attributeTick = modifiers.attributeTick;
-    } else if (
-      governField !== null &&
-      governField !== '' &&
-      governField !== 'none'
-    ) {
-      // Use item's govern field if valid
+    } else if (governField !== undefined) {
       attributeTick = governField;
     } else {
       // Default fallback

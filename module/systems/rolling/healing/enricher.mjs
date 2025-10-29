@@ -90,29 +90,28 @@ function _parseStackModifiers(formula, source, target) {
  * @private
  */
 function _parseAttributeReferences(formula, source, target) {
-  if (!formula) return formula;
+  if (!formula || !formula.includes('@')) return formula;
 
-  // Pattern for attribute shortcuts: @origin.pow or @target.pow
-  const shortPattern = /@(origin|target)\.(pow|dex|will|sta)/gi;
+  // Get roll data from both actors
+  const sourceRollData = source?.getRollData() ?? {};
+  const targetRollData = target?.getRollData() ?? {};
 
-  // Pattern for full paths: @origin.system.attributes.pow.tick
-  const fullPattern =
-    /@(origin|target)\.system\.attributes\.(pow|dex|will|sta)\.tick/gi;
+  const rollData = {
+    ...sourceRollData,
+    target: targetRollData,
+    origin: sourceRollData,
+  };
 
+  // Use Roll.replaceFormulaData with {warn: false} to prevent console warnings
+  // and wrap replaced values in parentheses to ensure proper arithmetic evaluation
   let result = formula;
 
-  // Replace full paths first
-  result = result.replace(fullPattern, (match, actorRef, attr) => {
-    const actor = actorRef === 'origin' ? source : target;
-    const value = actor?.system?.attributes?.[attr]?.tick ?? 0;
-    return value.toString();
-  });
-
-  // Replace shortcuts
-  result = result.replace(shortPattern, (match, actorRef, attr) => {
-    const actor = actorRef === 'origin' ? source : target;
-    const value = actor?.system?.attributes?.[attr]?.tick ?? 0;
-    return value.toString();
+  // Match @word patterns (including dots for nested properties)
+  const atPattern = /@([a-zA-Z0-9_.]+)/g;
+  result = result.replace(atPattern, (match, path) => {
+    const value = foundry.utils.getProperty(rollData, path);
+    // Return the value wrapped in parentheses to ensure arithmetic works
+    return value !== undefined ? `(${value})` : match;
   });
 
   return result;
@@ -324,15 +323,8 @@ async function _applyQuickHealing(
   sourceActor,
   tokenId = null
 ) {
-  // Calculate governing attribute bonus based on resource target
-  // WP healing uses WILL tick, HP healing uses POW tick
-  let attributeTick;
-  if (resourceTarget === 'wp') {
-    attributeTick = sourceActor.system?.attributes?.will?.tick || 1;
-  } else {
-    attributeTick = sourceActor.system?.attributes?.pow?.tick || 1;
-  }
-  const finalHealing = baseAmount + attributeTick;
+  const attributeTick = 0; // No governing attribute for enricher
+  const finalHealing = baseAmount;
 
   // Apply healing to actor
   const result = await targetActor.applyHealing(finalHealing, resourceTarget, {
@@ -535,7 +527,7 @@ async function _openHealingDialog(sourceActor, formula, resourceTarget, link) {
       sourceItem: null,
       originalHealing: baseHealing,
       originalResourceTarget: resourceTarget,
-      govern: resourceTarget === 'wp' ? 'will' : 'pow',
+      govern: null,
       healMod: 0,
       healType: resourceTarget,
     });
@@ -560,6 +552,11 @@ async function _onHealingLinkClick(event) {
 
   // Try to get source actor from stored UUID first
   let sourceActor = sourceActorUuid ? await fromUuid(sourceActorUuid) : null;
+
+  // If we got a synthetic token actor, get the base actor
+  if (sourceActor?.isToken) {
+    sourceActor = game.actors.get(sourceActor.id) || sourceActor;
+  }
 
   // Fallback to context-based lookup
   if (!sourceActor) {
@@ -586,10 +583,14 @@ async function _onHealingLinkClick(event) {
 
     if (healTargets.length === 0) {
       // Apply to self if no targets
-      const selfToken = sourceActor.getActiveTokens()[0];
-      healTargets = selfToken
-        ? [selfToken]
-        : [{ actor: sourceActor, id: 'actor-only' }];
+      const selfTokens = sourceActor.isToken
+        ? [sourceActor.token?.object].filter(Boolean)
+        : sourceActor.getActiveTokens?.() || [];
+
+      healTargets =
+        selfTokens.length > 0
+          ? selfTokens
+          : [{ actor: sourceActor, id: 'actor-only' }];
     }
 
     // Get primary target for attribute and stack parsing

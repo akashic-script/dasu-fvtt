@@ -164,9 +164,14 @@
               <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>
               <span class="cost-value">{{item.system.cost}} {{upper item.system.costType}}</span>
             </div>
-            <button type="button" class="pay-cost-btn" data-action="payCost" data-cost="{{item.system.cost}}" data-cost-type="{{item.system.costType}}" data-tooltip="{{localize 'DASU.RollCard.PayCost'}}">
-              <i class="fas fa-minus-circle"></i>
-            </button>
+            <div class="cost-buttons">
+              <button type="button" class="pay-cost-btn" data-action="payHalfCost" data-cost="{{item.system.cost}}" data-cost-type="{{item.system.costType}}" data-tooltip="{{localize 'DASU.RollCard.PayHalfCost'}}">
+                <i class="fas fa-adjust"></i>
+              </button>
+              <button type="button" class="pay-cost-btn" data-action="payCost" data-cost="{{item.system.cost}}" data-cost-type="{{item.system.costType}}" data-tooltip="{{localize 'DASU.RollCard.PayCost'}}">
+                <i class="fas fa-minus-circle"></i>
+              </button>
+            </div>
           </div>
         {{/if}}
         {{!-- Only show damage for spell and technique categories --}}
@@ -209,9 +214,14 @@
               <span class="cost-label">{{localize "DASU.RollCard.Cost"}}:</span>
               <span class="cost-value">{{item.system.cost}} {{localize "DASU.Labels.willPoints"}}</span>
             </div>
-            <button type="button" class="pay-cost-btn" data-action="payCost" data-cost="{{item.system.cost}}" data-cost-type="wp" data-tooltip="{{localize 'DASU.RollCard.PayCost'}}">
-              <i class="fas fa-minus-circle"></i>
-            </button>
+            <div class="cost-buttons">
+              <button type="button" class="pay-cost-btn" data-action="payHalfCost" data-cost="{{item.system.cost}}" data-cost-type="wp" data-tooltip="{{localize 'DASU.RollCard.PayHalfCost'}}">
+                <i class="fas fa-adjust"></i>
+              </button>
+              <button type="button" class="pay-cost-btn" data-action="payCost" data-cost="{{item.system.cost}}" data-cost-type="wp" data-tooltip="{{localize 'DASU.RollCard.PayCost'}}">
+                <i class="fas fa-minus-circle"></i>
+              </button>
+            </div>
           </div>
         {{/if}}
         {{#if item.system.damage}}

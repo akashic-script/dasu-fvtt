@@ -29,6 +29,10 @@
       <div class="form-columns">
         <div class="form-column">
           <div class="form-group">
+            <label>{{localize "DASU.Healing.EditDialog.HealingBase"}}</label>
+            <span class="form-value">{{originalHealing}}</span>
+          </div>
+          <div class="form-group">
             <label for="healMod" data-tooltip="{{localize "DASU.Healing.EditDialog.HealingModifierHint"}}">{{localize "DASU.Healing.EditDialog.HealingModifier"}}</label>
             <input type="number" name="healMod" id="healMod" value="{{healingData.healMod}}" min="-20" max="20" step="1">
           </div>

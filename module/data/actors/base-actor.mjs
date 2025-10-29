@@ -70,11 +70,14 @@ export default class BaseActorDataModel extends foundry.abstract.TypeDataModel {
    */
   getRollData() {
     const data = { ...this };
+    const aliases = globalThis.DASU.rollDataAliases;
 
-    // Add shorthand attribute tick values for formulas
-    if (this.attributes) {
-      for (const [key, attr] of Object.entries(this.attributes)) {
-        data[key] = attr.tick ?? 0;
+    if (aliases) {
+      for (const [alias, path] of Object.entries(aliases)) {
+        const value = foundry.utils.getProperty(this, path);
+        if (value !== undefined) {
+          data[alias] = value;
+        }
       }
     }
 

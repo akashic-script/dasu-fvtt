@@ -109,6 +109,15 @@ export class DASUAccuracyDialog extends foundry.applications.api.HandlebarsAppli
         break;
     }
 
+    // Add actor bonuses
+    if (this.actor?.system?.stats) {
+      if (['weapon', 'ability'].includes(this.item.type)) {
+        baseBonus += this.actor.system.stats.toHit?.mod || 0;
+      } else if (this.item.type === 'tactic') {
+        baseBonus += this.actor.system.stats.toLand?.mod || 0;
+      }
+    }
+
     const totalBonus = baseBonus + bonusMod;
 
     // Determine formula based on roll type
@@ -166,6 +175,19 @@ export class DASUAccuracyDialog extends foundry.applications.api.HandlebarsAppli
         baseBonus = 0;
         bonusLabel = game.i18n.localize('DASU.Bonus');
         rollTypeLabel = game.i18n.localize('DASU.RollCheck');
+    }
+
+    // Add actor bonuses
+    if (this.actor?.system?.stats) {
+      if (['weapon', 'ability'].includes(this.item.type)) {
+        baseBonus +=
+          (this.actor.system.stats.toHit?.mod || 0) +
+          (this.actor.system.stats.toHit?.bonus || 0);
+      } else if (this.item.type === 'tactic') {
+        baseBonus +=
+          (this.actor.system.stats.toLand?.mod || 0) +
+          (this.actor.system.stats.toLand?.bonus || 0);
+      }
     }
 
     // Calculate total bonus with modifier

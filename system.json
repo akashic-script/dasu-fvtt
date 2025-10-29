@@ -95,6 +95,39 @@
   ],
   "packs": [
     {
+      "label": "Archetypes",
+      "type": "Item",
+      "name": "archetypes",
+      "path": "packs/archetypes",
+      "system": "dasu",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "label": "Subtypes",
+      "type": "Item",
+      "name": "subtypes",
+      "path": "packs/subtypes",
+      "system": "dasu",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "label": "Roles",
+      "type": "Item",
+      "name": "roles",
+      "path": "packs/roles",
+      "system": "dasu",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
       "label": "Handouts",
       "type": "JournalEntry",
       "name": "handouts",
@@ -106,7 +139,20 @@
       }
     }
   ],
-  "packFolders": [],
+  "packFolders": [
+    {
+      "name": "Daemon Creation",
+      "sorting": "a",
+      "color": "#276625",
+      "packs": ["archetypes", "subtypes", "roles"]
+    },
+    {
+      "name": "Summoner Creation",
+      "sorting": "a",
+      "color": "#276625",
+      "packs": ["classes", "schemas"]
+    }
+  ],
   "socket": false,
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
@@ -117,6 +163,6 @@
     "units": "ft",
     "diagonals": 0
   },
-  "primaryTokenAttribute": "stats.hp.current",
-  "secondaryTokenAttribute": "stats.wp.current"
+  "primaryTokenAttribute": "stats.hp",
+  "secondaryTokenAttribute": "stats.wp"
 }
