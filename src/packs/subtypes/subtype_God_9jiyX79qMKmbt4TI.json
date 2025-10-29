@@ -1,0 +1,31 @@
+{
+  "folder": null,
+  "name": "God",
+  "type": "subtype",
+  "system": {
+    "dsid": "FjKPp7Jb8fWkuYeq",
+    "benefits": "God daemons will have +X added to their stats. 8 max ability and tactics slots.",
+    "description": "<p>A powerful individual. The God is just that, a god manifest in the form of a daemon. They usually are created when mortals try to reify a concept into a more conceivable form. The God has no need to set out on a Journey by nature of their being. More often than not, placating or even fighting the God is end of a Journey. The God is an entity of immaculate power and requires great power to wield.</p>"
+  },
+  "_id": "9jiyX79qMKmbt4TI",
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.350",
+    "systemId": "dasu",
+    "systemVersion": "#{VERSION}#",
+    "createdTime": 1761715621679,
+    "modifiedTime": 1761715621679,
+    "lastModifiedBy": "p5jXebTe99YidXmM"
+  },
+  "ownership": {
+    "default": 0,
+    "p5jXebTe99YidXmM": 3
+  },
+  "sort": 0,
+  "_key": "!items!9jiyX79qMKmbt4TI"
+}

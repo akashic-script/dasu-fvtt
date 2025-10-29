@@ -1,0 +1,30 @@
+{
+  "folder": null,
+  "name": "Assist",
+  "type": "role",
+  "system": {
+    "dsid": "PLJRwZgdjcifVWIy",
+    "description": "<p>Supporters that sling out positive Statuses</p>"
+  },
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.350",
+    "systemId": "dasu",
+    "systemVersion": "#{VERSION}#",
+    "createdTime": 1761715646298,
+    "modifiedTime": 1761715682210,
+    "lastModifiedBy": "p5jXebTe99YidXmM"
+  },
+  "ownership": {
+    "default": 0,
+    "p5jXebTe99YidXmM": 3
+  },
+  "_id": "RpETunAKK4g48cVZ",
+  "sort": 400000,
+  "_key": "!items!RpETunAKK4g48cVZ"
+}

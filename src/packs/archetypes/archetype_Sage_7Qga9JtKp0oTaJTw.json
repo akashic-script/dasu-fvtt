@@ -1,0 +1,82 @@
+{
+  "folder": null,
+  "name": "Sage",
+  "type": "archetype",
+  "system": {
+    "dsid": "apoVxPWeUAY628rZ",
+    "description": "<p>A knowledgeable individual. They are known to be great reservoirs of information and wisdom. Often, they become known by aiding others along their Journey with their expansive knowledge. The Sage is a studious person, seeking out the secrets of the universe, although there has been known to be those born with this knowledge inherently.</p>",
+    "benefits": "Daemons of the Sage Archetype add their Lvl to WP"
+  },
+  "_id": "7Qga9JtKp0oTaJTw",
+  "img": "icons/svg/item-bag.svg",
+  "effects": [
+    {
+      "name": "Sage Benefit",
+      "origin": "Item.7Qga9JtKp0oTaJTw",
+      "img": "icons/svg/aura.svg",
+      "_id": "QC4Siyplvp0ydFpg",
+      "type": "base",
+      "system": {},
+      "changes": [
+        {
+          "key": "system.stats.wp.mod",
+          "mode": 2,
+          "value": "@system.level",
+          "priority": null
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "combat": null,
+        "seconds": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "description": "<p>Daemons of the Sage Archetype add their Lvl to WP</p>",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [],
+      "sort": 0,
+      "flags": {
+        "dasu": {
+          "stackable": false,
+          "stackId": "",
+          "maxStacks": null,
+          "showStackCount": false,
+          "specialDuration": "none"
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "dasu",
+        "systemVersion": "#{VERSION}#",
+        "lastModifiedBy": null
+      },
+      "_key": "!items.effects!7Qga9JtKp0oTaJTw.QC4Siyplvp0ydFpg"
+    }
+  ],
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.350",
+    "systemId": "dasu",
+    "systemVersion": "#{VERSION}#",
+    "createdTime": 1761715597119,
+    "modifiedTime": 1761715597119,
+    "lastModifiedBy": "p5jXebTe99YidXmM"
+  },
+  "ownership": {
+    "default": 0,
+    "p5jXebTe99YidXmM": 3
+  },
+  "sort": 0,
+  "_key": "!items!7Qga9JtKp0oTaJTw"
+}

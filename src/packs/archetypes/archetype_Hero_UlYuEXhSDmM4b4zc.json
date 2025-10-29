@@ -1,0 +1,82 @@
+{
+  "name": "Hero",
+  "type": "archetype",
+  "system": {
+    "dsid": "MbsgKUc47KJd2yPY",
+    "description": "<p>A noble individual. They often have some aspect of themselves they hold dear. Sometimes they have a strong sense of justice or duty. Most important to the Hero is the Journey. Often, a Hero has some form of a quest that they must undergo, be it to obtain some sort of magical artifact or to stop some magnanimous force from ending the world. Heroes are the most common daemon as they are the most driven and the willing to do something of note.</p>",
+    "benefits": "Daemons of the Hero Archetype add their Lvl x2 to HP"
+  },
+  "_id": "UlYuEXhSDmM4b4zc",
+  "img": "icons/svg/item-bag.svg",
+  "effects": [
+    {
+      "name": "Hero Benefit",
+      "origin": "Item.UlYuEXhSDmM4b4zc",
+      "img": "icons/svg/aura.svg",
+      "_id": "m0bQVMTLnNZeu7f2",
+      "type": "base",
+      "system": {},
+      "changes": [
+        {
+          "key": "system.stats.hp.mod",
+          "mode": 2,
+          "value": "@system.level*2",
+          "priority": null
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "combat": null,
+        "seconds": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "description": "<p>Daemons of the Hero Archetype add their Lvl x2 to HP</p>",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [],
+      "sort": 0,
+      "flags": {
+        "dasu": {
+          "stackable": false,
+          "stackId": "",
+          "maxStacks": null,
+          "showStackCount": false,
+          "specialDuration": "none"
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "dasu",
+        "systemVersion": "#{VERSION}#",
+        "lastModifiedBy": null
+      },
+      "_key": "!items.effects!UlYuEXhSDmM4b4zc.m0bQVMTLnNZeu7f2"
+    }
+  ],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.350",
+    "systemId": "dasu",
+    "systemVersion": "#{VERSION}#",
+    "createdTime": 1761715597119,
+    "modifiedTime": 1761715597119,
+    "lastModifiedBy": "p5jXebTe99YidXmM"
+  },
+  "ownership": {
+    "default": 0,
+    "p5jXebTe99YidXmM": 3
+  },
+  "sort": 0,
+  "_key": "!items!UlYuEXhSDmM4b4zc"
+}

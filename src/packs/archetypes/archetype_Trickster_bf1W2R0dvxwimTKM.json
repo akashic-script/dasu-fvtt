@@ -1,0 +1,88 @@
+{
+  "folder": null,
+  "name": "Trickster",
+  "type": "archetype",
+  "system": {
+    "dsid": "0DJw3FWoZmdm3ohY",
+    "description": "<p>An impish individual. They are known to lead many astray. The Trickster has used its understanding of magics to change the fate of humanity for as long as humans have been. Despite their ghoulish nature, the Trickster doesn’t intrinsically hold nefarious thoughts. They do sometimes, but not always. Know well that while the Trickster lives in the shadows, they hold a great deal of power over the lives of mortal men and thus deserve their place in the Akashic Records.</p>",
+    "benefits": "Daemons of the Trickster Archetype add their +1 to Avoid/Defense."
+  },
+  "_id": "bf1W2R0dvxwimTKM",
+  "img": "icons/svg/item-bag.svg",
+  "effects": [
+    {
+      "name": "Trickster Benefit",
+      "origin": "Item.bf1W2R0dvxwimTKM",
+      "img": "icons/svg/aura.svg",
+      "_id": "EJh1xiUrCtlHXV7G",
+      "type": "base",
+      "system": {},
+      "changes": [
+        {
+          "key": "system.stats.avoid.mod",
+          "mode": 2,
+          "value": "1",
+          "priority": null
+        },
+        {
+          "key": "system.stats.def.mod",
+          "mode": 2,
+          "value": "1",
+          "priority": null
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "combat": null,
+        "seconds": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "description": "<p>Daemons of the Trickster Archetype add their +1 to Avoid/Defense.</p>",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [],
+      "sort": 0,
+      "flags": {
+        "dasu": {
+          "stackable": false,
+          "stackId": "",
+          "maxStacks": null,
+          "showStackCount": false,
+          "specialDuration": "none"
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "dasu",
+        "systemVersion": "#{VERSION}#",
+        "lastModifiedBy": null
+      },
+      "_key": "!items.effects!bf1W2R0dvxwimTKM.EJh1xiUrCtlHXV7G"
+    }
+  ],
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.350",
+    "systemId": "dasu",
+    "systemVersion": "#{VERSION}#",
+    "createdTime": 1761715597119,
+    "modifiedTime": 1761715597119,
+    "lastModifiedBy": "p5jXebTe99YidXmM"
+  },
+  "ownership": {
+    "default": 0,
+    "p5jXebTe99YidXmM": 3
+  },
+  "sort": 0,
+  "_key": "!items!bf1W2R0dvxwimTKM"
+}

@@ -1,0 +1,31 @@
+{
+  "folder": null,
+  "name": "Self",
+  "type": "subtype",
+  "system": {
+    "dsid": "4tsyUfvt3Gv37JkW",
+    "description": "<p>An established individual. The Self is a coalescence of dreams, quirks, beliefs, a person’s totality given spiritual form. The Self represents not only the story of a living being, but the story of all those who observe it. The Self is the most common subtype of daemon, encompassing nearly all daemons in existence. The Journey is exemplified by encounters with the Self, reckoning with it is the path to the calcification of one’s immortal soul.</p>",
+    "benefits": "Self daemons do not receive any stat beneficial. 6 max ability and tactics slots."
+  },
+  "_id": "HcIn6jpDpb3Iwy56",
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.350",
+    "systemId": "dasu",
+    "systemVersion": "#{VERSION}#",
+    "createdTime": 1761715621679,
+    "modifiedTime": 1761715621679,
+    "lastModifiedBy": "p5jXebTe99YidXmM"
+  },
+  "ownership": {
+    "default": 0,
+    "p5jXebTe99YidXmM": 3
+  },
+  "sort": 0,
+  "_key": "!items!HcIn6jpDpb3Iwy56"
+}

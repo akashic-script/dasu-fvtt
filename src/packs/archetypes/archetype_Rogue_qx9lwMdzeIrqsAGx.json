@@ -1,0 +1,88 @@
+{
+  "folder": null,
+  "name": "Rogue",
+  "type": "archetype",
+  "system": {
+    "dsid": "Dm5N0sZiu0C2HdNa",
+    "description": "<p>A skilled individual. Generally, a Rogue is born of a bad situation, but they aren’t explicitly bound to that fate. Their most lauded traits are their versatility and determination. The methodology of a Rogue is rarely direct but always deliberate. Commonly, Rogues are remembered for that one big heist or some crazy stunt they did. Rogues are one of the rarer daemons but still appear frequently enough.</p><p></p>",
+    "benefits": "Daemons of the Rogue Archetype add their +1 To Hit/To Land."
+  },
+  "_id": "qx9lwMdzeIrqsAGx",
+  "img": "icons/svg/item-bag.svg",
+  "effects": [
+    {
+      "name": "Rogue Benefit",
+      "origin": "Item.qx9lwMdzeIrqsAGx",
+      "img": "icons/svg/aura.svg",
+      "_id": "6SQpBLvpnZFfJC8q",
+      "type": "base",
+      "system": {},
+      "changes": [
+        {
+          "key": "system.stats.toHit.mod",
+          "mode": 2,
+          "value": "1",
+          "priority": null
+        },
+        {
+          "key": "system.stats.toLand.mod",
+          "mode": 2,
+          "value": "1",
+          "priority": null
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "combat": null,
+        "seconds": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "description": "<p>Daemons of the Rogue Archetype add their +1 To Hit/To Land.</p>",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [],
+      "sort": 0,
+      "flags": {
+        "dasu": {
+          "stackable": false,
+          "stackId": "",
+          "maxStacks": null,
+          "showStackCount": false,
+          "specialDuration": "none"
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "dasu",
+        "systemVersion": "#{VERSION}#",
+        "lastModifiedBy": null
+      },
+      "_key": "!items.effects!qx9lwMdzeIrqsAGx.6SQpBLvpnZFfJC8q"
+    }
+  ],
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.350",
+    "systemId": "dasu",
+    "systemVersion": "#{VERSION}#",
+    "createdTime": 1761715597119,
+    "modifiedTime": 1761715597119,
+    "lastModifiedBy": "p5jXebTe99YidXmM"
+  },
+  "ownership": {
+    "default": 0,
+    "p5jXebTe99YidXmM": 3
+  },
+  "sort": 0,
+  "_key": "!items!qx9lwMdzeIrqsAGx"
+}

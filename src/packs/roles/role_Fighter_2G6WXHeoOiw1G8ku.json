@@ -1,0 +1,30 @@
+{
+  "folder": null,
+  "name": "Fighter",
+  "type": "role",
+  "system": {
+    "dsid": "sumNNRhLZdsNAwcn",
+    "description": "<p>Physical combatants, damage dealers</p>"
+  },
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.350",
+    "systemId": "dasu",
+    "systemVersion": "#{VERSION}#",
+    "createdTime": 1761715660852,
+    "modifiedTime": 1761715682210,
+    "lastModifiedBy": "p5jXebTe99YidXmM"
+  },
+  "ownership": {
+    "default": 0,
+    "p5jXebTe99YidXmM": 3
+  },
+  "_id": "2G6WXHeoOiw1G8ku",
+  "sort": 500000,
+  "_key": "!items!2G6WXHeoOiw1G8ku"
+}

@@ -1,0 +1,30 @@
+{
+  "folder": null,
+  "name": "Magus",
+  "type": "role",
+  "system": {
+    "dsid": "xeLMNx3UAgrL0Rpr",
+    "description": "<p>Magic combatants, Weakness attackers</p>"
+  },
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.350",
+    "systemId": "dasu",
+    "systemVersion": "#{VERSION}#",
+    "createdTime": 1761715680092,
+    "modifiedTime": 1761715682210,
+    "lastModifiedBy": "p5jXebTe99YidXmM"
+  },
+  "ownership": {
+    "default": 0,
+    "p5jXebTe99YidXmM": 3
+  },
+  "_id": "DloIGWDjD9E7KbIr",
+  "sort": 300000,
+  "_key": "!items!DloIGWDjD9E7KbIr"
+}
