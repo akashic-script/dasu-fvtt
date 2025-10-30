@@ -57,6 +57,28 @@
             {{/each}}
           </div>
 
+          {{!-- Defense Stats --}}
+          <div class="skills-section attributes grid grid-2col">
+            {{!-- Defense Stat --}}
+            <div class="attribute flexrow flex-group-center">
+              <div class="attribute-header flexrow flex-group-center">
+                <div class="attribute-name">{{localize 'DASU.Actor.Stats.def.label'}}</div>
+                <div class="tick-button attribute-value" data-tooltip="Defense: 7 + (POW {{system.attributes.pow.tick}} + WILL {{system.attributes.will.tick}}) / 2{{#if system.stats.def.mod}} + {{system.stats.def.mod}} mod{{/if}}">
+                  {{system.stats.def.value}}
+                </div>
+              </div>
+            </div>
+            {{!-- Avoid Stat --}}
+            <div class="attribute flexrow flex-group-center">
+              <div class="attribute-header flexrow flex-group-center">
+                <div class="attribute-name">{{localize 'DASU.Actor.Stats.avoid.label'}}</div>
+                <div class="tick-button attribute-value" data-tooltip="Avoid: 7 + (DEX {{system.attributes.dex.tick}} + STA {{system.attributes.sta.tick}}) / 2{{#if system.stats.avoid.mod}} + {{system.stats.avoid.mod}} mod{{/if}}">
+                  {{system.stats.avoid.value}}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {{! Critical Modifier Section for Daemons }}
           <div class="crit-section">
             <div class="crit-header flexrow">
