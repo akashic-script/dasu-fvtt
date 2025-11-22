@@ -45,7 +45,7 @@ export class DASURecruitDialog extends foundry.applications.api.HandlebarsApplic
       // Check if this daemon is already in the summoner's stock
       const stocks = actor.system.stocks || [];
       const hasThisDaemon = stocks.some(
-        (stock) => stock.references?.actor === this.daemon.id
+        (stock) => stock.actorId === this.daemon.id
       );
 
       return !hasThisDaemon;
@@ -142,10 +142,8 @@ export class DASURecruitDialog extends foundry.applications.api.HandlebarsApplic
       // Add the cloned daemon to the selected summoner's stock
       const currentStocks = selectedSummoner.system.stocks || [];
       const newStock = {
-        references: {
-          actor: clonedDaemon.id,
-          isSummoned: false,
-        },
+        actorId: clonedDaemon.id,
+        isSummoned: false,
       };
 
       await selectedSummoner.update({

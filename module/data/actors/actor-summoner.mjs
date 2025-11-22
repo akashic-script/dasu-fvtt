@@ -112,13 +112,8 @@ export default class SummonerDataModel extends BaseActorDataModel {
       ),
       stocks: new fields.ArrayField(
         new fields.SchemaField({
-          references: new fields.SchemaField({
-            actor: new fields.StringField({ required: false }),
-            isSummoned: new fields.BooleanField({
-              required: false,
-              initial: false,
-            }),
-          }),
+          actorId: new fields.StringField({ required: true }),
+          isSummoned: new fields.BooleanField({ initial: false }),
         }),
         { required: false }
       ),

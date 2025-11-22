@@ -693,8 +693,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       const daemons = [];
 
       for (const stock of stocks) {
-        if (stock.references?.actor) {
-          const actor = game.actors.get(stock.references.actor);
+        if (stock.actorId) {
+          const actor = game.actors.get(stock.actorId);
           if (actor && actor.type === 'daemon') {
             daemons.push({
               _id: actor.id,
@@ -702,7 +702,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
               img: actor.img,
               type: actor.type,
               system: actor.system,
-              isSummoned: stock.references.isSummoned || false,
+              isSummoned: stock.isSummoned || false,
             });
           }
         }
@@ -1960,22 +1960,17 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   static async _toggleSummoned(_event, target) {
     const daemonId = target.closest('li[data-actor-id]').dataset.actorId;
     const stocks = this.actor.system.stocks || [];
-    const stockIndex = stocks.findIndex(
-      (stock) => stock.references?.actor === daemonId
-    );
+    const stockIndex = stocks.findIndex((stock) => stock.actorId === daemonId);
 
     if (stockIndex === -1) return;
 
     const currentStock = stocks[stockIndex];
-    const newIsSummoned = !currentStock.references.isSummoned;
+    const newIsSummoned = !currentStock.isSummoned;
 
     const updatedStocks = [...stocks];
     updatedStocks[stockIndex] = {
       ...currentStock,
-      references: {
-        ...currentStock.references,
-        isSummoned: newIsSummoned,
-      },
+      isSummoned: newIsSummoned,
     };
 
     await this.actor.update({ 'system.stocks': updatedStocks });
@@ -1992,9 +1987,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
   static async _removeFromStock(_event, target) {
     const daemonId = target.closest('li[data-actor-id]').dataset.actorId;
     const stocks = this.actor.system.stocks || [];
-    const updatedStocks = stocks.filter(
-      (stock) => stock.references?.actor !== daemonId
-    );
+    const updatedStocks = stocks.filter((stock) => stock.actorId !== daemonId);
 
     await this.actor.update({ 'system.stocks': updatedStocks });
   }
@@ -2735,9 +2728,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     // Check if daemon is already in stocks
     const stocks = this.actor.system.stocks || [];
-    const existingStock = stocks.find(
-      (stock) => stock.references?.actor === actor.id
-    );
+    const existingStock = stocks.find((stock) => stock.actorId === actor.id);
 
     if (existingStock) {
       ui.notifications.warn('This daemon is already in your stocks');
@@ -2782,10 +2773,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     // Add cloned daemon to stocks
     const newStock = {
-      references: {
-        actor: clonedDaemon.id,
-        isSummoned: false,
-      },
+      actorId: clonedDaemon.id,
+      isSummoned: false,
     };
 
     const updatedStocks = [...stocks, newStock];
@@ -4683,8 +4672,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     for (const stock of stocks) {
       // Only include items from summoned daemons
-      if (stock.references?.actor && stock.references?.isSummoned) {
-        const daemonActor = game.actors.get(stock.references.actor);
+      if (stock.actorId && stock.isSummoned) {
+        const daemonActor = game.actors.get(stock.actorId);
         if (daemonActor && daemonActor.type === 'daemon') {
           // Process each item from the daemon
           for (const item of daemonActor.items) {
@@ -4790,8 +4779,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     // Verify the daemon is actually summoned by this summoner
     const stocks = this.document.system.stocks || [];
     const daemonStock = stocks.find(
-      (stock) =>
-        stock.references?.actor === daemonId && stock.references?.isSummoned
+      (stock) => stock.actorId === daemonId && stock.isSummoned
     );
 
     if (!daemonStock) return null;
@@ -4846,10 +4834,8 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
 
     const stocks = this.document.system.stocks || [];
     return stocks
-      .filter(
-        (stock) => stock.references?.actor && stock.references?.isSummoned
-      )
-      .map((stock) => stock.references.actor);
+      .filter((stock) => stock.actorId && stock.isSummoned)
+      .map((stock) => stock.actorId);
   }
 
   /**
