@@ -8,11 +8,21 @@
       "ActiveEffect": "DASU Active Effect"
     },
     "Attributes": {
-      "none": { "label": "No Attribute" },
-      "pow": { "label": "Power" },
-      "dex": { "label": "Dexterity" },
-      "will": { "label": "Willpower" },
-      "sta": { "label": "Stamina" }
+      "none": {
+        "label": "No Attribute"
+      },
+      "pow": {
+        "label": "Power"
+      },
+      "dex": {
+        "label": "Dexterity"
+      },
+      "will": {
+        "label": "Willpower"
+      },
+      "sta": {
+        "label": "Stamina"
+      }
     },
     "Class": {
       "Official": "Official Class",
@@ -82,13 +92,28 @@
       "Attributes": {
         "label": "Attributes",
         "list": {
-          "pow": { "label": "Power", "abbr": "PWR" },
-          "dex": { "label": "Dexterity", "abbr": "DEX" },
-          "will": { "label": "Willpower", "abbr": "WILL" },
-          "sta": { "label": "Stamina", "abbr": "STA" }
+          "pow": {
+            "label": "Power",
+            "abbr": "PWR"
+          },
+          "dex": {
+            "label": "Dexterity",
+            "abbr": "DEX"
+          },
+          "will": {
+            "label": "Willpower",
+            "abbr": "WILL"
+          },
+          "sta": {
+            "label": "Stamina",
+            "abbr": "STA"
+          }
         },
         "points": {
-          "label": { "label": "Attribute Points", "abbr": "AP" },
+          "label": {
+            "label": "Attribute Points",
+            "abbr": "AP"
+          },
           "tooltip": "AP (Attribute Points): Used to buy attribute ticks. You gain 1 AP at level 1 and then 1 AP at every odd level (3, 5, 7, 9, etc.). Each tick above 1 in any attribute costs 1 AP."
         },
         "tick": {
@@ -116,10 +141,22 @@
         }
       },
       "Stats": {
-        "hp": { "label": "HP", "tooltip": "Health Points" },
-        "wp": { "label": "WP", "tooltip": "Willpower Points" },
-        "avoid": { "label": "AVD", "tooltip": "Avoid (Dexterity + Stamina)" },
-        "def": { "label": "DEF", "tooltip": "Defense (Power + Willpower)" },
+        "hp": {
+          "label": "HP",
+          "tooltip": "Health Points"
+        },
+        "wp": {
+          "label": "WP",
+          "tooltip": "Willpower Points"
+        },
+        "avoid": {
+          "label": "AVD",
+          "tooltip": "Avoid (Dexterity + Stamina)"
+        },
+        "def": {
+          "label": "DEF",
+          "tooltip": "Defense (Power + Willpower)"
+        },
         "crit": {
           "label": "Critical Modifier",
           "threshold": "Threshold",
@@ -131,13 +168,19 @@
       },
       "base": {
         "FIELDS": {
-          "biography": { "label": "Biography" },
-          "level": { "label": "Level" }
+          "biography": {
+            "label": "Biography"
+          },
+          "level": {
+            "label": "Level"
+          }
         }
       },
       "Daemon": {
         "FIELDS": {},
-        "xp": { "label": "XP" }
+        "xp": {
+          "label": "XP"
+        }
       },
       "EditMode": {
         "Edit": "Edit Mode",
@@ -282,7 +325,9 @@
       },
       "Summoner": {
         "FIELDS": {
-          "attributes.level.value": { "label": "Level" }
+          "attributes.level.value": {
+            "label": "Level"
+          }
         }
       },
       "Tabs": {
@@ -372,23 +417,47 @@
       "Ability": {
         "FIELDS": {
           "aptitudes": {
-            "type": { "label": "Aptitude Type" },
-            "value": { "label": "Aptitude Value" }
+            "type": {
+              "label": "Aptitude Type"
+            },
+            "value": {
+              "label": "Aptitude Value"
+            }
           },
-          "category": { "label": "Category" },
-          "cost": { "label": "Cost" },
-          "costType": { "label": "Cost Type" },
+          "category": {
+            "label": "Category"
+          },
+          "cost": {
+            "label": "Cost"
+          },
+          "costType": {
+            "label": "Cost Type"
+          },
           "damage": {
-            "type": { "label": "Damage Type" },
-            "value": { "label": "Damage Value" }
+            "type": {
+              "label": "Damage Type"
+            },
+            "value": {
+              "label": "Damage Value"
+            }
           },
           "healed": {
-            "type": { "label": "Heal Type" },
-            "value": { "label": "Heal Value" }
+            "type": {
+              "label": "Heal Type"
+            },
+            "value": {
+              "label": "Heal Value"
+            }
           },
-          "isInfinity": { "label": "Guaranteed" },
-          "resourceTarget": { "label": "Target Resource" },
-          "toHit": { "label": "To Hit Bonus" }
+          "isInfinity": {
+            "label": "Guaranteed"
+          },
+          "resourceTarget": {
+            "label": "Target Resource"
+          },
+          "toHit": {
+            "label": "To Hit Bonus"
+          }
         },
         "CATEGORIES": {
           "affliction": "Affliction",
@@ -400,7 +469,9 @@
       },
       "General": {
         "FIELDS": {
-          "maxTagSlots": { "label": "Maximum Tag Slots" }
+          "maxTagSlots": {
+            "label": "Maximum Tag Slots"
+          }
         },
         "Tags": {
           "TagSlotsDescription": "Equip tags to item.",
@@ -409,12 +480,16 @@
       },
       "Scar": {
         "FIELDS": {
-          "effect": { "label": "Effect" }
+          "effect": {
+            "label": "Effect"
+          }
         }
       },
       "Schema": {
         "FIELDS": {
-          "level": { "label": "Level" }
+          "level": {
+            "label": "Level"
+          }
         },
         "sectionDescription": "Describe the schema's effects and properties.",
         "progression": {
@@ -437,13 +512,17 @@
       },
       "Special": {
         "FIELDS": {
-          "effect": { "label": "Effect" }
+          "effect": {
+            "label": "Effect"
+          }
         }
       },
       "Tag": {
         "Deleted": "Deleted Tag",
         "FIELDS": {
-          "effect": { "label": "Effect" }
+          "effect": {
+            "label": "Effect"
+          }
         },
         "InvalidTooltip": "This tag has been deleted or is no longer available",
         "AlreadyEquipped": "Already equipped in a weapon"
@@ -458,26 +537,50 @@
       },
       "Tactic": {
         "FIELDS": {
-          "cost": { "label": "Cost" },
-          "damage": {
-            "type": { "label": "Damage Type" },
-            "value": { "label": "Damage Value" }
+          "cost": {
+            "label": "Cost"
           },
-          "effect": { "label": "Effect" },
-          "isInfinity": { "label": "Guaranteed" },
-          "resourceTarget": { "label": "Target Resource" },
-          "toLand": { "label": "To Land Bonus" }
+          "damage": {
+            "type": {
+              "label": "Damage Type"
+            },
+            "value": {
+              "label": "Damage Value"
+            }
+          },
+          "effect": {
+            "label": "Effect"
+          },
+          "isInfinity": {
+            "label": "Guaranteed"
+          },
+          "resourceTarget": {
+            "label": "Target Resource"
+          },
+          "toLand": {
+            "label": "To Land Bonus"
+          }
         }
       },
       "Weapon": {
         "FIELDS": {
-          "cost": { "label": "Cost" },
-          "damage": {
-            "type": { "label": "Damage Type" },
-            "value": { "label": "Damage Value" }
+          "cost": {
+            "label": "Cost"
           },
-          "range": { "label": "Range" },
-          "toHit": { "label": "To Hit Bonus" }
+          "damage": {
+            "type": {
+              "label": "Damage Type"
+            },
+            "value": {
+              "label": "Damage Value"
+            }
+          },
+          "range": {
+            "label": "Range"
+          },
+          "toHit": {
+            "label": "To Hit Bonus"
+          }
         },
         "Settings": {},
         "Equip": "Equip Weapon",
@@ -542,25 +645,75 @@
       }
     },
     "FIELDS": {
-      "govern": { "label": "Governing Attribute" }
+      "govern": {
+        "label": "Governing Attribute"
+      }
     },
     "aptitudeTypes": {
-      "d": { "long": "Dark", "short": "D" },
-      "da": { "long": "Debuff Almighty", "short": "DA" },
-      "dm": { "long": "Debuff Mental", "short": "DM" },
-      "dp": { "long": "Debuff Physical", "short": "DP" },
-      "ea": { "long": "Earth", "short": "EA" },
-      "el": { "long": "Electric", "short": "EL" },
-      "f": { "long": "Fire", "short": "F" },
-      "h": { "long": "Heal", "short": "H" },
-      "i": { "long": "Ice", "short": "I" },
-      "l": { "long": "Light", "short": "L" },
-      "ta": { "long": "Technique Almighty", "short": "TA" },
-      "tb": { "long": "Technique Brutal", "short": "TB" },
-      "tg": { "long": "Technique General", "short": "TG" },
-      "tt": { "long": "Technique Technical", "short": "TT" },
-      "w": { "long": "Wind", "short": "W" },
-      "assist": { "long": "Assist", "short": "AST" }
+      "d": {
+        "long": "Dark",
+        "short": "D"
+      },
+      "da": {
+        "long": "Debuff Almighty",
+        "short": "DA"
+      },
+      "dm": {
+        "long": "Debuff Mental",
+        "short": "DM"
+      },
+      "dp": {
+        "long": "Debuff Physical",
+        "short": "DP"
+      },
+      "ea": {
+        "long": "Earth",
+        "short": "EA"
+      },
+      "el": {
+        "long": "Electric",
+        "short": "EL"
+      },
+      "f": {
+        "long": "Fire",
+        "short": "F"
+      },
+      "h": {
+        "long": "Heal",
+        "short": "H"
+      },
+      "i": {
+        "long": "Ice",
+        "short": "I"
+      },
+      "l": {
+        "long": "Light",
+        "short": "L"
+      },
+      "ta": {
+        "long": "Technique Almighty",
+        "short": "TA"
+      },
+      "tb": {
+        "long": "Technique Brutal",
+        "short": "TB"
+      },
+      "tg": {
+        "long": "Technique General",
+        "short": "TG"
+      },
+      "tt": {
+        "long": "Technique Technical",
+        "short": "TT"
+      },
+      "w": {
+        "long": "Wind",
+        "short": "W"
+      },
+      "assist": {
+        "long": "Assist",
+        "short": "AST"
+      }
     },
     "damageTypes": {
       "dark": "Dark",
@@ -574,11 +727,26 @@
       "wind": "Wind"
     },
     "resistanceTypes": {
-      "-1": { "long": "Weak", "short": "WK" },
-      "0": { "long": "Normal", "short": "-" },
-      "1": { "long": "Resist", "short": "RS" },
-      "2": { "long": "Nullify", "short": "NU" },
-      "3": { "long": "Drain", "short": "DR" }
+      "-1": {
+        "long": "Weak",
+        "short": "WK"
+      },
+      "0": {
+        "long": "Normal",
+        "short": "-"
+      },
+      "1": {
+        "long": "Resist",
+        "short": "RS"
+      },
+      "2": {
+        "long": "Nullify",
+        "short": "NU"
+      },
+      "3": {
+        "long": "Drain",
+        "short": "DR"
+      }
     },
     "CostType": {
       "wp": "WP",
@@ -649,7 +817,6 @@
           "name": "Starting AP",
           "hint": "How many AP characters start with at level 1"
         },
-
         "apFormula": {
           "name": "AP Progression Formula",
           "hint": "Formula for calculating AP gained from levels",
@@ -664,6 +831,24 @@
         "resetDefaults": "Reset to Defaults",
         "saveChanges": "Save Changes"
       }
+    },
+    "Socket": {
+      "NoGM": "No GM available to process the request.",
+      "NoPermission": "You do not have permission to perform this action. A GM with the socketlib module enabled is required.",
+      "NoPermissionDamage": "You do not have permission to apply damage. A GM with the socketlib module enabled is required.",
+      "NoPermissionHealing": "You do not have permission to apply healing. A GM with the socketlib module enabled is required.",
+      "NoPermissionEffect": "You do not have permission to apply this effect. A GM with the socketlib module enabled is required.",
+      "NoPermissionRemoveEffectStack": "You do not have permission to remove this effect stack. A GM with the socketlib module enabled is required.",
+      "NoGMDamage": "No GM available to apply damage.",
+      "NoGMHealing": "No GM available to apply healing.",
+      "NoGMEffect": "No GM available to apply effect.",
+      "NoGMRemoveEffectStack": "No GM available to remove effect stack."
+    },
+    "GMStatus": {
+      "Online": "GM Online",
+      "Offline": "GM Offline",
+      "ActiveGMs": "{count} GM(s) online: {names}",
+      "NoGMsOnline": "No Game Masters are currently online. Some features may be unavailable."
     },
     "Notifications": {
       "levelUp": {

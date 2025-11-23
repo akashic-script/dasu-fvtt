@@ -391,7 +391,28 @@ export class HealingEditDialog {
         }
 
         if (Object.keys(updates).length > 0) {
-          await targetActor.update(updates);
+          if (game.user.isGM) {
+            await targetActor.update(updates);
+          } else if (game.dasu?.socket) {
+            try {
+              await game.dasu.socket.executeAsGM(
+                'updateActorAsGM',
+                targetActor.uuid,
+                updates
+              );
+            } catch (err) {
+              console.error(err); // for debugging
+              ui.notifications.error(
+                game.i18n.localize('DASU.Socket.NoGMHealing')
+              );
+              return { applied: false, error: 'No GM available' };
+            }
+          } else {
+            ui.notifications.error(
+              game.i18n.localize('DASU.Socket.NoPermissionHealing')
+            );
+            return { applied: false, error: 'Permission denied' };
+          }
         }
 
         if (originalMessageId) {

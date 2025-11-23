@@ -495,7 +495,26 @@ export class DASUActor extends Actor {
     }
 
     if (Object.keys(updates).length > 0) {
-      await this.update(updates);
+      if (game.user.isGM || this.testUserPermission(game.user, 'OWNER')) {
+        await this.update(updates);
+      } else if (game.dasu?.socket) {
+        try {
+          await game.dasu.socket.executeAsGM(
+            'updateActorAsGM',
+            this.uuid,
+            updates
+          );
+        } catch (err) {
+          console.error(err);
+          ui.notifications.error(game.i18n.localize('DASU.Socket.NoGMDamage'));
+          throw new Error('No GM available to apply damage.');
+        }
+      } else {
+        ui.notifications.error(
+          game.i18n.localize('DASU.Socket.NoPermissionDamage')
+        );
+        throw new Error('Permission denied to apply damage.');
+      }
     }
 
     return {
@@ -557,7 +576,26 @@ export class DASUActor extends Actor {
     }
 
     if (Object.keys(updates).length > 0) {
-      await this.update(updates);
+      if (game.user.isGM || this.testUserPermission(game.user, 'OWNER')) {
+        await this.update(updates);
+      } else if (game.dasu?.socket) {
+        try {
+          await game.dasu.socket.executeAsGM(
+            'updateActorAsGM',
+            this.uuid,
+            updates
+          );
+        } catch (err) {
+          console.error(err);
+          ui.notifications.error(game.i18n.localize('DASU.Socket.NoGMHealing'));
+          throw new Error('No GM available to apply healing.');
+        }
+      } else {
+        ui.notifications.error(
+          game.i18n.localize('DASU.Socket.NoPermissionHealing')
+        );
+        throw new Error('Permission denied to apply healing.');
+      }
     }
 
     return {
@@ -691,10 +729,37 @@ export class DASUActor extends Actor {
    * @param {string} stackId - The stack identifier
    * @returns {Promise<void>}
    */
-  async removeEffectStack(stackId) {
+  async removeEffectStack(stackId, _isSocketCall = false) {
     const effect = this.getStackableEffect(stackId);
 
     if (!effect) return;
+
+    if (
+      !_isSocketCall &&
+      !game.user.isGM &&
+      !this.testUserPermission(game.user, 'OWNER')
+    ) {
+      if (game.dasu?.socket) {
+        try {
+          return await game.dasu.socket.executeAsGM(
+            'removeEffectStackAsGM',
+            this.uuid,
+            stackId
+          );
+        } catch (err) {
+          console.error(err);
+          ui.notifications.error(
+            game.i18n.localize('DASU.Socket.NoGMRemoveEffectStack')
+          );
+          return;
+        }
+      } else {
+        ui.notifications.error(
+          game.i18n.localize('DASU.Socket.NoPermissionRemoveEffectStack')
+        );
+        return;
+      }
+    }
 
     const currentStacks = effect.flags.dasu.currentStacks || 1;
 

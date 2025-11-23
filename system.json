@@ -9,6 +9,14 @@
       "url": "https://github.com/spyrella/"
     }
   ],
+  "relationships": {
+    "requires": [
+      {
+        "id": "socketlib",
+        "type": "module"
+      }
+    ]
+  },
   "documentTypes": {
     "Actor": {
       "summoner": {
@@ -153,7 +161,7 @@
       "packs": ["classes", "schemas"]
     }
   ],
-  "socket": false,
+  "socket": true,
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
   "background": "systems/dasu/assets/anvil-impact.png",

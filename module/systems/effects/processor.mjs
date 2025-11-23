@@ -18,9 +18,42 @@ export class EffectProcessor {
    * @param {Actor} [options.source] - Source actor who applied the effect
    * @param {Item} [options.item] - Source item that triggered the effect
    * @param {string} [options.origin] - Origin UUID for the effect
+   * @param {boolean} [_isSocketCall=false] - Internal flag to prevent socket loops
    * @returns {Promise<ActiveEffect|null>} Created effect or null if toggled off
    */
-  static async applyEffect(actor, effectData, options = {}) {
+  static async applyEffect(
+    actor,
+    effectData,
+    options = {},
+    _isSocketCall = false
+  ) {
+    // Socketlib integration for non-GMs
+    if (
+      !_isSocketCall &&
+      !game.user.isGM &&
+      !actor.testUserPermission(game.user, 'OWNER')
+    ) {
+      if (game.dasu?.socket) {
+        try {
+          return await game.dasu.socket.executeAsGM(
+            'applyEffectAsGM',
+            actor.uuid,
+            effectData,
+            options
+          );
+        } catch (err) {
+          console.error(err);
+          ui.notifications.error(game.i18n.localize('DASU.Socket.NoGMEffect'));
+          return null;
+        }
+      } else {
+        ui.notifications.error(
+          game.i18n.localize('DASU.Socket.NoPermissionEffect')
+        );
+        return null;
+      }
+    }
+
     // Phase 1: Pre-process - Allow modifications before any logic
     const preprocessResult = await this._runHook('preProcessEffect', {
       actor,

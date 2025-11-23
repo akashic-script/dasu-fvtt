@@ -241,7 +241,7 @@ export class DamageEditDialog {
       const icon = previewResult.isHealing ? '♥' : '⚔';
       const type = previewResult.isHealing ? 'Healing' : 'Damage';
       const resistance =
-        previewResult.resistance?.type !== 'normal'
+        previewResult.resistance && previewResult.resistance.type !== 'normal'
           ? ` (${previewResult.resistance.type})`
           : '';
 
@@ -337,13 +337,14 @@ export class DamageEditDialog {
             targetActor.system.hp?.max ??
             20;
 
-          // Revert original damage first (only if HP was originally targeted), then apply new damage
+          // Only revert if original damage was actually applied to this resource
           const originallyTargetedHp =
             originalResourceTarget === 'hp' ||
             originalResourceTarget === 'both';
-          const revertedHp = originallyTargetedHp
-            ? Math.min(currentHp + originalDamage, maxHp)
-            : currentHp;
+          const revertedHp =
+            originallyTargetedHp && originalDamage > 0
+              ? Math.min(currentHp + originalDamage, maxHp)
+              : currentHp;
           let finalHp;
 
           if (newDamage.isHealing) {
@@ -352,10 +353,13 @@ export class DamageEditDialog {
             finalHp = Math.max(0, revertedHp - newDamage.finalDamage);
           }
 
-          if (targetActor.system.stats?.hp?.current !== undefined) {
-            updates['system.stats.hp.current'] = finalHp;
-          } else {
-            updates['system.hp.current'] = finalHp;
+          // Only update if the value actually changes
+          if (finalHp !== currentHp) {
+            if (targetActor.system.stats?.hp?.current !== undefined) {
+              updates['system.stats.hp.current'] = finalHp;
+            } else {
+              updates['system.hp.current'] = finalHp;
+            }
           }
         }
 
@@ -372,13 +376,14 @@ export class DamageEditDialog {
             targetActor.system.wp?.max ??
             20;
 
-          // Revert original damage first (only if WP was originally targeted), then apply new damage
+          // Only revert if original damage was actually applied to this resource
           const originallyTargetedWp =
             originalResourceTarget === 'wp' ||
             originalResourceTarget === 'both';
-          const revertedWp = originallyTargetedWp
-            ? Math.min(currentWp + originalDamage, maxWp)
-            : currentWp;
+          const revertedWp =
+            originallyTargetedWp && originalDamage > 0
+              ? Math.min(currentWp + originalDamage, maxWp)
+              : currentWp;
           let finalWp;
 
           if (newDamage.isHealing) {
@@ -387,15 +392,39 @@ export class DamageEditDialog {
             finalWp = Math.max(0, revertedWp - newDamage.finalDamage);
           }
 
-          if (targetActor.system.stats?.wp?.current !== undefined) {
-            updates['system.stats.wp.current'] = finalWp;
-          } else {
-            updates['system.wp.current'] = finalWp;
+          // Only update if the value actually changes
+          if (finalWp !== currentWp) {
+            if (targetActor.system.stats?.wp?.current !== undefined) {
+              updates['system.stats.wp.current'] = finalWp;
+            } else {
+              updates['system.wp.current'] = finalWp;
+            }
           }
         }
 
         if (Object.keys(updates).length > 0) {
-          await targetActor.update(updates);
+          if (game.user.isGM) {
+            await targetActor.update(updates);
+          } else if (game.dasu?.socket) {
+            try {
+              await game.dasu.socket.executeAsGM(
+                'updateActorAsGM',
+                targetActor.uuid,
+                updates
+              );
+            } catch (err) {
+              console.error(err); // for debugging
+              ui.notifications.error(
+                game.i18n.localize('DASU.Socket.NoGMDamage')
+              );
+              return { applied: false, error: 'No GM available' };
+            }
+          } else {
+            ui.notifications.error(
+              game.i18n.localize('DASU.Socket.NoPermissionDamage')
+            );
+            return { applied: false, error: 'Permission denied' };
+          }
         }
 
         // Update the original message with strikethrough and disabled buttons
@@ -589,6 +618,7 @@ export class DamageEditDialog {
     try {
       let baseDamage;
       let breakdown;
+      const damageMod = Number(damageData.damageMod) || 0;
 
       if (sourceItem?.name === 'Enricher Damage') {
         // From enricher, use originalDamage as base
@@ -613,15 +643,15 @@ export class DamageEditDialog {
         }
 
         // Add damage modifier from dialog
-        baseDamage += damageData.damageMod || 0;
-        if (damageData.damageMod) {
-          breakdown += ` + ${damageData.damageMod} (mod)`;
+        baseDamage += damageMod;
+        if (damageMod) {
+          breakdown += ` + ${damageMod} (mod)`;
         }
       } else {
         // Regular roll, recalculate from item
         const modifiers = {
           attributeTick: damageData.govern,
-          bonus: damageData.damageMod,
+          bonus: damageMod,
           ignoreResistance:
             damageData.ignoreResist ||
             damageData.ignoreWeak ||
@@ -636,14 +666,13 @@ export class DamageEditDialog {
 
         // Create breakdown for regular roll
         const weaponDamage = sourceItem?.system?.damage?.value || 0;
-        const tickValue =
-          baseDamage - weaponDamage - (damageData.damageMod || 0);
+        const tickValue = baseDamage - weaponDamage - damageMod;
         breakdown = `Weapon: ${weaponDamage}`;
         if (tickValue) {
           breakdown += ` + ${tickValue} (${damageData.govern})`;
         }
-        if (damageData.damageMod) {
-          breakdown += ` + ${damageData.damageMod} (mod)`;
+        if (damageMod) {
+          breakdown += ` + ${damageMod} (mod)`;
         }
       }
 
@@ -651,51 +680,54 @@ export class DamageEditDialog {
       let finalDamage = baseDamage;
       let resistanceResult = null;
 
-      // Check if any resistance should be applied
-      const anyIgnored =
-        damageData.ignoreResist ||
-        damageData.ignoreWeak ||
-        damageData.ignoreNullify ||
-        damageData.ignoreDrain;
+      // For GMs, calculate full resistance. For players, omit it from preview.
+      if (game.user.isGM) {
+        // Check if any resistance should be applied
+        const anyIgnored =
+          damageData.ignoreResist ||
+          damageData.ignoreWeak ||
+          damageData.ignoreNullify ||
+          damageData.ignoreDrain;
 
-      if (!anyIgnored) {
-        // Apply all resistance normally
-        resistanceResult = DamageCalculator.applyResistance(
-          baseDamage,
-          targetActor,
-          damageData.damageType,
-          isCritical
-        );
-        finalDamage = resistanceResult.damage;
-      } else {
-        // Apply resistance but selectively ignore certain types
-        resistanceResult = DamageCalculator.applyResistance(
-          baseDamage,
-          targetActor,
-          damageData.damageType,
-          isCritical
-        );
-
-        // Override specific resistance types based on ignore flags
-        if (
-          (resistanceResult.type === 'resist' && damageData.ignoreResist) ||
-          (resistanceResult.type === 'weak' && damageData.ignoreWeak) ||
-          (resistanceResult.type === 'nullify' && damageData.ignoreNullify) ||
-          (resistanceResult.type === 'drain' && damageData.ignoreDrain)
-        ) {
-          // Override to normal damage
-          finalDamage = baseDamage;
-          resistanceResult.type = 'normal';
-          resistanceResult.multiplier = 1;
-        } else {
+        if (!anyIgnored) {
+          // Apply all resistance normally
+          resistanceResult = DamageCalculator.applyResistance(
+            baseDamage,
+            targetActor,
+            damageData.damageType,
+            isCritical
+          );
           finalDamage = resistanceResult.damage;
-        }
-      }
+        } else {
+          // Apply resistance but selectively ignore certain types
+          resistanceResult = DamageCalculator.applyResistance(
+            baseDamage,
+            targetActor,
+            damageData.damageType,
+            isCritical
+          );
 
-      if (resistanceResult && resistanceResult.type !== 'normal') {
-        const resistMultiplier = resistanceResult.multiplier || 1;
-        if (resistMultiplier !== 1) {
-          breakdown += ` × ${resistMultiplier} = ${Math.floor(finalDamage)}`;
+          // Override specific resistance types based on ignore flags
+          if (
+            (resistanceResult.type === 'resist' && damageData.ignoreResist) ||
+            (resistanceResult.type === 'weak' && damageData.ignoreWeak) ||
+            (resistanceResult.type === 'nullify' && damageData.ignoreNullify) ||
+            (resistanceResult.type === 'drain' && damageData.ignoreDrain)
+          ) {
+            // Override to normal damage
+            finalDamage = baseDamage;
+            resistanceResult.type = 'normal';
+            resistanceResult.multiplier = 1;
+          } else {
+            finalDamage = resistanceResult.damage;
+          }
+        }
+
+        if (resistanceResult && resistanceResult.type !== 'normal') {
+          const resistMultiplier = resistanceResult.multiplier || 1;
+          if (resistMultiplier !== 1) {
+            breakdown += ` × ${resistMultiplier} = ${Math.floor(finalDamage)}`;
+          }
         }
       }
 

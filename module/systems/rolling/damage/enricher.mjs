@@ -145,52 +145,36 @@ function _parseDamageInstance(instanceText) {
     return null;
   }
 
-  // Check for prompt mode with optional parameters: [[/damage prompt 5 fire]]
-  if (tokens[0].toLowerCase() === 'prompt') {
-    // If only "prompt", use defaults
-    if (tokens.length === 1) {
-      return {
-        isPrompt: true,
-        formula: '0',
-        damageType: 'physical',
-        resourceTarget: 'hp',
-      };
-    }
-
-    // Parse the rest as normal damage parameters
-    const formula = tokens[1];
-    let damageType = 'physical';
-    let resourceTarget = 'hp';
-
-    // Check if token 2 is a damage type
-    if (tokens[2] && DAMAGE_TYPES.includes(tokens[2].toLowerCase())) {
-      damageType = tokens[2].toLowerCase();
-      // Check if token 3 is a resource target
-      if (tokens[3] && RESOURCE_TARGETS.includes(tokens[3].toLowerCase())) {
-        resourceTarget = tokens[3].toLowerCase();
-      }
-    }
-    // Check if token 2 is a resource target
-    else if (tokens[2] && RESOURCE_TARGETS.includes(tokens[2].toLowerCase())) {
-      resourceTarget = tokens[2].toLowerCase();
-    }
-
-    return {
-      isPrompt: true,
-      formula,
-      damageType,
-      resourceTarget,
-    };
-  }
-
-  // Find where the formula ends by looking for damage type or resource keywords
-  let formulaEndIndex = 0;
+  let isPromptMode = false;
+  let formulaTokens = [];
   let damageType = 'physical';
   let resourceTarget = 'hp';
 
-  // Scan tokens to find damage types and resources
-  for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i];
+  // First, check for 'prompt' token anywhere and remove it from processing
+  const filteredTokens = [];
+  for (const token of tokens) {
+    if (token.toLowerCase() === 'prompt') {
+      isPromptMode = true;
+    } else {
+      filteredTokens.push(token);
+    }
+  }
+
+  // If only "prompt" was provided, use defaults and enable prompt mode
+  if (filteredTokens.length === 0 && isPromptMode) {
+    return {
+      isPrompt: true,
+      formula: '0',
+      damageType: 'physical',
+      resourceTarget: 'hp',
+    };
+  }
+
+  // Now parse the filtered tokens for formula, damage type, and resource target
+  let formulaEndIndex = 0;
+
+  for (let i = 0; i < filteredTokens.length; i++) {
+    const token = filteredTokens[i];
     const lowerToken = token.toLowerCase();
 
     if (DAMAGE_TYPES.includes(lowerToken)) {
@@ -199,8 +183,8 @@ function _parseDamageInstance(instanceText) {
     } else if (RESOURCE_TARGETS.includes(lowerToken)) {
       resourceTarget = lowerToken;
       if (formulaEndIndex === 0) formulaEndIndex = i;
-    } else if (token.includes('/') || lowerToken === 'prompt') {
-      // Multiple damage types (e.g., "fire/ice") or prompt
+    } else if (token.includes('/')) {
+      // Multiple damage types (e.g., "fire/ice")
       damageType = lowerToken;
       if (formulaEndIndex === 0) formulaEndIndex = i;
     }
@@ -208,13 +192,14 @@ function _parseDamageInstance(instanceText) {
 
   // If no damage type or resource found, all tokens are part of the formula
   if (formulaEndIndex === 0) {
-    formulaEndIndex = tokens.length;
+    formulaEndIndex = filteredTokens.length;
   }
 
   // Reconstruct the formula from the tokens before the damage type
-  const formula = tokens.slice(0, formulaEndIndex).join(' ');
+  const formula = filteredTokens.slice(0, formulaEndIndex).join(' ');
 
   return {
+    isPrompt: isPromptMode,
     formula,
     damageType,
     resourceTarget,
@@ -538,17 +523,16 @@ async function _onDamageLinkClick(event) {
 
   try {
     // Get targets first (needed for stack and attribute parsing)
-    const targets = getTargets();
+    const targets = getTargets().filter((t) => t?.actor);
 
     if (targets.length === 0) {
       ui.notifications.warn(
-        'No targets selected. Please select targets to apply damage.'
+        'No valid targets found. Please select one or more tokens with actors to apply damage.'
       );
       return;
     }
 
     const primaryTarget = targets[0]?.actor || null;
-
     // Parse attribute references (@origin.pow, @target.dex, etc.)
     let parsedFormula = _parseAttributeReferences(
       formula,

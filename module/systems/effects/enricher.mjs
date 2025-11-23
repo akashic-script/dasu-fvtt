@@ -49,6 +49,7 @@ import {
 
 import { EffectProcessor } from './processor.mjs';
 import { StatusEffectDialog } from '../../ui/dialogs/status-effect-dialog.mjs';
+import { SystemControls } from '../../helpers/system-controls.mjs';
 
 /**
  * Valid effect states
@@ -473,15 +474,24 @@ function _buildEffectData(statusCondition, statusId, durationOverride = null) {
 }
 
 /**
- * Apply or remove an effect from an actor
+ * Check if a GM is currently connected
  *
+ * @returns {boolean} True if at least one GM is connected
+ * @private
+ */
+function _isGMConnected() {
+  return game.users.some((user) => user.active && user.isGM);
+}
+
+/**
+ * Apply or remove an effect from an actor
  * @param {Actor} actor - The actor to modify
  * @param {string} effectId - Effect ID from DASU_STATUS_CONDITIONS
  * @param {string} state - Desired state ('on', 'off', 'toggle', 'up', 'down')
  * @param {Object|null} duration - Duration override from enricher
  * @param {boolean} isRightClick - Whether this is a right-click (for unstacking)
  * @param {string} [origin] - Origin UUID for the effect
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>} True if effect was applied successfully
  * @private
  */
 async function _applyEffect(
@@ -492,67 +502,96 @@ async function _applyEffect(
   isRightClick = false,
   origin = null
 ) {
-  if (!actor) return;
+  if (!actor) return false;
 
   const statusCondition = CONFIG.DASU_STATUS_CONDITIONS?.[effectId];
   if (!statusCondition) {
     console.warn(`DASU | Effect Enricher | Unknown effect: ${effectId}`);
-    return;
+    return false;
   }
 
   const stackableData = _getStackableEffectData(effectId);
 
-  // Handle stack states
-  if (state === 'up' || state === 'down') {
-    if (!stackableData?.isStackable) {
-      console.warn(
-        `DASU | Effect Enricher | Cannot use stack state on non-stackable effect: ${effectId}`
-      );
-      return;
+  try {
+    // Handle stack states
+    if (state === 'up' || state === 'down') {
+      if (!stackableData?.isStackable) {
+        console.warn(
+          `DASU | Effect Enricher | Cannot use stack state on non-stackable effect: ${effectId}`
+        );
+        return false;
+      }
+
+      if (state === 'up') {
+        const effectData = _buildEffectData(
+          statusCondition,
+          effectId,
+          duration
+        );
+        await EffectProcessor.applyEffect(actor, effectData, {
+          toggle: false,
+          origin,
+        });
+      } else {
+        await _removeEffectStack(actor, stackableData.stackId);
+      }
+      return true;
     }
 
-    if (state === 'up') {
-      const effectData = _buildEffectData(statusCondition, effectId, duration);
+    // Handle stackable effects with regular states
+    if (stackableData?.isStackable) {
+      if (isRightClick) {
+        await _removeEffectStack(actor, stackableData.stackId);
+      } else {
+        const effectData = _buildEffectData(
+          statusCondition,
+          effectId,
+          duration
+        );
+        await EffectProcessor.applyEffect(actor, effectData, {
+          toggle: false,
+          origin,
+        });
+      }
+      return true;
+    }
+
+    // Handle non-stackable effects
+    const effectData = _buildEffectData(statusCondition, effectId, duration);
+    const hasEffect = actor.effects.find((e) => e.statuses.has(effectId));
+
+    if (state === 'toggle') {
+      await EffectProcessor.applyEffect(actor, effectData, {
+        toggle: true,
+        origin,
+      });
+      return true;
+    } else if (state === 'on' && !hasEffect) {
       await EffectProcessor.applyEffect(actor, effectData, {
         toggle: false,
         origin,
       });
-    } else {
-      await _removeEffectStack(actor, stackableData.stackId);
+      return true;
+    } else if (state === 'off' && hasEffect) {
+      await hasEffect.delete();
+      return true;
     }
-    return;
-  }
 
-  // Handle stackable effects with regular states
-  if (stackableData?.isStackable) {
-    if (isRightClick) {
-      await _removeEffectStack(actor, stackableData.stackId);
-    } else {
-      const effectData = _buildEffectData(statusCondition, effectId, duration);
-      await EffectProcessor.applyEffect(actor, effectData, {
-        toggle: false,
-        origin,
-      });
+    return false;
+  } catch (error) {
+    // Check if this is a GM connection error
+    if (
+      error.name === 'SocketlibNoGMConnectedError' ||
+      error.message?.includes('no GM is connected') ||
+      error.message?.includes('No GM available')
+    ) {
+      console.warn('DASU | Effect Enricher | No GM connected to apply effect');
+      return false;
     }
-    return;
-  }
 
-  // Handle non-stackable effects
-  const effectData = _buildEffectData(statusCondition, effectId, duration);
-  const hasEffect = actor.effects.find((e) => e.statuses.has(effectId));
-
-  if (state === 'toggle') {
-    await EffectProcessor.applyEffect(actor, effectData, {
-      toggle: true,
-      origin,
-    });
-  } else if (state === 'on' && !hasEffect) {
-    await EffectProcessor.applyEffect(actor, effectData, {
-      toggle: false,
-      origin,
-    });
-  } else if (state === 'off' && hasEffect) {
-    await hasEffect.delete();
+    // Re-throw other errors
+    console.error('DASU | Effect Enricher | Error applying effect:', error);
+    throw error;
   }
 }
 
@@ -564,7 +603,7 @@ async function _applyEffect(
  * @param {Object|null} duration - Duration data
  * @param {string} [origin] - Origin UUID for the effect
  * @param {string} [effectName] - Name for the effect
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>} True if effect was applied successfully
  * @private
  */
 async function _applyCustomEffect(
@@ -574,7 +613,7 @@ async function _applyCustomEffect(
   origin = null,
   effectName = 'Custom Effect'
 ) {
-  if (!actor) return;
+  if (!actor) return false;
 
   const effectData = {
     name: effectName,
@@ -594,10 +633,30 @@ async function _applyCustomEffect(
     }
   }
 
-  await EffectProcessor.applyEffect(actor, effectData, {
-    toggle: false,
-    origin,
-  });
+  try {
+    await EffectProcessor.applyEffect(actor, effectData, {
+      toggle: false,
+      origin,
+    });
+    return true;
+  } catch (error) {
+    if (
+      error.name === 'SocketlibNoGMConnectedError' ||
+      error.message?.includes('no GM is connected') ||
+      error.message?.includes('No GM available')
+    ) {
+      console.warn(
+        'DASU | Effect Enricher | No GM connected to apply custom effect'
+      );
+      return false;
+    }
+
+    console.error(
+      'DASU | Effect Enricher | Error applying custom effect:',
+      error
+    );
+    throw error;
+  }
 }
 
 /**
@@ -660,6 +719,14 @@ async function _onEffectLinkClick(event) {
     return;
   }
 
+  // Check if GM is connected before proceeding
+  if (!_isGMConnected()) {
+    ui.notifications.error(
+      'Cannot apply effects: No Game Master is currently connected.'
+    );
+    return;
+  }
+
   const sourceActor = getSourceActor(link);
   const origin = sourceActor?.uuid || null;
 
@@ -686,27 +753,46 @@ async function _onEffectLinkClick(event) {
     }
 
     const customName = effectName || 'Custom Effect';
+    let successCount = 0;
+    let failCount = 0;
 
     if (tokensToProcess.length) {
       for (const token of tokensToProcess) {
-        await _applyCustomEffect(
+        const success = await _applyCustomEffect(
           token.actor,
           changes,
           parsedDuration,
           origin,
           customName
         );
+        if (success) successCount++;
+        else failCount++;
       }
-      _showEffectNotification(customName, 'applied to', tokensToProcess.length);
+
+      if (successCount > 0) {
+        _showEffectNotification(customName, 'applied to', successCount);
+      }
+      if (failCount > 0) {
+        ui.notifications.error(
+          `Failed to apply ${customName} to ${failCount} token(s)`
+        );
+      }
     } else if (sourceActor) {
-      await _applyCustomEffect(
+      const success = await _applyCustomEffect(
         sourceActor,
         changes,
         parsedDuration,
         origin,
         customName
       );
-      _showEffectNotification(customName, 'applied to', 1, sourceActor.name);
+
+      if (success) {
+        _showEffectNotification(customName, 'applied to', 1, sourceActor.name);
+      } else {
+        ui.notifications.error(
+          `Failed to apply ${customName} to ${sourceActor.name}`
+        );
+      }
     }
     return;
   }
@@ -714,10 +800,12 @@ async function _onEffectLinkClick(event) {
   // Apply standard effect
   const stackableData = _getStackableEffectData(effectId);
   const name = _getEffectName(effectId);
+  let successCount = 0;
+  let failCount = 0;
 
   if (tokensToProcess.length) {
     for (const token of tokensToProcess) {
-      await _applyEffect(
+      const success = await _applyEffect(
         token.actor,
         effectId,
         state,
@@ -725,22 +813,32 @@ async function _onEffectLinkClick(event) {
         false,
         origin
       );
+      if (success) successCount++;
+      else failCount++;
     }
 
-    const action =
-      stackableData?.isStackable || state === 'up'
-        ? 'stack added to'
-        : state === 'down'
-        ? 'stack removed from'
-        : state === 'on'
-        ? 'applied to'
-        : state === 'off'
-        ? 'removed from'
-        : 'toggled on';
+    if (successCount > 0) {
+      const action =
+        stackableData?.isStackable || state === 'up'
+          ? 'stack added to'
+          : state === 'down'
+          ? 'stack removed from'
+          : state === 'on'
+          ? 'applied to'
+          : state === 'off'
+          ? 'removed from'
+          : 'toggled on';
 
-    _showEffectNotification(name, action, tokensToProcess.length);
+      _showEffectNotification(name, action, successCount);
+    }
+
+    if (failCount > 0) {
+      ui.notifications.error(
+        `Failed to apply ${name} to ${failCount} token(s). Ensure a GM is connected.`
+      );
+    }
   } else if (sourceActor) {
-    await _applyEffect(
+    const success = await _applyEffect(
       sourceActor,
       effectId,
       state,
@@ -749,18 +847,24 @@ async function _onEffectLinkClick(event) {
       origin
     );
 
-    const action =
-      stackableData?.isStackable || state === 'up'
-        ? 'stack added to'
-        : state === 'down'
-        ? 'stack removed from'
-        : state === 'on'
-        ? 'applied to'
-        : state === 'off'
-        ? 'removed from'
-        : 'toggled on';
+    if (success) {
+      const action =
+        stackableData?.isStackable || state === 'up'
+          ? 'stack added to'
+          : state === 'down'
+          ? 'stack removed from'
+          : state === 'on'
+          ? 'applied to'
+          : state === 'off'
+          ? 'removed from'
+          : 'toggled on';
 
-    _showEffectNotification(name, action, 1, sourceActor.name);
+      _showEffectNotification(name, action, 1, sourceActor.name);
+    } else {
+      ui.notifications.error(
+        `Failed to apply ${name} to ${sourceActor.name}. Ensure a GM is connected.`
+      );
+    }
   }
 }
 
@@ -864,6 +968,14 @@ async function _onEffectLinkContextMenu(event) {
   const stackableData = _getStackableEffectData(effectId);
   if (!stackableData?.isStackable) return;
 
+  // Check if GM is connected
+  if (!_isGMConnected()) {
+    ui.notifications.error(
+      'Cannot remove effect stacks: No Game Master is currently connected.'
+    );
+    return;
+  }
+
   // Get source actor with fallback chain
   let sourceActor = getSourceActor(link);
 
@@ -905,8 +1017,11 @@ async function _onEffectLinkContextMenu(event) {
     }
   }
 
+  let successCount = 0;
+  let failCount = 0;
+
   for (const token of tokensToProcess) {
-    await _applyEffect(
+    const success = await _applyEffect(
       token.actor,
       effectId,
       'toggle',
@@ -914,10 +1029,21 @@ async function _onEffectLinkContextMenu(event) {
       true,
       origin
     );
+    if (success) successCount++;
+    else failCount++;
   }
 
   const name = _getEffectName(effectId);
-  _showEffectNotification(name, 'stack removed from', tokensToProcess.length);
+
+  if (successCount > 0) {
+    _showEffectNotification(name, 'stack removed from', successCount);
+  }
+
+  if (failCount > 0) {
+    ui.notifications.error(
+      `Failed to remove ${name} stack from ${failCount} token(s). Ensure a GM is connected.`
+    );
+  }
 }
 
 /**
@@ -953,3 +1079,60 @@ export const registerEffectEnricher = createEnricherInitializer({
   clickHandler: _onEffectLinkClick,
   contextMenuHandler: _onEffectLinkContextMenu,
 });
+
+/**
+ * Get the GM status control tool configuration
+ * @returns {Object} Control tool configuration
+ */
+function getGMStatusTool() {
+  const gmOnline = _isGMConnected();
+
+  return {
+    name: gmOnline ? 'DASU.GMStatus.Online' : 'DASU.GMStatus.Offline',
+    icon: gmOnline ? 'fa-solid fa-user' : 'fa-solid fa-user-slash',
+    button: true,
+    onClick: () => {
+      // Show detailed GM info when clicked
+      const gmUsers = game.users.filter((u) => u.isGM);
+      const activeGMs = gmUsers.filter((u) => u.active);
+
+      if (activeGMs.length > 0) {
+        const gmNames = activeGMs.map((u) => u.name).join(', ');
+        ui.notifications.info(
+          game.i18n.format('DASU.GMStatus.ActiveGMs', {
+            count: activeGMs.length,
+            names: gmNames,
+          })
+        );
+      } else {
+        ui.notifications.warn(game.i18n.localize('DASU.GMStatus.NoGMsOnline'));
+      }
+    },
+  };
+}
+
+/**
+ * Register the GM status button as the first system control
+ * @param {SystemControlTool[]} tools
+ */
+function onGetSystemTools(tools) {
+  // Insert at the beginning of the tools array
+  tools.unshift(getGMStatusTool());
+}
+
+/**
+ * Update the GM status indicator when users connect/disconnect
+ */
+function updateGMStatus() {
+  // Trigger a re-render of system controls
+  if (ui.controls) {
+    ui.controls.render();
+  }
+}
+
+// Register the button
+Hooks.on(SystemControls.HOOK_GET_SYSTEM_TOOLS, onGetSystemTools);
+
+// Update when users connect/disconnect
+Hooks.on('userConnected', updateGMStatus);
+Hooks.on('ready', updateGMStatus);

@@ -413,6 +413,73 @@ Hooks.once('ready', function () {
       module.initializeTargetSheetHandlers();
     }
   });
+
+  // Initialize socketlib integration
+  if (game.modules.get('socketlib')?.active) {
+    if (!game.dasu) game.dasu = {};
+
+    try {
+      // eslint-disable-next-line no-undef
+      game.dasu.socket = socketlib.registerSystem('dasu');
+
+      // Handler for actor updates (applyDamage, applyHealing)
+      const updateActorAsGM = async (actorUuid, updates) => {
+        if (!game.user.isGM) {
+          console.warn('DASU | Non-GM attempted updateActorAsGM');
+          return;
+        }
+
+        const actor = await fromUuid(actorUuid);
+        if (!actor) {
+          console.error(`DASU | Actor not found: ${actorUuid}`);
+          return;
+        }
+
+        await actor.update(updates);
+      };
+
+      // Handler for removing effect stacks
+      const removeEffectStackAsGM = async (actorUuid, stackId) => {
+        if (!game.user.isGM) {
+          console.warn('DASU | Non-GM attempted removeEffectStackAsGM');
+          return;
+        }
+
+        const actor = await fromUuid(actorUuid);
+        if (!actor) {
+          console.error(`DASU | Actor not found: ${actorUuid}`);
+          return;
+        }
+
+        await actor.removeEffectStack(stackId, true);
+      };
+
+      // Handler for applying effects
+      const applyEffectAsGM = async (actorUuid, effectData) => {
+        if (!game.user.isGM) {
+          console.warn('DASU | Non-GM attempted applyEffectAsGM');
+          return;
+        }
+
+        const actor = await fromUuid(actorUuid);
+        if (!actor) {
+          console.error(`DASU | Actor not found: ${actorUuid}`);
+          return;
+        }
+
+        await actor.createEmbeddedDocuments('ActiveEffect', [effectData]);
+      };
+
+      // Register handlers immediately
+      game.dasu.socket.register('updateActorAsGM', updateActorAsGM);
+      game.dasu.socket.register('removeEffectStackAsGM', removeEffectStackAsGM);
+      game.dasu.socket.register('applyEffectAsGM', applyEffectAsGM);
+
+      console.log('DASU | Socketlib initialized and handlers registered');
+    } catch (error) {
+      console.error('DASU | Error initializing socketlib:', error);
+    }
+  }
 });
 
 // Global level change listener for DASU
