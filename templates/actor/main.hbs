@@ -655,6 +655,11 @@
                     <span>{{localize "DASU.Filter.Tactics"}}</span>
                   </label>
                   <label class='filter-option'>
+                    <input type='checkbox' value='item' checked>
+                    <i class='fas fa-box'></i>
+                    <span>{{localize "DASU.Filter.Items"}}</span>
+                  </label>
+                  <label class='filter-option'>
                     <input type='checkbox' value='special' checked>
                     <i class='fas fa-star'></i>
                     <span>{{localize "DASU.Filter.Specials"}}</span>
@@ -1115,6 +1120,60 @@
                     <i class='fas fa-bars'></i>
                   </a>
                 </div>
+                </div>
+                <div class='item-description-row' style='display: none;'>
+                  <div class='item-description-content'>
+                    {{#if item.enrichedDescription}}{{{item.enrichedDescription}}}{{else}}<em>{{localize "DASU.Item.NoDescriptionAvailable"}}</em>{{/if}}
+                  </div>
+                </div>
+              </li>
+            {{/each}}
+          </div>
+          {{/if}}
+
+          {{! Inventory Items }}
+          {{#if (or (eq itemFilterState null) (includes itemFilterState "item"))}}
+          <li class='item flexrow items-header' data-item-type='item' data-sortable="true" draggable="true">
+            <div class='item-name'>
+              <span class='item-name-text'>{{localize 'DASU.TYPES.Item.item'}}</span>
+            </div>
+            <div class='item-controls'>
+              <a class='item-control item-create' data-tooltip='{{localize "DASU.Item.Create" name=(localize "DASU.TYPES.Item.item")}}' data-action='createDoc' data-document-class='Item' data-type='item'>
+                <i class='fas fa-plus'></i>
+              </a>
+            </div>
+          </li>
+          <div class='item-list inventory-item-list'>
+            {{#each inventoryItems as |item id|}}
+              <li class='item expandable-item' data-item-id='{{item._id}}' data-document-class='Item' draggable="true" data-sortable="true">
+                <div class='item-row flexrow'>
+                  <div class='item-name flexrow item-name-clickable' data-action='toggleDescription'>
+                    <div class='item-image'>
+                      <a class='rollable' data-action='roll' data-roll-type='item'>
+                        <img src='{{item.img}}' data-tooltip='{{item.name}}' width='24' height='24'/>
+                      </a>
+                    </div>
+                    <span class='item-name-text'>{{item.name}}</span>
+                    {{#if (includes item.traits 'innate')}}
+                      <span class="badge innate-badge" title="{{localize 'DASU.Item.LevelGranted'}}">{{localize "DASU.Item.Innate"}}</span>
+                    {{/if}}
+                  </div>
+                  <div class='item-actions'>
+                    <span class='item-quantity'>×{{item.system.quantity}}</span>
+                  </div>
+                  <div class='item-controls'>
+                    <a class='item-control item-edit' data-tooltip='{{localize "DOCUMENT.Update" type="item"}}' data-action='viewDoc'>
+                      <i class='fas fa-edit'></i>
+                    </a>
+                    {{#if (and @root.editable @root.isEditMode)}}
+                      <a class='item-control item-delete' data-tooltip='{{localize "DASU.Item.DeleteWithoutConfirm"}}' data-action='deleteDocNoConfirm'>
+                        <i class='fas fa-trash'></i>
+                      </a>
+                    {{/if}}
+                    <a class='item-control context-menu-toggle' data-tooltip='{{localize "DASU.Item.MoreActions"}}'>
+                      <i class='fas fa-bars'></i>
+                    </a>
+                  </div>
                 </div>
                 <div class='item-description-row' style='display: none;'>
                   <div class='item-description-content'>

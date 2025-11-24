@@ -564,6 +564,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     const schemas = [];
     const features = [];
     const classes = [];
+    const inventoryItems = [];
 
     // Iterate through items, allocating to containers
     for (let i of this.document.items) {
@@ -602,6 +603,10 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       // Append to tags.
       else if (i.type === 'tag') {
         tags.push(i);
+      }
+      // Append to inventory items.
+      else if (i.type === 'item') {
+        inventoryItems.push(i);
       }
       // Append to tactics.
       else if (i.type === 'tactic') {
@@ -685,6 +690,10 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
     context.scars = scars.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.schemas = schemas.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.classes = classes.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.items = inventoryItems.sort(
+      (a, b) => (a.sort || 0) - (b.sort || 0)
+    );
 
     // Prepare daemons for summoners
     if (this.document.type === 'summoner') {
@@ -1641,6 +1650,11 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
           // Map item list class to filter type
           // For ability subcategories, the filter uses the subcategory name
           let filterType = itemListClass;
+
+          // Special handling for inventory-item -> item mapping
+          if (itemListClass === 'inventory-item') {
+            filterType = 'item';
+          }
 
           // Special handling for ability subcategories
           if (
@@ -3281,6 +3295,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       'affliction',
       'restorative',
       'tactic',
+      'item',
       'special',
       'scar',
       'schema',
@@ -3310,6 +3325,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
         icon: 'fas fa-heart',
       },
       { value: 'tactic', name: 'DASU.Filter.Tactics', icon: 'fas fa-chess' },
+      { value: 'item', name: 'DASU.Filter.Items', icon: 'fas fa-box' },
       { value: 'special', name: 'DASU.Filter.Specials', icon: 'fas fa-star' },
       { value: 'scar', name: 'DASU.Filter.Scars', icon: 'fas fa-scar' },
       { value: 'schema', name: 'DASU.Filter.Schemas', icon: 'fas fa-cube' },
@@ -3465,6 +3481,7 @@ export class DASUActorSheet extends api.HandlebarsApplicationMixin(
       'affliction',
       'restorative',
       'tactic',
+      'item',
       'special',
       'scar',
       'schema',

@@ -62,6 +62,10 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
       template: 'systems/dasu/templates/item/attribute-parts/weapon.hbs',
       scrollable: [''],
     },
+    attributesItem: {
+      template: 'systems/dasu/templates/item/attribute-parts/item.hbs',
+      scrollable: [''],
+    },
     attributesTag: {
       template: 'systems/dasu/templates/item/attribute-parts/tag.hbs',
       scrollable: [''],
@@ -132,6 +136,11 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
         break;
       case 'weapon':
         options.parts.push('attributesWeapon', 'effects');
+
+        break;
+
+      case 'item':
+        options.parts.push('attributesItem', 'effects');
 
         break;
       case 'tag':
@@ -320,6 +329,21 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
             }
           );
         break;
+
+      case 'attributesItem':
+        context.tab = context.tabs[partId];
+        // Add enriched description for ProseMirror
+        context.enrichedDescription =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.description,
+            {
+              secrets: this.document.isOwner,
+              rollData: this.item.getRollData(),
+              relativeTo: this.item,
+            }
+          );
+        break;
+
       case 'attributesTag':
         context.tab = context.tabs[partId];
         let allowedTypes = Array.from(globalThis.DASU_TAGGABLE_TYPES || []);
@@ -644,6 +668,7 @@ export class DASUItemSheet extends api.HandlebarsApplicationMixin(
           break;
         case 'attributesAbility':
         case 'attributesWeapon':
+        case 'attributesItem':
         case 'attributesTag':
         case 'attributesTactic':
         case 'attributesSpecial':

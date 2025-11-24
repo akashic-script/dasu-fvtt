@@ -408,6 +408,7 @@
       "Techniques": "Techniques",
       "Title": "Filter by Type",
       "Weapons": "Weapons",
+      "Items": "Items",
       "Schemas": "Schemas",
       "Features": "Features",
       "Classes": "Classes",
@@ -466,6 +467,16 @@
           "technique": "Technique"
         },
         "categoryNote": "Change the category to see different fields specific to that ability type."
+      },
+      "Item": {
+        "FIELDS": {
+          "cost": {
+            "label": "Cost"
+          },
+          "quantity": {
+            "label": "Quantity"
+          }
+        }
       },
       "General": {
         "FIELDS": {
