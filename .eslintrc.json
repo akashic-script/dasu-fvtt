@@ -4,7 +4,7 @@
     "es2021": true,
     "node": true
   },
-  "extends": ["eslint:recommended"],
+  "extends": ["eslint:recommended", "prettier"],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module"
@@ -12,7 +12,7 @@
   "ignorePatterns": ["docs/"],
   "rules": {
     "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "single"],
+    "quotes": "off",
     "semi": ["error", "always"],
     "no-unused-vars": "off",
     "no-console": "off",
