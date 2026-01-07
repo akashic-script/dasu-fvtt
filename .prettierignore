@@ -9,6 +9,7 @@ node_modules/
 dist/
 build/
 packs/
+docs/
 
 # FoundryVTT specific
 foundryconfig.json 
