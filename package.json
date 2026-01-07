@@ -25,9 +25,9 @@
   "license": "Apache-2.0",
   "private": true,
   "devDependencies": {
-    "@foundryvtt/foundryvtt-cli": "^1.1.0",
     "@commitlint/cli": "^17.8.1",
     "@commitlint/config-conventional": "^17.8.1",
+    "@foundryvtt/foundryvtt-cli": "^1.1.0",
     "@release-it/conventional-changelog": "^10.0.1",
     "commitizen": "^4.3.1",
     "conventional-changelog-cli": "^4.1.0",
