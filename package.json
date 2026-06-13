@@ -1,0 +1,57 @@
+{
+  "name": "dasu",
+  "version": "0.0.0",
+  "description": "Daemon Summoner system for Foundry VTT",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "commit": "cz",
+    "prepare": "husky install",
+    "release": "release-it",
+    "release:patch": "release-it patch",
+    "release:minor": "release-it minor",
+    "release:major": "release-it major",
+    "release:dry": "release-it --dry-run",
+    "unpack": "node ./tools/pushLDBtoYML.mjs",
+    "pack": "node ./tools/pullYMLtoLDB.mjs"
+  },
+  "browserslist": [
+    "last 3 versions"
+  ],
+  "author": "Spyrella",
+  "license": "Apache-2.0",
+  "private": true,
+  "devDependencies": {
+    "@commitlint/cli": "^17.8.1",
+    "@commitlint/config-conventional": "^17.8.1",
+    "@foundryvtt/foundryvtt-cli": "^1.1.0",
+    "@release-it/conventional-changelog": "^10.0.1",
+    "commitizen": "^4.3.1",
+    "conventional-changelog-cli": "^4.1.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "@eslint/js": "^8.57.1",
+    "eslint": "^8.57.1",
+    "globals": "^13.24.0",
+    "fvtt-types": "13.346.0-beta.20250812191140",
+    "husky": "^8.0.3",
+    "js-yaml": "^4.1.0",
+    "lint-staged": "^13.3.0",
+    "prettier": "^2.8.8",
+    "release-it": "^19.0.3",
+    "typescript": "^5.9.3"
+  },
+  "lint-staged": {
+    "*.{js,mjs,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,css}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "conventional-changelog-angular": "^8.0.0"
+  }
+}

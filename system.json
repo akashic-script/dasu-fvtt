@@ -1,0 +1,65 @@
+{
+  "id": "dasu",
+  "title": "Daemon Summoner",
+  "description": "The Daemon Summoner system for FoundryVTT!",
+  "type": "system",
+  "authors": [
+    {
+      "name": "Spyrella",
+      "discord": "spyrella",
+      "url": "https://github.com/spyrella/"
+    }
+  ],
+  "url": "#{URL}#",
+  "license": "LICENSE.txt",
+  "readme": "README.md",
+  "bugs": "#{URL}#/issues",
+  "changelog": "CHANGELOG.md",
+  "media": [
+    {
+      "type": "setup",
+      "url": "systems/dasu/assets/anvil-impact.png",
+      "thumbnail": "systems/dasu/assets/anvil-impact.png"
+    }
+  ],
+  "version": "#{VERSION}#",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14",
+    "maximum": "14"
+  },
+  "esmodules": ["module/dasu.mjs"],
+  "documentTypes": {
+    "Actor": {
+      "character": {},
+      "npc": {}
+    },
+    "Item": {
+      "item": {},
+      "feature": {},
+      "spell": {}
+    }
+  },
+  "styles": [{ "src": "css/dasu.css", "layer": "system" }],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "packs": [],
+  "packFolders": [],
+  "socket": true,
+  "manifest": "#{MANIFEST}#",
+  "download": "#{DOWNLOAD}#",
+  "background": "systems/dasu/assets/anvil-impact.png",
+  "grid": {
+    "type": 0,
+    "distance": 5,
+    "units": "ft",
+    "diagonals": 0
+  },
+  "primaryTokenAttribute": "health",
+  "secondaryTokenAttribute": "power"
+}
