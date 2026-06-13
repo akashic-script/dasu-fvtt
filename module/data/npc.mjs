@@ -10,11 +10,27 @@ export default class DASUNPC extends DASUActorBase {
     schema.cr = new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 });
     schema.xp = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
 
+    const abilityKeys = Object.keys(CONFIG.DASU.abilities);
+    const abilitiesSchema = {};
+    for (const ability of abilityKeys) {
+      abilitiesSchema[ability] = new fields.SchemaField({
+        value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0, max: 6 }),
+        label: new fields.StringField({ required: true, blank: true })
+      });
+    }
+    schema.abilities = new fields.SchemaField(abilitiesSchema);
+
     return schema;
   }
 
   prepareDerivedData() {
     super.prepareDerivedData();
     this.xp = this.cr * this.cr * 100;
+    if (!this.abilities) return;
+    for (const key in this.abilities) {
+      if (!this.abilities[key]) continue;
+      this.abilities[key].label = game.i18n.localize(CONFIG.DASU.abilities[key]) ?? key;
+      this.abilities[key].abbr = game.i18n.localize(CONFIG.DASU.abilityAbbreviations[key]) ?? key;
+    }
   }
 }

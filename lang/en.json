@@ -1,12 +1,10 @@
 {
   "DASU": {
     "Ability": {
-      "Str": { "long": "Strength", "abbr": "str" },
-      "Con": { "long": "Constitution", "abbr": "con" },
-      "Dex": { "long": "Dexterity", "abbr": "dex" },
-      "Int": { "long": "Intelligence", "abbr": "int" },
-      "Wis": { "long": "Wisdom", "abbr": "wis" },
-      "Cha": { "long": "Charisma", "abbr": "cha" }
+      "Pow": { "long": "Power", "abbr": "Pow" },
+      "Dex": { "long": "Dexterity", "abbr": "Dex" },
+      "Wil": { "long": "Willpower", "abbr": "Wil" },
+      "Sta": { "long": "Stamina", "abbr": "Sta" }
     },
     "SheetLabels": {
       "Actor": "DASU Actor Sheet",

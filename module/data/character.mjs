@@ -17,8 +17,7 @@ export default class DASUCharacter extends DASUActorBase {
     const abilitiesSchema = {};
     for (const ability of abilityKeys) {
       abilitiesSchema[ability] = new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 10, min: 0 }),
-        mod: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0, max: 6 }),
         label: new fields.StringField({ required: true, blank: true })
       });
     }
@@ -32,8 +31,8 @@ export default class DASUCharacter extends DASUActorBase {
     if (!this.abilities) return;
     for (const key in this.abilities) {
       if (!this.abilities[key]) continue;
-      this.abilities[key].mod = Math.floor((this.abilities[key].value - 10) / 2);
       this.abilities[key].label = game.i18n.localize(CONFIG.DASU.abilities[key]) ?? key;
+      this.abilities[key].abbr = game.i18n.localize(CONFIG.DASU.abilityAbbreviations[key]) ?? key;
     }
   }
 
