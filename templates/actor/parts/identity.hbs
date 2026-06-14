@@ -1,0 +1,30 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="{{tab.id}}">
+
+  <div class="triad-fields">
+    <img class="triad-bg-triangle" src="systems/dasu/assets/moral-triad.svg" alt="" aria-hidden="true" />
+    <div class="triad-legend">{{localize "DASU.Sheet.Section.MoralTriad"}}</div>
+    <div class="triad-field">
+      <label class="triad-label">{{localize "DASU.Actor.Triad.Virtue"}}</label>
+      <input class="triad-input" type="text" name="system.triad.virtue" value="{{system.triad.virtue}}" data-suggestions="dasu-virtues" placeholder="{{localize 'DASU.Actor.Triad.VirtuePlaceholder'}}" />
+    </div>
+    <div class="triad-field">
+      <label class="triad-label">{{localize "DASU.Actor.Triad.Sin"}}</label>
+      <input class="triad-input" type="text" name="system.triad.sin" value="{{system.triad.sin}}" data-suggestions="dasu-sins" placeholder="{{localize 'DASU.Actor.Triad.SinPlaceholder'}}" />
+    </div>
+    <div class="triad-field">
+      <label class="triad-label">{{localize "DASU.Actor.Triad.Anathema"}}</label>
+      <input class="triad-input" type="text" name="system.triad.anathema" value="{{system.triad.anathema}}" data-suggestions="dasu-anathemas" placeholder="{{localize 'DASU.Actor.Triad.AnathemaPlaceholder'}}" />
+    </div>
+  </div>
+
+  <div class="triad-legend">{{localize "DASU.Sheet.Section.Description"}}</div>
+  <prose-mirror name="system.biography" toggled value="{{actor.system.biography}}" data-document-uuid="{{actor.uuid}}" {{#unless editable}}disabled{{/unless}}>
+    {{{biographyHTML}}}
+  </prose-mirror>
+
+  <div class="triad-legend">{{localize "DASU.Sheet.Section.FieldNotes"}}</div>
+  <prose-mirror name="system.notes" toggled value="{{actor.system.notes}}" data-document-uuid="{{actor.uuid}}" {{#unless editable}}disabled{{/unless}}>
+    {{{notesHTML}}}
+  </prose-mirror>
+
+</section>

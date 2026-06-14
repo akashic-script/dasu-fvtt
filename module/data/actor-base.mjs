@@ -14,7 +14,14 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
       max: new fields.NumberField({ ...requiredInteger, initial: 5 }),
     });
     schema.biography = new fields.StringField({ required: true, blank: true });
+    schema.notes = new fields.StringField({ required: true, blank: true });
     schema.level = new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 });
+
+    schema.triad = new fields.SchemaField({
+      virtue:   new fields.StringField({ required: true, blank: true }),
+      sin:      new fields.StringField({ required: true, blank: true }),
+      anathema: new fields.StringField({ required: true, blank: true }),
+    });
 
     schema.stats = new fields.SchemaField({
       avoid: new fields.SchemaField({ bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }) }),
@@ -26,13 +33,6 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
     return schema;
   }
 
-  prepareBaseData() {
-    super.prepareBaseData();
-  }
-
-  /**
-   * Derive HP/WP maximums and combat stats from attributes.
-   */
   _prepareDerivedStats() {
     const a = this.attributes;
     if (!a) return;

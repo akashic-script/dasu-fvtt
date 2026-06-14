@@ -4,6 +4,7 @@
     <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" />
   </div>
 
+  {{!-- Resources --}}
   <div class="sidebar-resources">
     <div class="resource-row" data-action="openResourcePopover" data-resource="health">
       <span class="resource-label resource-label-hp" data-tooltip="{{localize 'DASU.Actor.HP.long'}}">{{localize "DASU.Actor.HP.abbr"}}</span>
@@ -29,6 +30,7 @@
     </div>
   </div>
 
+  {{!-- Attributes --}}
   <div class="sidebar-section">
     <div class="sidebar-section-label">
       <span class="sidebar-section-title" data-tooltip="{{localize 'DASU.Actor.Section.Attributes'}}">{{localize "DASU.Actor.Section.Attributes"}}</span>
@@ -45,7 +47,6 @@
   </div>
 
   {{!-- Derived stats --}}
-  {{!-- FEAT: Placeholder --}}
   <div class="sidebar-section">
     <div class="sidebar-section-label">
       <span class="sidebar-section-title" data-tooltip="{{localize 'DASU.Actor.Section.Stats'}}">{{localize "DASU.Actor.Section.Stats"}}</span>

@@ -47,7 +47,6 @@ export default class DASUSummoner extends DASUActorBase {
     const apSpent = Object.values(this.attributes).reduce((sum, a) => sum + a.value, 0) - 4;
     this.ap = { max: apMax, spent: apSpent, value: apMax - apSpent };
 
-    // SP pool
     for (const key of Object.keys(CONFIG.DASU.skills)) {
       if (!this.skills[key]) this.skills[key] = { value: 0, customName: '' };
     }
@@ -59,7 +58,6 @@ export default class DASUSummoner extends DASUActorBase {
       s.isCustom = !i18nKey;
     }
 
-    // SP pool
     const spMax = 3 + (this.level - 1) * 2;
     const triCost = (r) => (r * (r + 1)) / 2;
     const spSpent = Object.values(this.skills ?? {}).reduce((sum, s) => sum + triCost(s.value ?? 0), 0);

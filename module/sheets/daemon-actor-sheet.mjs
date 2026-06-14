@@ -11,9 +11,9 @@ export class DASUDaemonActorSheet extends DASUActorSheet {
   static TABS = {
     primary: {
       tabs: [
-        { id: 'identity', label: 'Identity', icon: 'fas fa-feather' },
-        { id: 'items', label: 'Items', icon: 'fas fa-backpack' },
-        { id: 'effects', label: 'Effects', icon: 'fas fa-bolt' },
+        { id: 'identity', label: 'DASU.Sheet.Tab.Identity', icon: 'fas fa-feather' },
+        { id: 'items', label: 'DASU.Sheet.Tab.Items', icon: 'fas fa-backpack' },
+        { id: 'effects', label: 'DASU.Sheet.Tab.Effects', icon: 'fas fa-bolt' },
       ],
       initial: 'identity',
     },
@@ -29,7 +29,7 @@ export class DASUDaemonActorSheet extends DASUActorSheet {
     },
     tabs: { template: 'systems/dasu/templates/actor/parts/tab-navigation.hbs' },
     identity: {
-      template: 'systems/dasu/templates/actor/parts/description.hbs',
+      template: 'systems/dasu/templates/actor/parts/identity.hbs',
       scrollable: [''],
     },
     items: {
@@ -44,7 +44,7 @@ export class DASUDaemonActorSheet extends DASUActorSheet {
 
   /** @override */
   _onFirstRender(context, options) {
-    this.tabGroups.primary ??= 'description';
+    this.tabGroups.primary ??= 'identity';
     super._onFirstRender(context, options);
   }
 }

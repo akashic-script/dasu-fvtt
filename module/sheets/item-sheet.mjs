@@ -32,8 +32,8 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   static TABS = {
     primary: {
       tabs: [
-        { id: 'description', label: 'Description', icon: 'fas fa-feather' },
-        { id: 'effects', label: 'Effects', icon: 'fas fa-bolt' },
+        { id: 'description', label: 'DASU.Sheet.Tab.Description', icon: 'fas fa-feather' },
+        { id: 'effects', label: 'DASU.Sheet.Tab.Effects', icon: 'fas fa-bolt' },
       ],
       initial: 'description',
     },

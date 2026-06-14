@@ -93,6 +93,16 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
         }
       );
 
+    context.notesHTML =
+      await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+        actor.system.notes ?? '',
+        {
+          relativeTo: actor,
+          secrets: actor.isOwner,
+          rollData: context.rollData,
+        }
+      );
+
     const health = actorData.health ?? {};
     const power = actorData.power ?? {};
     context.healthPercent =
@@ -126,9 +136,68 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   }
 
   /** @override */
+  static TRIAD_SUGGESTION_KEYS = {
+    'dasu-virtues':   'DASU.Actor.Triad.VirtueSuggestions',
+    'dasu-sins':      'DASU.Actor.Triad.SinSuggestions',
+    'dasu-anathemas': 'DASU.Actor.Triad.AnathemaSuggestions',
+  };
+
   _onFirstRender(context, options) {
     super._onFirstRender(context, options);
     this.#buildLayout();
+  }
+
+  #bindTriadComboboxes() {
+    for (const input of this.element.querySelectorAll('.triad-input[data-suggestions]')) {
+      const key = input.dataset.suggestions;
+      const i18nKey = DASUActorSheet.TRIAD_SUGGESTION_KEYS[key];
+      const raw = i18nKey ? game.i18n.localize(i18nKey) : '';
+      const suggestions = raw ? raw.split(',') : [];
+      input.addEventListener('focus', () => this.#openTriadDropdown(input, suggestions));
+      input.addEventListener('input', () => this.#openTriadDropdown(input, suggestions));
+      input.addEventListener('blur', (e) => {
+        if (e.relatedTarget?.classList.contains('triad-input')) return;
+        setTimeout(() => this.#closeTriadDropdown(), 120);
+      });
+    }
+  }
+
+  #openTriadDropdown(input, suggestions) {
+    this.#closeTriadDropdown();
+    const q = input.value.trim().toLowerCase();
+    const filtered = q ? suggestions.filter(s => s.toLowerCase().includes(q)) : suggestions;
+    if (!filtered.length) return;
+
+    const rect = input.getBoundingClientRect();
+    const menu = document.createElement('div');
+    menu.className = 'dasu-triad-dropdown';
+    menu.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.bottom}px;width:${rect.width}px;z-index:99999`;
+
+    for (const val of filtered) {
+      const item = document.createElement('div');
+      item.className = 'dasu-triad-option';
+      item.textContent = val;
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        input.value = val;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        this.#closeTriadDropdown();
+      });
+      menu.appendChild(item);
+    }
+
+    document.body.appendChild(menu);
+    this._triadDropdown = menu;
+  }
+
+  #closeTriadDropdown() {
+    this._triadDropdown?.remove();
+    this._triadDropdown = null;
+  }
+
+  async _onClose(options) {
+    this.#closeTriadDropdown();
+    return super._onClose(options);
   }
 
   #buildLayout() {
@@ -195,10 +264,11 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   async _onRender(context, options) {
     await super._onRender(context, options);
     this._renderModeToggle();
+    this.#bindTriadComboboxes();
     this.element.classList.toggle('edit-mode', this.isEditMode);
     this.element
       .querySelectorAll(
-        'input:not([type="hidden"]):not(.dasu-mode-checkbox), select'
+        'input:not([type="hidden"]):not(.dasu-mode-checkbox):not(.triad-input), select'
       )
       .forEach((el) => el.toggleAttribute('readonly', !this.isEditMode));
 
@@ -475,7 +545,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       {
         value: val.value,
         max: val.max,
-        label: isHp ? 'HP' : 'WP',
+        label: game.i18n.localize(isHp ? 'DASU.Actor.HP.abbr' : 'DASU.Actor.WP.abbr'),
         labelClass: isHp ? 'resource-label-hp' : 'resource-label-wp',
       }
     );

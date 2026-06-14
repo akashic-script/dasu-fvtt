@@ -13,6 +13,27 @@
   --dasu-space-lg: 20px;
 }
 
+.dasu-triad-dropdown {
+  background: var(--dasu-panel-solid, #1a1520);
+  border: 1px solid rgb(255 255 255 / 12%);
+  font-family: 'Ubuntu Sans Mono', monospace;
+  font-size: 13px;
+  color: #eeede0;
+  overflow-y: auto;
+  max-height: 200px;
+
+  .dasu-triad-option {
+    padding: 5px 10px;
+    cursor: pointer;
+    border-bottom: 1px solid rgb(255 255 255 / 6%);
+    &:last-child { border-bottom: none; }
+    &:hover {
+      background: #d9a800;
+      color: #1a1520;
+    }
+  }
+}
+
 @layer base {
   .window-app {
     font-family: var(--dasu-font);
@@ -424,7 +445,7 @@
     }
 
     &.actor:not(.edit-mode) {
-      input:not([type='hidden']):not(.dasu-mode-checkbox):not(.dasu-pill),
+      input:not([type='hidden']):not(.dasu-mode-checkbox):not(.dasu-pill):not(.triad-input),
       select {
         pointer-events: none;
         cursor: default;
@@ -1151,6 +1172,7 @@
       background: none !important;
       background-color: transparent !important;
       border: none !important;
+      border-bottom: var(--dasu-border) !important;
       border-radius: 0;
       padding: 0;
       gap: 0;
@@ -1279,6 +1301,93 @@
       .tab:has(prose-mirror).active {
         display: flex;
         flex-direction: column;
+      }
+
+      .triad-legend {
+        font-size: 0.7em;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--dasu-tab-icon);
+        border-bottom: var(--dasu-border);
+        padding-bottom: 4px;
+        margin-bottom: 2px;
+        & + * + & {
+          margin-top: 10px;
+        }
+      }
+
+      .triad-fields + .triad-legend,
+      prose-mirror + .triad-legend {
+        margin-top: 10px;
+      }
+
+      .triad-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 10px;
+        flex: 0 0 auto;
+        position: relative;
+        isolation: isolate;
+
+        .triad-bg-triangle {
+          display: block;
+          position: absolute;
+          top: 50%;
+          right: 26px;
+          width: min(34%, 150px);
+          aspect-ratio: 1 / 1;
+          color: var(--dasu-tab-icon);
+          opacity: 0.18;
+          pointer-events: none;
+          transform: translateY(-50%) rotate(-75deg);
+          z-index: 0;
+        }
+
+        .triad-field {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          position: relative;
+          z-index: 1;
+        }
+
+        > .triad-legend {
+          position: relative;
+          z-index: 1;
+        }
+
+        .triad-label {
+          flex: 0 0 72px;
+          font-size: 0.75em;
+          font-weight: bold;
+          text-transform: uppercase;
+          letter-spacing: 0.07em;
+          color: var(--dasu-tab-icon);
+          text-align: right;
+        }
+
+        .triad-input {
+          flex: 1;
+          background: rgb(var(--dasu-panel) / 40%);
+          border: none;
+          border-radius: 0;
+          border-bottom: 1px solid rgb(255 255 255 / 15%);
+          color: var(--dasu-ink);
+          font-family: var(--dasu-font);
+          font-size: 0.9em;
+          padding: 3px 6px;
+          outline: none;
+          transition: border-color 150ms ease;
+          &:focus {
+            border-bottom-color: var(--dasu-hp);
+          }
+          &::placeholder {
+            color: rgb(255 255 255 / 25%);
+            font-style: italic;
+          }
+        }
       }
     }
 

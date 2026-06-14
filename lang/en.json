@@ -37,6 +37,17 @@
         "Hit": { "long": "To Hit", "abbr": "HIT" },
         "Land": { "long": "To Land", "abbr": "LAND" }
       },
+      "Triad": {
+        "Virtue": "Virtue",
+        "VirtuePlaceholder": "What drives you?",
+        "VirtueSuggestions": "Ambition,Cunning,Passion,Competition,Yearning,Indulgence,Certainty,Comfort,Devotion,Discernment,Conviction,Aspiration",
+        "Sin": "Sin",
+        "SinPlaceholder": "What tempts you?",
+        "SinSuggestions": "Pride,Greed,Wrath,Envy,Lust,Gluttony,Sloth,Ignorance,Attachment,Aversion,Delusion,Obsession",
+        "Anathema": "Anathema",
+        "AnathemaPlaceholder": "What do you despise?",
+        "AnathemaSuggestions": "Dishonor,Disgrace,Poverty,Helplessness,Insignificance,Sterility,Starvation,Paralysis,Confusion,Subjugation,Blindness,Emptiness"
+      },
       "Skill": {
         "NamePlaceholder": "Custom Skill Name",
         "AddCustom": "Add Skill",
@@ -57,6 +68,20 @@
       "CreateFeature": "Create feature",
       "DeleteItem": "Delete",
       "RollFlavorAbility": "[ability]",
+      "Tab": {
+        "Identity": "Identity",
+        "Classes": "Classes",
+        "Abilities": "Abilities",
+        "Features": "Features",
+        "Items": "Items",
+        "Effects": "Effects",
+        "Description": "Description"
+      },
+      "Section": {
+        "MoralTriad": "Moral Triad",
+        "Description": "Description",
+        "FieldNotes": "Field Notes"
+      },
       "Warn": {
         "NoAP": "Not enough Attribute Points.",
         "RuleOfTwo": "Rule of Two: another attribute must be at {value} first.",
