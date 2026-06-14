@@ -29,8 +29,8 @@
 
   "TYPES": {
     "Actor": {
-      "character": "Character",
-      "npc": "NPC"
+      "summoner": "Summoner",
+      "daemon": "Daemon"
     },
     "Item": {
       "item": "Item",

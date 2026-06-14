@@ -1,6 +1,6 @@
 import DASUActorBase from "./actor-base.mjs";
 
-export default class DASUCharacter extends DASUActorBase {
+export default class DASUSummoner extends DASUActorBase {
 
   static defineSchema() {
     const fields = foundry.data.fields;

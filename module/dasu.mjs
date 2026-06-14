@@ -1,6 +1,7 @@
 import { DASUActor } from './documents/actor.mjs';
 import { DASUItem } from './documents/item.mjs';
-import { DASUActorSheet } from './sheets/actor-sheet.mjs';
+import { DASUSummonerActorSheet } from './sheets/summoner-actor-sheet.mjs';
+import { DASUDaemonActorSheet } from './sheets/daemon-actor-sheet.mjs';
 import { DASUItemSheet } from './sheets/item-sheet.mjs';
 import { preloadHandlebarsTemplates } from './helpers/templates.mjs';
 import { DASU } from './helpers/config.mjs';
@@ -22,8 +23,8 @@ Hooks.once('init', function () {
 
   CONFIG.Actor.documentClass = DASUActor;
   Object.assign(CONFIG.Actor.dataModels, {
-    character: models.DASUCharacter,
-    npc: models.DASUNPC,
+    summoner: models.DASUSummoner,
+    daemon: models.DASUDaemon,
   });
 
   CONFIG.Item.documentClass = DASUItem;
@@ -36,12 +37,14 @@ Hooks.once('init', function () {
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
     Actor,
     'dasu',
-    DASUActorSheet,
-    {
-      types: ['character', 'npc'],
-      makeDefault: true,
-      label: 'DASU.SheetLabels.Actor',
-    }
+    DASUSummonerActorSheet,
+    { types: ['summoner'], makeDefault: true, label: 'DASU.SheetLabels.Actor' }
+  );
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(
+    Actor,
+    'dasu',
+    DASUDaemonActorSheet,
+    { types: ['daemon'], makeDefault: true, label: 'DASU.SheetLabels.Actor' }
   );
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
     Item,

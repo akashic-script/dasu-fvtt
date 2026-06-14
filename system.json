@@ -31,8 +31,8 @@
   "esmodules": ["module/dasu.mjs"],
   "documentTypes": {
     "Actor": {
-      "character": {},
-      "npc": {}
+      "summoner": {},
+      "daemon": {}
     },
     "Item": {
       "item": {},

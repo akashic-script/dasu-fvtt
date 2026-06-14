@@ -5,11 +5,6 @@ import {
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
 
-/**
- * Extend the basic ActorSheet with some very simple modifications
- * @extends {DocumentSheetV2}
- * @mixes {HandlebarsApplication}
- */
 export class DASUActorSheet extends HandlebarsApplicationMixin(
   DocumentSheetV2
 ) {
@@ -21,14 +16,16 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     return this._mode === this.constructor.MODES.EDIT;
   }
 
+  get actor() {
+    return this.document;
+  }
+
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ['dasu', 'sheet', 'actor'],
     position: { width: 600, height: 850 },
     window: { resizable: true },
-    form: {
-      submitOnChange: true,
-    },
+    form: { submitOnChange: true },
     actions: {
       editItem: DASUActorSheet.#editItem,
       createItem: DASUActorSheet.#createItem,
@@ -45,96 +42,10 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   };
 
   /** @override */
-  static TABS = {
-    primary: {
-      tabs: [
-        { id: 'features', label: 'Features', icon: 'fas fa-list' },
-        { id: 'description', label: 'Identity', icon: 'fas fa-feather' },
-        { id: 'items', label: 'Items', icon: 'fas fa-backpack' },
-        { id: 'spells', label: 'Spells', icon: 'fas fa-book-sparkles' },
-        { id: 'effects', label: 'Effects', icon: 'fas fa-bolt' },
-      ],
-      initial: 'features',
-    },
-  };
-
-  /** @override */
-  _prepareTabs(group) {
-    const tabs = super._prepareTabs(group);
-    if (group === 'primary' && this.actor.type === 'npc') {
-      // NPCs don't have features or spells tabs
-      delete tabs.features;
-      delete tabs.spells;
-      // Set description as initial tab for NPCs
-      tabs.description.active = true;
-      tabs.description.cssClass = 'active';
-    }
-    return tabs;
-  }
-
-  /** @override */
-  static PARTS = {
-    header: {
-      template: 'systems/dasu/templates/actor/parts/header.hbs',
-    },
-    sidebar: {
-      template: 'systems/dasu/templates/actor/parts/sidebar.hbs',
-    },
-    tabs: {
-      template: 'systems/dasu/templates/actor/parts/tab-navigation.hbs',
-    },
-    features: {
-      template: 'systems/dasu/templates/actor/parts/features.hbs',
-      scrollable: [''],
-    },
-    description: {
-      template: 'systems/dasu/templates/actor/parts/description.hbs',
-      scrollable: [''],
-    },
-    items: {
-      template: 'systems/dasu/templates/actor/parts/items.hbs',
-      scrollable: [''],
-    },
-    spells: {
-      template: 'systems/dasu/templates/actor/parts/spells.hbs',
-      scrollable: [''],
-    },
-    effects: {
-      template: 'systems/dasu/templates/actor/parts/effects.hbs',
-      scrollable: [''],
-    },
-  };
-
-  /** @override */
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
     this._mode = options.mode ?? this._mode ?? this.constructor.MODES.PLAY;
   }
-
-  /** @override */
-  _configureRenderParts(options) {
-    const parts = super._configureRenderParts(options);
-    const actorType = this.actor.type;
-
-    if (actorType === 'npc') {
-      parts.header.template = `systems/dasu/templates/actor/parts/header-npc.hbs`;
-      parts.sidebar.template = `systems/dasu/templates/actor/parts/sidebar-npc.hbs`;
-      delete parts.features;
-      delete parts.spells;
-    }
-
-    return parts;
-  }
-
-  /**
-   * The Actor document managed by this sheet.
-   * @type {Actor}
-   */
-  get actor() {
-    return this.document;
-  }
-
-  /* -------------------------------------------- */
 
   /** @override */
   async _preparePartContext(partId, context, options) {
@@ -153,34 +64,18 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     const actor = context.document;
     const actorData = actor.system;
 
-    // Add the actor's data to context for easier access, as well as flags.
     context.actor = actor;
-    context.data = actor.toObject(); // Legacy compatibility
+    context.data = actor.toObject();
     context.system = actorData;
     context.flags = actor.flags;
-
-    // Template convenience variables
     context.cssClass = [...this.options.classes, actor.type].join(' ');
     context.owner = actor.isOwner;
-
-    // Add items array for compatibility with legacy getData() structure
     context.items = Array.from(actor.items.values());
     context.items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
-    // Prepare character data and items.
-    if (actor.type === 'character') {
-      this._prepareItems(context);
-      this._prepareCharacterData(context);
-    }
+    this._prepareItems(context);
 
-    // Prepare NPC data and items.
-    if (actor.type === 'npc') {
-      this._prepareItems(context);
-    }
-
-    // Add roll data for TinyMCE editors.
     context.rollData = actor.getRollData();
-
     context.biographyHTML =
       await foundry.applications.ux.TextEditor.implementation.enrichHTML(
         actor.system.biography ?? '',
@@ -191,7 +86,6 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
         }
       );
 
-    // Resource bar percentages for sidebar
     const health = actorData.health ?? {};
     const power = actorData.power ?? {};
     context.healthPercent =
@@ -203,36 +97,14 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
         ? Math.min(100, Math.max(0, (power.value / power.max) * 100))
         : 0;
 
-    // Prepare active effects
     context.effects = prepareActiveEffectCategories(
-      // A generator that returns all effects stored on the actor
-      // as well as any items
       actor.allApplicableEffects()
     );
 
     return context;
   }
 
-  /**
-   * Organize and classify Items for Character sheets.
-   *
-   * @param {Object} context The context to prepare.
-   *
-   * @return {undefined}
-   */
-  _prepareCharacterData(context) {
-    // Ability labels and modifiers are prepared by the TypeDataModel.
-  }
-
-  /**
-   * Organize and classify Items for Character sheets.
-   *
-   * @param {Object} context The context to prepare.
-   *
-   * @return {undefined}
-   */
   _prepareItems(context) {
-    // Initialize containers.
     const gear = [];
     const features = [];
     const spells = {
@@ -248,39 +120,23 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       9: [],
     };
 
-    // Iterate through items, allocating to containers
-    for (let i of context.items) {
+    for (const i of context.items) {
       i.img = i.img || Item.DEFAULT_ICON;
-      // Append to gear.
-      if (i.type === 'item') {
-        gear.push(i);
-      }
-      // Append to features.
-      else if (i.type === 'feature') {
-        features.push(i);
-      }
-      // Append to spells.
-      else if (i.type === 'spell') {
-        if (i.system.spellLevel != undefined) {
-          spells[i.system.spellLevel].push(i);
-        }
+      if (i.type === 'item') gear.push(i);
+      else if (i.type === 'feature') features.push(i);
+      else if (i.type === 'spell' && i.system.spellLevel != undefined) {
+        spells[i.system.spellLevel].push(i);
       }
     }
 
-    // Assign and return
     context.gear = gear;
     context.features = features;
     context.spells = spells;
   }
 
-  /* -------------------------------------------- */
-
   /** @override */
   _onFirstRender(context, options) {
     super._onFirstRender(context, options);
-    if (this.actor.type === 'npc') {
-      this.tabGroups.primary ??= 'description';
-    }
     this.#buildLayout();
   }
 
@@ -356,10 +212,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       .forEach((el) => el.toggleAttribute('readonly', !this.isEditMode));
 
     const activeTab =
-      this.tabGroups?.primary ??
-      (this.actor.type === 'npc'
-        ? 'description'
-        : this.constructor.TABS.primary.initial);
+      this.tabGroups?.primary ?? this.constructor.TABS.primary.initial;
     if (
       activeTab &&
       this.element.querySelector(
@@ -372,11 +225,9 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       });
     }
 
-    // Drag events for macros.
     if (this.actor.isOwner) {
       const handler = (ev) => this._onDragStart(ev);
-      const itemElements = this.element.querySelectorAll('li.item');
-      for (const li of itemElements) {
+      for (const li of this.element.querySelectorAll('li.item')) {
         if (li.classList.contains('inventory-header')) continue;
         li.setAttribute('draggable', true);
         li.addEventListener('dragstart', handler, false);
@@ -384,60 +235,42 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     }
   }
 
-  /**
-   * Handle editing an item.
-   * @param {PointerEvent} event   The originating click event.
-   * @param {HTMLElement} target   The capturing HTML element.
-   * @private
-   */
+  _onDragStart(event) {
+    const target = event.currentTarget;
+    if ('link' in event.target.dataset) return;
+    let dragData;
+    if (target.dataset.itemId) {
+      const item = this.actor.items.get(target.dataset.itemId);
+      dragData = item.toDragData();
+    }
+    if (dragData)
+      event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+  }
+
   static #editItem(event, target) {
     const li = target.closest('.item');
     const item = this.actor.items.get(li.dataset.itemId);
     item.sheet.render(true);
   }
 
-  /**
-   * Handle creating a new Owned Item for the actor.
-   * @param {PointerEvent} event   The originating click event.
-   * @param {HTMLElement} target   The capturing HTML element.
-   * @private
-   */
   static async #createItem(event, target) {
     event.preventDefault();
     const type = target.dataset.type;
     const data = foundry.utils.deepClone(target.dataset);
-    const name = `New ${type.capitalize()}`;
-    const itemData = {
-      name: name,
-      type: type,
-      system: data,
-    };
+    const itemData = { name: `New ${type.capitalize()}`, type, system: data };
     delete itemData.system['type'];
     delete itemData.system['action'];
     return await Item.create(itemData, { parent: this.actor });
   }
 
-  /**
-   * Handle deleting an item.
-   * @param {PointerEvent} event   The originating click event.
-   * @param {HTMLElement} target   The capturing HTML element.
-   * @private
-   */
   static async #deleteItem(event, target) {
     const li = target.closest('.item');
     const item = this.actor.items.get(li.dataset.itemId);
     await item.delete();
-    // Use native DOM to hide the element
     li.style.display = 'none';
     this.render();
   }
 
-  /**
-   * Handle active effect management.
-   * @param {PointerEvent} event   The originating click event.
-   * @param {HTMLElement} target   The capturing HTML element.
-   * @private
-   */
   static #onEffectAction(event, target) {
     const row = target.closest('li');
     const document =
@@ -447,30 +280,17 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     onManageActiveEffect(event, document, target);
   }
 
-  /**
-   * Handle clickable rolls.
-   * @param {PointerEvent} event   The originating click event.
-   * @param {HTMLElement} target   The capturing HTML element.
-   * @private
-   */
   static #onRoll(event, target) {
     if (this.isEditMode) return;
     event.preventDefault();
     const dataset = target.dataset;
-
-    // Handle item rolls.
-    if (dataset.rollType) {
-      if (dataset.rollType == 'item') {
-        const itemId = target.closest('.item').dataset.itemId;
-        const item = this.actor.items.get(itemId);
-        if (item) return item.roll();
-      }
+    if (dataset.rollType === 'item') {
+      const item = this.actor.items.get(target.closest('.item').dataset.itemId);
+      if (item) return item.roll();
     }
-
-    // Handle rolls that supply the formula directly.
     if (dataset.roll) {
-      let label = dataset.label ? `[ability] ${dataset.label}` : '';
-      let roll = new Roll(dataset.roll, this.actor.getRollData());
+      const label = dataset.label ? `[ability] ${dataset.label}` : '';
+      const roll = new Roll(dataset.roll, this.actor.getRollData());
       roll.toMessage({
         speaker: ChatMessage.getSpeaker({ actor: this.actor }),
         flavor: label,
@@ -480,11 +300,6 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     }
   }
 
-  /**
-   * Handle drag start for macros.
-   * @param {DragEvent} event   The drag start event
-   * @private
-   */
   static async #onOpenResourcePopover(event, target) {
     const { resource } = target.dataset;
     const popId = `dasu-popover-${resource}`;
@@ -525,20 +340,17 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     target.classList.add('popover-open');
 
     const int = (sel) => parseInt(pop.querySelector(sel).value) || 0;
-
     const syncSidebar = () => {
       const v = int('.pop-value');
       const m = int('.pop-max');
-      const row = target;
-      const valEl = row.querySelector('.resource-val');
-      const maxEl = row.querySelector('.resource-max');
-      const fill = row.querySelector('.resource-bar-fill');
-      if (valEl) valEl.textContent = v;
-      if (maxEl) maxEl.textContent = m;
+      if (target.querySelector('.resource-val'))
+        target.querySelector('.resource-val').textContent = v;
+      if (target.querySelector('.resource-max'))
+        target.querySelector('.resource-max').textContent = m;
+      const fill = target.querySelector('.resource-bar-fill');
       if (fill)
         fill.style.width = `${m > 0 ? Math.min(100, (v / m) * 100) : 0}%`;
     };
-
     const update = (key, v) => {
       this.actor.update(
         { [`system.${resource}.${key}`]: v },
@@ -561,20 +373,24 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
         update('value', next);
       })
     );
-    pop.querySelector('.pop-value').addEventListener('change', (e) => {
-      update('value', parseInt(e.target.value) || 0);
-    });
-    pop.querySelector('.pop-max').addEventListener('change', (e) => {
-      update('max', parseInt(e.target.value) || 0);
-    });
-    pop.querySelectorAll('input').forEach((input) => {
+    pop
+      .querySelector('.pop-value')
+      .addEventListener('change', (e) =>
+        update('value', parseInt(e.target.value) || 0)
+      );
+    pop
+      .querySelector('.pop-max')
+      .addEventListener('change', (e) =>
+        update('max', parseInt(e.target.value) || 0)
+      );
+    pop.querySelectorAll('input').forEach((input) =>
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
           input.blur();
         }
-      });
-    });
+      })
+    );
 
     const close = (e) => {
       if (!pop.contains(e.target) && e.target !== target) {
@@ -599,22 +415,8 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     const max =
       foundry.utils.getProperty(this.actor.system, `${resource}.max`) ??
       current;
-    const newVal = Math.min(max, Math.max(0, current + delta));
-    this.actor.update({ [`system.${resource}.value`]: newVal });
-  }
-
-  _onDragStart(event) {
-    const target = event.currentTarget;
-    if ('link' in event.target.dataset) return;
-
-    let dragData;
-    if (target.dataset.itemId) {
-      const item = this.actor.items.get(target.dataset.itemId);
-      dragData = item.toDragData();
-    }
-
-    if (dragData) {
-      event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-    }
+    this.actor.update({
+      [`system.${resource}.value`]: Math.min(max, Math.max(0, current + delta)),
+    });
   }
 }
