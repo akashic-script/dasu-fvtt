@@ -29,6 +29,8 @@ export default class DASUDaemon extends DASUActorBase {
       this.attributes[key].abbr = game.i18n.localize(CONFIG.DASU.attributeAbbreviations[key]) ?? key;
     }
 
+    this._prepareDerivedStats();
+
     // AP pool
     const oddLevels = Math.floor((this.level + 1) / 2);
     const apMax = oddLevels + 1;
@@ -46,6 +48,7 @@ export default class DASUDaemon extends DASUActorBase {
     }
     data.lvl = this.level;
     data.ap = foundry.utils.deepClone(this.ap);
+    data.stats = foundry.utils.deepClone(this.stats);
     return data;
   }
 }

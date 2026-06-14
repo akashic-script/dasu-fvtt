@@ -23,7 +23,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ['dasu', 'sheet', 'actor'],
-    position: { width: 600, height: 850 },
+    position: { width: 600, height: 860 },
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
@@ -76,6 +76,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     if (actorData.sp) context.sp = actorData.sp;
     context.cssClass = [...this.options.classes, actor.type].join(' ');
     context.owner = actor.isOwner;
+    context.isEditMode = this.isEditMode;
     context.items = Array.from(actor.items.values());
     context.items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
@@ -224,59 +225,102 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       }
     }
 
-    this.element.addEventListener('wheel', (e) => {
-      if (this._wheelPending || !this.isEditMode) return;
-      const target = e.target;
-      const delta = e.deltaY < 0 ? 1 : -1;
+    this.element.addEventListener(
+      'wheel',
+      (e) => {
+        if (this._wheelPending || !this.isEditMode) return;
+        const target = e.target;
+        const delta = e.deltaY < 0 ? 1 : -1;
 
-      const attrKey = target.name?.match(/^system\.attributes\.(\w+)\.value$/)?.[1]
-        ?? (target.matches('.attribute-controls .attribute-value')
-          ? target.closest('[data-attribute]')?.dataset.attribute
-          : null);
+        const attrKey =
+          target.name?.match(/^system\.attributes\.(\w+)\.value$/)?.[1] ??
+          (target.matches('.attribute-controls .attribute-value')
+            ? target.closest('[data-attribute]')?.dataset.attribute
+            : null);
 
-      if (attrKey && (target.matches('input[data-dtype="Number"]') ? !target.readOnly : true)) {
-        e.preventDefault();
-        this._wheelPending = true;
-        setTimeout(() => { this._wheelPending = false; }, 300);
-        const current = this.actor.system.attributes[attrKey]?.value ?? 1;
-        DASUActorSheet.#applyAttributeDelta(this.actor, attrKey, current, delta);
-        return;
-      }
+        if (
+          attrKey &&
+          (target.matches('input[data-dtype="Number"]')
+            ? !target.readOnly
+            : true)
+        ) {
+          e.preventDefault();
+          this._wheelPending = true;
+          setTimeout(() => {
+            this._wheelPending = false;
+          }, 300);
+          const current = this.actor.system.attributes[attrKey]?.value ?? 1;
+          DASUActorSheet.#applyAttributeDelta(
+            this.actor,
+            attrKey,
+            current,
+            delta
+          );
+          return;
+        }
 
-      if (target.matches('input[data-dtype="Number"]') && !target.readOnly) {
-        e.preventDefault();
-        this._wheelPending = true;
-        setTimeout(() => { this._wheelPending = false; }, 300);
-        const current = parseInt(target.value) || 0;
-        target.value = current + delta;
-        target.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    }, { passive: false });
+        if (target.matches('input[data-dtype="Number"]') && !target.readOnly) {
+          e.preventDefault();
+          this._wheelPending = true;
+          setTimeout(() => {
+            this._wheelPending = false;
+          }, 300);
+          const current = parseInt(target.value) || 0;
+          target.value = current + delta;
+          target.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      },
+      { passive: false }
+    );
 
-    for (const input of this.element.querySelectorAll('input.attribute-value')) {
-      input.addEventListener('change', (e) => {
-        const key = input.name?.match(/^system\.attributes\.(\w+)\.value$/)?.[1];
-        if (!key) return;
-        const next = parseInt(input.value) || 1;
-        const prev = this.actor.system.attributes[key]?.value ?? 1;
-        if (next <= prev) return;
-        const warn = DASUActorSheet.#canRaiseAttribute(this.actor.system.attributes, this.actor.system.ap, key, next);
-        if (warn) { DASUActorSheet.#warnAttribute(warn, next); e.stopImmediatePropagation(); input.value = prev; }
-      }, { capture: true });
+    for (const input of this.element.querySelectorAll(
+      'input.attribute-value'
+    )) {
+      input.addEventListener(
+        'change',
+        (e) => {
+          const key = input.name?.match(
+            /^system\.attributes\.(\w+)\.value$/
+          )?.[1];
+          if (!key) return;
+          const next = parseInt(input.value) || 1;
+          const prev = this.actor.system.attributes[key]?.value ?? 1;
+          if (next <= prev) return;
+          const warn = DASUActorSheet.#canRaiseAttribute(
+            this.actor.system.attributes,
+            this.actor.system.ap,
+            key,
+            next
+          );
+          if (warn) {
+            DASUActorSheet.#warnAttribute(warn, next);
+            e.stopImmediatePropagation();
+            input.value = prev;
+          }
+        },
+        { capture: true }
+      );
     }
 
     for (const input of this.element.querySelectorAll('input.skill-value')) {
-      input.addEventListener('change', (e) => {
-        const key = input.name?.match(/^system\.skills\.(\w+)\.value$/)?.[1];
-        if (!key) return;
-        const prev = this.actor.system.skills[key]?.value ?? 0;
-        const next = Math.max(0, Math.min(6, parseInt(input.value) || 0));
-        const delta = next - prev;
-        if (delta === 0) { input.value = prev; return; }
-        e.stopImmediatePropagation();
-        input.value = prev;
-        DASUActorSheet.#applySkillDelta(this.actor, key, prev, delta);
-      }, { capture: true });
+      input.addEventListener(
+        'change',
+        (e) => {
+          const key = input.name?.match(/^system\.skills\.(\w+)\.value$/)?.[1];
+          if (!key) return;
+          const prev = this.actor.system.skills[key]?.value ?? 0;
+          const next = Math.max(0, Math.min(6, parseInt(input.value) || 0));
+          const delta = next - prev;
+          if (delta === 0) {
+            input.value = prev;
+            return;
+          }
+          e.stopImmediatePropagation();
+          input.value = prev;
+          DASUActorSheet.#applySkillDelta(this.actor, key, prev, delta);
+        },
+        { capture: true }
+      );
     }
 
     for (const row of this.element.querySelectorAll('.skill-row')) {
@@ -285,22 +329,35 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
         const key = row.dataset.skill;
         const isCustom = !(key in CONFIG.DASU.skills);
         const items = [
-          { label: game.i18n.localize('DASU.Sheet.EditItem'), icon: 'fas fa-pen', onClick: () => {} },
-        ];
-        if (isCustom) items.push({
-          label: game.i18n.localize('DASU.Sheet.DeleteItem'),
-          icon: 'fas fa-trash',
-          onClick: () => {
-            const raw = this.actor.toObject().system.skills ?? {};
-            delete raw[key];
-            this.actor.update({ 'system.skills': raw }, { diff: false, recursive: false });
+          {
+            label: game.i18n.localize('DASU.Sheet.EditItem'),
+            icon: 'fas fa-pen',
+            onClick: () => {},
           },
-        });
+        ];
+        if (isCustom)
+          items.push({
+            label: game.i18n.localize('DASU.Sheet.DeleteItem'),
+            icon: 'fas fa-trash',
+            onClick: () => {
+              const raw = this.actor.toObject().system.skills ?? {};
+              delete raw[key];
+              this.actor.update(
+                { 'system.skills': raw },
+                { diff: false, recursive: false }
+              );
+            },
+          });
         const menu = new foundry.applications.ux.ContextMenu(
-          document.body, '#_dasu_nomatch_', items,
+          document.body,
+          '#_dasu_nomatch_',
+          items,
           { jQuery: false, fixed: true, relative: 'target' }
         );
-        setTimeout(() => { ui.context = menu; menu.render(row, { event: e }); }, 0);
+        setTimeout(() => {
+          ui.context = menu;
+          menu.render(row, { event: e });
+        }, 0);
       });
     }
   }
@@ -328,7 +385,8 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     const item = this.actor.items.get(li.dataset.itemId);
     if (!item) return;
     const menu = new foundry.applications.ux.ContextMenu(
-      document.body, null,
+      document.body,
+      null,
       [
         {
           label: game.i18n.localize('DASU.Sheet.DeleteItem'),
@@ -338,14 +396,21 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       ],
       { jQuery: false, fixed: true, relative: 'target' }
     );
-    setTimeout(() => { ui.context = menu; menu.render(target); }, 0);
+    setTimeout(() => {
+      ui.context = menu;
+      menu.render(target);
+    }, 0);
   }
 
   static async #createItem(event, target) {
     event.preventDefault();
     const type = target.dataset.type;
     const data = foundry.utils.deepClone(target.dataset);
-    const itemData = { name: game.i18n.format('DOCUMENT.New', { type: type.capitalize() }), type, system: data };
+    const itemData = {
+      name: game.i18n.format('DOCUMENT.New', { type: type.capitalize() }),
+      type,
+      system: data,
+    };
     delete itemData.system['type'];
     delete itemData.system['action'];
     return await Item.create(itemData, { parent: this.actor });
@@ -377,7 +442,11 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       if (item) return item.roll();
     }
     if (dataset.roll) {
-      const label = dataset.label ? `${game.i18n.localize('DASU.Sheet.RollFlavorAbility')} ${dataset.label}` : '';
+      const label = dataset.label
+        ? `${game.i18n.localize('DASU.Sheet.RollFlavorAbility')} ${
+            dataset.label
+          }`
+        : '';
       const roll = new Roll(dataset.roll, this.actor.getRollData());
       roll.toMessage({
         speaker: ChatMessage.getSpeaker({ actor: this.actor }),
@@ -466,11 +535,6 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       .addEventListener('change', (e) =>
         update('value', parseInt(e.target.value) || 0)
       );
-    pop
-      .querySelector('.pop-max')
-      .addEventListener('change', (e) =>
-        update('max', parseInt(e.target.value) || 0)
-      );
     pop.querySelectorAll('input').forEach((input) =>
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
@@ -522,9 +586,10 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
 
   static #warnAttribute(reason, next) {
     if (!reason) return;
-    const msg = reason === 'DASU.Sheet.Warn.RuleOfTwo'
-      ? game.i18n.format(reason, { value: next - 1 })
-      : game.i18n.localize(reason);
+    const msg =
+      reason === 'DASU.Sheet.Warn.RuleOfTwo'
+        ? game.i18n.format(reason, { value: next - 1 })
+        : game.i18n.localize(reason);
     ui.notifications.warn(msg);
   }
 
@@ -532,8 +597,16 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     const next = current + delta;
     if (delta < 0 && next < 1) return;
     if (delta > 0) {
-      const warn = DASUActorSheet.#canRaiseAttribute(actor.system.attributes, actor.system.ap, key, next);
-      if (warn) { DASUActorSheet.#warnAttribute(warn, next); return; }
+      const warn = DASUActorSheet.#canRaiseAttribute(
+        actor.system.attributes,
+        actor.system.ap,
+        key,
+        next
+      );
+      if (warn) {
+        DASUActorSheet.#warnAttribute(warn, next);
+        return;
+      }
     }
     actor.update({ [`system.attributes.${key}.value`]: next });
   }
@@ -550,8 +623,16 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     const next = current + delta;
     if (delta < 0 && next < 0) return;
     if (delta > 0) {
-      const warn = DASUActorSheet.#canRaiseSkill(actor.system.skills, actor.system.sp, key, next);
-      if (warn) { ui.notifications.warn(game.i18n.localize(warn)); return; }
+      const warn = DASUActorSheet.#canRaiseSkill(
+        actor.system.skills,
+        actor.system.sp,
+        key,
+        next
+      );
+      if (warn) {
+        ui.notifications.warn(game.i18n.localize(warn));
+        return;
+      }
     }
     actor.update({ [`system.skills.${key}.value`]: next });
   }
@@ -563,14 +644,20 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   }
 
   static #onCreateCustomSkill() {
+    if (!this.isEditMode) return;
     const id = foundry.utils.randomID(8);
-    this.actor.update({ [`system.skills.${id}`]: { value: 0, customName: '' } });
+    this.actor.update({
+      [`system.skills.${id}`]: { value: 0, customName: '' },
+    });
   }
 
   static #onDeleteCustomSkill(event, target) {
     const { id } = target.dataset;
     const skills = this.actor.toObject().system.skills ?? {};
     delete skills[id];
-    this.actor.update({ 'system.skills': skills }, { diff: false, recursive: false });
+    this.actor.update(
+      { 'system.skills': skills },
+      { diff: false, recursive: false }
+    );
   }
 }

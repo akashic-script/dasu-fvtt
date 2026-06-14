@@ -357,7 +357,7 @@
     --dasu-surface-raised: rgb(255 255 255 / 8%);
     --dasu-panel-accent: rgb(255 255 255 / 8%);
     --dasu-panel-solid: #1a1520;
-    --dasu-border: 2px groove #eeede0;
+    --dasu-border: 1px solid rgb(255 255 255 / 12%);
     --dasu-border-subtle: 1px solid rgb(var(--dasu-panel) / 30%);
 
     --dasu-tab-icon: #b5b3a4;
@@ -735,7 +735,6 @@
         flex-direction: column;
         gap: 0;
         padding: 0;
-        border-bottom: var(--dasu-border);
 
         .resource-row {
           display: grid;
@@ -743,6 +742,7 @@
           grid-template-rows: 1fr 6px;
           cursor: pointer;
           overflow: hidden;
+          border-bottom: var(--dasu-border);
 
           &.popover-open .resource-label.resource-label-hp,
           &:hover .resource-label.resource-label-hp {
@@ -810,7 +810,7 @@
               position: absolute;
               inset: 0;
               background: var(--dasu-surface-raised);
-              clip-path: polygon(0 0, 60% 0, 36% 100%, 0 100%);
+              clip-path: polygon(0 0, 60% 0, 35% 100%, 0 100%);
             }
 
             .resource-val {
@@ -836,9 +836,23 @@
             height: 6px;
             background: var(--dasu-resource-bar-bg);
 
+            overflow: hidden;
+
+            &::after {
+              content: '';
+              position: absolute;
+              inset: 0 0 0 auto;
+              width: 12px;
+              background: rgb(255 255 255 / 12%);
+              clip-path: polygon(100% 0, 100% 100%, 0 100%);
+              z-index: 1;
+            }
+
             .resource-bar-fill {
               position: absolute;
               inset: 0 auto 0 0;
+              padding-right: 6px;
+              clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
               transition: width 200ms ease;
             }
             .resource-bar-hp {
@@ -982,6 +996,21 @@
         cursor: pointer;
       }
 
+      .sidebar-stats {
+        .stat-bonus-wrap {
+          display: none;
+          align-items: center;
+          gap: 2px;
+        }
+        .stat-bonus-sign {
+          font-size: 1.1em;
+          opacity: 0.5;
+        }
+        .stat-total {
+          display: flex;
+        }
+      }
+
       .sidebar-skills {
         display: flex;
         flex-direction: column;
@@ -1061,11 +1090,13 @@
           justify-content: center;
           opacity: 0.5;
           cursor: pointer;
-          &:hover { opacity: 1; }
+          &:hover {
+            opacity: 1;
+          }
         }
 
         .skill-add-btn {
-          display: flex;
+          display: none;
           align-items: center;
           justify-content: center;
           height: 28px;
@@ -1081,7 +1112,19 @@
             border-color: rgb(255 255 255 / 50%);
             color: rgb(255 255 255 / 70%);
           }
+          .edit-mode & {
+            display: flex;
+          }
         }
+      }
+    }
+
+    &.edit-mode .sidebar-stats {
+      .stat-bonus-wrap {
+        display: flex;
+      }
+      .stat-total {
+        display: none;
       }
     }
 
@@ -1100,7 +1143,6 @@
     &.edit-mode .skill-delete-btn {
       display: flex;
     }
-
 
     &.actor nav.sheet-tabs {
       display: flex;

@@ -39,6 +39,8 @@ export default class DASUSummoner extends DASUActorBase {
       this.attributes[key].abbr = game.i18n.localize(CONFIG.DASU.attributeAbbreviations[key]) ?? key;
     }
 
+    this._prepareDerivedStats();
+
     // AP pool
     const oddLevels = Math.floor((this.level + 1) / 2);
     const apMax = oddLevels + 1;
@@ -57,6 +59,7 @@ export default class DASUSummoner extends DASUActorBase {
       s.isCustom = !i18nKey;
     }
 
+    // SP pool
     const spMax = 3 + (this.level - 1) * 2;
     const triCost = (r) => (r * (r + 1)) / 2;
     const spSpent = Object.values(this.skills ?? {}).reduce((sum, s) => sum + triCost(s.value ?? 0), 0);
@@ -78,6 +81,7 @@ export default class DASUSummoner extends DASUActorBase {
     data.lvl = this.level;
     data.ap = foundry.utils.deepClone(this.ap);
     data.sp = foundry.utils.deepClone(this.sp);
+    data.stats = foundry.utils.deepClone(this.stats);
     return data;
   }
 }

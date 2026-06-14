@@ -53,19 +53,23 @@
     <div class="sidebar-stats">
       <div class="stat-score">
         <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Avoid.long'}}">{{localize "DASU.Actor.Stat.Avoid.abbr"}}</span>
-        <span class="stat-value dasu-pill">0</span>
+        <span class="stat-value dasu-pill stat-total">{{system.stats.avoid.value}}</span>
+        <label class="stat-bonus-wrap"><span class="stat-bonus-sign">±</span><input class="stat-value dasu-pill stat-bonus" type="text" name="system.stats.avoid.bonus" value="{{system.stats.avoid.bonus}}" data-dtype="Number" /></label>
       </div>
       <div class="stat-score">
         <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Defense.long'}}">{{localize "DASU.Actor.Stat.Defense.abbr"}}</span>
-        <span class="stat-value dasu-pill">0</span>
+        <span class="stat-value dasu-pill stat-total">{{system.stats.defense.value}}</span>
+        <label class="stat-bonus-wrap"><span class="stat-bonus-sign">±</span><input class="stat-value dasu-pill stat-bonus" type="text" name="system.stats.defense.bonus" value="{{system.stats.defense.bonus}}" data-dtype="Number" /></label>
       </div>
       <div class="stat-score">
         <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Hit.long'}}">{{localize "DASU.Actor.Stat.Hit.abbr"}}</span>
-        <span class="stat-value dasu-pill">0</span>
+        <span class="stat-value dasu-pill stat-total">{{system.stats.hit.value}}</span>
+        <label class="stat-bonus-wrap"><span class="stat-bonus-sign">±</span><input class="stat-value dasu-pill stat-bonus" type="text" name="system.stats.hit.bonus" value="{{system.stats.hit.bonus}}" data-dtype="Number" /></label>
       </div>
       <div class="stat-score">
         <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Land.long'}}">{{localize "DASU.Actor.Stat.Land.abbr"}}</span>
-        <span class="stat-value dasu-pill">0</span>
+        <span class="stat-value dasu-pill stat-total">{{system.stats.land.value}}</span>
+        <label class="stat-bonus-wrap"><span class="stat-bonus-sign">±</span><input class="stat-value dasu-pill stat-bonus" type="text" name="system.stats.land.bonus" value="{{system.stats.land.bonus}}" data-dtype="Number" /></label>
       </div>
     </div>
   </div>
@@ -89,7 +93,7 @@
         </div>
       </div>
       {{/each}}
-      <button type="button" class="skill-add-btn" data-action="createCustomSkill" {{#unless editable}}disabled{{/unless}}><i class="fas fa-plus"></i></button>
+      <button type="button" class="skill-add-btn" data-action="createCustomSkill"><i class="fas fa-plus"></i></button>
     </div>
   </div>
 
