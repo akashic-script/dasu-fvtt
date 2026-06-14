@@ -31,7 +31,8 @@ Hooks.once('init', function () {
   Object.assign(CONFIG.Item.dataModels, {
     item: models.DASUItem,
     feature: models.DASUFeature,
-    spell: models.DASUSpell,
+    class: models.DASUClass,
+    ability: models.DASUAbility,
   });
 
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
@@ -51,7 +52,7 @@ Hooks.once('init', function () {
     'dasu',
     DASUItemSheet,
     {
-      types: ['item', 'feature', 'spell'],
+      types: ['item', 'feature', 'class', 'ability'],
       makeDefault: true,
       label: 'DASU.SheetLabels.Item',
     }

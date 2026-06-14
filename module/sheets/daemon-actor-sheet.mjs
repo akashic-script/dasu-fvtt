@@ -11,11 +11,11 @@ export class DASUDaemonActorSheet extends DASUActorSheet {
   static TABS = {
     primary: {
       tabs: [
-        { id: 'description', label: 'Identity', icon: 'fas fa-feather' },
+        { id: 'identity', label: 'Identity', icon: 'fas fa-feather' },
         { id: 'items', label: 'Items', icon: 'fas fa-backpack' },
         { id: 'effects', label: 'Effects', icon: 'fas fa-bolt' },
       ],
-      initial: 'description',
+      initial: 'identity',
     },
   };
 
@@ -28,7 +28,7 @@ export class DASUDaemonActorSheet extends DASUActorSheet {
       template: 'systems/dasu/templates/actor/parts/sidebar-daemon.hbs',
     },
     tabs: { template: 'systems/dasu/templates/actor/parts/tab-navigation.hbs' },
-    description: {
+    identity: {
       template: 'systems/dasu/templates/actor/parts/description.hbs',
       scrollable: [''],
     },

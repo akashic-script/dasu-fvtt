@@ -83,10 +83,7 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
 
     // Customize templates based on item type if needed
     // For example, features might not have attributes tab
-    if (itemType === 'feature' || itemType === 'spell') {
-      // These item types might have different attribute templates
-      // For now, keep the same
-    }
+    // if (itemType === 'feature') {}
 
     return parts;
   }

@@ -10,13 +10,14 @@ export class DASUSummonerActorSheet extends DASUActorSheet {
   static TABS = {
     primary: {
       tabs: [
+        { id: 'identity', label: 'Identity', icon: 'fas fa-feather' },
+        { id: 'classes', label: 'Classes', icon: 'fas fa-chess-knight' },
+        { id: 'abilities', label: 'Abilities', icon: 'fas fa-fist-raised' },
         { id: 'features', label: 'Features', icon: 'fas fa-list' },
-        { id: 'description', label: 'Identity', icon: 'fas fa-feather' },
         { id: 'items', label: 'Items', icon: 'fas fa-backpack' },
-        { id: 'spells', label: 'Spells', icon: 'fas fa-book-sparkles' },
         { id: 'effects', label: 'Effects', icon: 'fas fa-bolt' },
       ],
-      initial: 'features',
+      initial: 'identity',
     },
   };
 
@@ -25,20 +26,24 @@ export class DASUSummonerActorSheet extends DASUActorSheet {
     header: { template: 'systems/dasu/templates/actor/parts/header.hbs' },
     sidebar: { template: 'systems/dasu/templates/actor/parts/sidebar.hbs' },
     tabs: { template: 'systems/dasu/templates/actor/parts/tab-navigation.hbs' },
+    classes: {
+      template: 'systems/dasu/templates/actor/parts/classes.hbs',
+      scrollable: [''],
+    },
+    abilities: {
+      template: 'systems/dasu/templates/actor/parts/abilities.hbs',
+      scrollable: [''],
+    },
     features: {
       template: 'systems/dasu/templates/actor/parts/features.hbs',
       scrollable: [''],
     },
-    description: {
+    identity: {
       template: 'systems/dasu/templates/actor/parts/description.hbs',
       scrollable: [''],
     },
     items: {
       template: 'systems/dasu/templates/actor/parts/items.hbs',
-      scrollable: [''],
-    },
-    spells: {
-      template: 'systems/dasu/templates/actor/parts/spells.hbs',
       scrollable: [''],
     },
     effects: {

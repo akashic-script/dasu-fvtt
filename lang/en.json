@@ -11,12 +11,7 @@
       "Item": "DASU Item Sheet"
     },
     "ItemName": "Item Name",
-    "Item": {
-      "Spell": {
-        "SpellLVL": "Level {level} Spells",
-        "AddLVL": "Add LVL {level}"
-      }
-    },
+    "Item": {},
     "Effect": {
       "Source": "Source",
       "Toggle": "Disable Effect",
@@ -35,7 +30,8 @@
     "Item": {
       "item": "Item",
       "feature": "Feature",
-      "spell": "Spell"
+      "class": "Class",
+      "ability": "Ability"
     }
   }
 }

@@ -351,7 +351,7 @@
 
     --dasu-accent-feature: #d9a800;
     --dasu-accent-item: #6ab4d8;
-    --dasu-accent-spell: #c084f5;
+    --dasu-accent-ability: #c084f5;
 
     --dasu-surface-1: rgb(var(--dasu-panel) / 40%);
     --dasu-surface-raised: rgb(255 255 255 / 8%);
@@ -373,6 +373,7 @@
       border-radius: 0;
       box-sizing: border-box;
       cursor: pointer;
+      outline: none;
       background: linear-gradient(
           to bottom,
           rgb(255 255 255 / 10%),
@@ -1308,8 +1309,8 @@
         &[data-item-type='item'] {
           --item-accent: var(--dasu-accent-item);
         }
-        &[data-item-type='spell'] {
-          --item-accent: var(--dasu-accent-spell);
+        &[data-item-type='ability'] {
+          --item-accent: var(--dasu-accent-ability);
         }
 
         display: flex;
@@ -1497,7 +1498,7 @@
 
   --dasu-accent-feature: #d9a800;
   --dasu-accent-item: #4a90c0;
-  --dasu-accent-spell: #c084f5;
+  --dasu-accent-ability: #c084f5;
 
   color: var(--dasu-ink);
   --background: var(--dasu-paper);

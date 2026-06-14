@@ -37,7 +37,8 @@
     "Item": {
       "item": {},
       "feature": {},
-      "spell": {}
+      "class": {},
+      "ability": {}
     }
   },
   "styles": [{ "src": "css/dasu.css", "layer": "system" }],
