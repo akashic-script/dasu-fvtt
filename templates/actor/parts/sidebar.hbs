@@ -6,7 +6,7 @@
 
   <div class="sidebar-resources">
     <div class="resource-row" data-action="openResourcePopover" data-resource="health">
-      <span class="resource-label resource-label-hp">HP</span>
+      <span class="resource-label resource-label-hp" data-tooltip="{{localize 'DASU.Actor.HP.long'}}">{{localize "DASU.Actor.HP.abbr"}}</span>
       <div class="resource-current">
         <span class="resource-val">{{system.health.value}}</span>
         <span class="resource-sep">/</span>
@@ -17,7 +17,7 @@
       </div>
     </div>
     <div class="resource-row" data-action="openResourcePopover" data-resource="power">
-      <span class="resource-label resource-label-wp">WP</span>
+      <span class="resource-label resource-label-wp" data-tooltip="{{localize 'DASU.Actor.WP.long'}}">{{localize "DASU.Actor.WP.abbr"}}</span>
       <div class="resource-current">
         <span class="resource-val">{{system.power.value}}</span>
         <span class="resource-sep">/</span>
@@ -31,14 +31,14 @@
 
   <div class="sidebar-section">
     <div class="sidebar-section-label">
-      <span class="sidebar-section-title">Attributes</span>
-      <span class="sidebar-section-counter">AP: 0/0</span>
+      <span class="sidebar-section-title" data-tooltip="{{localize 'DASU.Actor.Section.Attributes'}}">{{localize "DASU.Actor.Section.Attributes"}}</span>
+      <span class="sidebar-section-counter" data-tooltip="{{localize 'DASU.Actor.AP.long'}}">{{localize "DASU.Actor.AP.abbr"}}: {{ap.value}}/{{ap.max}}</span>
     </div>
     <div class="sidebar-abilities">
       {{#each system.abilities as |ability key|}}
       <div class="ability-score">
-        <span class="ability-label">{{ability.abbr}}</span>
-        <input class="ability-value dasu-pill rollable" type="text" name="system.abilities.{{key}}.value" value="{{ability.value}}" data-dtype="Number" data-action="roll" data-roll="@abilities.{{key}}.value" data-label="{{ability.label}}" data-tooltip="{{ability.label}}" data-tooltip-direction="RIGHT" />
+        <span class="ability-label" data-tooltip="{{ability.label}}">{{ability.abbr}}</span>
+        <input class="ability-value dasu-pill rollable" type="text" name="system.abilities.{{key}}.value" value="{{ability.value}}" data-dtype="Number" data-action="roll" data-roll="@abilities.{{key}}.value" data-label="{{ability.label}}" />
       </div>
       {{/each}}
     </div>
@@ -48,23 +48,23 @@
   {{!-- FEAT: Placeholder --}}
   <div class="sidebar-section">
     <div class="sidebar-section-label">
-      <span class="sidebar-section-title">Stats</span>
+      <span class="sidebar-section-title" data-tooltip="{{localize 'DASU.Actor.Section.Stats'}}">{{localize "DASU.Actor.Section.Stats"}}</span>
     </div>
     <div class="sidebar-stats">
       <div class="stat-score">
-        <span class="stat-label">AVO</span>
+        <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Avoid.long'}}">{{localize "DASU.Actor.Stat.Avoid.abbr"}}</span>
         <span class="stat-value dasu-pill">0</span>
       </div>
       <div class="stat-score">
-        <span class="stat-label">DEF</span>
+        <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Defense.long'}}">{{localize "DASU.Actor.Stat.Defense.abbr"}}</span>
         <span class="stat-value dasu-pill">0</span>
       </div>
       <div class="stat-score">
-        <span class="stat-label">HIT</span>
+        <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Hit.long'}}">{{localize "DASU.Actor.Stat.Hit.abbr"}}</span>
         <span class="stat-value dasu-pill">0</span>
       </div>
       <div class="stat-score">
-        <span class="stat-label">LAND</span>
+        <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Land.long'}}">{{localize "DASU.Actor.Stat.Land.abbr"}}</span>
         <span class="stat-value dasu-pill">0</span>
       </div>
     </div>
@@ -73,40 +73,40 @@
   {{!-- Skills — placeholder section --}}
   <div class="sidebar-section">
     <div class="sidebar-section-label">
-      <span class="sidebar-section-title">Skills</span>
-      <span class="sidebar-section-counter">SP: 0/0</span>
+      <span class="sidebar-section-title" data-tooltip="{{localize 'DASU.Actor.Section.Skills'}}">{{localize "DASU.Actor.Section.Skills"}}</span>
+      <span class="sidebar-section-counter" data-tooltip="{{localize 'DASU.Actor.SP.long'}}">{{localize "DASU.Actor.SP.abbr"}}: {{sp.value}}/{{sp.max}}</span>
     </div>
     <div class="sidebar-skills">
       <div class="skill-row">
-        <span class="skill-label">Athletics</span>
+        <span class="skill-label">{{localize "DASU.Actor.Skill.Athletics"}}</span>
         <span class="skill-value dasu-pill">0</span>
       </div>
       <div class="skill-row">
-        <span class="skill-label">Academia</span>
+        <span class="skill-label">{{localize "DASU.Actor.Skill.Academia"}}</span>
         <span class="skill-value dasu-pill">0</span>
       </div>
       <div class="skill-row">
-        <span class="skill-label">Craftsmanship</span>
+        <span class="skill-label">{{localize "DASU.Actor.Skill.Craftsmanship"}}</span>
         <span class="skill-value dasu-pill">0</span>
       </div>
       <div class="skill-row">
-        <span class="skill-label">Intuition</span>
+        <span class="skill-label">{{localize "DASU.Actor.Skill.Intuition"}}</span>
         <span class="skill-value dasu-pill">0</span>
       </div>
       <div class="skill-row">
-        <span class="skill-label">Medicine</span>
+        <span class="skill-label">{{localize "DASU.Actor.Skill.Medicine"}}</span>
         <span class="skill-value dasu-pill">0</span>
       </div>
       <div class="skill-row">
-        <span class="skill-label">Perceiving</span>
+        <span class="skill-label">{{localize "DASU.Actor.Skill.Perceiving"}}</span>
         <span class="skill-value dasu-pill">0</span>
       </div>
       <div class="skill-row">
-        <span class="skill-label">Stealth</span>
+        <span class="skill-label">{{localize "DASU.Actor.Skill.Stealth"}}</span>
         <span class="skill-value dasu-pill">0</span>
       </div>
       <div class="skill-row">
-        <span class="skill-label">Outdoorsmanship</span>
+        <span class="skill-label">{{localize "DASU.Actor.Skill.Outdoorsmanship"}}</span>
         <span class="skill-value dasu-pill">0</span>
       </div>
     </div>

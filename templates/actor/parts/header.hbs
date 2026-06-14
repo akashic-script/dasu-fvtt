@@ -1,7 +1,7 @@
 <header class="sheet-header">
-  <h1><input class="header-name" type="text" name="name" value="{{actor.name}}" placeholder="Summoner Name" /></h1>
+  <h1><input class="header-name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize 'DASU.Actor.SummonerNamePlaceholder'}}" /></h1>
   <div class="header-level">
-    <span class="header-lv-label">LVL</span>
+    <span class="header-lv-label">{{localize "DASU.Actor.Level.abbr"}}</span>
     <input class="dasu-pill" type="text" name="system.level" value="{{system.level}}" data-dtype="Number" {{#unless editable}}readonly{{/unless}} />
   </div>
 </header>

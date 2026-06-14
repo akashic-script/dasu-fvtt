@@ -157,7 +157,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     if (this.isEditable && !toggle) {
       toggle = document.createElement('label');
       toggle.className = 'dasu-mode-toggle';
-      toggle.title = 'Toggle edit mode';
+      toggle.dataset.tooltip = game.i18n.localize('DASU.Sheet.EditModeToggle');
       toggle.innerHTML = `
         <input class="dasu-mode-checkbox" type="checkbox" />
         <span class="dasu-mode-track">
@@ -246,7 +246,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       document.body, null,
       [
         {
-          label: 'Delete',
+          label: game.i18n.localize('DASU.Sheet.DeleteItem'),
           icon: 'fas fa-trash',
           onClick: () => item.delete(),
         },
@@ -260,7 +260,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     event.preventDefault();
     const type = target.dataset.type;
     const data = foundry.utils.deepClone(target.dataset);
-    const itemData = { name: `New ${type.capitalize()}`, type, system: data };
+    const itemData = { name: game.i18n.format('DOCUMENT.New', { type: type.capitalize() }), type, system: data };
     delete itemData.system['type'];
     delete itemData.system['action'];
     return await Item.create(itemData, { parent: this.actor });
@@ -292,7 +292,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       if (item) return item.roll();
     }
     if (dataset.roll) {
-      const label = dataset.label ? `[ability] ${dataset.label}` : '';
+      const label = dataset.label ? `${game.i18n.localize('DASU.Sheet.RollFlavorAbility')} ${dataset.label}` : '';
       const roll = new Roll(dataset.roll, this.actor.getRollData());
       roll.toMessage({
         speaker: ChatMessage.getSpeaker({ actor: this.actor }),

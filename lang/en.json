@@ -3,15 +3,13 @@
     "Ability": {
       "Pow": { "long": "Power", "abbr": "Pow" },
       "Dex": { "long": "Dexterity", "abbr": "Dex" },
-      "Wil": { "long": "Willpower", "abbr": "Wil" },
+      "Wil": { "long": "Willpower", "abbr": "Will" },
       "Sta": { "long": "Stamina", "abbr": "Sta" }
     },
     "SheetLabels": {
       "Actor": "DASU Actor Sheet",
       "Item": "DASU Item Sheet"
     },
-    "ItemName": "Item Name",
-    "Item": {},
     "Effect": {
       "Source": "Source",
       "Toggle": "Disable Effect",
@@ -19,6 +17,54 @@
       "Temporary": "Temporary Effects",
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects"
+    },
+    "Actor": {
+      "SummonerNamePlaceholder": "Summoner Name",
+      "DaemonNamePlaceholder": "Daemon Name",
+      "Level": { "long": "Level", "abbr": "LVL" },
+      "Section": {
+        "Attributes": "Attributes",
+        "Stats": "Stats",
+        "Skills": "Skills"
+      },
+      "HP": { "long": "Hit Points", "abbr": "HP" },
+      "WP": { "long": "Will Points", "abbr": "WP" },
+      "AP": { "long": "Attribute Points", "abbr": "AP" },
+      "SP": { "long": "Skill Points", "abbr": "SP" },
+      "Stat": {
+        "Avoid": { "long": "Avoid", "abbr": "AVO" },
+        "Defense": { "long": "Defense", "abbr": "DEF" },
+        "Hit": { "long": "To Hit", "abbr": "HIT" },
+        "Land": { "long": "To Land", "abbr": "LAND" }
+      },
+      "Skill": {
+        "NamePlaceholder": "Custom Skill Name",
+        "Athletics": "Athletics",
+        "Academia": "Academia",
+        "Craftsmanship": "Craftsmanship",
+        "Intuition": "Intuition",
+        "Medicine": "Medicine",
+        "Perceiving": "Perceiving",
+        "Stealth": "Stealth",
+        "Outdoorsmanship": "Outdoorsmanship"
+      }
+    },
+    "Sheet": {
+      "EditModeToggle": "Toggle edit mode",
+      "MoreOptions": "More",
+      "EditItem": "Edit",
+      "CreateFeature": "Create feature",
+      "DeleteItem": "Delete",
+      "RollFlavorAbility": "[ability]"
+    },
+    "Item": {
+      "NamePlaceholder": "Item Name",
+      "Roll": {
+        "Formula": "Roll Formula:",
+        "DiceNum": "Number of Dice",
+        "DiceSize": "Die Size",
+        "DiceBonus": "Roll Modifier"
+      }
     }
   },
 

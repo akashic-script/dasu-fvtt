@@ -5,7 +5,7 @@
       <a
         class='item-control item-create'
         data-action='createItem'
-        title='Create item'
+        data-tooltip='{{localize "DASU.Sheet.CreateFeature"}}'
         data-type='feature'
       >
         <i class='fas fa-plus'></i>
@@ -24,10 +24,10 @@
         <h4>{{item.name}}</h4>
       </div>
       <div class='item-controls'>
-        <a class='item-control item-edit' data-action='editItem' title='Edit'>
+        <a class='item-control item-edit' data-action='editItem' data-tooltip='{{localize "DASU.Sheet.EditItem"}}'>
           <i class='fas fa-edit'></i>
         </a>
-        <a class='item-control item-menu' data-action='menuItem' title='More'>
+        <a class='item-control item-menu' data-action='menuItem' data-tooltip='{{localize "DASU.Sheet.MoreOptions"}}'>
           <i class='fas fa-bars'></i>
         </a>
       </div>
