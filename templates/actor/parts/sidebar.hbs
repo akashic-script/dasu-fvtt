@@ -32,13 +32,13 @@
   <div class="sidebar-section">
     <div class="sidebar-section-label">
       <span class="sidebar-section-title" data-tooltip="{{localize 'DASU.Actor.Section.Attributes'}}">{{localize "DASU.Actor.Section.Attributes"}}</span>
-      <span class="sidebar-section-counter" data-tooltip="{{localize 'DASU.Actor.AP.long'}}">{{localize "DASU.Actor.AP.abbr"}}: {{ap.value}}/{{ap.max}}</span>
+      <span class="sidebar-section-counter" data-tooltip="{{localize 'DASU.Actor.AP.long'}}">{{localize "DASU.Actor.AP.abbr"}}: {{ap.spent}}/{{ap.max}}</span>
     </div>
-    <div class="sidebar-abilities">
-      {{#each system.abilities as |ability key|}}
-      <div class="ability-score">
-        <span class="ability-label" data-tooltip="{{ability.label}}">{{ability.abbr}}</span>
-        <input class="ability-value dasu-pill rollable" type="text" name="system.abilities.{{key}}.value" value="{{ability.value}}" data-dtype="Number" data-action="roll" data-roll="@abilities.{{key}}.value" data-label="{{ability.label}}" />
+    <div class="sidebar-attributes">
+      {{#each system.attributes as |attribute key|}}
+      <div class="attribute-score">
+        <span class="attribute-label" data-tooltip="{{attribute.label}}">{{attribute.abbr}}</span>
+        <input class="attribute-value dasu-pill rollable" type="text" name="system.attributes.{{key}}.value" value="{{attribute.value}}" data-dtype="Number" data-action="roll" data-roll="@attributes.{{key}}.value" data-label="{{attribute.label}}" />
       </div>
       {{/each}}
     </div>

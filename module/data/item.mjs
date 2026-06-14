@@ -13,7 +13,7 @@ export default class DASUItem extends DASUItemBase {
     schema.roll = new fields.SchemaField({
       diceNum: new fields.NumberField({ ...requiredInteger, initial: 1, min: 1 }),
       diceSize: new fields.StringField({ initial: "d20" }),
-      diceBonus: new fields.StringField({ initial: "+@abilities.str.mod+ceil(@lvl / 2)" })
+      diceBonus: new fields.StringField({ initial: "+@attributes.pow.value+ceil(@lvl / 2)" })
     });
 
     schema.formula = new fields.StringField({ blank: true });

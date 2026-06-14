@@ -1,2 +1,22 @@
 <section class="tab {{tab.cssClass}}" data-group="primary" data-tab="abilities">
+  <div class="attributes-header">
+    <span class="attributes-ap-label" data-tooltip="{{localize 'DASU.Actor.AP.long'}}">
+      {{localize "DASU.Actor.AP.abbr"}}: {{ap.spent}}/{{ap.max}}
+    </span>
+  </div>
+  <div class="attributes-list">
+    {{#each system.attributes as |attribute key|}}
+    <div class="attribute-row" data-attribute="{{key}}">
+      <div class="attribute-info">
+        <span class="attribute-name">{{attribute.label}}</span>
+        <span class="attribute-abbr dasu-pill" data-tooltip="{{attribute.label}}">{{attribute.abbr}}</span>
+      </div>
+      <div class="attribute-controls">
+        <button type="button" class="attribute-btn dasu-pill" data-action="attributeStep" data-attribute="{{key}}" data-step="-1" {{#unless editable}}disabled{{/unless}}>−</button>
+        <span class="attribute-value dasu-pill">{{attribute.value}}</span>
+        <button type="button" class="attribute-btn dasu-pill" data-action="attributeStep" data-attribute="{{key}}" data-step="1" {{#unless editable}}disabled{{/unless}}>+</button>
+      </div>
+    </div>
+    {{/each}}
+  </div>
 </section>

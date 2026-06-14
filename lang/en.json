@@ -55,7 +55,12 @@
       "EditItem": "Edit",
       "CreateFeature": "Create feature",
       "DeleteItem": "Delete",
-      "RollFlavorAbility": "[ability]"
+      "RollFlavorAbility": "[ability]",
+      "Warn": {
+        "NoAP": "Not enough Attribute Points.",
+        "RuleOfTwo": "Rule of Two: another attribute must be at {value} first.",
+        "AttrCapped": "Attribute is already at maximum (6)."
+      }
     },
     "Item": {
       "NamePlaceholder": "Item Name",

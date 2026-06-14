@@ -17,7 +17,7 @@ Hooks.once('init', function () {
   CONFIG.DASU = DASU;
 
   CONFIG.Combat.initiative = {
-    formula: '1d20 + @abilities.dex.mod',
+    formula: '1d20 + @attributes.dex.value',
     decimals: 2,
   };
 

@@ -39,6 +39,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       roll: DASUActorSheet.#onRoll,
       resourceStep: DASUActorSheet.#onResourceStep,
       openResourcePopover: DASUActorSheet.#onOpenResourcePopover,
+      attributeStep: DASUActorSheet.#onAttributeStep,
     },
   };
 
@@ -69,6 +70,8 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     context.data = actor.toObject();
     context.system = actorData;
     context.flags = actor.flags;
+    if (actorData.ap) context.ap = actorData.ap;
+    if (actorData.sp) context.sp = actorData.sp;
     context.cssClass = [...this.options.classes, actor.type].join(' ');
     context.owner = actor.isOwner;
     context.items = Array.from(actor.items.values());
@@ -217,6 +220,47 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
         li.setAttribute('draggable', true);
         li.addEventListener('dragstart', handler, false);
       }
+    }
+
+    this.element.addEventListener('wheel', (e) => {
+      if (this._wheelPending || !this.isEditMode) return;
+      const target = e.target;
+      const delta = e.deltaY < 0 ? 1 : -1;
+
+      const attrKey = target.name?.match(/^system\.attributes\.(\w+)\.value$/)?.[1]
+        ?? (target.matches('.attribute-controls .attribute-value')
+          ? target.closest('[data-attribute]')?.dataset.attribute
+          : null);
+
+      if (attrKey && (target.matches('input[data-dtype="Number"]') ? !target.readOnly : true)) {
+        e.preventDefault();
+        this._wheelPending = true;
+        setTimeout(() => { this._wheelPending = false; }, 300);
+        const current = this.actor.system.attributes[attrKey]?.value ?? 1;
+        DASUActorSheet.#applyAttributeDelta(this.actor, attrKey, current, delta);
+        return;
+      }
+
+      if (target.matches('input[data-dtype="Number"]') && !target.readOnly) {
+        e.preventDefault();
+        this._wheelPending = true;
+        setTimeout(() => { this._wheelPending = false; }, 300);
+        const current = parseInt(target.value) || 0;
+        target.value = current + delta;
+        target.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }, { passive: false });
+
+    for (const input of this.element.querySelectorAll('input.attribute-value')) {
+      input.addEventListener('change', (e) => {
+        const key = input.name?.match(/^system\.attributes\.(\w+)\.value$/)?.[1];
+        if (!key) return;
+        const next = parseInt(input.value) || 1;
+        const prev = this.actor.system.attributes[key]?.value ?? 1;
+        if (next <= prev) return;
+        const warn = DASUActorSheet.#canRaiseAttribute(this.actor.system.attributes, this.actor.system.ap, key, next);
+        if (warn) { DASUActorSheet.#warnAttribute(warn, next); e.stopImmediatePropagation(); input.value = prev; }
+      }, { capture: true });
     }
   }
 
@@ -421,5 +465,41 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     this.actor.update({
       [`system.${resource}.value`]: Math.min(max, Math.max(0, current + delta)),
     });
+  }
+
+  static #canRaiseAttribute(attributes, ap, key, next) {
+    if (next > 6) return 'DASU.Sheet.Warn.AttrCapped';
+    if (next < 1) return null;
+    if (ap?.value <= 0) return 'DASU.Sheet.Warn.NoAP';
+    if (next >= 3) {
+      const others = Object.entries(attributes).filter(([k]) => k !== key);
+      if (others.filter(([, a]) => a.value >= next - 1).length < 1)
+        return 'DASU.Sheet.Warn.RuleOfTwo';
+    }
+    return null;
+  }
+
+  static #warnAttribute(reason, next) {
+    if (!reason) return;
+    const msg = reason === 'DASU.Sheet.Warn.RuleOfTwo'
+      ? game.i18n.format(reason, { value: next - 1 })
+      : game.i18n.localize(reason);
+    ui.notifications.warn(msg);
+  }
+
+  static #applyAttributeDelta(actor, key, current, delta) {
+    const next = current + delta;
+    if (delta < 0 && next < 1) return;
+    if (delta > 0) {
+      const warn = DASUActorSheet.#canRaiseAttribute(actor.system.attributes, actor.system.ap, key, next);
+      if (warn) { DASUActorSheet.#warnAttribute(warn, next); return; }
+    }
+    actor.update({ [`system.attributes.${key}.value`]: next });
+  }
+
+  static #onAttributeStep(event, target) {
+    const { attribute, step } = target.dataset;
+    const current = this.actor.system.attributes[attribute]?.value ?? 1;
+    DASUActorSheet.#applyAttributeDelta(this.actor, attribute, current, parseInt(step));
   }
 }
