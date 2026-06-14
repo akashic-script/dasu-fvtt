@@ -7,12 +7,6 @@ export default class DASUSummoner extends DASUActorBase {
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = super.defineSchema();
 
-    schema.attributes = new fields.SchemaField({
-      level: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 1 })
-      }),
-    });
-
     const abilityKeys = Object.keys(CONFIG.DASU.abilities);
     const abilitiesSchema = {};
     for (const ability of abilityKeys) {
@@ -38,16 +32,13 @@ export default class DASUSummoner extends DASUActorBase {
 
   getRollData() {
     const data = {};
-
     if (this.abilities) {
       data.abilities = {};
       for (let [k, v] of Object.entries(this.abilities)) {
         data.abilities[k] = foundry.utils.deepClone(v);
       }
     }
-
-    data.lvl = this.attributes.level.value;
-
+    data.lvl = this.level;
     return data;
   }
 }

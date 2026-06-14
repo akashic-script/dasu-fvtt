@@ -7,9 +7,6 @@ export default class DASUDaemon extends DASUActorBase {
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = super.defineSchema();
 
-    schema.cr = new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 });
-    schema.xp = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
-
     const abilityKeys = Object.keys(CONFIG.DASU.abilities);
     const abilitiesSchema = {};
     for (const ability of abilityKeys) {
@@ -25,7 +22,6 @@ export default class DASUDaemon extends DASUActorBase {
 
   prepareDerivedData() {
     super.prepareDerivedData();
-    this.xp = this.cr * this.cr * 100;
     if (!this.abilities) return;
     for (const key in this.abilities) {
       if (!this.abilities[key]) continue;
