@@ -39,6 +39,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       roll: DASUActorSheet.#onRoll,
       resourceStep: DASUActorSheet.#onResourceStep,
       openResourcePopover: DASUActorSheet.#onOpenResourcePopover,
+      openMeritPopover: DASUActorSheet.#onOpenMeritPopover,
       skillStep: DASUActorSheet.#onSkillStep,
       createCustomSkill: DASUActorSheet.#onCreateCustomSkill,
       deleteCustomSkill: DASUActorSheet.#onDeleteCustomSkill,
@@ -641,6 +642,82 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
           e.preventDefault();
           input.blur();
         }
+      })
+    );
+
+    const close = (e) => {
+      if (!pop.contains(e.target) && e.target !== target) {
+        pop.remove();
+        target.classList.remove('popover-open');
+        document.removeEventListener('pointerdown', close);
+        this.render();
+      }
+    };
+    setTimeout(() => document.addEventListener('pointerdown', close), 0);
+  }
+
+  static async #onOpenMeritPopover(event, target) {
+    const popId = 'dasu-popover-merit';
+    const existing = document.getElementById(popId);
+    if (existing) {
+      existing.remove();
+      target.classList.remove('popover-open');
+      return;
+    }
+
+    const currentMerit = this.actor.system.merit;
+    const nextThreshold = this.actor.system.meritProgress?.needed ?? '—';
+    const html = await foundry.applications.handlebars.renderTemplate(
+      'systems/dasu/templates/actor/parts/merit-popover.hbs',
+      {
+        value: currentMerit,
+        label: game.i18n.localize('DASU.Actor.Merit.long'),
+        nextThreshold,
+      }
+    );
+    const pop = Object.assign(document.createElement('div'), {
+      id: popId,
+      className: 'dasu-resource-popover',
+      innerHTML: html,
+    });
+
+    const anchor = this.element;
+    const aRect = anchor.getBoundingClientRect();
+    const rRect = target.getBoundingClientRect();
+    const popWidth = 160;
+    const leftRaw = rRect.right - aRect.left + anchor.scrollLeft - popWidth;
+    Object.assign(pop.style, {
+      top: `${rRect.bottom - aRect.top + anchor.scrollTop + 2}px`,
+      left: `${Math.max(0, leftRaw)}px`,
+      width: `${popWidth}px`,
+    });
+    anchor.appendChild(pop);
+    target.classList.add('popover-open');
+
+    const int = (sel) => parseInt(pop.querySelector(sel)?.value) || 0;
+    const syncHeader = () => {
+      const v = int('.pop-value');
+      const el = target.querySelector('.dasu-pill');
+      if (el) el.value = v;
+    };
+    const update = (v) => {
+      this.actor.update({ 'system.merit': Math.max(0, v) }, { render: false });
+      syncHeader();
+    };
+
+    pop.querySelectorAll('.resource-btn').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const next = Math.max(0, int('.pop-value') + int('.resource-delta') * parseInt(btn.dataset.step));
+        pop.querySelector('.pop-value').value = next;
+        update(next);
+      })
+    );
+    pop.querySelector('.pop-value').addEventListener('change', (e) =>
+      update(parseInt(e.target.value) || 0)
+    );
+    pop.querySelectorAll('input').forEach((input) =>
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
       })
     );
 

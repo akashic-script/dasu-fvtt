@@ -2,9 +2,9 @@
   {{#each tabs}}
   <a class="item {{#if active}}active{{/if}}" role="tab"
      data-action="tab" data-group="primary" data-tab="{{id}}"
-     aria-label="{{label}}" aria-selected="{{active}}">
+     aria-label="{{localize label}}" aria-selected="{{active}}">
     <i class="{{icon}}" inert></i>
-    <span class="tab-label">{{label}}</span>
+    <span class="tab-label">{{localize label}}</span>
   </a>
   {{/each}}
 </nav>
