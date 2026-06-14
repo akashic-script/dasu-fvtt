@@ -340,6 +340,7 @@
 @layer sheet {
   .dasu {
     --dasu-sidebar-width: 190px;
+    --dasu-editor-color: var(--dasu-ink);
 
     --dasu-hp: #d9a800;
     --dasu-wp: #6ab4d8;
@@ -440,17 +441,27 @@
       border-bottom: var(--dasu-border);
       color: var(--dasu-on-panel);
 
-      .header-name {
+      h1 {
         flex: 1;
         min-width: 0;
+        margin: 0 !important;
+        font-size: 2em;
+        font-weight: bold;
+        font-family: var(--dasu-font-title);
+        color: inherit;
+        overflow: hidden;
+      }
+
+      .header-name {
+        width: 100%;
         background: transparent;
         border: none;
         border-bottom: 2px solid transparent;
         border-radius: 0;
         color: inherit;
-        font-size: 2.25em;
-        font-weight: bold;
-        font-family: var(--dasu-font-title);
+        font-size: inherit;
+        font-weight: inherit;
+        font-family: inherit;
         padding: 0;
         outline: none;
         &:focus {
@@ -1167,7 +1178,28 @@
       display: flex;
       flex-direction: column;
       flex: 1;
-      min-height: 200px;
+      min-height: 420px;
+      color: var(--dasu-editor-color);
+      background: var(--dasu-surface-raised);
+
+      .editor-content,
+      .ProseMirror {
+        padding: var(--dasu-space-md);
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+          margin: 0.15em 0 !important;
+          line-height: 1.2;
+        }
+
+        p {
+          margin: 0.25em 0 !important;
+        }
+      }
 
       &:hover button.toggle:enabled {
         display: flex;
@@ -1190,13 +1222,15 @@
       margin: 2px 0;
       padding: 0;
       align-items: center;
-      color: var(--color-text-primary);
-      background: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+      color: var(--dasu-ink);
+      background: color-mix(in srgb, var(--dasu-ink) 12%, transparent);
       font-weight: bold;
 
       > * {
-        font-size: 13px;
+        font-size: 11px;
         text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
 
       .item-name {
@@ -1419,9 +1453,10 @@
         .item-name,
         .effect-source,
         .effect-duration {
-          font-size: 0.9em;
-          letter-spacing: 0.04em;
-          opacity: 0.75;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          opacity: 1;
         }
 
         .effect-source,
@@ -1456,6 +1491,7 @@
   --dasu-wp: #4a90c0;
   --dasu-paper: rgb(42 31 61 / 85%);
   --dasu-ink: #f0ecff;
+  --dasu-editor-color: #1a1030;
   --dasu-on-panel: #f0ecff;
   --dasu-panel: 100 70 160;
 
