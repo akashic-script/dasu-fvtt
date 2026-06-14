@@ -20,6 +20,22 @@ export default class DASUDaemon extends DASUActorBase {
     return schema;
   }
 
+  // Daemons don't level up; they collect Merits to Transform at a per-entry
+  // threshold.
+  // TODO: replace the placeholder threshold with per-daemon-entry transform data.
+  _prepareMeritProgress() {
+    const threshold = CONFIG.DASU.daemonTransformMerits ?? 100;
+    const toNext = Math.max(0, threshold - this.merit);
+    this.meritProgress = {
+      mode: 'transform',
+      atMax: false,
+      toNext,
+      needed: threshold,
+      nextLevel: null,
+      canAdvance: toNext === 0,
+    };
+  }
+
   prepareDerivedData() {
     super.prepareDerivedData();
     if (!this.attributes) return;

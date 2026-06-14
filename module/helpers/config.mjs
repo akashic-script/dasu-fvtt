@@ -18,6 +18,50 @@ DASU.attributeAbbreviations = {
   sta: 'DASU.Ability.Sta.abbr',
 };
 
+/**
+ * Cumulative merits required to reach each level.
+ * @type {Object<number, number>}
+ */
+DASU.levelMerits = {
+  1: 0,
+  2: 1,
+  3: 3,
+  4: 6,
+  5: 10,
+  6: 16,
+  7: 24,
+  8: 34,
+  9: 46,
+  10: 60,
+  11: 76,
+  12: 94,
+  13: 114,
+  14: 136,
+  15: 160,
+  16: 186,
+  17: 214,
+  18: 244,
+  19: 276,
+  20: 310,
+  21: 346,
+  22: 384,
+  23: 424,
+  24: 466,
+  25: 510,
+  26: 556,
+  27: 604,
+  28: 654,
+  29: 706,
+  30: 760,
+};
+
+/**
+ * Placeholder merit threshold for a daemon to Transform.
+ * Per the rules this is defined per daemon entry; wired up later.
+ * @type {number}
+ */
+DASU.daemonTransformMerits = 100;
+
 DASU.skills = {
   athletics: 'DASU.Actor.Skill.Athletics',
   academia: 'DASU.Actor.Skill.Academia',

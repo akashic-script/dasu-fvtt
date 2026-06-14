@@ -1,7 +1,21 @@
 <header class="sheet-header">
-  <h1><input class="header-name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize 'DASU.Actor.SummonerNamePlaceholder'}}" /></h1>
-  <div class="header-level">
-    <span class="header-lv-label">{{localize "DASU.Actor.Level.abbr"}}</span>
-    <input class="dasu-pill" type="text" name="system.level" value="{{system.level}}" data-dtype="Number" {{#unless editable}}readonly{{/unless}} />
+  <div class="header-name-row">
+    <h1><input class="header-name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize 'DASU.Actor.SummonerNamePlaceholder'}}" /></h1>
+    <div class="header-level">
+      <span class="header-lv-label">{{localize "DASU.Actor.Level.abbr"}}</span>
+      <input class="dasu-pill" type="text" name="system.level" value="{{system.level}}" data-dtype="Number" {{#unless editable}}readonly{{/unless}} />
+    </div>
+  </div>
+  <div class="header-identity-row">
+    <input class="header-identity" type="text" placeholder="{{localize 'DASU.Actor.ClassPlaceholder'}}" />
+    {{#if canAdvance}}
+    <button type="button" class="header-levelup" data-action="advance" data-tooltip="{{advanceTooltip}}">
+      <i class="fa-solid fa-angles-up"></i>
+    </button>
+    {{/if}}
+    <div class="header-level header-merit" data-tooltip="{{meritTooltip}}">
+      <span class="header-lv-label">{{localize "DASU.Actor.Merit.abbr"}}</span>
+      <input class="dasu-pill" type="text" name="system.merit" value="{{system.merit}}" data-dtype="Number" {{#unless editable}}readonly{{/unless}} />
+    </div>
   </div>
 </header>

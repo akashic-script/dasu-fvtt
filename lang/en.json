@@ -21,7 +21,18 @@
     "Actor": {
       "SummonerNamePlaceholder": "Summoner Name",
       "DaemonNamePlaceholder": "Daemon Name",
+      "ClassPlaceholder": "Class / Identity",
       "Level": { "long": "Level", "abbr": "LVL" },
+      "Merit": {
+        "long": "Merits",
+        "abbr": "MER",
+        "ToNext": "{count} merits to level {level}",
+        "ToTransform": "{count} merits to Transform",
+        "AtMax": "Max level reached",
+        "LevelUp": "Level up",
+        "Transform": "Transform",
+        "TransformReady": "This daemon has enough Merits to Transform."
+      },
       "Section": {
         "Attributes": "Attributes",
         "Stats": "Stats",

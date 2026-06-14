@@ -10,10 +10,26 @@ export class DASUSummonerActorSheet extends DASUActorSheet {
   static TABS = {
     primary: {
       tabs: [
-        { id: 'identity', label: 'DASU.Sheet.Tab.Identity', icon: 'fas fa-feather' },
-        { id: 'classes', label: 'DASU.Sheet.Tab.Classes', icon: 'fas fa-chess-knight' },
-        { id: 'abilities', label: 'DASU.Sheet.Tab.Abilities', icon: 'fas fa-fist-raised' },
-        { id: 'features', label: 'DASU.Sheet.Tab.Features', icon: 'fas fa-list' },
+        {
+          id: 'identity',
+          label: 'DASU.Sheet.Tab.Identity',
+          icon: 'fas fa-feather',
+        },
+        {
+          id: 'classes',
+          label: 'DASU.Sheet.Tab.Classes',
+          icon: 'fas fa-chess-knight',
+        },
+        {
+          id: 'abilities',
+          label: 'DASU.Sheet.Tab.Abilities',
+          icon: 'fas fa-fist-raised',
+        },
+        {
+          id: 'features',
+          label: 'DASU.Sheet.Tab.Features',
+          icon: 'fas fa-list',
+        },
         { id: 'items', label: 'DASU.Sheet.Tab.Items', icon: 'fas fa-backpack' },
         { id: 'effects', label: 'DASU.Sheet.Tab.Effects', icon: 'fas fa-bolt' },
       ],

@@ -42,6 +42,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       skillStep: DASUActorSheet.#onSkillStep,
       createCustomSkill: DASUActorSheet.#onCreateCustomSkill,
       deleteCustomSkill: DASUActorSheet.#onDeleteCustomSkill,
+      advance: DASUActorSheet.#onAdvance,
     },
   };
 
@@ -118,6 +119,25 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       actor.allApplicableEffects()
     );
 
+    const merit = actorData.meritProgress;
+    const isTransform = merit?.mode === 'transform';
+    context.canAdvance = merit?.canAdvance ?? false;
+    context.advanceTooltip = game.i18n.localize(
+      isTransform ? 'DASU.Actor.Merit.Transform' : 'DASU.Actor.Merit.LevelUp'
+    );
+    if (merit?.atMax) {
+      context.meritTooltip = game.i18n.localize('DASU.Actor.Merit.AtMax');
+    } else if (isTransform) {
+      context.meritTooltip = game.i18n.format('DASU.Actor.Merit.ToTransform', {
+        count: merit?.toNext ?? 0,
+      });
+    } else {
+      context.meritTooltip = game.i18n.format('DASU.Actor.Merit.ToNext', {
+        count: merit?.toNext ?? 0,
+        level: merit?.nextLevel ?? actorData.level + 1,
+      });
+    }
+
     return context;
   }
 
@@ -137,8 +157,8 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
 
   /** @override */
   static TRIAD_SUGGESTION_KEYS = {
-    'dasu-virtues':   'DASU.Actor.Triad.VirtueSuggestions',
-    'dasu-sins':      'DASU.Actor.Triad.SinSuggestions',
+    'dasu-virtues': 'DASU.Actor.Triad.VirtueSuggestions',
+    'dasu-sins': 'DASU.Actor.Triad.SinSuggestions',
     'dasu-anathemas': 'DASU.Actor.Triad.AnathemaSuggestions',
   };
 
@@ -148,13 +168,19 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   }
 
   #bindTriadComboboxes() {
-    for (const input of this.element.querySelectorAll('.triad-input[data-suggestions]')) {
+    for (const input of this.element.querySelectorAll(
+      '.triad-input[data-suggestions]'
+    )) {
       const key = input.dataset.suggestions;
       const i18nKey = DASUActorSheet.TRIAD_SUGGESTION_KEYS[key];
       const raw = i18nKey ? game.i18n.localize(i18nKey) : '';
       const suggestions = raw ? raw.split(',') : [];
-      input.addEventListener('focus', () => this.#openTriadDropdown(input, suggestions));
-      input.addEventListener('input', () => this.#openTriadDropdown(input, suggestions));
+      input.addEventListener('focus', () =>
+        this.#openTriadDropdown(input, suggestions)
+      );
+      input.addEventListener('input', () =>
+        this.#openTriadDropdown(input, suggestions)
+      );
       input.addEventListener('blur', (e) => {
         if (e.relatedTarget?.classList.contains('triad-input')) return;
         setTimeout(() => this.#closeTriadDropdown(), 120);
@@ -165,7 +191,9 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   #openTriadDropdown(input, suggestions) {
     this.#closeTriadDropdown();
     const q = input.value.trim().toLowerCase();
-    const filtered = q ? suggestions.filter(s => s.toLowerCase().includes(q)) : suggestions;
+    const filtered = q
+      ? suggestions.filter((s) => s.toLowerCase().includes(q))
+      : suggestions;
     if (!filtered.length) return;
 
     const rect = input.getBoundingClientRect();
@@ -545,7 +573,9 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       {
         value: val.value,
         max: val.max,
-        label: game.i18n.localize(isHp ? 'DASU.Actor.HP.abbr' : 'DASU.Actor.WP.abbr'),
+        label: game.i18n.localize(
+          isHp ? 'DASU.Actor.HP.abbr' : 'DASU.Actor.WP.abbr'
+        ),
         labelClass: isHp ? 'resource-label-hp' : 'resource-label-wp',
       }
     );
@@ -640,6 +670,20 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     this.actor.update({
       [`system.${resource}.value`]: Math.min(max, Math.max(0, current + delta)),
     });
+  }
+
+  static #onAdvance(event, target) {
+    event.preventDefault();
+    const merit = this.actor.system.meritProgress;
+    if (!merit?.canAdvance) return;
+    if (merit.mode === 'transform') {
+      // Daemon Transformation: per-entry effects not yet wired up.
+      ui.notifications.info(
+        game.i18n.localize('DASU.Actor.Merit.TransformReady')
+      );
+      return;
+    }
+    this.actor.update({ 'system.level': this.actor.system.level + 1 });
   }
 
   static #canRaiseAttribute(attributes, ap, key, next) {

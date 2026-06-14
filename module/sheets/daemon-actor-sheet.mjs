@@ -11,7 +11,11 @@ export class DASUDaemonActorSheet extends DASUActorSheet {
   static TABS = {
     primary: {
       tabs: [
-        { id: 'identity', label: 'DASU.Sheet.Tab.Identity', icon: 'fas fa-feather' },
+        {
+          id: 'identity',
+          label: 'DASU.Sheet.Tab.Identity',
+          icon: 'fas fa-feather',
+        },
         { id: 'items', label: 'DASU.Sheet.Tab.Items', icon: 'fas fa-backpack' },
         { id: 'effects', label: 'DASU.Sheet.Tab.Effects', icon: 'fas fa-bolt' },
       ],

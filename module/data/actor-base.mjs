@@ -16,6 +16,7 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
     schema.biography = new fields.StringField({ required: true, blank: true });
     schema.notes = new fields.StringField({ required: true, blank: true });
     schema.level = new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 });
+    schema.merit = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
 
     schema.triad = new fields.SchemaField({
       virtue:   new fields.StringField({ required: true, blank: true }),
@@ -31,6 +32,31 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
     });
 
     return schema;
+  }
+
+  prepareDerivedData() {
+    super.prepareDerivedData();
+    this._prepareMeritProgress();
+  }
+
+  // Summoners advance by Level, reaching the next level's cumulative Merit
+  // threshold. Daemons override this with Transform progress instead.
+  _prepareMeritProgress() {
+    const table = CONFIG.DASU.levelMerits ?? {};
+    const maxLevel = Math.max(this.level, ...Object.keys(table).map(Number));
+    const nextLevel = this.level + 1;
+    const nextThreshold = table[nextLevel];
+    const atMax = nextThreshold === undefined || this.level >= maxLevel;
+    const toNext = atMax ? 0 : Math.max(0, nextThreshold - this.merit);
+
+    this.meritProgress = {
+      mode: 'level',
+      atMax,
+      toNext,
+      needed: atMax ? 0 : nextThreshold,
+      nextLevel: atMax ? null : nextLevel,
+      canAdvance: !atMax && toNext === 0,
+    };
   }
 
   _prepareDerivedStats() {
