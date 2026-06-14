@@ -944,7 +944,7 @@
 
         .ability-label,
         .stat-label {
-          font-size: 0.85em;
+          font-size: 0.9em;
           font-weight: bold;
           text-transform: uppercase;
           opacity: 0.75;
@@ -989,7 +989,7 @@
         }
 
         .skill-label {
-          font-size: 0.85em;
+          font-size: 1em;
           font-weight: bold;
           opacity: 0.75;
           white-space: nowrap;

@@ -1,0 +1,47 @@
+<aside class="sheet-sidebar">
+
+  <div class="sidebar-portrait">
+    <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" />
+  </div>
+
+  <div class="sidebar-resources">
+    <div class="resource-row" data-action="openResourcePopover" data-resource="health">
+      <span class="resource-label resource-label-hp">HP</span>
+      <div class="resource-current">
+        <span class="resource-val">{{system.health.value}}</span>
+        <span class="resource-sep">/</span>
+        <span class="resource-max">{{system.health.max}}</span>
+      </div>
+      <div class="resource-bar">
+        <div class="resource-bar-fill resource-bar-hp" style="width: {{healthPercent}}%"></div>
+      </div>
+    </div>
+    <div class="resource-row" data-action="openResourcePopover" data-resource="power">
+      <span class="resource-label resource-label-wp">WP</span>
+      <div class="resource-current">
+        <span class="resource-val">{{system.power.value}}</span>
+        <span class="resource-sep">/</span>
+        <span class="resource-max">{{system.power.max}}</span>
+      </div>
+      <div class="resource-bar">
+        <div class="resource-bar-fill resource-bar-wp" style="width: {{powerPercent}}%"></div>
+      </div>
+    </div>
+    <div class="resource-row resource-row-xp">
+      <span class="resource-label">XP</span>
+      <div class="resource-current">
+        <input class="resource-xp-input" type="text" name="system.xp" value="{{system.xp}}" data-dtype="Number" />
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-abilities">
+    {{#each system.abilities as |ability key|}}
+    <div class="ability-score rollable" data-action="roll" data-roll="@abilities.{{key}}.value" data-label="{{ability.label}}" data-tooltip="{{ability.label}}" data-tooltip-direction="RIGHT">
+      <span class="ability-label">{{ability.abbr}}</span>
+      <input class="ability-value dasu-pill" type="text" name="system.abilities.{{key}}.value" value="{{ability.value}}" data-dtype="Number" />
+    </div>
+    {{/each}}
+  </div>
+
+</aside>

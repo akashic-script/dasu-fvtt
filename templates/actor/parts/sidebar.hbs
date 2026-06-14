@@ -1,0 +1,115 @@
+<aside class="sheet-sidebar">
+
+  <div class="sidebar-portrait">
+    <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" />
+  </div>
+
+  <div class="sidebar-resources">
+    <div class="resource-row" data-action="openResourcePopover" data-resource="health">
+      <span class="resource-label resource-label-hp">HP</span>
+      <div class="resource-current">
+        <span class="resource-val">{{system.health.value}}</span>
+        <span class="resource-sep">/</span>
+        <span class="resource-max">{{system.health.max}}</span>
+      </div>
+      <div class="resource-bar">
+        <div class="resource-bar-fill resource-bar-hp" style="width: {{healthPercent}}%"></div>
+      </div>
+    </div>
+    <div class="resource-row" data-action="openResourcePopover" data-resource="power">
+      <span class="resource-label resource-label-wp">WP</span>
+      <div class="resource-current">
+        <span class="resource-val">{{system.power.value}}</span>
+        <span class="resource-sep">/</span>
+        <span class="resource-max">{{system.power.max}}</span>
+      </div>
+      <div class="resource-bar">
+        <div class="resource-bar-fill resource-bar-wp" style="width: {{powerPercent}}%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">
+      <span class="sidebar-section-title">Attributes</span>
+      <span class="sidebar-section-counter">AP: 0/0</span>
+    </div>
+    <div class="sidebar-abilities">
+      {{#each system.abilities as |ability key|}}
+      <div class="ability-score">
+        <span class="ability-label">{{ability.abbr}}</span>
+        <input class="ability-value dasu-pill rollable" type="text" name="system.abilities.{{key}}.value" value="{{ability.value}}" data-dtype="Number" data-action="roll" data-roll="@abilities.{{key}}.value" data-label="{{ability.label}}" data-tooltip="{{ability.label}}" data-tooltip-direction="RIGHT" />
+      </div>
+      {{/each}}
+    </div>
+  </div>
+
+  {{!-- Derived stats --}}
+  {{!-- FEAT: Placeholder --}}
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">
+      <span class="sidebar-section-title">Stats</span>
+    </div>
+    <div class="sidebar-stats">
+      <div class="stat-score">
+        <span class="stat-label">AVO</span>
+        <span class="stat-value dasu-pill">0</span>
+      </div>
+      <div class="stat-score">
+        <span class="stat-label">DEF</span>
+        <span class="stat-value dasu-pill">0</span>
+      </div>
+      <div class="stat-score">
+        <span class="stat-label">HIT</span>
+        <span class="stat-value dasu-pill">0</span>
+      </div>
+      <div class="stat-score">
+        <span class="stat-label">LAND</span>
+        <span class="stat-value dasu-pill">0</span>
+      </div>
+    </div>
+  </div>
+
+  {{!-- Skills — placeholder section --}}
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">
+      <span class="sidebar-section-title">Skills</span>
+      <span class="sidebar-section-counter">SP: 0/0</span>
+    </div>
+    <div class="sidebar-skills">
+      <div class="skill-row">
+        <span class="skill-label">Athletics</span>
+        <span class="skill-value dasu-pill">0</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Academia</span>
+        <span class="skill-value dasu-pill">0</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Craftsmanship</span>
+        <span class="skill-value dasu-pill">0</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Intuition</span>
+        <span class="skill-value dasu-pill">0</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Medicine</span>
+        <span class="skill-value dasu-pill">0</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Perceiving</span>
+        <span class="skill-value dasu-pill">0</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Stealth</span>
+        <span class="skill-value dasu-pill">0</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Outdoorsmanship</span>
+        <span class="skill-value dasu-pill">0</span>
+      </div>
+    </div>
+  </div>
+
+</aside>

@@ -57,9 +57,7 @@ Hooks.once('init', function () {
   return preloadHandlebarsTemplates();
 });
 
-foundry.applications.handlebars.registerHelper('toLowerCase', (str) =>
-  str.toLowerCase()
-);
+Handlebars.registerHelper('toLowerCase', (str) => str.toLowerCase());
 
 Hooks.once('ready', function () {
   Hooks.on('hotbarDrop', (bar, data, slot) => createItemMacro(data, slot));
