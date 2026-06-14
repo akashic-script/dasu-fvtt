@@ -70,45 +70,26 @@
     </div>
   </div>
 
-  {{!-- Skills — placeholder section --}}
+  {{!-- Skills --}}
   <div class="sidebar-section">
     <div class="sidebar-section-label">
       <span class="sidebar-section-title" data-tooltip="{{localize 'DASU.Actor.Section.Skills'}}">{{localize "DASU.Actor.Section.Skills"}}</span>
-      <span class="sidebar-section-counter" data-tooltip="{{localize 'DASU.Actor.SP.long'}}">{{localize "DASU.Actor.SP.abbr"}}: {{sp.value}}/{{sp.max}}</span>
+      <span class="sidebar-section-counter" data-tooltip="{{localize 'DASU.Actor.SP.long'}}">{{localize "DASU.Actor.SP.abbr"}}: {{sp.spent}}/{{sp.max}}</span>
     </div>
     <div class="sidebar-skills">
-      <div class="skill-row">
-        <span class="skill-label">{{localize "DASU.Actor.Skill.Athletics"}}</span>
-        <span class="skill-value dasu-pill">0</span>
+      {{#each system.skills as |skill key|}}
+      <div class="skill-row {{#if skill.isCustom}}custom-skill-row{{/if}}" data-skill="{{key}}">
+        <span class="skill-label">{{skill.label}}</span>
+        <input class="skill-custom-name" type="text" name="system.skills.{{key}}.customName" value="{{skill.customName}}" placeholder="{{skill.label}}" />
+        <div class="skill-controls">
+          <button type="button" class="skill-btn dasu-pill" data-action="skillStep" data-skill="{{key}}" data-step="-1" {{#unless editable}}disabled{{/unless}}>−</button>
+          <input class="skill-value dasu-pill" type="text" name="system.skills.{{key}}.value" value="{{skill.value}}" data-dtype="Number" />
+          <button type="button" class="skill-btn dasu-pill" data-action="skillStep" data-skill="{{key}}" data-step="1" {{#unless editable}}disabled{{/unless}}>+</button>
+          {{#if skill.isCustom}}<button type="button" class="skill-delete-btn" data-action="deleteCustomSkill" data-id="{{key}}" {{#unless editable}}disabled{{/unless}}><i class="fas fa-trash"></i></button>{{/if}}
+        </div>
       </div>
-      <div class="skill-row">
-        <span class="skill-label">{{localize "DASU.Actor.Skill.Academia"}}</span>
-        <span class="skill-value dasu-pill">0</span>
-      </div>
-      <div class="skill-row">
-        <span class="skill-label">{{localize "DASU.Actor.Skill.Craftsmanship"}}</span>
-        <span class="skill-value dasu-pill">0</span>
-      </div>
-      <div class="skill-row">
-        <span class="skill-label">{{localize "DASU.Actor.Skill.Intuition"}}</span>
-        <span class="skill-value dasu-pill">0</span>
-      </div>
-      <div class="skill-row">
-        <span class="skill-label">{{localize "DASU.Actor.Skill.Medicine"}}</span>
-        <span class="skill-value dasu-pill">0</span>
-      </div>
-      <div class="skill-row">
-        <span class="skill-label">{{localize "DASU.Actor.Skill.Perceiving"}}</span>
-        <span class="skill-value dasu-pill">0</span>
-      </div>
-      <div class="skill-row">
-        <span class="skill-label">{{localize "DASU.Actor.Skill.Stealth"}}</span>
-        <span class="skill-value dasu-pill">0</span>
-      </div>
-      <div class="skill-row">
-        <span class="skill-label">{{localize "DASU.Actor.Skill.Outdoorsmanship"}}</span>
-        <span class="skill-value dasu-pill">0</span>
-      </div>
+      {{/each}}
+      <button type="button" class="skill-add-btn" data-action="createCustomSkill" {{#unless editable}}disabled{{/unless}}><i class="fas fa-plus"></i></button>
     </div>
   </div>
 

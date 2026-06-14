@@ -1010,8 +1010,38 @@
           flex: 1;
         }
 
-        .skill-value {
+        .skill-custom-name {
+          display: none;
+          flex: 1;
+          font-size: 1em;
+          font-weight: bold;
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid var(--dasu-border-subtle);
+          padding: 0;
+          min-width: 0;
+        }
+
+        .skill-controls {
+          display: flex;
+          align-items: center;
+          gap: 2px;
           flex: 0 0 auto;
+        }
+
+        .skill-btn {
+          width: 20px;
+          height: 20px;
+          padding: 0;
+          font-size: 1em;
+          line-height: 1;
+          display: none;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+
+        .skill-value {
           width: 2.2em;
           height: 22px;
           font-size: 1em;
@@ -1021,8 +1051,56 @@
           justify-content: center;
           line-height: 1;
         }
+
+        .skill-delete-btn {
+          display: none;
+          width: 20px;
+          height: 20px;
+          padding: 0;
+          align-items: center;
+          justify-content: center;
+          opacity: 0.5;
+          cursor: pointer;
+          &:hover { opacity: 1; }
+        }
+
+        .skill-add-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 28px;
+          margin: 2px 0 0;
+          background: transparent;
+          border: 1px dashed rgb(255 255 255 / 20%);
+          border-radius: 3px;
+          color: rgb(255 255 255 / 30%);
+          font-size: 1.2em;
+          cursor: pointer;
+          transition: border-color 0.15s, color 0.15s;
+          &:hover {
+            border-color: rgb(255 255 255 / 50%);
+            color: rgb(255 255 255 / 70%);
+          }
+        }
       }
     }
+
+    &.edit-mode .skill-btn {
+      display: flex;
+    }
+
+    &.edit-mode .skill-row .skill-label {
+      display: none;
+    }
+
+    &.edit-mode .skill-row .skill-custom-name {
+      display: block;
+    }
+
+    &.edit-mode .skill-delete-btn {
+      display: flex;
+    }
+
 
     &.actor nav.sheet-tabs {
       display: flex;

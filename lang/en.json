@@ -39,6 +39,7 @@
       },
       "Skill": {
         "NamePlaceholder": "Custom Skill Name",
+        "AddCustom": "Add Skill",
         "Athletics": "Athletics",
         "Academia": "Academia",
         "Craftsmanship": "Craftsmanship",
@@ -59,7 +60,9 @@
       "Warn": {
         "NoAP": "Not enough Attribute Points.",
         "RuleOfTwo": "Rule of Two: another attribute must be at {value} first.",
-        "AttrCapped": "Attribute is already at maximum (6)."
+        "AttrCapped": "Attribute is already at maximum (6).",
+        "NoSP": "Not enough Skill Points.",
+        "SkillCapped": "Skill is already at maximum (6)."
       }
     },
     "Item": {

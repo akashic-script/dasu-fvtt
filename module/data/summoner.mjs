@@ -17,6 +17,16 @@ export default class DASUSummoner extends DASUActorBase {
     }
     schema.attributes = new fields.SchemaField(attributesSchema);
 
+    schema.skills = new fields.ObjectField({
+      required: true,
+      initial: () => {
+        const init = {};
+        for (const key of Object.keys(CONFIG.DASU.skills))
+          init[key] = { value: 0, customName: '' };
+        return init;
+      },
+    });
+
     return schema;
   }
 
@@ -34,18 +44,40 @@ export default class DASUSummoner extends DASUActorBase {
     const apMax = oddLevels + 1;
     const apSpent = Object.values(this.attributes).reduce((sum, a) => sum + a.value, 0) - 4;
     this.ap = { max: apMax, spent: apSpent, value: apMax - apSpent };
+
+    // SP pool
+    for (const key of Object.keys(CONFIG.DASU.skills)) {
+      if (!this.skills[key]) this.skills[key] = { value: 0, customName: '' };
+    }
+
+    for (const [key, s] of Object.entries(this.skills ?? {})) {
+      const i18nKey = CONFIG.DASU.skills[key];
+      const defaultLabel = i18nKey ? game.i18n.localize(i18nKey) : key;
+      s.label = s.customName?.trim() || defaultLabel;
+      s.isCustom = !i18nKey;
+    }
+
+    const spMax = 3 + (this.level - 1) * 2;
+    const triCost = (r) => (r * (r + 1)) / 2;
+    const spSpent = Object.values(this.skills ?? {}).reduce((sum, s) => sum + triCost(s.value ?? 0), 0);
+    this.sp = { max: spMax, spent: spSpent, value: spMax - spSpent };
   }
 
   getRollData() {
     const data = {};
     if (this.attributes) {
       data.attributes = {};
-      for (let [k, v] of Object.entries(this.attributes)) {
+      for (let [k, v] of Object.entries(this.attributes))
         data.attributes[k] = foundry.utils.deepClone(v);
-      }
+    }
+    if (this.skills) {
+      data.skills = {};
+      for (let [k, v] of Object.entries(this.skills))
+        data.skills[k] = foundry.utils.deepClone(v);
     }
     data.lvl = this.level;
     data.ap = foundry.utils.deepClone(this.ap);
+    data.sp = foundry.utils.deepClone(this.sp);
     return data;
   }
 }

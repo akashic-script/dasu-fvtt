@@ -17,3 +17,14 @@ DASU.attributeAbbreviations = {
   wil: 'DASU.Ability.Wil.abbr',
   sta: 'DASU.Ability.Sta.abbr',
 };
+
+DASU.skills = {
+  athletics:      'DASU.Actor.Skill.Athletics',
+  academia:       'DASU.Actor.Skill.Academia',
+  craftsmanship:  'DASU.Actor.Skill.Craftsmanship',
+  intuition:      'DASU.Actor.Skill.Intuition',
+  medicine:       'DASU.Actor.Skill.Medicine',
+  perceiving:     'DASU.Actor.Skill.Perceiving',
+  stealth:        'DASU.Actor.Skill.Stealth',
+  outdoorsmanship:'DASU.Actor.Skill.Outdoorsmanship',
+};

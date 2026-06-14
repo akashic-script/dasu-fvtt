@@ -39,7 +39,9 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       roll: DASUActorSheet.#onRoll,
       resourceStep: DASUActorSheet.#onResourceStep,
       openResourcePopover: DASUActorSheet.#onOpenResourcePopover,
-      attributeStep: DASUActorSheet.#onAttributeStep,
+      skillStep: DASUActorSheet.#onSkillStep,
+      createCustomSkill: DASUActorSheet.#onCreateCustomSkill,
+      deleteCustomSkill: DASUActorSheet.#onDeleteCustomSkill,
     },
   };
 
@@ -261,6 +263,45 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
         const warn = DASUActorSheet.#canRaiseAttribute(this.actor.system.attributes, this.actor.system.ap, key, next);
         if (warn) { DASUActorSheet.#warnAttribute(warn, next); e.stopImmediatePropagation(); input.value = prev; }
       }, { capture: true });
+    }
+
+    for (const input of this.element.querySelectorAll('input.skill-value')) {
+      input.addEventListener('change', (e) => {
+        const key = input.name?.match(/^system\.skills\.(\w+)\.value$/)?.[1];
+        if (!key) return;
+        const prev = this.actor.system.skills[key]?.value ?? 0;
+        const next = Math.max(0, Math.min(6, parseInt(input.value) || 0));
+        const delta = next - prev;
+        if (delta === 0) { input.value = prev; return; }
+        e.stopImmediatePropagation();
+        input.value = prev;
+        DASUActorSheet.#applySkillDelta(this.actor, key, prev, delta);
+      }, { capture: true });
+    }
+
+    for (const row of this.element.querySelectorAll('.skill-row')) {
+      row.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        const key = row.dataset.skill;
+        const isCustom = !(key in CONFIG.DASU.skills);
+        const items = [
+          { label: game.i18n.localize('DASU.Sheet.EditItem'), icon: 'fas fa-pen', onClick: () => {} },
+        ];
+        if (isCustom) items.push({
+          label: game.i18n.localize('DASU.Sheet.DeleteItem'),
+          icon: 'fas fa-trash',
+          onClick: () => {
+            const raw = this.actor.toObject().system.skills ?? {};
+            delete raw[key];
+            this.actor.update({ 'system.skills': raw }, { diff: false, recursive: false });
+          },
+        });
+        const menu = new foundry.applications.ux.ContextMenu(
+          document.body, '#_dasu_nomatch_', items,
+          { jQuery: false, fixed: true, relative: 'target' }
+        );
+        setTimeout(() => { ui.context = menu; menu.render(row, { event: e }); }, 0);
+      });
     }
   }
 
@@ -497,9 +538,39 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     actor.update({ [`system.attributes.${key}.value`]: next });
   }
 
-  static #onAttributeStep(event, target) {
-    const { attribute, step } = target.dataset;
-    const current = this.actor.system.attributes[attribute]?.value ?? 1;
-    DASUActorSheet.#applyAttributeDelta(this.actor, attribute, current, parseInt(step));
+  static #canRaiseSkill(skills, sp, key, next) {
+    if (next > 6) return 'DASU.Sheet.Warn.SkillCapped';
+    if (next < 0) return null;
+    const cost = next; // cost to go from (next-1) to next is next SP
+    if (sp?.value < cost) return 'DASU.Sheet.Warn.NoSP';
+    return null;
+  }
+
+  static #applySkillDelta(actor, key, current, delta) {
+    const next = current + delta;
+    if (delta < 0 && next < 0) return;
+    if (delta > 0) {
+      const warn = DASUActorSheet.#canRaiseSkill(actor.system.skills, actor.system.sp, key, next);
+      if (warn) { ui.notifications.warn(game.i18n.localize(warn)); return; }
+    }
+    actor.update({ [`system.skills.${key}.value`]: next });
+  }
+
+  static #onSkillStep(event, target) {
+    const { skill, step } = target.dataset;
+    const current = this.actor.system.skills[skill]?.value ?? 0;
+    DASUActorSheet.#applySkillDelta(this.actor, skill, current, parseInt(step));
+  }
+
+  static #onCreateCustomSkill() {
+    const id = foundry.utils.randomID(8);
+    this.actor.update({ [`system.skills.${id}`]: { value: 0, customName: '' } });
+  }
+
+  static #onDeleteCustomSkill(event, target) {
+    const { id } = target.dataset;
+    const skills = this.actor.toObject().system.skills ?? {};
+    delete skills[id];
+    this.actor.update({ 'system.skills': skills }, { diff: false, recursive: false });
   }
 }
