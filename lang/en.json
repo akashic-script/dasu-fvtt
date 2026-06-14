@@ -10,6 +10,7 @@
       "Actor": "DASU Actor Sheet",
       "Item": "DASU Item Sheet"
     },
+    "ItemName": "Item Name",
     "Item": {
       "Spell": {
         "SpellLVL": "Level {level} Spells",
@@ -18,7 +19,8 @@
     },
     "Effect": {
       "Source": "Source",
-      "Toggle": "Toggle Effect",
+      "Toggle": "Disable Effect",
+      "Enable": "Enable Effect",
       "Temporary": "Temporary Effects",
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects"
