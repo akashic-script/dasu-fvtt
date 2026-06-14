@@ -13,24 +13,24 @@ export class DASUSummonerActorSheet extends DASUActorSheet {
         {
           id: 'identity',
           label: 'DASU.Sheet.Tab.Identity',
-          icon: 'fas fa-feather',
+          icon: 'fas fa-circle-nodes',
         },
         {
-          id: 'classes',
-          label: 'DASU.Sheet.Tab.Classes',
-          icon: 'fas fa-chess-knight',
-        },
-        {
-          id: 'abilities',
-          label: 'DASU.Sheet.Tab.Abilities',
-          icon: 'fas fa-fist-raised',
+          id: 'syn',
+          label: 'DASU.Sheet.Tab.Syn',
+          icon: 'fas fa-share-nodes',
         },
         {
           id: 'features',
           label: 'DASU.Sheet.Tab.Features',
-          icon: 'fas fa-list',
+          icon: 'fas fa-star-and-crescent',
         },
-        { id: 'items', label: 'DASU.Sheet.Tab.Items', icon: 'fas fa-backpack' },
+        {
+          id: 'abilities',
+          label: 'DASU.Sheet.Tab.Abilities',
+          icon: 'fas fa-hand-fist',
+        },
+        { id: 'items', label: 'DASU.Sheet.Tab.Items', icon: 'fa-solid fa-suitcase' },
         { id: 'effects', label: 'DASU.Sheet.Tab.Effects', icon: 'fas fa-bolt' },
       ],
       initial: 'identity',
@@ -42,8 +42,8 @@ export class DASUSummonerActorSheet extends DASUActorSheet {
     header: { template: 'systems/dasu/templates/actor/parts/header.hbs' },
     sidebar: { template: 'systems/dasu/templates/actor/parts/sidebar.hbs' },
     tabs: { template: 'systems/dasu/templates/actor/parts/tab-navigation.hbs' },
-    classes: {
-      template: 'systems/dasu/templates/actor/parts/classes.hbs',
+    syn: {
+      template: 'systems/dasu/templates/actor/parts/syn.hbs',
       scrollable: [''],
     },
     abilities: {

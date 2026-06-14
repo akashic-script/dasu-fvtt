@@ -14,9 +14,14 @@ export class DASUDaemonActorSheet extends DASUActorSheet {
         {
           id: 'identity',
           label: 'DASU.Sheet.Tab.Identity',
-          icon: 'fas fa-feather',
+          icon: 'fas fa-circle-nodes',
         },
-        { id: 'items', label: 'DASU.Sheet.Tab.Items', icon: 'fas fa-backpack' },
+        {
+          id: 'ack',
+          label: 'DASU.Sheet.Tab.Ack',
+          icon: 'fas fa-arrows-rotate',
+        },
+        { id: 'items', label: 'DASU.Sheet.Tab.Items', icon: 'fas fa-suitcase' },
         { id: 'effects', label: 'DASU.Sheet.Tab.Effects', icon: 'fas fa-bolt' },
       ],
       initial: 'identity',
@@ -34,6 +39,10 @@ export class DASUDaemonActorSheet extends DASUActorSheet {
     tabs: { template: 'systems/dasu/templates/actor/parts/tab-navigation.hbs' },
     identity: {
       template: 'systems/dasu/templates/actor/parts/identity.hbs',
+      scrollable: [''],
+    },
+    ack: {
+      template: 'systems/dasu/templates/actor/parts/ack.hbs',
       scrollable: [''],
     },
     items: {

@@ -728,7 +728,9 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   static #canRaiseSkill(skills, sp, key, next) {
     if (next > 6) return 'DASU.Sheet.Warn.SkillCapped';
     if (next < 0) return null;
-    const cost = next; // cost to go from (next-1) to next is next SP
+    const triCost = (r) => (r * (r + 1)) / 2;
+    const current = skills[key]?.value ?? 0;
+    const cost = triCost(next) - triCost(current);
     if (sp?.value < cost) return 'DASU.Sheet.Warn.NoSP';
     return null;
   }
@@ -736,6 +738,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   static #applySkillDelta(actor, key, current, delta) {
     const next = current + delta;
     if (delta < 0 && next < 0) return;
+    if (delta > 0 && next > 6) return;
     if (delta > 0) {
       const warn = DASUActorSheet.#canRaiseSkill(
         actor.system.skills,

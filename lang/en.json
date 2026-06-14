@@ -81,7 +81,8 @@
       "RollFlavorAbility": "[ability]",
       "Tab": {
         "Identity": "Identity",
-        "Classes": "Classes",
+        "Syn": "SYN",
+        "Ack": "ACK",
         "Abilities": "Abilities",
         "Features": "Features",
         "Items": "Items",

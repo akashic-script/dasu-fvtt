@@ -389,6 +389,12 @@
     --dasu-resource-current-bg: rgb(var(--dasu-panel) / 30%);
     --dasu-resource-bar-bg: rgb(var(--dasu-panel) / 40%);
 
+    input::placeholder,
+    textarea::placeholder {
+      color: rgb(from var(--dasu-ink) r g b / 30%);
+      font-style: italic;
+    }
+
     .dasu-pill {
       text-align: center;
       font-weight: bold;
