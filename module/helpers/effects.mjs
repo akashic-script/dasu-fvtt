@@ -18,7 +18,7 @@ export function onManageActiveEffect(event, owner, element) {
           name: game.i18n.format('DOCUMENT.New', {
             type: game.i18n.localize('DOCUMENT.ActiveEffect'),
           }),
-          icon: 'icons/svg/aura.svg',
+          img: 'icons/svg/aura.svg',
           origin: owner.uuid,
           'duration.rounds':
             li.dataset.effectType === 'temporary' ? 1 : undefined,
@@ -26,11 +26,46 @@ export function onManageActiveEffect(event, owner, element) {
         },
       ]);
     case 'edit':
+      if (!effect) return;
       return effect.sheet.render(true);
     case 'delete':
+      if (!effect) return;
       return effect.delete();
     case 'toggle':
+      if (!effect) return;
       return effect.update({ disabled: !effect.disabled });
+    case 'menu': {
+      if (!effect) return;
+      const items = [
+        {
+          label: effect.disabled
+            ? game.i18n.localize('DASU.Effect.Enable')
+            : game.i18n.localize('DASU.Effect.Toggle'),
+          icon: effect.disabled ? 'fas fa-check' : 'fas fa-times',
+          onClick: () => effect.update({ disabled: !effect.disabled }),
+        },
+        {
+          label: game.i18n.localize('DOCUMENT.Delete'),
+          icon: 'fas fa-trash',
+          onClick: () => effect.delete(),
+        },
+      ];
+      const menu = new foundry.applications.ux.ContextMenu(
+        document.body,
+        null,
+        items,
+        {
+          jQuery: false,
+          fixed: true,
+          relative: 'target',
+        }
+      );
+      setTimeout(() => {
+        ui.context = menu;
+        menu.render(a);
+      }, 0);
+      return;
+    }
   }
 }
 
