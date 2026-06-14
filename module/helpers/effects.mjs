@@ -38,6 +38,11 @@ export function onManageActiveEffect(event, owner, element) {
       if (!effect) return;
       const items = [
         {
+          label: 'Edit',
+          icon: 'fas fa-edit',
+          onClick: () => effect.sheet.render(true),
+        },
+        {
           label: effect.disabled
             ? game.i18n.localize('DASU.Effect.Enable')
             : game.i18n.localize('DASU.Effect.Toggle'),
@@ -45,7 +50,7 @@ export function onManageActiveEffect(event, owner, element) {
           onClick: () => effect.update({ disabled: !effect.disabled }),
         },
         {
-          label: game.i18n.localize('DOCUMENT.Delete'),
+          label: 'Delete',
           icon: 'fas fa-trash',
           onClick: () => effect.delete(),
         },

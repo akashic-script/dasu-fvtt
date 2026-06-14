@@ -24,19 +24,11 @@
         <h4>{{item.name}}</h4>
       </div>
       <div class='item-controls'>
-        <a
-          class='item-control item-edit'
-          data-action='editItem'
-          title='{{localize "DOCUMENT.Edit" type='feature'}}'
-        >
+        <a class='item-control item-edit' data-action='editItem' title='Edit'>
           <i class='fas fa-edit'></i>
         </a>
-        <a
-          class='item-control item-delete'
-          data-action='deleteItem'
-          title='{{localize "DOCUMENT.Delete" type='feature'}}'
-        >
-          <i class='fas fa-trash'></i>
+        <a class='item-control item-menu' data-action='menuItem' title='More'>
+          <i class='fas fa-bars'></i>
         </a>
       </div>
     </li>

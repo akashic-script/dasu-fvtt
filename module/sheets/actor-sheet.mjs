@@ -30,6 +30,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       editItem: DASUActorSheet.#editItem,
       createItem: DASUActorSheet.#createItem,
       deleteItem: DASUActorSheet.#deleteItem,
+      menuItem: DASUActorSheet.#menuItem,
       create: DASUActorSheet.#onEffectAction,
       edit: DASUActorSheet.#onEffectAction,
       delete: DASUActorSheet.#onEffectAction,
@@ -235,6 +236,24 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     const li = target.closest('.item');
     const item = this.actor.items.get(li.dataset.itemId);
     item.sheet.render(true);
+  }
+
+  static #menuItem(event, target) {
+    const li = target.closest('.item');
+    const item = this.actor.items.get(li.dataset.itemId);
+    if (!item) return;
+    const menu = new foundry.applications.ux.ContextMenu(
+      document.body, null,
+      [
+        {
+          label: 'Delete',
+          icon: 'fas fa-trash',
+          onClick: () => item.delete(),
+        },
+      ],
+      { jQuery: false, fixed: true, relative: 'target' }
+    );
+    setTimeout(() => { ui.context = menu; menu.render(target); }, 0);
   }
 
   static async #createItem(event, target) {

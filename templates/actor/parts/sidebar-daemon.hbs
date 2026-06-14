@@ -35,13 +35,18 @@
     </div>
   </div>
 
-  <div class="sidebar-abilities">
-    {{#each system.abilities as |ability key|}}
-    <div class="ability-score rollable" data-action="roll" data-roll="@abilities.{{key}}.value" data-label="{{ability.label}}" data-tooltip="{{ability.label}}" data-tooltip-direction="RIGHT">
-      <span class="ability-label">{{ability.abbr}}</span>
-      <input class="ability-value dasu-pill" type="text" name="system.abilities.{{key}}.value" value="{{ability.value}}" data-dtype="Number" />
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">
+      <span class="sidebar-section-title">Attributes</span>
     </div>
-    {{/each}}
+    <div class="sidebar-abilities">
+      {{#each system.abilities as |ability key|}}
+      <div class="ability-score">
+        <span class="ability-label">{{ability.abbr}}</span>
+        <input class="ability-value dasu-pill rollable" type="text" name="system.abilities.{{key}}.value" value="{{ability.value}}" data-dtype="Number" data-action="roll" data-roll="@abilities.{{key}}.value" data-label="{{ability.label}}" data-tooltip="{{ability.label}}" data-tooltip-direction="RIGHT" />
+      </div>
+      {{/each}}
+    </div>
   </div>
 
 </aside>

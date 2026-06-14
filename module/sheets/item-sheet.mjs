@@ -14,7 +14,7 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ['dasu', 'sheet', 'item'],
-    position: { width: 480, height: 520 },
+    position: { width: 520, height: 520 },
     window: { resizable: true },
     form: {
       submitOnChange: true,
@@ -33,7 +33,6 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     primary: {
       tabs: [
         { id: 'description', label: 'Description', icon: 'fas fa-feather' },
-        { id: 'attributes', label: 'Attributes', icon: 'fas fa-sliders' },
         { id: 'effects', label: 'Effects', icon: 'fas fa-bolt' },
       ],
       initial: 'description',
@@ -53,10 +52,6 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     },
     description: {
       template: 'systems/dasu/templates/item/parts/description.hbs',
-      scrollable: [''],
-    },
-    attributes: {
-      template: 'systems/dasu/templates/item/parts/attributes.hbs',
       scrollable: [''],
     },
     effects: {
