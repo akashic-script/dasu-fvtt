@@ -1,6 +1,6 @@
 <ol class='items-list'>
   {{#each spells as |spells spellLevel|}}
-    <li class='item flexrow items-header'>
+    <li class='items-header'>
       <div class='item-name'>
         {{localize 'DASU.Item.Spell.SpellLVL' level=spellLevel}}
       </div>
@@ -18,7 +18,7 @@
       </div>
     </li>
     {{#each spells as |item id|}}
-      <li class='item flexrow' data-item-id='{{item._id}}'>
+      <li class='item flexrow' data-item-id='{{item._id}}' data-item-type='spell'>
         <div class='item-name flexrow'>
           <div class='item-image'>
             <a class='rollable' data-action='roll' data-roll-type='item'><img
