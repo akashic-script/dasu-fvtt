@@ -13,10 +13,19 @@ import {
 export class DASUActorSheet extends HandlebarsApplicationMixin(
   DocumentSheetV2
 ) {
+  static MODES = { PLAY: 1, EDIT: 2 };
+
+  _mode = null;
+
+  get isEditMode() {
+    return this._mode === this.constructor.MODES.EDIT;
+  }
+
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ['dasu', 'sheet', 'actor'],
-    position: { width: 600, height: 600 },
+    position: { width: 600, height: 850 },
+    window: { resizable: true },
     form: {
       submitOnChange: true,
     },
@@ -28,7 +37,10 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
       edit: DASUActorSheet.#onEffectAction,
       delete: DASUActorSheet.#onEffectAction,
       toggle: DASUActorSheet.#onEffectAction,
+      menu: DASUActorSheet.#onEffectAction,
       roll: DASUActorSheet.#onRoll,
+      resourceStep: DASUActorSheet.#onResourceStep,
+      openResourcePopover: DASUActorSheet.#onOpenResourcePopover,
     },
   };
 
@@ -36,11 +48,11 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   static TABS = {
     primary: {
       tabs: [
-        { id: 'features', label: 'Features' },
-        { id: 'description', label: 'Description' },
-        { id: 'items', label: 'Items' },
-        { id: 'spells', label: 'Spells' },
-        { id: 'effects', label: 'Effects' },
+        { id: 'features', label: 'Features', icon: 'fas fa-list' },
+        { id: 'description', label: 'Identity', icon: 'fas fa-feather' },
+        { id: 'items', label: 'Items', icon: 'fas fa-backpack' },
+        { id: 'spells', label: 'Spells', icon: 'fas fa-book-sparkles' },
+        { id: 'effects', label: 'Effects', icon: 'fas fa-bolt' },
       ],
       initial: 'features',
     },
@@ -65,8 +77,11 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     header: {
       template: 'systems/dasu/templates/actor/parts/header.hbs',
     },
+    sidebar: {
+      template: 'systems/dasu/templates/actor/parts/sidebar.hbs',
+    },
     tabs: {
-      template: 'templates/generic/tab-navigation.hbs',
+      template: 'systems/dasu/templates/actor/parts/tab-navigation.hbs',
     },
     features: {
       template: 'systems/dasu/templates/actor/parts/features.hbs',
@@ -91,32 +106,22 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   };
 
   /** @override */
+  _configureRenderOptions(options) {
+    super._configureRenderOptions(options);
+    this._mode = options.mode ?? this._mode ?? this.constructor.MODES.PLAY;
+  }
+
+  /** @override */
   _configureRenderParts(options) {
     const parts = super._configureRenderParts(options);
-    // Dynamically set templates based on actor type
     const actorType = this.actor.type;
 
-    // Set header template based on actor type
     if (actorType === 'npc') {
       parts.header.template = `systems/dasu/templates/actor/parts/header-npc.hbs`;
-      // Remove tabs that NPCs don't have
+      parts.sidebar.template = `systems/dasu/templates/actor/parts/sidebar-npc.hbs`;
       delete parts.features;
       delete parts.spells;
-    } else {
-      parts.header.template = `systems/dasu/templates/actor/parts/header.hbs`;
     }
-
-    // Set tab templates (these are shared)
-    if (parts.description)
-      parts.description.template = `systems/dasu/templates/actor/parts/description.hbs`;
-    if (parts.items)
-      parts.items.template = `systems/dasu/templates/actor/parts/items.hbs`;
-    if (parts.effects)
-      parts.effects.template = `systems/dasu/templates/actor/parts/effects.hbs`;
-    if (parts.features)
-      parts.features.template = `systems/dasu/templates/actor/parts/features.hbs`;
-    if (parts.spells)
-      parts.spells.template = `systems/dasu/templates/actor/parts/spells.hbs`;
 
     return parts;
   }
@@ -134,17 +139,11 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   /** @override */
   async _preparePartContext(partId, context, options) {
     context = await super._preparePartContext(partId, context, options);
-    // For the tabs navigation part, convert tabs object to array
     if (partId === 'tabs' && context.tabs) {
-      context.tabs = Object.values(context.tabs);
+      return { ...context, tabs: Object.values(context.tabs) };
     }
-    // For tab content parts, provide the tab context
-    else {
-      const tab = context.tabs?.[partId];
-      if (tab) {
-        context.tab = tab;
-      }
-    }
+    const tab = context.tabs?.[partId];
+    if (tab) context.tab = tab;
     return context;
   }
 
@@ -191,6 +190,18 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
           rollData: context.rollData,
         }
       );
+
+    // Resource bar percentages for sidebar
+    const health = actorData.health ?? {};
+    const power = actorData.power ?? {};
+    context.healthPercent =
+      health.max > 0
+        ? Math.min(100, Math.max(0, (health.value / health.max) * 100))
+        : 0;
+    context.powerPercent =
+      power.max > 0
+        ? Math.min(100, Math.max(0, (power.value / power.max) * 100))
+        : 0;
 
     // Prepare active effects
     context.effects = prepareActiveEffectCategories(
@@ -265,8 +276,84 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
   /* -------------------------------------------- */
 
   /** @override */
+  _onFirstRender(context, options) {
+    super._onFirstRender(context, options);
+    if (this.actor.type === 'npc') {
+      this.tabGroups.primary ??= 'description';
+    }
+    this.#buildLayout();
+  }
+
+  #buildLayout() {
+    const sidebar = this.element.querySelector('.sheet-sidebar');
+    const tabNav = this.element.querySelector('nav.tabs');
+    if (!sidebar || !tabNav) return;
+
+    const tabSections = [
+      ...this.element.querySelectorAll('.tab[data-group="primary"]'),
+    ];
+    const tabBody = document.createElement('div');
+    tabBody.classList.add('tab-body');
+    tabSections[0]?.before(tabBody);
+    tabSections.forEach((s) => tabBody.append(s));
+    tabBody.prepend(tabNav);
+
+    const mainContent = document.createElement('div');
+    mainContent.classList.add('main-content');
+    sidebar.after(mainContent);
+    mainContent.append(sidebar, tabBody);
+
+    const sheetBody = document.createElement('div');
+    sheetBody.classList.add('sheet-body');
+    mainContent.after(sheetBody);
+    sheetBody.append(mainContent);
+  }
+
+  _renderModeToggle() {
+    const header = this.element.querySelector('.window-header');
+    if (!header) return;
+    let toggle = header.querySelector('.dasu-mode-toggle');
+    if (this.isEditable && !toggle) {
+      toggle = document.createElement('label');
+      toggle.className = 'dasu-mode-toggle';
+      toggle.title = 'Toggle edit mode';
+      toggle.innerHTML = `
+        <input class="dasu-mode-checkbox" type="checkbox" />
+        <span class="dasu-mode-track">
+          <span class="dasu-mode-thumb"><i class="fas fa-pen"></i></span>
+        </span>`;
+      toggle
+        .querySelector('.dasu-mode-checkbox')
+        .addEventListener('change', (e) => {
+          const { MODES } = this.constructor;
+          this._mode = e.target.checked ? MODES.EDIT : MODES.PLAY;
+          this.element.classList.toggle('edit-mode', this.isEditMode);
+          this.element
+            .querySelectorAll(
+              'input:not([type="hidden"]):not(.dasu-mode-checkbox), select'
+            )
+            .forEach((el) => el.toggleAttribute('readonly', !this.isEditMode));
+        });
+      toggle.addEventListener('dblclick', (e) => e.stopPropagation());
+      toggle.addEventListener('pointerdown', (e) => e.stopPropagation());
+      header.prepend(toggle);
+    } else if (this.isEditable && toggle) {
+      toggle.querySelector('.dasu-mode-checkbox').checked = this.isEditMode;
+    } else if (!this.isEditable && toggle) {
+      toggle.remove();
+    }
+  }
+
+  /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);
+    this._renderModeToggle();
+    this.element.classList.toggle('edit-mode', this.isEditMode);
+    this.element
+      .querySelectorAll(
+        'input:not([type="hidden"]):not(.dasu-mode-checkbox), select'
+      )
+      .forEach((el) => el.toggleAttribute('readonly', !this.isEditMode));
 
     const activeTab =
       this.tabGroups?.primary ??
@@ -342,7 +429,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
     await item.delete();
     // Use native DOM to hide the element
     li.style.display = 'none';
-    this.render(false);
+    this.render();
   }
 
   /**
@@ -367,6 +454,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
    * @private
    */
   static #onRoll(event, target) {
+    if (this.isEditMode) return;
     event.preventDefault();
     const dataset = target.dataset;
 
@@ -397,6 +485,124 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
    * @param {DragEvent} event   The drag start event
    * @private
    */
+  static async #onOpenResourcePopover(event, target) {
+    const { resource } = target.dataset;
+    const popId = `dasu-popover-${resource}`;
+    const existing = document.getElementById(popId);
+    if (existing) {
+      existing.remove();
+      target.classList.remove('popover-open');
+      return;
+    }
+
+    const val = this.actor.system[resource === 'health' ? 'health' : 'power'];
+    const isHp = resource === 'health';
+
+    const html = await foundry.applications.handlebars.renderTemplate(
+      'systems/dasu/templates/actor/parts/resource-popover.hbs',
+      {
+        value: val.value,
+        max: val.max,
+        label: isHp ? 'HP' : 'WP',
+        labelClass: isHp ? 'resource-label-hp' : 'resource-label-wp',
+      }
+    );
+    const pop = Object.assign(document.createElement('div'), {
+      id: popId,
+      className: 'dasu-resource-popover',
+      innerHTML: html,
+    });
+
+    const anchor = this.element;
+    const aRect = anchor.getBoundingClientRect();
+    const rRect = target.getBoundingClientRect();
+    Object.assign(pop.style, {
+      top: `${rRect.bottom - aRect.top + anchor.scrollTop + 2}px`,
+      left: `${rRect.left - aRect.left + anchor.scrollLeft}px`,
+      width: `${rRect.width}px`,
+    });
+    anchor.appendChild(pop);
+    target.classList.add('popover-open');
+
+    const int = (sel) => parseInt(pop.querySelector(sel).value) || 0;
+
+    const syncSidebar = () => {
+      const v = int('.pop-value');
+      const m = int('.pop-max');
+      const row = target;
+      const valEl = row.querySelector('.resource-val');
+      const maxEl = row.querySelector('.resource-max');
+      const fill = row.querySelector('.resource-bar-fill');
+      if (valEl) valEl.textContent = v;
+      if (maxEl) maxEl.textContent = m;
+      if (fill)
+        fill.style.width = `${m > 0 ? Math.min(100, (v / m) * 100) : 0}%`;
+    };
+
+    const update = (key, v) => {
+      this.actor.update(
+        { [`system.${resource}.${key}`]: v },
+        { render: false }
+      );
+      syncSidebar();
+    };
+
+    pop.querySelectorAll('.resource-btn').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const next = Math.min(
+          int('.pop-max'),
+          Math.max(
+            0,
+            int('.pop-value') +
+              int('.resource-delta') * parseInt(btn.dataset.step)
+          )
+        );
+        pop.querySelector('.pop-value').value = next;
+        update('value', next);
+      })
+    );
+    pop.querySelector('.pop-value').addEventListener('change', (e) => {
+      update('value', parseInt(e.target.value) || 0);
+    });
+    pop.querySelector('.pop-max').addEventListener('change', (e) => {
+      update('max', parseInt(e.target.value) || 0);
+    });
+    pop.querySelectorAll('input').forEach((input) => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        }
+      });
+    });
+
+    const close = (e) => {
+      if (!pop.contains(e.target) && e.target !== target) {
+        pop.remove();
+        target.classList.remove('popover-open');
+        document.removeEventListener('pointerdown', close);
+        this.render();
+      }
+    };
+    setTimeout(() => document.addEventListener('pointerdown', close), 0);
+  }
+
+  static #onResourceStep(event, target) {
+    const resource = target.dataset.resource;
+    const sign = parseInt(target.dataset.step);
+    const deltaInput = target
+      .closest('.resource-stepper')
+      .querySelector('.resource-delta');
+    const delta = (parseInt(deltaInput?.value) || 1) * sign;
+    const current =
+      foundry.utils.getProperty(this.actor.system, `${resource}.value`) ?? 0;
+    const max =
+      foundry.utils.getProperty(this.actor.system, `${resource}.max`) ??
+      current;
+    const newVal = Math.min(max, Math.max(0, current + delta));
+    this.actor.update({ [`system.${resource}.value`]: newVal });
+  }
+
   _onDragStart(event) {
     const target = event.currentTarget;
     if ('link' in event.target.dataset) return;
