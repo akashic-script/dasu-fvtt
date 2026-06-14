@@ -14,7 +14,8 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ['dasu', 'sheet', 'item'],
-    position: { width: 520, height: 480 },
+    position: { width: 480, height: 520 },
+    window: { resizable: true },
     form: {
       submitOnChange: true,
     },
@@ -23,6 +24,7 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
       edit: DASUItemSheet.#onEffectAction,
       delete: DASUItemSheet.#onEffectAction,
       toggle: DASUItemSheet.#onEffectAction,
+      menu: DASUItemSheet.#onEffectAction,
     },
   };
 
@@ -30,9 +32,9 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   static TABS = {
     primary: {
       tabs: [
-        { id: 'description', label: 'Description' },
-        { id: 'attributes', label: 'Attributes' },
-        { id: 'effects', label: 'Effects' },
+        { id: 'description', label: 'Description', icon: 'fas fa-feather' },
+        { id: 'attributes', label: 'Attributes', icon: 'fas fa-sliders' },
+        { id: 'effects', label: 'Effects', icon: 'fas fa-bolt' },
       ],
       initial: 'description',
     },
@@ -43,8 +45,11 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     header: {
       template: 'systems/dasu/templates/item/parts/header.hbs',
     },
+    sidebar: {
+      template: 'systems/dasu/templates/item/parts/sidebar.hbs',
+    },
     tabs: {
-      template: 'templates/generic/tab-navigation.hbs',
+      template: 'systems/dasu/templates/item/parts/tab-navigation.hbs',
     },
     description: {
       template: 'systems/dasu/templates/item/parts/description.hbs',
@@ -91,18 +96,43 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   /** @override */
   async _preparePartContext(partId, context, options) {
     context = await super._preparePartContext(partId, context, options);
-    // For the tabs navigation part, convert tabs object to array
     if (partId === 'tabs' && context.tabs) {
-      context.tabs = Object.values(context.tabs);
+      return { ...context, tabs: Object.values(context.tabs) };
     }
-    // For tab content parts, provide the tab context
-    else {
-      const tab = context.tabs?.[partId];
-      if (tab) {
-        context.tab = tab;
-      }
-    }
+    const tab = context.tabs?.[partId];
+    if (tab) context.tab = tab;
     return context;
+  }
+
+  /** @override */
+  _onFirstRender(context, options) {
+    super._onFirstRender(context, options);
+    this.#buildLayout();
+  }
+
+  #buildLayout() {
+    const sidebar = this.element.querySelector('.sheet-sidebar');
+    const tabNav = this.element.querySelector('nav.tabs');
+    if (!sidebar || !tabNav) return;
+
+    const tabSections = [
+      ...this.element.querySelectorAll('.tab[data-group="primary"]'),
+    ];
+    const tabBody = document.createElement('div');
+    tabBody.classList.add('tab-body');
+    tabSections[0]?.before(tabBody);
+    tabSections.forEach((s) => tabBody.append(s));
+    tabBody.prepend(tabNav);
+
+    const mainContent = document.createElement('div');
+    mainContent.classList.add('main-content');
+    sidebar.after(mainContent);
+    mainContent.append(sidebar, tabBody);
+
+    const sheetBody = document.createElement('div');
+    sheetBody.classList.add('sheet-body');
+    mainContent.after(sheetBody);
+    sheetBody.append(mainContent);
   }
 
   /** @override */
