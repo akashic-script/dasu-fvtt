@@ -30,6 +30,7 @@ Hooks.once('init', function () {
   CONFIG.Item.documentClass = DASUItem;
   Object.assign(CONFIG.Item.dataModels, {
     item: models.DASUItem,
+    weapon: models.DASUWeapon,
     feature: models.DASUFeature,
     class: models.DASUClass,
     ability: models.DASUAbility,
@@ -52,7 +53,7 @@ Hooks.once('init', function () {
     'dasu',
     DASUItemSheet,
     {
-      types: ['item', 'feature', 'class', 'ability'],
+      types: ['item', 'weapon', 'feature', 'class', 'ability'],
       makeDefault: true,
       label: 'DASU.SheetLabels.Item',
     }

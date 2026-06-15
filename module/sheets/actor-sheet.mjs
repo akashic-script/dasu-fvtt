@@ -138,15 +138,18 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
   _prepareItems(context) {
     const gear = [];
+    const weapons = [];
     const features = [];
 
     for (const i of context.items) {
       i.img = i.img || Item.DEFAULT_ICON;
       if (i.type === 'item') gear.push(i);
+      else if (i.type === 'weapon') weapons.push(i);
       else if (i.type === 'feature') features.push(i);
     }
 
     context.gear = gear;
+    context.weapons = weapons;
     context.features = features;
   }
 

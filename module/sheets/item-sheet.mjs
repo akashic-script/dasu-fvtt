@@ -4,6 +4,7 @@ import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
+import { DASU } from '../helpers/config.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -150,6 +151,17 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     context.cssClass = this.options.classes.join(' ');
     context.owner = item.isOwner;
     context.isItem = item.type === 'item';
+    context.isWeapon = item.type === 'weapon';
+
+    if (context.isWeapon) {
+      const localize = (obj) =>
+        Object.fromEntries(
+          Object.entries(obj).map(([k, v]) => [k, game.i18n.localize(v)])
+        );
+      context.categoryOptions = localize(DASU.weaponCategories);
+      context.rangeOptions = localize(DASU.weaponRanges);
+      context.damageTypeOptions = localize(DASU.damageTypes);
+    }
 
     // Retrieve the roll data for TinyMCE editors.
     context.rollData = item.getRollData();

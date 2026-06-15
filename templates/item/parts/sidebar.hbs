@@ -17,4 +17,39 @@
     </div>
   </div>
   {{/if}}
+
+  {{#if isWeapon}}
+  <div class="item-sidebar-fields">
+    <div class="item-sidebar-field item-sidebar-field--wide">
+      <label>{{localize "DASU.Item.Weapon.Category"}}</label>
+      <select name="system.category">
+        {{selectOptions categoryOptions selected=system.category}}
+      </select>
+    </div>
+    <div class="item-sidebar-field item-sidebar-field--wide">
+      <label>{{localize "DASU.Item.Weapon.Range"}}</label>
+      <select name="system.range">
+        {{selectOptions rangeOptions selected=system.range}}
+      </select>
+    </div>
+    <div class="item-sidebar-field">
+      <label>{{localize "DASU.Item.Weapon.Damage"}}</label>
+      <input type="number" name="system.damage.value" value="{{system.damage.value}}" min="0" />
+    </div>
+    <div class="item-sidebar-field item-sidebar-field--wide">
+      <label>{{localize "DASU.Item.Weapon.DamageType"}}</label>
+      <select name="system.damage.damageType">
+        {{selectOptions damageTypeOptions selected=system.damage.damageType}}
+      </select>
+    </div>
+    <div class="item-sidebar-field">
+      <label>{{localize "DASU.Item.Weapon.ToHit"}}</label>
+      <input type="number" name="system.toHit" value="{{system.toHit}}" />
+    </div>
+    <div class="item-sidebar-field">
+      <label>{{localize "DASU.Item.Weapon.Price"}}</label>
+      <input type="number" name="system.price" value="{{system.price}}" min="0" />
+    </div>
+  </div>
+  {{/if}}
 </div>

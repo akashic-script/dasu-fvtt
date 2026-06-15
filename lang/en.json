@@ -18,6 +18,17 @@
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects"
     },
+    "DamageType": {
+      "Fire": "Fire",
+      "Ice": "Ice",
+      "Electric": "Electric",
+      "Wind": "Wind",
+      "Earth": "Earth",
+      "Light": "Light",
+      "Dark": "Dark",
+      "Physical": "Physical",
+      "Untyped": "Untyped"
+    },
     "Actor": {
       "SummonerNamePlaceholder": "Summoner Name",
       "DaemonNamePlaceholder": "Daemon Name",
@@ -110,6 +121,20 @@
         "DiceNum": "Number of Dice",
         "DiceSize": "Die Size",
         "DiceBonus": "Roll Modifier"
+      },
+      "Weapon": {
+        "Category": "Category",
+        "CategorySmall": "Small",
+        "CategoryLarge": "Large",
+        "CategoryRanged": "Ranged",
+        "CategoryFirearm": "Firearm",
+        "Range": "Range",
+        "RangeMelee": "Melee",
+        "RangeRanged": "Ranged",
+        "Damage": "DMG",
+        "DamageType": "Type",
+        "ToHit": "To Hit",
+        "Price": "Price"
       }
     }
   },
@@ -121,6 +146,7 @@
     },
     "Item": {
       "item": "Item",
+      "weapon": "Weapon",
       "feature": "Feature",
       "class": "Class",
       "ability": "Ability"

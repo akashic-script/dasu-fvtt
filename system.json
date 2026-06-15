@@ -38,10 +38,16 @@
       "item": {},
       "feature": {},
       "class": {},
-      "ability": {}
+      "ability": {},
+      "weapon": {}
     }
   },
-  "styles": [{ "src": "css/dasu.css", "layer": "system" }],
+  "styles": [
+    {
+      "src": "css/dasu.css",
+      "layer": "system"
+    }
+  ],
   "languages": [
     {
       "lang": "en",

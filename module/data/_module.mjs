@@ -1,9 +1,11 @@
 export {default as DASUActorBase} from "./actor-base.mjs";
+export {DamageField} from "./fields/damage-field.mjs";
 export {default as DASUSummoner} from "./summoner.mjs";
 export {default as DASUDaemon} from "./daemon.mjs";
 
 export {default as DASUItemBase} from "./item-base.mjs";
 export {default as DASUItem} from "./item.mjs";
+export {default as DASUWeapon} from "./item-weapon.mjs";
 export {default as DASUFeature} from "./feature.mjs";
 export {default as DASUClass} from "./class.mjs";
 export {default as DASUAbility} from "./ability.mjs";

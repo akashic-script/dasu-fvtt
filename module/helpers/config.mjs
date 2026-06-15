@@ -62,6 +62,30 @@ DASU.levelMerits = {
  */
 DASU.daemonTransformMerits = 100;
 
+DASU.weaponCategories = {
+  small: 'DASU.Item.Weapon.CategorySmall',
+  large: 'DASU.Item.Weapon.CategoryLarge',
+  ranged: 'DASU.Item.Weapon.CategoryRanged',
+  firearm: 'DASU.Item.Weapon.CategoryFirearm',
+};
+
+DASU.weaponRanges = {
+  melee: 'DASU.Item.Weapon.RangeMelee',
+  ranged: 'DASU.Item.Weapon.RangeRanged',
+};
+
+DASU.damageTypes = {
+  fire: 'DASU.DamageType.Fire',
+  ice: 'DASU.DamageType.Ice',
+  electric: 'DASU.DamageType.Electric',
+  wind: 'DASU.DamageType.Wind',
+  earth: 'DASU.DamageType.Earth',
+  light: 'DASU.DamageType.Light',
+  dark: 'DASU.DamageType.Dark',
+  physical: 'DASU.DamageType.Physical',
+  untyped: 'DASU.DamageType.Untyped',
+};
+
 DASU.skills = {
   athletics: 'DASU.Actor.Skill.Athletics',
   academia: 'DASU.Actor.Skill.Academia',

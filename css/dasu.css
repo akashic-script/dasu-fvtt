@@ -515,8 +515,9 @@
     --dasu-on-panel: #eeede0;
     --dasu-panel: 0 0 0;
     --dasu-accent-feature: #d9a800;
-    --dasu-accent-item: #6ab4d8;
+    --dasu-accent-item: #8a9aa8;
     --dasu-accent-ability: #c084f5;
+    --dasu-accent-weapon: #7a9ab5;
     --dasu-surface-1: rgb(var(--dasu-panel) / 40%);
     --dasu-surface-raised: rgb(255 255 255 / 8%);
     --dasu-panel-accent: rgb(255 255 255 / 8%);
@@ -857,6 +858,26 @@
             border-radius: 0;
             color: var(--dasu-on-panel);
             padding: 0 4px;
+          }
+
+          select {
+            flex: 1;
+            height: 22px;
+            font-size: 0.9em;
+            background: rgb(var(--dasu-panel) / 40%);
+            border: 1px solid rgb(255 255 255 / 12%);
+            border-radius: 0;
+            color: var(--dasu-on-panel);
+            padding: 0 4px;
+
+            option {
+              background: var(--dasu-panel-solid);
+              color: var(--dasu-on-panel);
+            }
+          }
+
+          &.item-sidebar-field--wide label {
+            flex: 0 0 52px;
           }
         }
       }
@@ -1454,7 +1475,9 @@
       .editor-fieldset {
         flex: 1;
         min-height: 120px;
-        prose-mirror { min-height: 100px; }
+        prose-mirror {
+          min-height: 100px;
+        }
       }
 
       .triad-fields {
@@ -1617,12 +1640,18 @@
     }
 
     .items-list {
+      --col-img: 36px;
+      --col-formula: 52px;
+      --col-controls: 54px;
+
       list-style: none;
       margin: 0;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
+      display: grid;
+      grid-template-columns: var(--col-img) 1fr var(--col-formula) var(
+          --col-formula
+        ) var(--col-controls);
+      gap: 1px 0;
       background: transparent;
       position: relative;
 
@@ -1632,11 +1661,24 @@
         padding: 0;
       }
 
+      .items-header,
+      .item {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: subgrid;
+      }
+
       .items-header {
-        display: flex;
+        --section-accent: var(--dasu-hp);
+        &[data-section='weapon'] {
+          --section-accent: var(--dasu-accent-weapon);
+        }
+        &[data-section='item'] {
+          --section-accent: var(--dasu-accent-item);
+        }
+
         align-items: center;
         height: 24px;
-        padding: 0 10px;
         background: rgb(var(--dasu-panel) / 95%);
         color: var(--dasu-tab-icon);
         font-size: 0.72em;
@@ -1644,24 +1686,29 @@
         text-transform: uppercase;
         letter-spacing: 0.1em;
         border-bottom: 1px solid rgb(255 255 255 / 8%);
-        border-left: 3px solid var(--dasu-hp);
+        box-shadow: inset 3px 0 0 0 var(--section-accent);
 
         .item-name {
-          flex: 1;
+          grid-column: 1 / 3;
+          padding-left: 10px;
           min-width: 0;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
         .item-formula {
-          flex: 0 0 64px;
-          text-align: right;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
         }
         .item-controls {
-          flex: 0 0 auto;
+          grid-column: -2 / -1;
           display: flex;
-          gap: 6px;
-          margin-left: 8px;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 8px;
+          padding: 0 10px 0 8px;
           a {
             color: var(--dasu-tab-icon);
             font-size: 11px;
@@ -1680,14 +1727,14 @@
         &[data-item-type='ability'] {
           --item-accent: var(--dasu-accent-ability);
         }
+        &[data-item-type='weapon'] {
+          --item-accent: var(--dasu-accent-weapon);
+        }
 
-        display: flex;
         align-items: stretch;
         height: 30px;
-        padding: 0 10px 0 0;
         background: rgb(var(--dasu-panel) / 60%);
         color: var(--dasu-on-panel);
-        gap: 0;
         cursor: pointer;
         position: relative;
         transition: background 80ms ease, color 80ms ease;
@@ -1730,15 +1777,14 @@
         }
 
         .item-name {
-          flex: 1;
+          grid-column: 1 / 3;
           display: flex;
           align-items: center;
-          gap: 0;
           overflow: hidden;
           margin: 0;
 
           .item-image {
-            flex: 0 0 36px;
+            flex: 0 0 var(--col-img);
             height: 30px;
             display: flex;
             align-items: center;
@@ -1776,27 +1822,25 @@
         }
 
         .item-formula {
-          flex: 0 0 auto;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0 8px;
           font-size: 0.78em;
           font-weight: bold;
           letter-spacing: 0.04em;
           color: var(--dasu-tab-icon-active);
           background: var(--item-accent);
-          min-width: 52px;
           transition: background 80ms ease, color 80ms ease;
           box-shadow: inset 0 1px 0 rgb(255 255 255 / 15%);
         }
 
         .item-controls {
-          flex: 0 0 auto;
+          grid-column: -2 / -1;
           display: flex;
           align-items: center;
+          justify-content: flex-end;
           gap: 8px;
-          padding: 0 0 0 8px;
+          padding: 0 10px 0 8px;
           opacity: 0;
           transition: opacity 80ms ease;
           a {
@@ -1861,8 +1905,9 @@
   --dasu-on-panel: #f0ecff;
   --dasu-panel: 100 70 160;
   --dasu-accent-feature: #d9a800;
-  --dasu-accent-item: #4a90c0;
+  --dasu-accent-item: #8a9aa8;
   --dasu-accent-ability: #c084f5;
+  --dasu-accent-weapon: #7a9ab5;
   --dasu-border: 2px groove #b8a0d8;
   --dasu-surface-1: rgb(90 62 138 / 95%);
   --dasu-surface-raised: rgb(255 255 255 / 70%);
