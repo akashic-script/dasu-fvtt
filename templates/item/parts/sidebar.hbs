@@ -2,4 +2,19 @@
   <div class="sidebar-portrait">
     <img class="profile-img" src="{{item.img}}" data-action="editImage" data-edit="img" title="{{item.name}}" />
   </div>
+
+  <div class="item-sidebar-type">Core Stats</div>
+
+  {{#if isItem}}
+  <div class="item-sidebar-fields">
+    <div class="item-sidebar-field">
+      <label>QTY</label>
+      <input type="number" name="system.quantity" value="{{system.quantity}}" min="1" />
+    </div>
+    <div class="item-sidebar-field">
+      <label>WT</label>
+      <input type="number" name="system.weight" value="{{system.weight}}" min="0" step="0.1" />
+    </div>
+  </div>
+  {{/if}}
 </div>

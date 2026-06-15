@@ -37,6 +37,11 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
           label: 'DASU.Sheet.Tab.Description',
           icon: 'fas fa-feather',
         },
+        {
+          id: 'advanced',
+          label: 'DASU.Sheet.Tab.Advanced',
+          icon: 'fas fa-sliders',
+        },
         { id: 'effects', label: 'DASU.Sheet.Tab.Effects', icon: 'fas fa-bolt' },
       ],
       initial: 'description',
@@ -58,6 +63,10 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
       template: 'systems/dasu/templates/item/parts/description.hbs',
       scrollable: [''],
     },
+    advanced: {
+      template: 'systems/dasu/templates/item/parts/advanced.hbs',
+      scrollable: [''],
+    },
     effects: {
       template: 'systems/dasu/templates/item/parts/effects.hbs',
       scrollable: [''],
@@ -75,15 +84,7 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   /** @override */
   _configureRenderParts(options) {
     const parts = super._configureRenderParts(options);
-    // Dynamically set header template based on item type
-    const itemType = this.item.type;
-    // For now, all item types use the same header, but we could customize per type
-    parts.header.template = `systems/dasu/templates/item/parts/header.hbs`;
-
-    // Customize templates based on item type if needed
-    // For example, features might not have attributes tab
-    // if (itemType === 'feature') {}
-
+    if (this.item.type !== 'item') delete parts.advanced;
     return parts;
   }
 
@@ -148,6 +149,7 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     // Template convenience variables
     context.cssClass = this.options.classes.join(' ');
     context.owner = item.isOwner;
+    context.isItem = item.type === 'item';
 
     // Retrieve the roll data for TinyMCE editors.
     context.rollData = item.getRollData();

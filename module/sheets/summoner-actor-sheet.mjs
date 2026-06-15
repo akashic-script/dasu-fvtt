@@ -30,7 +30,11 @@ export class DASUSummonerActorSheet extends DASUActorSheet {
           label: 'DASU.Sheet.Tab.Abilities',
           icon: 'fas fa-hand-fist',
         },
-        { id: 'items', label: 'DASU.Sheet.Tab.Items', icon: 'fa-solid fa-suitcase' },
+        {
+          id: 'items',
+          label: 'DASU.Sheet.Tab.Items',
+          icon: 'fa-solid fa-suitcase',
+        },
         { id: 'effects', label: 'DASU.Sheet.Tab.Effects', icon: 'fas fa-bolt' },
       ],
       initial: 'identity',

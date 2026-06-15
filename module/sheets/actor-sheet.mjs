@@ -1,23 +1,17 @@
 const { HandlebarsApplicationMixin } = foundry.applications.api;
-const { DocumentSheetV2 } = foundry.applications.api;
+const { ActorSheetV2 } = foundry.applications.sheets;
 import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
 
-export class DASUActorSheet extends HandlebarsApplicationMixin(
-  DocumentSheetV2
-) {
+export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   static MODES = { PLAY: 1, EDIT: 2 };
 
   _mode = null;
 
   get isEditMode() {
     return this._mode === this.constructor.MODES.EDIT;
-  }
-
-  get actor() {
-    return this.document;
   }
 
   /** @override */
@@ -707,17 +701,24 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(
 
     pop.querySelectorAll('.resource-btn').forEach((btn) =>
       btn.addEventListener('click', () => {
-        const next = Math.max(0, int('.pop-value') + int('.resource-delta') * parseInt(btn.dataset.step));
+        const next = Math.max(
+          0,
+          int('.pop-value') +
+            int('.resource-delta') * parseInt(btn.dataset.step)
+        );
         pop.querySelector('.pop-value').value = next;
         update(next);
       })
     );
-    pop.querySelector('.pop-value').addEventListener('change', (e) =>
-      update(parseInt(e.target.value) || 0)
-    );
+    pop
+      .querySelector('.pop-value')
+      .addEventListener('change', (e) => update(parseInt(e.target.value) || 0));
     pop.querySelectorAll('input').forEach((input) =>
       input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        }
       })
     );
 

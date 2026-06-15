@@ -21,7 +21,11 @@ export class DASUDaemonActorSheet extends DASUActorSheet {
           label: 'DASU.Sheet.Tab.Ack',
           icon: 'fas fa-arrows-rotate',
         },
-        { id: 'features', label: 'DASU.Sheet.Tab.Features', icon: 'fas fa-star-and-crescent' },
+        {
+          id: 'features',
+          label: 'DASU.Sheet.Tab.Features',
+          icon: 'fas fa-star-and-crescent',
+        },
         { id: 'items', label: 'DASU.Sheet.Tab.Items', icon: 'fas fa-suitcase' },
         { id: 'effects', label: 'DASU.Sheet.Tab.Effects', icon: 'fas fa-bolt' },
       ],

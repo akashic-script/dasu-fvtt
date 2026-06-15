@@ -87,7 +87,8 @@
         "Features": "Features",
         "Items": "Items",
         "Effects": "Effects",
-        "Description": "Description"
+        "Description": "Description",
+        "Advanced": "Advanced"
       },
       "Section": {
         "MoralTriad": "Moral Triad",
