@@ -86,6 +86,44 @@ DASU.damageTypes = {
   untyped: 'DASU.DamageType.Untyped',
 };
 
+DASU.aptitudes = {
+  f: 'DASU.Aptitude.Fire.long',
+  i: 'DASU.Aptitude.Ice.long',
+  el: 'DASU.Aptitude.Electric.long',
+  w: 'DASU.Aptitude.Wind.long',
+  ea: 'DASU.Aptitude.Earth.long',
+  l: 'DASU.Aptitude.Light.long',
+  d: 'DASU.Aptitude.Dark.long',
+  dp: 'DASU.Aptitude.DebuffPhysical.long',
+  dm: 'DASU.Aptitude.DebuffMental.long',
+  da: 'DASU.Aptitude.DebuffAlmighty.long',
+  h: 'DASU.Aptitude.Heal.long',
+  tb: 'DASU.Aptitude.TechniqueBrutal.long',
+  tt: 'DASU.Aptitude.TechniqueTechnical.long',
+  tg: 'DASU.Aptitude.TechniqueGeneral.long',
+  ta: 'DASU.Aptitude.TechniqueAlmighty.long',
+  assist: 'DASU.Aptitude.Assist.long',
+};
+
+DASU.aptitudeAbbreviations = {
+  f: 'DASU.Aptitude.Fire.abbr',
+  i: 'DASU.Aptitude.Ice.abbr',
+  el: 'DASU.Aptitude.Electric.abbr',
+  w: 'DASU.Aptitude.Wind.abbr',
+  ea: 'DASU.Aptitude.Earth.abbr',
+  l: 'DASU.Aptitude.Light.abbr',
+  d: 'DASU.Aptitude.Dark.abbr',
+  dp: 'DASU.Aptitude.DebuffPhysical.abbr',
+  dm: 'DASU.Aptitude.DebuffMental.abbr',
+  da: 'DASU.Aptitude.DebuffAlmighty.abbr',
+  h: 'DASU.Aptitude.Heal.abbr',
+  tb: 'DASU.Aptitude.TechniqueBrutal.abbr',
+  tt: 'DASU.Aptitude.TechniqueTechnical.abbr',
+  tg: 'DASU.Aptitude.TechniqueGeneral.abbr',
+  ta: 'DASU.Aptitude.TechniqueAlmighty.abbr',
+  assist: 'DASU.Aptitude.Assist.abbr',
+};
+
 DASU.itemResources = {
   hp: 'DASU.Item.Item.ResourceHP',
   wp: 'DASU.Item.Item.ResourceWP',

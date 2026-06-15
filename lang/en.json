@@ -29,6 +29,24 @@
       "Physical": "Physical",
       "Untyped": "Untyped"
     },
+    "Aptitude": {
+      "Fire": { "long": "Fire", "abbr": "f" },
+      "Ice": { "long": "Ice", "abbr": "i" },
+      "Electric": { "long": "Electric", "abbr": "el" },
+      "Wind": { "long": "Wind", "abbr": "w" },
+      "Earth": { "long": "Earth", "abbr": "ea" },
+      "Light": { "long": "Light", "abbr": "l" },
+      "Dark": { "long": "Dark", "abbr": "d" },
+      "DebuffPhysical": { "long": "Debuff (Physical)", "abbr": "dp" },
+      "DebuffMental": { "long": "Debuff (Mental)", "abbr": "dm" },
+      "DebuffAlmighty": { "long": "Debuff (Almighty)", "abbr": "da" },
+      "Heal": { "long": "Heal", "abbr": "h" },
+      "TechniqueBrutal": { "long": "Technique (Brutal)", "abbr": "tb" },
+      "TechniqueTechnical": { "long": "Technique (Technical)", "abbr": "tt" },
+      "TechniqueGeneral": { "long": "Technique (General)", "abbr": "tg" },
+      "TechniqueAlmighty": { "long": "Technique (Almighty)", "abbr": "ta" },
+      "Assist": { "long": "Assist", "abbr": "assist" }
+    },
     "Actor": {
       "SummonerNamePlaceholder": "Summoner Name",
       "DaemonNamePlaceholder": "Daemon Name",
