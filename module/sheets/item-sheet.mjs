@@ -85,7 +85,7 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   /** @override */
   _configureRenderParts(options) {
     const parts = super._configureRenderParts(options);
-    if (this.item.type !== 'item') delete parts.advanced;
+    delete parts.advanced;
     return parts;
   }
 
@@ -153,11 +153,22 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     context.isItem = item.type === 'item';
     context.isWeapon = item.type === 'weapon';
 
+    const localize = (obj) =>
+      Object.fromEntries(
+        Object.entries(obj).map(([k, v]) => [k, game.i18n.localize(v)])
+      );
+
+    if (context.isItem) {
+      const isStatus = itemData.system.effect?.resource === 'status';
+      context.resourceOptions = localize(DASU.itemResources);
+      context.modeOptions = localize(DASU.itemEffectModes);
+      context.statusModeOptions = localize(DASU.itemStatusModes);
+      context.showMode = !isStatus;
+      context.showStatusMode = isStatus;
+      context.showStatusCount = isStatus && itemData.system.effect?.statusMode === 'choose';
+    }
+
     if (context.isWeapon) {
-      const localize = (obj) =>
-        Object.fromEntries(
-          Object.entries(obj).map(([k, v]) => [k, game.i18n.localize(v)])
-        );
       context.categoryOptions = localize(DASU.weaponCategories);
       context.rangeOptions = localize(DASU.weaponRanges);
       context.damageTypeOptions = localize(DASU.damageTypes);

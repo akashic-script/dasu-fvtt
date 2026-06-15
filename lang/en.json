@@ -122,6 +122,22 @@
         "DiceSize": "Die Size",
         "DiceBonus": "Roll Modifier"
       },
+      "Item": {
+        "Effect": "Effect",
+        "Resource": "Resource",
+        "ResourceHP": "HP",
+        "ResourceWP": "WP",
+        "ResourceStatus": "Status",
+        "Value": "Value",
+        "Mode": "Mode",
+        "ModeFlat": "Flat",
+        "ModePercent": "Percent",
+        "StatusMode": "Clear",
+        "StatusChoose": "Choose",
+        "StatusAll": "All",
+        "Price": "Price",
+        "Quantity": "QTY"
+      },
       "Weapon": {
         "Category": "Category",
         "CategorySmall": "Small",

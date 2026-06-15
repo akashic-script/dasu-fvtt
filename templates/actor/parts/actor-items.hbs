@@ -42,6 +42,8 @@
   {{!-- Items / Gear --}}
   <li class='items-header' data-section='item'>
     <div class='item-name'>{{localize "TYPES.Item.item"}}</div>
+    <div class='item-formula'>{{localize "DASU.Item.Item.Effect"}}</div>
+    <div class='item-formula'>{{localize "DASU.Item.Item.Price"}}</div>
     <div class='item-controls'>
       <a
         class='item-control item-create'
@@ -63,6 +65,8 @@
         </div>
         <h4>{{item.name}}</h4>
       </div>
+      <div class='item-formula'>{{item.system.effect.value}}</div>
+      <div class='item-formula'>{{item.system.price}}</div>
       <div class='item-controls'>
         <a class='item-control item-edit' data-action='editItem' data-tooltip='{{localize "DASU.Sheet.EditItem"}}'>
           <i class='fas fa-edit'></i>

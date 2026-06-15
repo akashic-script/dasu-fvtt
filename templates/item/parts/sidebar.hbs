@@ -7,13 +7,45 @@
 
   {{#if isItem}}
   <div class="item-sidebar-fields">
+    <div class="item-sidebar-field item-sidebar-field--wide">
+      <label>{{localize "DASU.Item.Item.Resource"}}</label>
+      <select name="system.effect.resource">
+        {{selectOptions resourceOptions selected=system.effect.resource}}
+      </select>
+    </div>
+    {{#if showMode}}
     <div class="item-sidebar-field">
-      <label>QTY</label>
-      <input type="number" name="system.quantity" value="{{system.quantity}}" min="1" />
+      <label>{{localize "DASU.Item.Item.Value"}}</label>
+      <input type="number" name="system.effect.value" value="{{system.effect.value}}" min="0" />
+    </div>
+    <div class="item-sidebar-field item-sidebar-field--wide">
+      <label>{{localize "DASU.Item.Item.Mode"}}</label>
+      <select name="system.effect.mode">
+        {{selectOptions modeOptions selected=system.effect.mode}}
+      </select>
+    </div>
+    {{/if}}
+    {{#if showStatusMode}}
+    <div class="item-sidebar-field item-sidebar-field--wide">
+      <label>{{localize "DASU.Item.Item.StatusMode"}}</label>
+      <select name="system.effect.statusMode">
+        {{selectOptions statusModeOptions selected=system.effect.statusMode}}
+      </select>
+    </div>
+    {{/if}}
+    {{#if showStatusCount}}
+    <div class="item-sidebar-field">
+      <label>{{localize "DASU.Item.Item.Value"}}</label>
+      <input type="number" name="system.effect.value" value="{{system.effect.value}}" min="1" />
+    </div>
+    {{/if}}
+    <div class="item-sidebar-field">
+      <label>{{localize "DASU.Item.Item.Price"}}</label>
+      <input type="number" name="system.price" value="{{system.price}}" min="0" />
     </div>
     <div class="item-sidebar-field">
-      <label>WT</label>
-      <input type="number" name="system.weight" value="{{system.weight}}" min="0" step="0.1" />
+      <label>{{localize "DASU.Item.Item.Quantity"}}</label>
+      <input type="number" name="system.quantity" value="{{system.quantity}}" min="1" />
     </div>
   </div>
   {{/if}}

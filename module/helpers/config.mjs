@@ -86,6 +86,22 @@ DASU.damageTypes = {
   untyped: 'DASU.DamageType.Untyped',
 };
 
+DASU.itemResources = {
+  hp: 'DASU.Item.Item.ResourceHP',
+  wp: 'DASU.Item.Item.ResourceWP',
+  status: 'DASU.Item.Item.ResourceStatus',
+};
+
+DASU.itemEffectModes = {
+  flat: 'DASU.Item.Item.ModeFlat',
+  percent: 'DASU.Item.Item.ModePercent',
+};
+
+DASU.itemStatusModes = {
+  choose: 'DASU.Item.Item.StatusChoose',
+  all: 'DASU.Item.Item.StatusAll',
+};
+
 DASU.skills = {
   athletics: 'DASU.Actor.Skill.Athletics',
   academia: 'DASU.Actor.Skill.Academia',
