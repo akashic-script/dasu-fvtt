@@ -1,76 +1,76 @@
 <aside class="sheet-sidebar">
 
-  <div class="sidebar-portrait">
+  <div class="actor-sidebar__portrait">
     <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" />
   </div>
 
   {{!-- Resources --}}
-  <div class="sidebar-resources">
-    <div class="resource-row" data-action="openResourcePopover" data-resource="health">
-      <span class="resource-label resource-label-hp" data-tooltip="{{localize 'DASU.Actor.HP.long'}}">{{localize "DASU.Actor.HP.abbr"}}</span>
-      <div class="resource-current">
-        <span class="resource-val">{{system.health.value}}</span>
-        <span class="resource-sep">/</span>
-        <span class="resource-max">{{system.health.max}}</span>
+  <div class="actor-sidebar__resources">
+    <div class="actor-sidebar__resource-row" data-action="openResourcePopover" data-resource="health">
+      <span class="actor-sidebar__resource-label actor-sidebar__resource-label--hp" data-tooltip="{{localize 'DASU.Actor.HP.long'}}">{{localize "DASU.Actor.HP.abbr"}}</span>
+      <div class="actor-sidebar__resource-current">
+        <span class="actor-sidebar__resource-val">{{system.health.value}}</span>
+        <span class="actor-sidebar__resource-sep">/</span>
+        <span class="actor-sidebar__resource-max">{{system.health.max}}</span>
       </div>
-      <div class="resource-bar">
-        <div class="resource-bar-fill resource-bar-hp" style="width: {{healthPercent}}%"></div>
+      <div class="actor-sidebar__resource-bar">
+        <div class="actor-sidebar__resource-fill actor-sidebar__resource-fill--hp" style="width: {{healthPercent}}%"></div>
       </div>
     </div>
-    <div class="resource-row" data-action="openResourcePopover" data-resource="power">
-      <span class="resource-label resource-label-wp" data-tooltip="{{localize 'DASU.Actor.WP.long'}}">{{localize "DASU.Actor.WP.abbr"}}</span>
-      <div class="resource-current">
-        <span class="resource-val">{{system.power.value}}</span>
-        <span class="resource-sep">/</span>
-        <span class="resource-max">{{system.power.max}}</span>
+    <div class="actor-sidebar__resource-row" data-action="openResourcePopover" data-resource="power">
+      <span class="actor-sidebar__resource-label actor-sidebar__resource-label--wp" data-tooltip="{{localize 'DASU.Actor.WP.long'}}">{{localize "DASU.Actor.WP.abbr"}}</span>
+      <div class="actor-sidebar__resource-current">
+        <span class="actor-sidebar__resource-val">{{system.power.value}}</span>
+        <span class="actor-sidebar__resource-sep">/</span>
+        <span class="actor-sidebar__resource-max">{{system.power.max}}</span>
       </div>
-      <div class="resource-bar">
-        <div class="resource-bar-fill resource-bar-wp" style="width: {{powerPercent}}%"></div>
+      <div class="actor-sidebar__resource-bar">
+        <div class="actor-sidebar__resource-fill actor-sidebar__resource-fill--wp" style="width: {{powerPercent}}%"></div>
       </div>
     </div>
   </div>
 
   {{!-- Attributes --}}
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">
-      <span class="sidebar-section-title" data-tooltip="{{localize 'DASU.Actor.Section.Attributes'}}">{{localize "DASU.Actor.Section.Attributes"}}</span>
-      <span class="sidebar-section-counter" data-tooltip="{{localize 'DASU.Actor.AP.long'}}">{{localize "DASU.Actor.AP.abbr"}}: {{ap.spent}}/{{ap.max}}</span>
+  <div class="actor-sidebar__section">
+    <div class="actor-sidebar__section-label">
+      <span class="actor-sidebar__section-title" data-tooltip="{{localize 'DASU.Actor.Section.Attributes'}}">{{localize "DASU.Actor.Section.Attributes"}}</span>
+      <span class="actor-sidebar__section-counter" data-tooltip="{{localize 'DASU.Actor.AP.long'}}">{{localize "DASU.Actor.AP.abbr"}}: {{ap.spent}}/{{ap.max}}</span>
     </div>
-    <div class="sidebar-attributes">
+    <div class="actor-sidebar__attributes">
       {{#each system.attributes as |attribute key|}}
-      <div class="attribute-score">
-        <span class="attribute-label" data-tooltip="{{attribute.label}}">{{attribute.abbr}}</span>
-        <input class="attribute-value dasu-pill rollable" type="text" name="system.attributes.{{key}}.value" value="{{attribute.value}}" data-dtype="Number" data-action="roll" data-roll="@attributes.{{key}}.value" data-label="{{attribute.label}}" />
+      <div class="actor-sidebar__attr-score">
+        <span class="actor-sidebar__attr-label" data-tooltip="{{attribute.label}}">{{attribute.abbr}}</span>
+        <input class="actor-sidebar__attr-value dasu-pill rollable" type="text" name="system.attributes.{{key}}.value" value="{{attribute.value}}" data-dtype="Number" data-action="roll" data-roll="@attributes.{{key}}.value" data-label="{{attribute.label}}" />
       </div>
       {{/each}}
     </div>
   </div>
 
   {{!-- Derived stats --}}
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">
-      <span class="sidebar-section-title" data-tooltip="{{localize 'DASU.Actor.Section.Stats'}}">{{localize "DASU.Actor.Section.Stats"}}</span>
+  <div class="actor-sidebar__section">
+    <div class="actor-sidebar__section-label">
+      <span class="actor-sidebar__section-title" data-tooltip="{{localize 'DASU.Actor.Section.Stats'}}">{{localize "DASU.Actor.Section.Stats"}}</span>
     </div>
-    <div class="sidebar-stats">
+    <div class="actor-sidebar__stats">
       <div class="stat-score">
         <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Avoid.long'}}">{{localize "DASU.Actor.Stat.Avoid.abbr"}}</span>
         <span class="stat-value dasu-pill stat-total">{{system.stats.avoid.value}}</span>
-        <label class="stat-bonus-wrap"><span class="stat-bonus-sign">±</span><input class="stat-value dasu-pill stat-bonus" type="text" name="system.stats.avoid.bonus" value="{{system.stats.avoid.bonus}}" data-dtype="Number" /></label>
+        <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">±</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.stats.avoid.bonus" value="{{system.stats.avoid.bonus}}" data-dtype="Number" /></label>
       </div>
       <div class="stat-score">
         <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Defense.long'}}">{{localize "DASU.Actor.Stat.Defense.abbr"}}</span>
         <span class="stat-value dasu-pill stat-total">{{system.stats.defense.value}}</span>
-        <label class="stat-bonus-wrap"><span class="stat-bonus-sign">±</span><input class="stat-value dasu-pill stat-bonus" type="text" name="system.stats.defense.bonus" value="{{system.stats.defense.bonus}}" data-dtype="Number" /></label>
+        <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">±</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.stats.defense.bonus" value="{{system.stats.defense.bonus}}" data-dtype="Number" /></label>
       </div>
       <div class="stat-score">
         <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Hit.long'}}">{{localize "DASU.Actor.Stat.Hit.abbr"}}</span>
         <span class="stat-value dasu-pill stat-total">{{system.stats.hit.value}}</span>
-        <label class="stat-bonus-wrap"><span class="stat-bonus-sign">±</span><input class="stat-value dasu-pill stat-bonus" type="text" name="system.stats.hit.bonus" value="{{system.stats.hit.bonus}}" data-dtype="Number" /></label>
+        <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">±</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.stats.hit.bonus" value="{{system.stats.hit.bonus}}" data-dtype="Number" /></label>
       </div>
       <div class="stat-score">
         <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Land.long'}}">{{localize "DASU.Actor.Stat.Land.abbr"}}</span>
         <span class="stat-value dasu-pill stat-total">{{system.stats.land.value}}</span>
-        <label class="stat-bonus-wrap"><span class="stat-bonus-sign">±</span><input class="stat-value dasu-pill stat-bonus" type="text" name="system.stats.land.bonus" value="{{system.stats.land.bonus}}" data-dtype="Number" /></label>
+        <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">±</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.stats.land.bonus" value="{{system.stats.land.bonus}}" data-dtype="Number" /></label>
       </div>
     </div>
   </div>

@@ -1,20 +1,20 @@
 <section class="tab {{tab.cssClass}}" data-group="primary" data-tab="advanced" style="padding: 12px 14px;">
 
   <div class="dasu-fieldset">
-    <div class="dasu-fieldset-legend">{{localize "DASU.Item.Roll.Formula"}}</div>
-    <div class="dasu-fieldset-value">{{system.formula}}</div>
-    <div class="dasu-fieldset-row">
-      <div class="dasu-fieldset-field">
+    <div class="dasu-fieldset__legend">{{localize "DASU.Item.Roll.Formula"}}</div>
+    <div class="dasu-fieldset__value">{{system.formula}}</div>
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
         <label>{{localize "DASU.Item.Roll.DiceNum"}}</label>
         <input type="number" name="system.roll.diceNum" value="{{system.roll.diceNum}}" min="1" />
       </div>
-      <div class="dasu-fieldset-field">
+      <div class="dasu-fieldset__field">
         <label>{{localize "DASU.Item.Roll.DiceSize"}}</label>
         <input type="text" name="system.roll.diceSize" value="{{system.roll.diceSize}}" />
       </div>
     </div>
-    <div class="dasu-fieldset-row">
-      <div class="dasu-fieldset-field">
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
         <label>{{localize "DASU.Item.Roll.DiceBonus"}}</label>
         <input type="text" name="system.roll.diceBonus" value="{{system.roll.diceBonus}}" />
       </div>

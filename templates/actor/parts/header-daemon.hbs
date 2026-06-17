@@ -1,20 +1,20 @@
 <header class="sheet-header">
-  <div class="header-name-row">
-    <h1><input class="header-name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize 'DASU.Actor.DaemonNamePlaceholder'}}" /></h1>
-    <div class="header-level">
-      <span class="header-lv-label">{{localize "DASU.Actor.Level.long"}}</span>
+  <div class="actor-header__name-row">
+    <h1><input class="actor-header__name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize 'DASU.Actor.DaemonNamePlaceholder'}}" /></h1>
+    <div class="actor-header__level">
+      <span class="actor-header__level-label">{{localize "DASU.Actor.Level.long"}}</span>
       <input class="dasu-pill" type="text" name="system.level" value="{{system.level}}" data-dtype="Number" />
     </div>
   </div>
-  <div class="header-identity-row">
-    <input class="header-identity" type="text" placeholder="{{localize 'DASU.Actor.ClassPlaceholder'}}" />
+  <div class="actor-header__identity-row">
+    <input class="actor-header__identity" type="text" placeholder="{{localize 'DASU.Actor.ClassPlaceholder'}}" />
     {{#if canAdvance}}
-    <button type="button" class="header-levelup" data-action="advance" data-tooltip="{{advanceTooltip}}">
+    <button type="button" class="actor-header__levelup" data-action="advance" data-tooltip="{{advanceTooltip}}">
       <i class="fa-solid fa-angles-up"></i>
     </button>
     {{/if}}
-    <div class="header-level header-merit" data-tooltip="{{meritTooltip}}">
-      <span class="header-lv-label">{{localize "DASU.Actor.Merit.long"}}</span>
+    <div class="actor-header__level actor-header__level--merit" data-tooltip="{{meritTooltip}}">
+      <span class="actor-header__level-label">{{localize "DASU.Actor.Merit.long"}}</span>
       <input class="dasu-pill" type="text" name="system.merit" value="{{system.merit}}" data-dtype="Number" />
     </div>
   </div>

@@ -1,33 +1,33 @@
 <section class="tab identity-tab {{tab.cssClass}}" data-group="primary" data-tab="{{tab.id}}">
 
   <div class="dasu-fieldset">
-    <div class="dasu-fieldset-legend">{{localize "DASU.Sheet.Section.MoralTriad"}}</div>
+    <div class="dasu-fieldset__legend">{{localize "DASU.Sheet.Section.MoralTriad"}}</div>
     <div class="triad-fields" style="margin-bottom: 0;">
       <img class="triad-bg-triangle" src="systems/dasu/assets/moral-triad.svg" alt="" aria-hidden="true" />
       <div class="triad-field">
         <label class="triad-label">{{localize "DASU.Actor.Triad.Virtue"}}</label>
-        <input class="triad-input" type="text" name="system.triad.virtue" value="{{system.triad.virtue}}" data-suggestions="dasu-virtues" placeholder="{{localize 'DASU.Actor.Triad.VirtuePlaceholder'}}" />
+        <input class="dasu-triad__input" type="text" name="system.triad.virtue" value="{{system.triad.virtue}}" data-suggestions="dasu-virtues" placeholder="{{localize 'DASU.Actor.Triad.VirtuePlaceholder'}}" />
       </div>
       <div class="triad-field">
         <label class="triad-label">{{localize "DASU.Actor.Triad.Sin"}}</label>
-        <input class="triad-input" type="text" name="system.triad.sin" value="{{system.triad.sin}}" data-suggestions="dasu-sins" placeholder="{{localize 'DASU.Actor.Triad.SinPlaceholder'}}" />
+        <input class="dasu-triad__input" type="text" name="system.triad.sin" value="{{system.triad.sin}}" data-suggestions="dasu-sins" placeholder="{{localize 'DASU.Actor.Triad.SinPlaceholder'}}" />
       </div>
       <div class="triad-field">
         <label class="triad-label">{{localize "DASU.Actor.Triad.Anathema"}}</label>
-        <input class="triad-input" type="text" name="system.triad.anathema" value="{{system.triad.anathema}}" data-suggestions="dasu-anathemas" placeholder="{{localize 'DASU.Actor.Triad.AnathemaPlaceholder'}}" />
+        <input class="dasu-triad__input" type="text" name="system.triad.anathema" value="{{system.triad.anathema}}" data-suggestions="dasu-anathemas" placeholder="{{localize 'DASU.Actor.Triad.AnathemaPlaceholder'}}" />
       </div>
     </div>
   </div>
 
-  <div class="dasu-fieldset editor-fieldset">
-    <div class="dasu-fieldset-legend">{{localize "DASU.Sheet.Section.Description"}}</div>
+  <div class="dasu-fieldset dasu-fieldset--editor">
+    <div class="dasu-fieldset__legend">{{localize "DASU.Sheet.Section.Description"}}</div>
     <prose-mirror name="system.biography" toggled value="{{actor.system.biography}}" data-document-uuid="{{actor.uuid}}" {{#unless editable}}disabled{{/unless}}>
       {{{biographyHTML}}}
     </prose-mirror>
   </div>
 
-  <div class="dasu-fieldset editor-fieldset">
-    <div class="dasu-fieldset-legend">{{localize "DASU.Sheet.Section.FieldNotes"}}</div>
+  <div class="dasu-fieldset dasu-fieldset--editor">
+    <div class="dasu-fieldset__legend">{{localize "DASU.Sheet.Section.FieldNotes"}}</div>
     <prose-mirror name="system.notes" toggled value="{{actor.system.notes}}" data-document-uuid="{{actor.uuid}}" {{#unless editable}}disabled{{/unless}}>
       {{{notesHTML}}}
     </prose-mirror>

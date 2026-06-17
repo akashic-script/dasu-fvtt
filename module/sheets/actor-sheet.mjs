@@ -183,7 +183,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   #bindTriadComboboxes() {
     for (const input of this.element.querySelectorAll(
-      '.triad-input[data-suggestions]'
+      '.dasu-triad__input[data-suggestions]'
     )) {
       const key = input.dataset.suggestions;
       const i18nKey = DASUActorSheet.TRIAD_SUGGESTION_KEYS[key];
@@ -196,7 +196,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
         this.#openTriadDropdown(input, suggestions)
       );
       input.addEventListener('blur', (e) => {
-        if (e.relatedTarget?.classList.contains('triad-input')) return;
+        if (e.relatedTarget?.classList.contains('dasu-triad__input')) return;
         setTimeout(() => this.#closeTriadDropdown(), 120);
       });
     }
@@ -297,7 +297,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.element.classList.toggle('edit-mode', this.isEditMode);
     this.element
       .querySelectorAll(
-        'input:not([type="hidden"]):not(.dasu-mode-checkbox):not(.triad-input), select'
+        'input:not([type="hidden"]):not(.dasu-mode-checkbox):not(.dasu-triad__input), select'
       )
       .forEach((el) => el.toggleAttribute('readonly', !this.isEditMode));
 
@@ -324,7 +324,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
         const attrKey =
           target.name?.match(/^system\.attributes\.(\w+)\.value$/)?.[1] ??
-          (target.matches('.attribute-controls .attribute-value')
+          (target.matches('.attribute-controls .actor-sidebar__attr-value')
             ? target.closest('[data-attribute]')?.dataset.attribute
             : null);
 
@@ -364,7 +364,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     );
 
     for (const input of this.element.querySelectorAll(
-      'input.attribute-value'
+      'input.actor-sidebar__attr-value'
     )) {
       input.addEventListener(
         'change',
@@ -392,7 +392,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
       );
     }
 
-    for (const input of this.element.querySelectorAll('input.skill-value')) {
+    for (const input of this.element.querySelectorAll(
+      'input.actor-sidebar__skill-value'
+    )) {
       input.addEventListener(
         'change',
         (e) => {
@@ -413,7 +415,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
       );
     }
 
-    for (const row of this.element.querySelectorAll('.skill-row')) {
+    for (const row of this.element.querySelectorAll(
+      '.actor-sidebar__skill-row'
+    )) {
       row.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         const key = row.dataset.skill;
@@ -498,7 +502,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
         label: game.i18n.localize(
           isHp ? 'DASU.Actor.HP.abbr' : 'DASU.Actor.WP.abbr'
         ),
-        labelClass: isHp ? 'resource-label-hp' : 'resource-label-wp',
+        labelClass: isHp
+          ? 'resource-popover__label--hp'
+          : 'resource-popover__label--wp',
       }
     );
     const pop = Object.assign(document.createElement('div'), {
@@ -520,13 +526,13 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
     const int = (sel) => parseInt(pop.querySelector(sel).value) || 0;
     const syncSidebar = () => {
-      const v = int('.pop-value');
-      const m = int('.pop-max');
-      if (target.querySelector('.resource-val'))
-        target.querySelector('.resource-val').textContent = v;
-      if (target.querySelector('.resource-max'))
-        target.querySelector('.resource-max').textContent = m;
-      const fill = target.querySelector('.resource-bar-fill');
+      const v = int('.resource-popover__value');
+      const m = int('.resource-popover__max');
+      if (target.querySelector('.actor-sidebar__resource-val'))
+        target.querySelector('.actor-sidebar__resource-val').textContent = v;
+      if (target.querySelector('.actor-sidebar__resource-max'))
+        target.querySelector('.actor-sidebar__resource-max').textContent = m;
+      const fill = target.querySelector('.actor-sidebar__resource-fill');
       if (fill)
         fill.style.width = `${m > 0 ? Math.min(100, (v / m) * 100) : 0}%`;
     };
@@ -538,22 +544,22 @@ export class DASUActorSheet extends SheetLayoutMixin(
       syncSidebar();
     };
 
-    pop.querySelectorAll('.resource-btn').forEach((btn) =>
+    pop.querySelectorAll('.resource-popover__btn').forEach((btn) =>
       btn.addEventListener('click', () => {
         const next = Math.min(
-          int('.pop-max'),
+          int('.resource-popover__max'),
           Math.max(
             0,
-            int('.pop-value') +
-              int('.resource-delta') * parseInt(btn.dataset.step)
+            int('.resource-popover__value') +
+              int('.resource-popover__delta') * parseInt(btn.dataset.step)
           )
         );
-        pop.querySelector('.pop-value').value = next;
+        pop.querySelector('.resource-popover__value').value = next;
         update('value', next);
       })
     );
     pop
-      .querySelector('.pop-value')
+      .querySelector('.resource-popover__value')
       .addEventListener('change', (e) =>
         update('value', parseInt(e.target.value) || 0)
       );
@@ -617,7 +623,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
     const int = (sel) => parseInt(pop.querySelector(sel)?.value) || 0;
     const syncHeader = () => {
-      const v = int('.pop-value');
+      const v = int('.resource-popover__value');
       const el = target.querySelector('.dasu-pill');
       if (el) el.value = v;
     };
@@ -626,19 +632,19 @@ export class DASUActorSheet extends SheetLayoutMixin(
       syncHeader();
     };
 
-    pop.querySelectorAll('.resource-btn').forEach((btn) =>
+    pop.querySelectorAll('.resource-popover__btn').forEach((btn) =>
       btn.addEventListener('click', () => {
         const next = Math.max(
           0,
-          int('.pop-value') +
-            int('.resource-delta') * parseInt(btn.dataset.step)
+          int('.resource-popover__value') +
+            int('.resource-popover__delta') * parseInt(btn.dataset.step)
         );
-        pop.querySelector('.pop-value').value = next;
+        pop.querySelector('.resource-popover__value').value = next;
         update(next);
       })
     );
     pop
-      .querySelector('.pop-value')
+      .querySelector('.resource-popover__value')
       .addEventListener('change', (e) => update(parseInt(e.target.value) || 0));
     pop.querySelectorAll('input').forEach((input) =>
       input.addEventListener('keydown', (e) => {
@@ -664,8 +670,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
     const resource = target.dataset.resource;
     const sign = parseInt(target.dataset.step);
     const deltaInput = target
-      .closest('.resource-stepper')
-      .querySelector('.resource-delta');
+      .closest('.resource-popover__stepper')
+      .querySelector('.resource-popover__delta');
     const delta = (parseInt(deltaInput?.value) || 1) * sign;
     const current =
       foundry.utils.getProperty(this.actor.system, `${resource}.value`) ?? 0;
