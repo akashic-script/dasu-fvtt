@@ -1,7 +1,9 @@
 <section class="tab identity-tab {{tab.cssClass}}" data-group="primary" data-tab="{{tab.id}}">
 
-  <div class="dasu-fieldset">
-    <div class="dasu-fieldset__legend">{{localize "DASU.Sheet.Section.MoralTriad"}}</div>
+  <div class="dasu-fieldset dasu-fieldset--active-legend">
+    <div class="dasu-fieldset__header">
+      <div class="dasu-fieldset__legend">{{localize "DASU.Sheet.Section.MoralTriad"}}</div>
+    </div>
     <div class="triad-fields" style="margin-bottom: 0;">
       <img class="triad-bg-triangle" src="systems/dasu/assets/moral-triad.svg" alt="" aria-hidden="true" />
       <div class="triad-field">
@@ -19,18 +21,24 @@
     </div>
   </div>
 
-  <div class="dasu-fieldset dasu-fieldset--editor">
-    <div class="dasu-fieldset__legend">{{localize "DASU.Sheet.Section.Description"}}</div>
-    <prose-mirror name="system.biography" toggled value="{{actor.system.biography}}" data-document-uuid="{{actor.uuid}}" {{#unless editable}}disabled{{/unless}}>
-      {{{biographyHTML}}}
-    </prose-mirror>
-  </div>
-
-  <div class="dasu-fieldset dasu-fieldset--editor">
-    <div class="dasu-fieldset__legend">{{localize "DASU.Sheet.Section.FieldNotes"}}</div>
-    <prose-mirror name="system.notes" toggled value="{{actor.system.notes}}" data-document-uuid="{{actor.uuid}}" {{#unless editable}}disabled{{/unless}}>
-      {{{notesHTML}}}
-    </prose-mirror>
+  <div class="dasu-fieldset dasu-fieldset--tabbed dasu-fieldset--editor">
+    <div class="dasu-fieldset__tabs">
+      <button class="dasu-fieldset__tab active" data-action="fieldsetTab" data-panel="biography" type="button">{{localize "DASU.Sheet.Section.Description"}}</button>
+      <button class="dasu-fieldset__tab" data-action="fieldsetTab" data-panel="notes" type="button">{{localize "DASU.Sheet.Section.FieldNotes"}}</button>
+      <div class="dasu-fieldset__split-btns">
+        <button class="dasu-fieldset__split-btn" data-action="fieldsetSplit" data-direction="column" type="button" data-tooltip="Split horizontally">⊞</button>
+      </div>
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="biography">
+      <prose-mirror name="system.biography" toggled value="{{actor.system.biography}}" data-document-uuid="{{actor.uuid}}" {{#unless editable}}disabled{{/unless}}>
+        {{{biographyHTML}}}
+      </prose-mirror>
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="notes" hidden>
+      <prose-mirror name="system.notes" toggled value="{{actor.system.notes}}" data-document-uuid="{{actor.uuid}}" {{#unless editable}}disabled{{/unless}}>
+        {{{notesHTML}}}
+      </prose-mirror>
+    </div>
   </div>
 
 </section>

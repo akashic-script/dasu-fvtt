@@ -61,6 +61,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
       createCustomSkill: DASUActorSheet.#onCreateCustomSkill,
       deleteCustomSkill: DASUActorSheet.#onDeleteCustomSkill,
       advance: DASUActorSheet.#onAdvance,
+      fieldsetTab: DASUActorSheet.#onFieldsetTab,
+      fieldsetSplit: DASUActorSheet.#onFieldsetSplit,
     },
   };
 
@@ -787,5 +789,48 @@ export class DASUActorSheet extends SheetLayoutMixin(
       { 'system.skills': skills },
       { diff: false, recursive: false }
     );
+  }
+
+  static #onFieldsetTab(event, target) {
+    const fieldset = target.closest('.dasu-fieldset--tabbed');
+    if (!fieldset) return;
+    const panel = target.dataset.panel;
+    fieldset
+      .querySelectorAll('.dasu-fieldset__tab')
+      .forEach((t) => t.classList.remove('active'));
+    fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
+      p.hidden = true;
+    });
+    target.classList.add('active');
+    fieldset.querySelector(
+      `.dasu-fieldset__panel[data-panel="${panel}"]`
+    ).hidden = false;
+  }
+
+  static #onFieldsetSplit(event, target) {
+    const fieldset = target.closest('.dasu-fieldset--tabbed');
+    if (!fieldset) return;
+    const direction = target.dataset.direction ?? 'row';
+    const alreadyActive = target.classList.contains('active');
+
+    fieldset
+      .querySelectorAll('.dasu-fieldset__split-btn')
+      .forEach((btn) => btn.classList.remove('active'));
+
+    if (alreadyActive) {
+      fieldset.classList.remove('dasu-fieldset--split');
+      const activeTab = fieldset.querySelector('.dasu-fieldset__tab.active');
+      const activePanel = activeTab?.dataset.panel;
+      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
+        p.hidden = p.dataset.panel !== activePanel;
+      });
+    } else {
+      target.classList.add('active');
+      fieldset.dataset.splitDirection = direction;
+      fieldset.classList.add('dasu-fieldset--split');
+      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
+        p.hidden = false;
+      });
+    }
   }
 }
