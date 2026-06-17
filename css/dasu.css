@@ -808,9 +808,10 @@
     --dasu-accent-ability: #9b6cc4;
     --dasu-accent-spell: #3a9db5;
     --dasu-accent-restorative: #3aaa62;
-    --dasu-accent-technique: #d96060;
+    --dasu-accent-technique: #cd790e;
     --dasu-accent-affliction: #9b6cc4;
     --dasu-accent-weapon: #7090a8;
+    --dasu-accent-tactic: #c45a5a;
     --dasu-surface-1: rgb(var(--dasu-panel) / 40%);
     --dasu-surface-raised: rgb(255 255 255 / 8%);
     --dasu-panel-accent: rgb(255 255 255 / 8%);
@@ -2337,6 +2338,9 @@
       &.feature-table .dasu-table__header {
         --section-accent: var(--dasu-accent-feature);
       }
+      &.tactic-table .dasu-table__header {
+        --section-accent: var(--dasu-accent-tactic);
+      }
       &.effect-table .dasu-table__header {
         --section-accent: var(--dasu-tab-icon);
       }
@@ -2374,6 +2378,9 @@
       }
       &.feature-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-feature);
+      }
+      &.tactic-table .dasu-table__row-container.item {
+        --item-accent: var(--dasu-accent-tactic);
       }
 
       /* Ability sub-category overrides */
@@ -2519,7 +2526,7 @@
         justify-content: center;
         text-align: center;
         width: 100%;
-        font-size: 0.78em;
+        font-size: 0.9em;
         font-weight: bold;
         letter-spacing: 0.04em;
         color: var(--dasu-on-panel);
@@ -2534,6 +2541,11 @@
       .cell-text--end {
         justify-content: flex-end;
         padding-right: 6px;
+      }
+
+      .cell-cost__currency {
+        font-size: 1.25em;
+        line-height: 1;
       }
 
       /* Controls cell */
@@ -2623,16 +2635,19 @@
 
     /* Per-table column definitions */
     .weapon-table {
-      grid-template-columns: [name] auto [damage] 48px [toHit] 48px [controls] 54px;
+      grid-template-columns: [name] auto [damage] 48px [toHit] 54px [controls] 54px;
     }
     .ability-table {
-      grid-template-columns: [name] auto [effect] 90px [cost] 48px [aptitude] 48px [controls] 54px;
+      grid-template-columns: [name] auto [effect] 80px [cost] 48px [toHit] 48px [aptitude] 48px [controls] 54px;
     }
     .item-table {
-      grid-template-columns: [name] auto [effect] 90px [price] 48px [qty] 48px [controls] 54px;
+      grid-template-columns: [name] auto [effect] 80px [price] 48px [qty] 48px [controls] 54px;
     }
     .feature-table {
       grid-template-columns: [name] auto [controls] 54px;
+    }
+    .tactic-table {
+      grid-template-columns: [name] auto [damage] 80px [cost] 54px [toLand] 48px [controls] 54px;
     }
     .effect-table {
       grid-template-columns: [name] auto [source] 80px [duration] 64px [controls] 54px;
@@ -2697,6 +2712,7 @@
   --dasu-accent-technique: #ff6c6c;
   --dasu-accent-affliction: #a855f7;
   --dasu-accent-weapon: #7090a8;
+  --dasu-accent-tactic: #e05555;
   --dasu-border: 2px groove #b8a0d8;
   --dasu-surface-1: rgb(90 62 138 / 95%);
   --dasu-surface-raised: rgb(255 255 255 / 70%);

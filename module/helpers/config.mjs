@@ -142,6 +142,12 @@ DASU.resourceTypes = {
   riches: 'DASU.Resource.Riches',
 };
 
+DASU.resourceAbbreviations = {
+  hp: 'DASU.Resource.HP',
+  wp: 'DASU.Resource.WP',
+  riches: 'DASU.Resource.RichesAbbr',
+};
+
 DASU.itemResources = {
   hp: 'DASU.Item.Item.ResourceHP',
   wp: 'DASU.Item.Item.ResourceWP',

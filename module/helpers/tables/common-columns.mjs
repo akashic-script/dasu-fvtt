@@ -216,6 +216,31 @@ function _renderTextCell(
 }
 
 /**
+ * @param {TextColumnOptions & { getHtml: (item: Item) => string | Promise<string> }} options
+ * @return {ColumnConfig<Item>}
+ */
+function htmlColumn(options = {}) {
+  const { cssClass, columnLabel, getHtml, tooltip, alignment = 'center', importance = 'normal' } = options;
+  return {
+    hideHeader: !columnLabel,
+    renderHeader: () => game.i18n.localize(columnLabel),
+    headerAlignment: alignment,
+    renderCell: async (item) => {
+      return foundry.applications.handlebars.renderTemplate(
+        TEMPLATE('cell/cell-html'),
+        {
+          html: '' + (await getHtml(item)),
+          tooltip: tooltip instanceof Function ? tooltip(item) : tooltip,
+          alignment,
+          importance,
+          cssClass,
+        }
+      );
+    },
+  };
+}
+
+/**
  * @typedef ResourceColumnOptions
  * @property {string} [columnName]   i18n key for the header
  * @property {"start" | "center" | "end"} [headerAlignment]
@@ -285,6 +310,7 @@ export const CommonColumns = Object.freeze({
   itemAnchorColumn,
   itemControlsColumn,
   textColumn,
+  htmlColumn,
   resourceColumn,
   ifElseColumn,
 });

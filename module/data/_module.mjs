@@ -9,3 +9,4 @@ export {default as DASUWeapon} from "./item-weapon.mjs";
 export {default as DASUFeature} from "./feature.mjs";
 export {default as DASUClass} from "./class.mjs";
 export {default as DASUAbility} from "./ability.mjs";
+export {default as DASUTactic} from "./tactic.mjs";

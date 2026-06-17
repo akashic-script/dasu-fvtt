@@ -137,6 +137,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     context.isItem = item.type === 'item';
     context.isWeapon = item.type === 'weapon';
     context.isAbility = item.type === 'ability';
+    context.isTactic = item.type === 'tactic';
 
     const localize = (obj) =>
       Object.fromEntries(
@@ -200,6 +201,12 @@ export class DASUItemSheet extends SheetLayoutMixin(
         context.isSpellAbility ||
         context.isAfflictionAbility ||
         context.isTechniqueAbility;
+    }
+
+    if (context.isTactic) {
+      context.resourceTypeOptions = localize(DASU.resourceTypes);
+      context.governOptions = localize(DASU.attributes);
+      context.damageTypeOptions = localize(DASU.damageTypes);
     }
 
     // Retrieve the roll data for TinyMCE editors.

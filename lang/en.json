@@ -22,6 +22,7 @@
       "HP": "HP",
       "WP": "WP",
       "Riches": "Riches",
+      "RichesAbbr": "¤",
       "CostLabelResource": "Cost",
       "CostLabelRiches": "Price"
     },
@@ -208,6 +209,16 @@
         "HealResource": "Resource",
         "HealMode": "Mode",
         "Attribute": "Attribute"
+      },
+      "Tactic": {
+        "Govern": "Governs",
+        "ResourceType": "Cost Type",
+        "Cost": "Cost",
+        "ToHit": "To Hit",
+        "ToLand": "To Land",
+        "IsInfinity": "Auto-pass",
+        "Damage": "DMG",
+        "DamageType": "Type"
       }
     }
   },
@@ -222,7 +233,8 @@
       "weapon": "Weapon",
       "feature": "Feature",
       "class": "Class",
-      "ability": "Ability"
+      "ability": "Ability",
+      "tactic": "Tactic"
     }
   }
 }

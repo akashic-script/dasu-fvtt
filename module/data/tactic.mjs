@@ -1,0 +1,34 @@
+import DASUItemBase from "./item-base.mjs";
+import { DamageField, ResourceField } from "./fields/index.mjs";
+import { DASU } from "../helpers/config.mjs";
+
+export default class DASUTactic extends DASUItemBase {
+
+  static defineSchema() {
+    const fields = foundry.data.fields;
+    const requiredInteger = { required: true, nullable: false, integer: true };
+    const schema = super.defineSchema();
+
+    schema.govern = new fields.StringField({
+      required: true,
+      blank: false,
+      initial: "pow",
+      choices: Object.keys(DASU.attributes),
+    });
+
+    schema.damage = DamageField({ initial: { value: 0, damageType: 'untyped' } });
+    schema.resource = ResourceField({ defaultType: 'wp' });
+    schema.toLand = new fields.NumberField({ ...requiredInteger, initial: 0 });
+    schema.isInfinity = new fields.BooleanField({ required: true, initial: false });
+
+    return schema;
+  }
+
+  /** @override */
+  prepareDerivedData() {
+    super.prepareDerivedData();
+    if (this.isInfinity) {
+      this.toLand = 0;
+    }
+  }
+}

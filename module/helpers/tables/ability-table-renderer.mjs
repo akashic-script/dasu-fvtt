@@ -17,9 +17,19 @@ export class AbilityTableRenderer extends DASUTableRenderer {
         columnLabel: 'DASU.Item.Ability.Effect',
         getText: AbilityTableRenderer.#formatEffect,
       }),
-      cost: CommonColumns.textColumn({
+      cost: CommonColumns.htmlColumn({
         columnLabel: 'DASU.Item.Ability.Cost',
-        getText: (item) => item.system.resource?.cost ?? '-',
+        getHtml: (item) => {
+          const r = item.system.resource;
+          if (!r) return '-';
+          const raw = game.i18n.localize(DASU.resourceAbbreviations[r.type] ?? '');
+          const abbr = raw === '¤' ? `<span class="cell-cost__currency">${raw}</span>` : (raw || r.type.toUpperCase());
+          return `${r.cost} ${abbr}`;
+        },
+      }),
+      toHit: CommonColumns.textColumn({
+        columnLabel: 'DASU.Actor.Stat.Hit.abbr',
+        getText: (item) => item.system.isInfinity ? '∞' : (item.system.toHit ?? '-'),
       }),
       aptitude: CommonColumns.textColumn({
         columnLabel: 'DASU.Item.Ability.Aptitude',

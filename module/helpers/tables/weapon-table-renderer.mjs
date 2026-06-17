@@ -18,7 +18,7 @@ export class WeaponTableRenderer extends DASUTableRenderer {
         getText: (item) => item.system.damage?.value ?? '-',
       }),
       toHit: CommonColumns.textColumn({
-        columnLabel: 'DASU.Item.Weapon.ToHit',
+        columnLabel: 'DASU.Actor.Stat.Hit.abbr',
         getText: (item) => item.system.toHit ?? '-',
       }),
       controls: CommonColumns.itemControlsColumn({
