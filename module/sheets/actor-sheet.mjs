@@ -131,15 +131,15 @@ export class DASUActorSheet extends SheetLayoutMixin(
         }
       );
 
-    const health = actorData.health ?? {};
-    const power = actorData.power ?? {};
+    const hp = actorData.resources?.hp ?? {};
+    const wp = actorData.resources?.wp ?? {};
     context.healthPercent =
-      health.max > 0
-        ? Math.min(100, Math.max(0, (health.value / health.max) * 100))
+      hp.max > 0
+        ? Math.min(100, Math.max(0, (hp.value / hp.max) * 100))
         : 0;
     context.powerPercent =
-      power.max > 0
-        ? Math.min(100, Math.max(0, (power.value / power.max) * 100))
+      wp.max > 0
+        ? Math.min(100, Math.max(0, (wp.value / wp.max) * 100))
         : 0;
 
     context.temporaryEffectsTable =
@@ -497,8 +497,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
       return;
     }
 
-    const val = this.actor.system[resource === 'health' ? 'health' : 'power'];
     const isHp = resource === 'health';
+    const val = this.actor.system.resources[isHp ? 'hp' : 'wp'];
 
     const html = await foundry.applications.handlebars.renderTemplate(
       'systems/dasu/templates/actor/parts/resource-popover.hbs',
@@ -542,11 +542,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
       if (fill)
         fill.style.width = `${m > 0 ? Math.min(100, (v / m) * 100) : 0}%`;
     };
-    const update = (key, v) => {
-      this.actor.update(
-        { [`system.${resource}.${key}`]: v },
-        { render: false }
-      );
+    const resourcePath = `system.resources.${isHp ? 'hp' : 'wp'}.value`;
+    const update = (v) => {
+      this.actor.update({ [resourcePath]: v }, { render: false });
       syncSidebar();
     };
 
@@ -561,13 +559,13 @@ export class DASUActorSheet extends SheetLayoutMixin(
           )
         );
         pop.querySelector('.resource-popover__value').value = next;
-        update('value', next);
+        update(next);
       })
     );
     pop
       .querySelector('.resource-popover__value')
       .addEventListener('change', (e) =>
-        update('value', parseInt(e.target.value) || 0)
+        update(parseInt(e.target.value) || 0)
       );
     pop.querySelectorAll('input').forEach((input) =>
       input.addEventListener('keydown', (e) => {
@@ -674,18 +672,17 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   static #onResourceStep(event, target) {
     const resource = target.dataset.resource;
+    const isHp = resource === 'health';
     const sign = parseInt(target.dataset.step);
     const deltaInput = target
       .closest('.resource-popover__stepper')
       .querySelector('.resource-popover__delta');
     const delta = (parseInt(deltaInput?.value) || 1) * sign;
-    const current =
-      foundry.utils.getProperty(this.actor.system, `${resource}.value`) ?? 0;
-    const max =
-      foundry.utils.getProperty(this.actor.system, `${resource}.max`) ??
-      current;
+    const res = this.actor.system.resources[isHp ? 'hp' : 'wp'];
+    const current = res?.value ?? 0;
+    const max = res?.max ?? current;
     this.actor.update({
-      [`system.${resource}.value`]: Math.min(max, Math.max(0, current + delta)),
+      [`system.resources.${isHp ? 'hp' : 'wp'}.value`]: Math.min(max, Math.max(0, current + delta)),
     });
   }
 

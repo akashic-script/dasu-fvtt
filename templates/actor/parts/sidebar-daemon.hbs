@@ -9,9 +9,9 @@
     <div class="actor-sidebar__resource-row" data-action="openResourcePopover" data-resource="health">
       <span class="actor-sidebar__resource-label actor-sidebar__resource-label--hp" data-tooltip="{{localize 'DASU.Actor.HP.long'}}">{{localize "DASU.Actor.HP.abbr"}}</span>
       <div class="actor-sidebar__resource-current">
-        <span class="actor-sidebar__resource-val">{{system.health.value}}</span>
+        <span class="actor-sidebar__resource-val">{{system.resources.hp.value}}</span>
         <span class="actor-sidebar__resource-sep">/</span>
-        <span class="actor-sidebar__resource-max">{{system.health.max}}</span>
+        <span class="actor-sidebar__resource-max">{{system.resources.hp.max}}</span>
       </div>
       <div class="actor-sidebar__resource-bar">
         <div class="actor-sidebar__resource-fill actor-sidebar__resource-fill--hp" style="width: {{healthPercent}}%"></div>
@@ -20,9 +20,9 @@
     <div class="actor-sidebar__resource-row" data-action="openResourcePopover" data-resource="power">
       <span class="actor-sidebar__resource-label actor-sidebar__resource-label--wp" data-tooltip="{{localize 'DASU.Actor.WP.long'}}">{{localize "DASU.Actor.WP.abbr"}}</span>
       <div class="actor-sidebar__resource-current">
-        <span class="actor-sidebar__resource-val">{{system.power.value}}</span>
+        <span class="actor-sidebar__resource-val">{{system.resources.wp.value}}</span>
         <span class="actor-sidebar__resource-sep">/</span>
-        <span class="actor-sidebar__resource-max">{{system.power.max}}</span>
+        <span class="actor-sidebar__resource-max">{{system.resources.wp.max}}</span>
       </div>
       <div class="actor-sidebar__resource-bar">
         <div class="actor-sidebar__resource-fill actor-sidebar__resource-fill--wp" style="width: {{powerPercent}}%"></div>

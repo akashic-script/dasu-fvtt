@@ -27,6 +27,11 @@ Hooks.once('init', function () {
     daemon: models.DASUDaemon,
   });
 
+  CONFIG.Actor.trackableAttributes = {
+    summoner: { bar: ['resources.hp', 'resources.wp'], value: [] },
+    daemon:   { bar: ['resources.hp', 'resources.wp'], value: [] },
+  };
+
   CONFIG.Item.documentClass = DASUItem;
   Object.assign(CONFIG.Item.dataModels, {
     item: models.DASUItem,

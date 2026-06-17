@@ -68,6 +68,6 @@
     "units": "ft",
     "diagonals": 0
   },
-  "primaryTokenAttribute": "health",
-  "secondaryTokenAttribute": "power"
+  "primaryTokenAttribute": "resources.hp",
+  "secondaryTokenAttribute": "resources.wp"
 }
