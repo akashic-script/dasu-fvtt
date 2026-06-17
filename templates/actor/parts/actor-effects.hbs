@@ -1,34 +1,3 @@
-<ol class="items-list effects-list">
-  {{#each effects as |section sid|}}
-    <li class="items-header" data-effect-type="{{section.type}}" data-parent-id="{{@root.actor.id}}">
-      <div class="item-name">{{localize section.label}}</div>
-      <div class="effect-source">{{localize "DASU.Effect.Source"}}</div>
-      <div class="effect-duration">{{localize "EFFECT.DURATION.Label"}}</div>
-      <div class="item-controls effect-controls">
-        <a class="effect-control" data-action="create" data-tooltip="{{localize 'DOCUMENT.Create' type="Effect"}}">
-          <i class="fas fa-plus"></i>
-        </a>
-      </div>
-    </li>
-
-    <ol class="item-list">
-    {{#each section.effects as |effect|}}
-      <li class="item effect" data-effect-id="{{effect.id}}" data-parent-id="{{effect.parent.id}}">
-        <div class="item-name effect-name">
-          <div class="item-image">
-            <img src="{{effect.img}}" title="{{effect.name}}" />
-          </div>
-          <h4>{{effect.name}}</h4>
-        </div>
-        <div class="effect-source">{{effect.sourceName}}</div>
-        <div class="effect-duration">{{effect.duration.label}}</div>
-        <div class="item-controls effect-controls">
-          <a class="effect-control effect-menu" data-action="menu" data-tooltip="{{localize 'DASU.Sheet.MoreOptions'}}">
-            <i class="fas fa-bars"></i>
-          </a>
-        </div>
-      </li>
-    {{/each}}
-    </ol>
-  {{/each}}
-</ol>
+{{{temporaryEffectsTable}}}
+{{{passiveEffectsTable}}}
+{{{inactiveEffectsTable}}}

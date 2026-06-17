@@ -1,5 +1,5 @@
 export {default as DASUActorBase} from "./actor-base.mjs";
-export {DamageField} from "./fields/damage-field.mjs";
+export * from "./fields/index.mjs";
 export {default as DASUSummoner} from "./summoner.mjs";
 export {default as DASUDaemon} from "./daemon.mjs";
 

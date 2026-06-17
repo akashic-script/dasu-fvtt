@@ -4,11 +4,43 @@ import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
+import { SheetLayoutMixin } from './mixins/sheet-layout-mixin.mjs';
+import { WeaponTableRenderer } from '../helpers/tables/weapon-table-renderer.mjs';
+import { AbilityTableRenderer } from '../helpers/tables/ability-table-renderer.mjs';
+import { ItemTableRenderer } from '../helpers/tables/item-table-renderer.mjs';
+import { FeatureTableRenderer } from '../helpers/tables/feature-table-renderer.mjs';
+import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
 
-export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
+export class DASUActorSheet extends SheetLayoutMixin(
+  HandlebarsApplicationMixin(ActorSheetV2)
+) {
   static MODES = { PLAY: 1, EDIT: 2 };
 
   _mode = null;
+
+  #weaponTable = new WeaponTableRenderer();
+  #abilityTable = new AbilityTableRenderer();
+  #itemTable = new ItemTableRenderer();
+  #featureTable = new FeatureTableRenderer();
+  #temporaryEffectsTable = new EffectTableRenderer(
+    'temporary',
+    'DASU.Effect.Temporary',
+    (doc) =>
+      prepareActiveEffectCategories(doc.allApplicableEffects()).temporary
+        .effects
+  );
+  #passiveEffectsTable = new EffectTableRenderer(
+    'passive',
+    'DASU.Effect.Passive',
+    (doc) =>
+      prepareActiveEffectCategories(doc.allApplicableEffects()).passive.effects
+  );
+  #inactiveEffectsTable = new EffectTableRenderer(
+    'inactive',
+    'DASU.Effect.Inactive',
+    (doc) =>
+      prepareActiveEffectCategories(doc.allApplicableEffects()).inactive.effects
+  );
 
   get isEditMode() {
     return this._mode === this.constructor.MODES.EDIT;
@@ -21,15 +53,6 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
-      editItem: DASUActorSheet.#editItem,
-      createItem: DASUActorSheet.#createItem,
-      deleteItem: DASUActorSheet.#deleteItem,
-      menuItem: DASUActorSheet.#menuItem,
-      create: DASUActorSheet.#onEffectAction,
-      edit: DASUActorSheet.#onEffectAction,
-      delete: DASUActorSheet.#onEffectAction,
-      toggle: DASUActorSheet.#onEffectAction,
-      menu: DASUActorSheet.#onEffectAction,
       roll: DASUActorSheet.#onRoll,
       resourceStep: DASUActorSheet.#onResourceStep,
       openResourcePopover: DASUActorSheet.#onOpenResourcePopover,
@@ -77,6 +100,10 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     context.items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
     this._prepareItems(context);
+    context.weaponTable = await this.#weaponTable.renderTable(this.document);
+    context.abilityTable = await this.#abilityTable.renderTable(this.document);
+    context.itemTable = await this.#itemTable.renderTable(this.document);
+    context.featureTable = await this.#featureTable.renderTable(this.document);
 
     context.rollData = actor.getRollData();
     context.biographyHTML =
@@ -110,8 +137,13 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         ? Math.min(100, Math.max(0, (power.value / power.max) * 100))
         : 0;
 
-    context.effects = prepareActiveEffectCategories(
-      actor.allApplicableEffects()
+    context.temporaryEffectsTable =
+      await this.#temporaryEffectsTable.renderTable(this.document);
+    context.passiveEffectsTable = await this.#passiveEffectsTable.renderTable(
+      this.document
+    );
+    context.inactiveEffectsTable = await this.#inactiveEffectsTable.renderTable(
+      this.document
     );
 
     const merit = actorData.meritProgress;
@@ -137,20 +169,9 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   }
 
   _prepareItems(context) {
-    const gear = [];
-    const weapons = [];
-    const features = [];
-
     for (const i of context.items) {
       i.img = i.img || Item.DEFAULT_ICON;
-      if (i.type === 'item') gear.push(i);
-      else if (i.type === 'weapon') weapons.push(i);
-      else if (i.type === 'feature') features.push(i);
     }
-
-    context.gear = gear;
-    context.weapons = weapons;
-    context.features = features;
   }
 
   /** @override */
@@ -159,11 +180,6 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     'dasu-sins': 'DASU.Actor.Triad.SinSuggestions',
     'dasu-anathemas': 'DASU.Actor.Triad.AnathemaSuggestions',
   };
-
-  _onFirstRender(context, options) {
-    super._onFirstRender(context, options);
-    this.#buildLayout();
-  }
 
   #bindTriadComboboxes() {
     for (const input of this.element.querySelectorAll(
@@ -226,31 +242,6 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     return super._onClose(options);
   }
 
-  #buildLayout() {
-    const sidebar = this.element.querySelector('.sheet-sidebar');
-    const tabNav = this.element.querySelector('nav.tabs');
-    if (!sidebar || !tabNav) return;
-
-    const tabSections = [
-      ...this.element.querySelectorAll('.tab[data-group="primary"]'),
-    ];
-    const tabBody = document.createElement('div');
-    tabBody.classList.add('tab-body');
-    tabSections[0]?.before(tabBody);
-    tabSections.forEach((s) => tabBody.append(s));
-    tabBody.prepend(tabNav);
-
-    const mainContent = document.createElement('div');
-    mainContent.classList.add('main-content');
-    sidebar.after(mainContent);
-    mainContent.append(sidebar, tabBody);
-
-    const sheetBody = document.createElement('div');
-    sheetBody.classList.add('sheet-body');
-    mainContent.after(sheetBody);
-    sheetBody.append(mainContent);
-  }
-
   _renderModeToggle() {
     const header = this.element.querySelector('.window-header');
     if (!header) return;
@@ -287,6 +278,18 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   }
 
   /** @override */
+  async _onFirstRender(context, options) {
+    await super._onFirstRender(context, options);
+    this.#weaponTable.activateListeners(this);
+    this.#abilityTable.activateListeners(this);
+    this.#itemTable.activateListeners(this);
+    this.#featureTable.activateListeners(this);
+    this.#temporaryEffectsTable.activateListeners(this);
+    this.#passiveEffectsTable.activateListeners(this);
+    this.#inactiveEffectsTable.activateListeners(this);
+  }
+
+  /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);
     this._renderModeToggle();
@@ -310,15 +313,6 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         force: true,
         updatePosition: false,
       });
-    }
-
-    if (this.actor.isOwner) {
-      const handler = (ev) => this._onDragStart(ev);
-      for (const li of this.element.querySelectorAll('li.item')) {
-        if (li.classList.contains('inventory-header')) continue;
-        li.setAttribute('draggable', true);
-        li.addEventListener('dragstart', handler, false);
-      }
     }
 
     this.element.addEventListener(
@@ -444,6 +438,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
               );
             },
           });
+        ui.context?.close();
         const menu = new foundry.applications.ux.ContextMenu(
           document.body,
           '#_dasu_nomatch_',
@@ -456,77 +451,6 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         }, 0);
       });
     }
-  }
-
-  _onDragStart(event) {
-    const target = event.currentTarget;
-    if ('link' in event.target.dataset) return;
-    let dragData;
-    if (target.dataset.itemId) {
-      const item = this.actor.items.get(target.dataset.itemId);
-      dragData = item.toDragData();
-    }
-    if (dragData)
-      event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-  }
-
-  static #editItem(event, target) {
-    const li = target.closest('.item');
-    const item = this.actor.items.get(li.dataset.itemId);
-    item.sheet.render(true);
-  }
-
-  static #menuItem(event, target) {
-    const li = target.closest('.item');
-    const item = this.actor.items.get(li.dataset.itemId);
-    if (!item) return;
-    const menu = new foundry.applications.ux.ContextMenu(
-      document.body,
-      null,
-      [
-        {
-          label: game.i18n.localize('DASU.Sheet.DeleteItem'),
-          icon: 'fas fa-trash',
-          onClick: () => item.delete(),
-        },
-      ],
-      { jQuery: false, fixed: true, relative: 'target' }
-    );
-    setTimeout(() => {
-      ui.context = menu;
-      menu.render(target);
-    }, 0);
-  }
-
-  static async #createItem(event, target) {
-    event.preventDefault();
-    const type = target.dataset.type;
-    const data = foundry.utils.deepClone(target.dataset);
-    const itemData = {
-      name: game.i18n.format('DOCUMENT.New', { type: type.capitalize() }),
-      type,
-      system: data,
-    };
-    delete itemData.system['type'];
-    delete itemData.system['action'];
-    return await Item.create(itemData, { parent: this.actor });
-  }
-
-  static async #deleteItem(event, target) {
-    const li = target.closest('.item');
-    const item = this.actor.items.get(li.dataset.itemId);
-    await item.delete();
-    li.style.display = 'none';
-    this.render();
-  }
-
-  static #onEffectAction(event, target) {
-    const row = target.closest('li');
-    const document =
-      row.dataset.parentId === this.actor.id
-        ? this.actor
-        : this.actor.items.get(row.dataset.parentId);
-    onManageActiveEffect(event, document, target);
   }
 
   static #onRoll(event, target) {
@@ -663,7 +587,7 @@ export class DASUActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }
 
     const currentMerit = this.actor.system.merit;
-    const nextThreshold = this.actor.system.meritProgress?.needed ?? '—';
+    const nextThreshold = this.actor.system.meritProgress?.needed ?? '-';
     const html = await foundry.applications.handlebars.renderTemplate(
       'systems/dasu/templates/actor/parts/merit-popover.hbs',
       {

@@ -21,16 +21,6 @@ export class DASUSummonerActorSheet extends DASUActorSheet {
           icon: 'fas fa-share-nodes',
         },
         {
-          id: 'features',
-          label: 'DASU.Sheet.Tab.Features',
-          icon: 'fas fa-star-and-crescent',
-        },
-        {
-          id: 'abilities',
-          label: 'DASU.Sheet.Tab.Abilities',
-          icon: 'fas fa-hand-fist',
-        },
-        {
           id: 'items',
           label: 'DASU.Sheet.Tab.Items',
           icon: 'fa-solid fa-suitcase',
@@ -48,14 +38,6 @@ export class DASUSummonerActorSheet extends DASUActorSheet {
     tabs: { template: 'systems/dasu/templates/actor/parts/tab-navigation.hbs' },
     syn: {
       template: 'systems/dasu/templates/actor/parts/syn.hbs',
-      scrollable: [''],
-    },
-    abilities: {
-      template: 'systems/dasu/templates/actor/parts/abilities.hbs',
-      scrollable: [''],
-    },
-    features: {
-      template: 'systems/dasu/templates/actor/parts/features.hbs',
       scrollable: [''],
     },
     identity: {

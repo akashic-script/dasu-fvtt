@@ -1,5 +1,5 @@
 import DASUItemBase from "./item-base.mjs";
-import { DamageField } from "./fields/damage-field.mjs";
+import { DamageField, ResourceField } from "./fields/index.mjs";
 import { DASU } from "../helpers/config.mjs";
 
 export default class DASUWeapon extends DASUItemBase {
@@ -25,7 +25,7 @@ export default class DASUWeapon extends DASUItemBase {
 
     schema.damage = DamageField();
     schema.toHit = new fields.NumberField({ ...requiredInteger, initial: 0 });
-    schema.price = new fields.NumberField({ required: true, nullable: false, initial: 0, min: 0 });
+    schema.resource = ResourceField();
 
     return schema;
   }

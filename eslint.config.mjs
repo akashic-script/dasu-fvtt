@@ -140,6 +140,7 @@ const foundryGlobals = {
   Color: 'readonly',
   DuplicateError: 'readonly',
   fromUuid: 'readonly',
+  fromUuidSync: 'readonly',
   getDocumentClass: 'readonly',
   renderDialog: 'readonly',
   renderTemplate: 'readonly',

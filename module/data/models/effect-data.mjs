@@ -1,0 +1,60 @@
+import { DASU } from '../../helpers/config.mjs';
+
+/**
+ * A consumable/item effect block: which resource it touches, how much, and how.
+ */
+export default class EffectData extends foundry.abstract.DataModel {
+  static defineSchema() {
+    const fields = foundry.data.fields;
+    return {
+      resource: new fields.StringField({
+        required: true,
+        blank: false,
+        initial: 'hp',
+        choices: Object.keys(DASU.itemResources),
+      }),
+      value: new fields.NumberField({
+        required: true,
+        nullable: false,
+        integer: true,
+        initial: 0,
+        min: 0,
+      }),
+      mode: new fields.StringField({
+        required: true,
+        blank: false,
+        initial: 'flat',
+        choices: Object.keys(DASU.itemEffectModes),
+      }),
+      statusMode: new fields.StringField({
+        required: true,
+        blank: false,
+        initial: 'clear',
+        choices: Object.keys(DASU.itemStatusModes),
+      }),
+      clearMode: new fields.StringField({
+        required: true,
+        blank: false,
+        initial: 'choose',
+        choices: Object.keys(DASU.itemClearModes),
+      }),
+      attribute: new fields.StringField({
+        required: true,
+        blank: false,
+        initial: 'pow',
+        choices: Object.keys(DASU.attributes),
+      }),
+      grantUuid: new fields.DocumentUUIDField({ type: 'ActiveEffect' }),
+    };
+  }
+
+  /** True when the effect targets a status rather than a numeric resource. */
+  get isStatus() {
+    return this.resource === 'status';
+  }
+
+  /** Localized label for the targeted resource. */
+  get resourceLabel() {
+    return game.i18n.localize(DASU.itemResources[this.resource] ?? '');
+  }
+}

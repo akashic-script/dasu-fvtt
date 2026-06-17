@@ -11,6 +11,7 @@ export function onManageActiveEffect(event, owner, element) {
   const effect = li.dataset.effectId
     ? owner.effects.get(li.dataset.effectId)
     : null;
+  const effectType = li.dataset.effectType ?? a.dataset.effectType;
   switch (a.dataset.action) {
     case 'create':
       return owner.createEmbeddedDocuments('ActiveEffect', [
@@ -20,9 +21,8 @@ export function onManageActiveEffect(event, owner, element) {
           }),
           img: 'icons/svg/aura.svg',
           origin: owner.uuid,
-          'duration.rounds':
-            li.dataset.effectType === 'temporary' ? 1 : undefined,
-          disabled: li.dataset.effectType === 'inactive',
+          'duration.rounds': effectType === 'temporary' ? 1 : undefined,
+          disabled: effectType === 'inactive',
         },
       ]);
     case 'edit':

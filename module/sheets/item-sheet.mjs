@@ -1,31 +1,30 @@
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { DocumentSheetV2 } = foundry.applications.api;
-import {
-  onManageActiveEffect,
-  prepareActiveEffectCategories,
-} from '../helpers/effects.mjs';
+import { prepareActiveEffectCategories } from '../helpers/effects.mjs';
 import { DASU } from '../helpers/config.mjs';
+import { SheetLayoutMixin } from './mixins/sheet-layout-mixin.mjs';
+import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {DocumentSheetV2}
  * @mixes {HandlebarsApplication}
  */
-export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
+export class DASUItemSheet extends SheetLayoutMixin(
+  HandlebarsApplicationMixin(DocumentSheetV2)
+) {
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ['dasu', 'sheet', 'item'],
-    position: { width: 520, height: 520 },
+    position: { width: 565, height: 520 },
     window: { resizable: true },
     form: {
       submitOnChange: true,
     },
     actions: {
-      create: DASUItemSheet.#onEffectAction,
-      edit: DASUItemSheet.#onEffectAction,
-      delete: DASUItemSheet.#onEffectAction,
-      toggle: DASUItemSheet.#onEffectAction,
-      menu: DASUItemSheet.#onEffectAction,
+      addItemEffect: DASUItemSheet.#onAddItemEffect,
+      deleteItemEffect: DASUItemSheet.#onDeleteItemEffect,
+      clearGrantUuid: DASUItemSheet.#onClearGrantUuid,
     },
   };
 
@@ -82,6 +81,22 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     return this.document;
   }
 
+  #temporaryEffectsTable = new EffectTableRenderer(
+    'temporary',
+    'DASU.Effect.Temporary',
+    (doc) => prepareActiveEffectCategories(doc.effects).temporary.effects
+  );
+  #passiveEffectsTable = new EffectTableRenderer(
+    'passive',
+    'DASU.Effect.Passive',
+    (doc) => prepareActiveEffectCategories(doc.effects).passive.effects
+  );
+  #inactiveEffectsTable = new EffectTableRenderer(
+    'inactive',
+    'DASU.Effect.Inactive',
+    (doc) => prepareActiveEffectCategories(doc.effects).inactive.effects
+  );
+
   /** @override */
   _configureRenderParts(options) {
     const parts = super._configureRenderParts(options);
@@ -103,37 +118,6 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   }
 
   /** @override */
-  _onFirstRender(context, options) {
-    super._onFirstRender(context, options);
-    this.#buildLayout();
-  }
-
-  #buildLayout() {
-    const sidebar = this.element.querySelector('.sheet-sidebar');
-    const tabNav = this.element.querySelector('nav.tabs');
-    if (!sidebar || !tabNav) return;
-
-    const tabSections = [
-      ...this.element.querySelectorAll('.tab[data-group="primary"]'),
-    ];
-    const tabBody = document.createElement('div');
-    tabBody.classList.add('tab-body');
-    tabSections[0]?.before(tabBody);
-    tabSections.forEach((s) => tabBody.append(s));
-    tabBody.prepend(tabNav);
-
-    const mainContent = document.createElement('div');
-    mainContent.classList.add('main-content');
-    sidebar.after(mainContent);
-    mainContent.append(sidebar, tabBody);
-
-    const sheetBody = document.createElement('div');
-    sheetBody.classList.add('sheet-body');
-    mainContent.after(sheetBody);
-    sheetBody.append(mainContent);
-  }
-
-  /** @override */
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const item = context.document;
@@ -152,6 +136,7 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     context.owner = item.isOwner;
     context.isItem = item.type === 'item';
     context.isWeapon = item.type === 'weapon';
+    context.isAbility = item.type === 'ability';
 
     const localize = (obj) =>
       Object.fromEntries(
@@ -159,19 +144,62 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
       );
 
     if (context.isItem) {
-      const isStatus = itemData.system.effect?.resource === 'status';
+      context.resourceTypeOptions = localize(DASU.resourceTypes);
       context.resourceOptions = localize(DASU.itemResources);
       context.modeOptions = localize(DASU.itemEffectModes);
       context.statusModeOptions = localize(DASU.itemStatusModes);
-      context.showMode = !isStatus;
-      context.showStatusMode = isStatus;
-      context.showStatusCount = isStatus && itemData.system.effect?.statusMode === 'choose';
+      context.clearModeOptions = localize(DASU.itemClearModes);
+      context.attributeOptions = localize(DASU.attributes);
+      context.itemEffects = (itemData.system.effects ?? []).map((effect, i) => {
+        const isStatus = effect.resource === 'status';
+        const isClear = isStatus && effect.statusMode === 'clear';
+        const isGrant = isStatus && effect.statusMode === 'grant';
+        const isNumericTick = !isStatus && effect.mode === 'tick';
+        let grantUuidName = '';
+        if (isGrant && effect.grantUuid) {
+          const doc = fromUuidSync(effect.grantUuid);
+          grantUuidName = doc?.name ?? effect.grantUuid;
+        }
+        return {
+          ...effect,
+          index: i,
+          showMode: !isStatus,
+          showAttribute: isNumericTick,
+          showStatusMode: isStatus,
+          showClearMode: isClear,
+          showStatusCount: isClear && effect.clearMode === 'choose',
+          showGrantUuid: isGrant,
+          grantUuidName,
+        };
+      });
     }
 
     if (context.isWeapon) {
+      context.resourceTypeOptions = localize(DASU.resourceTypes);
       context.categoryOptions = localize(DASU.weaponCategories);
       context.rangeOptions = localize(DASU.weaponRanges);
       context.damageTypeOptions = localize(DASU.damageTypes);
+    }
+
+    if (context.isAbility) {
+      const category = itemData.system.category;
+      context.resourceTypeOptions = localize(DASU.resourceTypes);
+      context.abilityCategoryOptions = localize(DASU.abilityCategories);
+      context.aptitudeOptions = localize(DASU.aptitudes);
+      context.damageTypeOptions = localize(DASU.damageTypes);
+      context.resourceOptions = localize(DASU.abilityHealResources);
+      context.modeOptions = localize(DASU.itemEffectModes);
+      context.attributeOptions = localize(DASU.attributes);
+      context.isSpellAbility = category === 'spell';
+      context.isAfflictionAbility = category === 'affliction';
+      context.isRestorativeAbility = category === 'restorative';
+      context.isTechniqueAbility = category === 'technique';
+      context.showAbilityDamage =
+        context.isSpellAbility || context.isTechniqueAbility;
+      context.showAbilityToHit =
+        context.isSpellAbility ||
+        context.isAfflictionAbility ||
+        context.isTechniqueAbility;
     }
 
     // Retrieve the roll data for TinyMCE editors.
@@ -183,8 +211,14 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
         { relativeTo: item, secrets: item.isOwner, rollData: context.rollData }
       );
 
-    // Prepare active effects for easier access
-    context.effects = prepareActiveEffectCategories(item.effects);
+    context.temporaryEffectsTable =
+      await this.#temporaryEffectsTable.renderTable(this.document);
+    context.passiveEffectsTable = await this.#passiveEffectsTable.renderTable(
+      this.document
+    );
+    context.inactiveEffectsTable = await this.#inactiveEffectsTable.renderTable(
+      this.document
+    );
 
     return context;
   }
@@ -192,8 +226,53 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   /* -------------------------------------------- */
 
   /** @override */
+  async _onFirstRender(context, options) {
+    await super._onFirstRender(context, options);
+    this.#temporaryEffectsTable.activateListeners(this);
+    this.#passiveEffectsTable.activateListeners(this);
+    this.#inactiveEffectsTable.activateListeners(this);
+  }
+
+  /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);
+
+    for (const nameEl of this.element.querySelectorAll(
+      '.effect-drop-zone__name[data-grant-uuid]'
+    )) {
+      nameEl.addEventListener('click', async () => {
+        const uuid = nameEl.dataset.grantUuid;
+        if (!uuid) return;
+        const doc = await fromUuid(uuid);
+        doc?.sheet?.render(true);
+      });
+    }
+
+    for (const zone of this.element.querySelectorAll('.effect-drop-zone')) {
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+      zone.addEventListener('dragleave', () =>
+        zone.classList.remove('drag-over')
+      );
+      zone.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        let data;
+        try {
+          data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        } catch {
+          return;
+        }
+        if (data.type !== 'ActiveEffect' || !data.uuid) return;
+        const index = Number(zone.dataset.effectIndex);
+        const effects = this.item.system.toObject().effects ?? [];
+        if (!effects[index]) return;
+        effects[index].grantUuid = data.uuid;
+        await this.item.update({ 'system.effects': effects });
+      });
+    }
 
     const activeTab =
       this.tabGroups?.primary ?? this.constructor.TABS.primary.initial;
@@ -212,13 +291,25 @@ export class DASUItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
 
   /* -------------------------------------------- */
 
-  /**
-   * Handle active effect management.
-   * @param {PointerEvent} event   The originating click event.
-   * @param {HTMLElement} target   The capturing HTML element.
-   * @private
-   */
-  static #onEffectAction(event, target) {
-    onManageActiveEffect(event, this.item, target);
+  static async #onAddItemEffect() {
+    const effects = this.item.system.toObject().effects ?? [];
+    effects.push({});
+    await this.item.update({ 'system.effects': effects });
+  }
+
+  static async #onClearGrantUuid(event, target) {
+    const index = Number(target.dataset.index);
+    const effects = this.item.system.toObject().effects ?? [];
+    if (!effects[index]) return;
+    effects[index].grantUuid = null;
+    await this.item.update({ 'system.effects': effects });
+  }
+
+  static async #onDeleteItemEffect(event, target) {
+    const index = Number(target.dataset.index);
+    const effects = this.item.system.toObject().effects ?? [];
+    if (index < 0 || index >= effects.length) return;
+    effects.splice(index, 1);
+    await this.item.update({ 'system.effects': effects });
   }
 }

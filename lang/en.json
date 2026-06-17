@@ -18,6 +18,13 @@
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects"
     },
+    "Resource": {
+      "HP": "HP",
+      "WP": "WP",
+      "Riches": "Riches",
+      "CostLabelResource": "Cost",
+      "CostLabelRiches": "Price"
+    },
     "DamageType": {
       "Fire": "Fire",
       "Ice": "Ice",
@@ -148,13 +155,23 @@
         "ResourceStatus": "Status",
         "Value": "Value",
         "Mode": "Mode",
+        "ModeTick": "Tick",
         "ModeFlat": "Flat",
         "ModePercent": "Percent",
-        "StatusMode": "Clear",
-        "StatusChoose": "Choose",
-        "StatusAll": "All",
+        "StatusMode": "Status Mode",
+        "StatusClear": "Clear",
+        "StatusGrant": "Grant",
+        "ClearMode": "Clear Mode",
+        "ClearChoose": "Choose",
+        "ClearAll": "All",
+        "GrantEffect": "Effect",
+        "GrantEffectHint": "Drop an Active Effect here",
         "Price": "Price",
-        "Quantity": "QTY"
+        "Quantity": "QTY",
+        "ResourceType": "Cost Type",
+        "Attribute": "Attribute",
+        "AddEffect": "Add Effect",
+        "DeleteEffect": "Remove Effect"
       },
       "Weapon": {
         "Category": "Category",
@@ -168,7 +185,29 @@
         "Damage": "DMG",
         "DamageType": "Type",
         "ToHit": "To Hit",
+        "ResourceType": "Cost Type",
         "Price": "Price"
+      },
+      "Ability": {
+        "Category": "Category",
+        "CategorySpell": "Spell",
+        "CategoryAffliction": "Affliction",
+        "CategoryRestorative": "Restorative",
+        "CategoryTechnique": "Technique",
+        "Effect": "Effect",
+        "ResourceType": "Cost Type",
+        "Cost": "Cost",
+        "ToHit": "To Hit",
+        "IsInfinity": "Auto-pass",
+        "Aptitude": "Aptitude",
+        "AptitudeType": "Aptitude",
+        "AptitudeValue": "Rank",
+        "Damage": "DMG",
+        "DamageType": "Type",
+        "Heal": "Heal",
+        "HealResource": "Resource",
+        "HealMode": "Mode",
+        "Attribute": "Attribute"
       }
     }
   },

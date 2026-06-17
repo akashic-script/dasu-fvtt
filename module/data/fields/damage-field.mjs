@@ -1,26 +1,9 @@
-import { DASU } from "../../helpers/config.mjs";
+import DamageData from '../models/damage-data.mjs';
 
 /**
- * A reusable SchemaField representing a damage roll: numeric value + element type.
- * @param {object} [opts]  Overrides for either sub-field.
+ * A reusable damage block (value + element type), backed by {@link DamageData}.
+ * @param {object} [opts]  EmbeddedDataField options.
  */
 export function DamageField(opts = {}) {
-  const fields = foundry.data.fields;
-  return new fields.SchemaField({
-    value: new fields.NumberField({
-      required: true,
-      nullable: false,
-      integer: true,
-      initial: 0,
-      min: 0,
-      ...opts.value,
-    }),
-    damageType: new fields.StringField({
-      required: true,
-      blank: false,
-      initial: "physical",
-      choices: Object.keys(DASU.damageTypes),
-      ...opts.damageType,
-    }),
-  });
+  return new foundry.data.fields.EmbeddedDataField(DamageData, opts);
 }

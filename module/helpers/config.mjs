@@ -74,6 +74,18 @@ DASU.weaponRanges = {
   ranged: 'DASU.Item.Weapon.RangeRanged',
 };
 
+DASU.abilityCategories = {
+  spell: 'DASU.Item.Ability.CategorySpell',
+  affliction: 'DASU.Item.Ability.CategoryAffliction',
+  restorative: 'DASU.Item.Ability.CategoryRestorative',
+  technique: 'DASU.Item.Ability.CategoryTechnique',
+};
+
+DASU.abilityHealResources = {
+  hp: 'DASU.Item.Item.ResourceHP',
+  wp: 'DASU.Item.Item.ResourceWP',
+};
+
 DASU.damageTypes = {
   fire: 'DASU.DamageType.Fire',
   ice: 'DASU.DamageType.Ice',
@@ -124,6 +136,12 @@ DASU.aptitudeAbbreviations = {
   assist: 'DASU.Aptitude.Assist.abbr',
 };
 
+DASU.resourceTypes = {
+  hp: 'DASU.Resource.HP',
+  wp: 'DASU.Resource.WP',
+  riches: 'DASU.Resource.Riches',
+};
+
 DASU.itemResources = {
   hp: 'DASU.Item.Item.ResourceHP',
   wp: 'DASU.Item.Item.ResourceWP',
@@ -131,13 +149,19 @@ DASU.itemResources = {
 };
 
 DASU.itemEffectModes = {
+  tick: 'DASU.Item.Item.ModeTick',
   flat: 'DASU.Item.Item.ModeFlat',
   percent: 'DASU.Item.Item.ModePercent',
 };
 
 DASU.itemStatusModes = {
-  choose: 'DASU.Item.Item.StatusChoose',
-  all: 'DASU.Item.Item.StatusAll',
+  clear: 'DASU.Item.Item.StatusClear',
+  grant: 'DASU.Item.Item.StatusGrant',
+};
+
+DASU.itemClearModes = {
+  choose: 'DASU.Item.Item.ClearChoose',
+  all: 'DASU.Item.Item.ClearAll',
 };
 
 DASU.skills = {

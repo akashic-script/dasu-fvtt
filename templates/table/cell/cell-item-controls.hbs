@@ -1,0 +1,19 @@
+<div class="cell-item-controls">
+  <a class="cell-item-controls__control {{#if disableEdit}}cell-item-controls__control--disabled{{/if}}"
+     data-action="editItem"
+     data-tooltip="{{localize 'DASU.Sheet.EditItem'}}">
+    <i class="fas fa-edit"></i>
+  </a>
+  {{#unless hideDelete}}
+    <a class="cell-item-controls__control {{#if disableDelete}}cell-item-controls__control--disabled{{/if}}"
+       data-action="deleteItem"
+       data-tooltip="{{localize 'DASU.Sheet.DeleteItem'}}">
+      <i class="fas fa-trash"></i>
+    </a>
+  {{/unless}}
+  <a class="cell-item-controls__control {{#if disableMenu}}cell-item-controls__control--disabled{{/if}}"
+     data-action="menuItem"
+     data-tooltip="{{localize 'DASU.Sheet.MoreOptions'}}">
+    <i class="fas fa-bars"></i>
+  </a>
+</div>

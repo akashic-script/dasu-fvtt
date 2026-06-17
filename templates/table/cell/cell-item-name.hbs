@@ -1,0 +1,23 @@
+<div class="cell-item-name">
+  <div class="cell-item-name__main">
+    <div class="cell-item-name__image">
+      {{#if rollable}}
+        <a data-action="rollItem" data-tooltip="{{name}}">
+          <img src="{{img}}" alt="{{name}}" width="22" height="22" />
+        </a>
+      {{else}}
+        <a data-link draggable="true" data-uuid="{{uuid}}" data-item-id="{{id}}" data-tooltip="{{name}}">
+          <img src="{{img}}" alt="{{name}}" width="22" height="22" />
+        </a>
+      {{/if}}
+    </div>
+    <div class="cell-item-name__name">
+      <span class="{{cssClass}}">{{name}}</span>
+    </div>
+  </div>
+  {{#if caption}}
+    <div class="cell-item-name__caption">
+      {{{caption}}}
+    </div>
+  {{/if}}
+</div>

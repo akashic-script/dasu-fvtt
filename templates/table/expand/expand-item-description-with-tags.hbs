@@ -1,0 +1,14 @@
+<div class="dasu-expand-description">
+  {{#if tags.length}}
+    <div class="dasu-expand-description__tags">
+      {{#each tags}}
+        <div class="dasu-expand-description__tag">
+          {{localize label}}: {{value}}
+        </div>
+      {{/each}}
+    </div>
+  {{/if}}
+  <div class="dasu-expand-description__body">
+    {{{description}}}
+  </div>
+</div>
