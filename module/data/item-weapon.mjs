@@ -13,14 +13,14 @@ export default class DASUWeapon extends DASUItemBase {
       required: true,
       blank: false,
       initial: "small",
-      choices: Object.keys(DASU.weaponCategories),
+      choices: DASU.weaponCategories,
     });
 
     schema.range = new fields.StringField({
       required: true,
       blank: false,
       initial: "melee",
-      choices: Object.keys(DASU.weaponRanges),
+      choices: DASU.weaponRanges,
     });
 
     schema.damage = DamageField();

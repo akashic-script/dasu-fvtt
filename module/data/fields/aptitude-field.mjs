@@ -11,7 +11,7 @@ export function AptitudeField(opts = {}) {
       required: true,
       blank: false,
       initial: 'f',
-      choices: Object.keys(DASU.aptitudes),
+      choices: DASU.aptitudes,
     }),
     value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 1, max: 4 }),
   }, opts);

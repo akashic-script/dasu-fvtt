@@ -13,7 +13,7 @@ export default class DASUTactic extends DASUItemBase {
       required: true,
       blank: false,
       initial: "none",
-      choices: ["none", ...Object.keys(DASU.attributes)],
+      choices: { none: "DASU.Item.Tactic.GovernNone", ...DASU.attributes },
     });
 
     schema.damage = DamageField({ initial: { value: 0, damageType: 'untyped' } });

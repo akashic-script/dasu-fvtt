@@ -13,7 +13,7 @@ export default class DASUAbility extends DASUItemBase {
       required: true,
       blank: false,
       initial: "spell",
-      choices: Object.keys(DASU.abilityCategories),
+      choices: DASU.abilityCategories,
     });
 
     schema.damage = DamageField();

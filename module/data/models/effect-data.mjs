@@ -11,7 +11,7 @@ export default class EffectData extends foundry.abstract.DataModel {
         required: true,
         blank: false,
         initial: 'hp',
-        choices: Object.keys(DASU.itemResources),
+        choices: DASU.itemResources,
       }),
       value: new fields.NumberField({
         required: true,
@@ -24,25 +24,25 @@ export default class EffectData extends foundry.abstract.DataModel {
         required: true,
         blank: false,
         initial: 'flat',
-        choices: Object.keys(DASU.itemEffectModes),
+        choices: DASU.itemEffectModes,
       }),
       statusMode: new fields.StringField({
         required: true,
         blank: false,
         initial: 'clear',
-        choices: Object.keys(DASU.itemStatusModes),
+        choices: DASU.itemStatusModes,
       }),
       clearMode: new fields.StringField({
         required: true,
         blank: false,
         initial: 'choose',
-        choices: Object.keys(DASU.itemClearModes),
+        choices: DASU.itemClearModes,
       }),
       attribute: new fields.StringField({
         required: true,
         blank: false,
         initial: 'pow',
-        choices: Object.keys(DASU.attributes),
+        choices: DASU.attributes,
       }),
       grantUuid: new fields.DocumentUUIDField({ type: 'ActiveEffect' }),
     };

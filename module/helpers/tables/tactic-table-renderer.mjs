@@ -19,7 +19,9 @@ export class TacticTableRenderer extends DASUTableRenderer {
           const d = item.system.damage;
           const val = d?.value ?? 0;
           const typeLabel = d?.typeLabel ?? '';
-          const governAbbr = game.i18n.localize(DASU.attributeAbbreviations[item.system.govern] ?? '').toUpperCase();
+          const governAbbr = game.i18n
+            .localize(DASU.attributeAbbreviations[item.system.govern] ?? '')
+            .toUpperCase();
           return `${governAbbr}+${val} ${typeLabel}`.trim();
         },
       }),
@@ -28,14 +30,20 @@ export class TacticTableRenderer extends DASUTableRenderer {
         getHtml: (item) => {
           const r = item.system.resource;
           if (!r) return '-';
-          const raw = game.i18n.localize(DASU.resourceAbbreviations[r.type] ?? '');
-          const abbr = raw === '¤' ? `<span class="cell-cost__currency">${raw}</span>` : (raw || r.type.toUpperCase());
+          const raw = game.i18n.localize(
+            DASU.resourceAbbreviations[r.type] ?? ''
+          );
+          const abbr =
+            raw === '¤'
+              ? `<span class="cell-cost__currency">${raw}</span>`
+              : raw || r.type.toUpperCase();
           return `${r.cost} ${abbr}`;
         },
       }),
       toLand: CommonColumns.textColumn({
         columnLabel: 'DASU.Actor.Stat.Land.abbr',
-        getText: (item) => item.system.isInfinity ? '∞' : (item.system.toLand ?? '-'),
+        getText: (item) =>
+          item.system.isInfinity ? '∞' : item.system.toLand ?? '-',
       }),
       controls: CommonColumns.itemControlsColumn({
         type: 'tactic',
@@ -59,12 +67,17 @@ export class TacticTableRenderer extends DASUTableRenderer {
     if (item.system.isInfinity) {
       tags.push({ label: 'DASU.Item.Tactic.IsInfinity', value: '∞' });
     } else {
-      tags.push({ label: 'DASU.Actor.Stat.Land.abbr', value: item.system.toLand });
+      tags.push({
+        label: 'DASU.Actor.Stat.Land.abbr',
+        value: item.system.toLand,
+      });
     }
 
     tags.push({
       label: 'DASU.Item.Tactic.Damage',
-      value: `${item.system.damage?.value ?? 0} ${item.system.damage?.typeLabel ?? ''}`.trim(),
+      value: `${item.system.damage?.value ?? 0} ${
+        item.system.damage?.typeLabel ?? ''
+      }`.trim(),
     });
 
     return tags;

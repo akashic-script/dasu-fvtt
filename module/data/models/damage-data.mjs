@@ -18,7 +18,7 @@ export default class DamageData extends foundry.abstract.DataModel {
         required: true,
         blank: false,
         initial: 'physical',
-        choices: Object.keys(DASU.damageTypes),
+        choices: DASU.damageTypes,
       }),
     };
   }

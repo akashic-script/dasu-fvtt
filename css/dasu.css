@@ -1857,7 +1857,7 @@
         overflow-y: scroll;
         scrollbar-width: thin;
         scrollbar-color: var(--dasu-hp) rgb(var(--dasu-panel) / 40%);
-        gap: 5px;
+        padding: 5px 0;
       }
 
       .tab:has(prose-mirror) {

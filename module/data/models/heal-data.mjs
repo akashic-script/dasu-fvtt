@@ -11,7 +11,7 @@ export default class HealData extends foundry.abstract.DataModel {
         required: true,
         blank: false,
         initial: 'hp',
-        choices: Object.keys(DASU.abilityHealResources),
+        choices: DASU.abilityHealResources,
       }),
       value: new fields.NumberField({
         required: true,
@@ -24,13 +24,13 @@ export default class HealData extends foundry.abstract.DataModel {
         required: true,
         blank: false,
         initial: 'flat',
-        choices: Object.keys(DASU.itemEffectModes),
+        choices: DASU.itemEffectModes,
       }),
       attribute: new fields.StringField({
         required: true,
         blank: false,
         initial: 'pow',
-        choices: Object.keys(DASU.attributes),
+        choices: DASU.attributes,
       }),
     };
   }

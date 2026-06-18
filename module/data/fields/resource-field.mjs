@@ -11,7 +11,7 @@ export function ResourceField({ defaultType = 'riches', ...opts } = {}) {
       required: true,
       blank: false,
       initial: defaultType,
-      choices: Object.keys(DASU.resourceTypes),
+      choices: DASU.resourceTypes,
     }),
     cost: new fields.NumberField({
       required: true,

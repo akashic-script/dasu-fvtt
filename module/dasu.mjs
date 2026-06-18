@@ -29,7 +29,7 @@ Hooks.once('init', function () {
 
   CONFIG.Actor.trackableAttributes = {
     summoner: { bar: ['resources.hp', 'resources.wp'], value: [] },
-    daemon:   { bar: ['resources.hp', 'resources.wp'], value: [] },
+    daemon: { bar: ['resources.hp', 'resources.wp'], value: [] },
   };
 
   CONFIG.Item.documentClass = DASUItem;

@@ -134,13 +134,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
     const hp = actorData.resources?.hp ?? {};
     const wp = actorData.resources?.wp ?? {};
     context.healthPercent =
-      hp.max > 0
-        ? Math.min(100, Math.max(0, (hp.value / hp.max) * 100))
-        : 0;
+      hp.max > 0 ? Math.min(100, Math.max(0, (hp.value / hp.max) * 100)) : 0;
     context.powerPercent =
-      wp.max > 0
-        ? Math.min(100, Math.max(0, (wp.value / wp.max) * 100))
-        : 0;
+      wp.max > 0 ? Math.min(100, Math.max(0, (wp.value / wp.max) * 100)) : 0;
 
     context.temporaryEffectsTable =
       await this.#temporaryEffectsTable.renderTable(this.document);
@@ -564,9 +560,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     );
     pop
       .querySelector('.resource-popover__value')
-      .addEventListener('change', (e) =>
-        update(parseInt(e.target.value) || 0)
-      );
+      .addEventListener('change', (e) => update(parseInt(e.target.value) || 0));
     pop.querySelectorAll('input').forEach((input) =>
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
@@ -682,7 +676,10 @@ export class DASUActorSheet extends SheetLayoutMixin(
     const current = res?.value ?? 0;
     const max = res?.max ?? current;
     this.actor.update({
-      [`system.resources.${isHp ? 'hp' : 'wp'}.value`]: Math.min(max, Math.max(0, current + delta)),
+      [`system.resources.${isHp ? 'hp' : 'wp'}.value`]: Math.min(
+        max,
+        Math.max(0, current + delta)
+      ),
     });
   }
 

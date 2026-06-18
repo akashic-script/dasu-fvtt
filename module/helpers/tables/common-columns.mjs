@@ -220,7 +220,14 @@ function _renderTextCell(
  * @return {ColumnConfig<Item>}
  */
 function htmlColumn(options = {}) {
-  const { cssClass, columnLabel, getHtml, tooltip, alignment = 'center', importance = 'normal' } = options;
+  const {
+    cssClass,
+    columnLabel,
+    getHtml,
+    tooltip,
+    alignment = 'center',
+    importance = 'normal',
+  } = options;
   return {
     hideHeader: !columnLabel,
     renderHeader: () => game.i18n.localize(columnLabel),
