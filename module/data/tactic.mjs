@@ -12,8 +12,8 @@ export default class DASUTactic extends DASUItemBase {
     schema.govern = new fields.StringField({
       required: true,
       blank: false,
-      initial: "pow",
-      choices: Object.keys(DASU.attributes),
+      initial: "none",
+      choices: ["none", ...Object.keys(DASU.attributes)],
     });
 
     schema.damage = DamageField({ initial: { value: 0, damageType: 'untyped' } });

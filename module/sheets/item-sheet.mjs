@@ -205,7 +205,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
 
     if (context.isTactic) {
       context.resourceTypeOptions = localize(DASU.resourceTypes);
-      context.governOptions = localize(DASU.attributes);
+      context.governOptions = { none: game.i18n.localize("DASU.Item.Tactic.GovernNone"), ...localize(DASU.attributes) };
       context.damageTypeOptions = localize(DASU.damageTypes);
     }
 

@@ -212,6 +212,7 @@
       },
       "Tactic": {
         "Govern": "Governs",
+        "GovernNone": "None",
         "ResourceType": "Cost Type",
         "Cost": "Cost",
         "ToHit": "To Hit",
