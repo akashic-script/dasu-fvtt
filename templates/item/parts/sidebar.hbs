@@ -15,7 +15,7 @@
     </div>
     <div class="item-sidebar__field">
       <label>{{#if (eq system.resource.type "riches")}}{{localize "DASU.Resource.CostLabelRiches"}}{{else}}{{localize "DASU.Resource.CostLabelResource"}}{{/if}}</label>
-      <input type="number" name="system.resource.cost" value="{{system.resource.cost}}" min="0" />
+      <input type="text" name="system.resource.cost" value="{{system.resource.cost}}" />
     </div>
     <div class="item-sidebar__field">
       <label>{{localize "DASU.Item.Item.Quantity"}}</label>
@@ -135,7 +135,7 @@
     </div>
     <div class="item-sidebar__field">
       <label>{{#if (eq system.resource.type "riches")}}{{localize "DASU.Resource.CostLabelRiches"}}{{else}}{{localize "DASU.Resource.CostLabelResource"}}{{/if}}</label>
-      <input type="number" name="system.resource.cost" value="{{system.resource.cost}}" min="0" />
+      <input type="text" name="system.resource.cost" value="{{system.resource.cost}}" />
     </div>
   </div>
   {{/if}}
@@ -157,7 +157,7 @@
     </div>
     <div class="item-sidebar__field">
       <label>{{#if (eq system.resource.type "riches")}}{{localize "DASU.Resource.CostLabelRiches"}}{{else}}{{localize "DASU.Resource.CostLabelResource"}}{{/if}}</label>
-      <input type="number" name="system.resource.cost" value="{{system.resource.cost}}" min="0" />
+      <input type="text" name="system.resource.cost" value="{{system.resource.cost}}" />
     </div>
     <div class="item-sidebar__divider"></div>
     <div class="item-sidebar__field">
@@ -182,6 +182,48 @@
   </div>
   {{/if}}
 
+  {{#if isSchema}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Schema.Level"}}</label>
+      <input type="number" name="system.level" value="{{system.level}}" min="1" max="3" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Schema.Level1Cost"}}</label>
+      <select name="system.level1.resource.type">
+        {{selectOptions resourceTypeOptions selected=system.level1.resource.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Resource.CostLabelResource"}}</label>
+      <input type="text" name="system.level1.resource.cost" value="{{system.level1.resource.cost}}" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Schema.Level2Cost"}}</label>
+      <select name="system.level2.resource.type">
+        {{selectOptions resourceTypeOptions selected=system.level2.resource.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Resource.CostLabelResource"}}</label>
+      <input type="text" name="system.level2.resource.cost" value="{{system.level2.resource.cost}}" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Schema.Level3Cost"}}</label>
+      <select name="system.level3.resource.type">
+        {{selectOptions resourceTypeOptions selected=system.level3.resource.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Resource.CostLabelResource"}}</label>
+      <input type="text" name="system.level3.resource.cost" value="{{system.level3.resource.cost}}" />
+    </div>
+  </div>
+  {{/if}}
+
   {{#if isAbility}}
   <div class="item-sidebar__fields">
     <div class="item-sidebar__field item-sidebar__field--wide">
@@ -199,7 +241,7 @@
     </div>
     <div class="item-sidebar__field">
       <label>{{#if (eq system.resource.type "riches")}}{{localize "DASU.Resource.CostLabelRiches"}}{{else}}{{localize "DASU.Resource.CostLabelResource"}}{{/if}}</label>
-      <input type="number" name="system.resource.cost" value="{{system.resource.cost}}" min="0" />
+      <input type="text" name="system.resource.cost" value="{{system.resource.cost}}" />
     </div>
     {{#if showAbilityToHit}}
     <div class="item-sidebar__field">

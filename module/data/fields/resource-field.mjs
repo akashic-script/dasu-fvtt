@@ -13,12 +13,10 @@ export function ResourceField({ defaultType = 'riches', ...opts } = {}) {
       initial: defaultType,
       choices: DASU.resourceTypes,
     }),
-    cost: new fields.NumberField({
+    cost: new fields.StringField({
       required: true,
-      nullable: false,
-      integer: true,
-      initial: 0,
-      min: 0,
+      blank: true,
+      initial: '0',
     }),
   }, opts);
 }

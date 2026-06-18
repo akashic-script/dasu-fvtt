@@ -10,6 +10,7 @@ import { AbilityTableRenderer } from '../helpers/tables/ability-table-renderer.m
 import { ItemTableRenderer } from '../helpers/tables/item-table-renderer.mjs';
 import { FeatureTableRenderer } from '../helpers/tables/feature-table-renderer.mjs';
 import { TacticTableRenderer } from '../helpers/tables/tactic-table-renderer.mjs';
+import { SchemaTableRenderer } from '../helpers/tables/schema-table-renderer.mjs';
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
 
 export class DASUActorSheet extends SheetLayoutMixin(
@@ -22,6 +23,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
   #weaponTable = new WeaponTableRenderer();
   #abilityTable = new AbilityTableRenderer();
   #tacticTable = new TacticTableRenderer();
+  #schemaTable = new SchemaTableRenderer();
   #itemTable = new ItemTableRenderer();
   #featureTable = new FeatureTableRenderer();
   #temporaryEffectsTable = new EffectTableRenderer(
@@ -107,6 +109,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.weaponTable = await this.#weaponTable.renderTable(this.document);
     context.abilityTable = await this.#abilityTable.renderTable(this.document);
     context.tacticTable = await this.#tacticTable.renderTable(this.document);
+    context.schemaTable = await this.#schemaTable.renderTable(this.document);
     context.itemTable = await this.#itemTable.renderTable(this.document);
     context.featureTable = await this.#featureTable.renderTable(this.document);
 
@@ -284,6 +287,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.#weaponTable.activateListeners(this);
     this.#abilityTable.activateListeners(this);
     this.#tacticTable.activateListeners(this);
+    this.#schemaTable.activateListeners(this);
     this.#itemTable.activateListeners(this);
     this.#featureTable.activateListeners(this);
     this.#temporaryEffectsTable.activateListeners(this);

@@ -220,6 +220,16 @@
         "IsInfinity": "Auto-pass",
         "Damage": "DMG",
         "DamageType": "Type"
+      },
+      "Schema": {
+        "Level": "Level",
+        "Requirements": "Requirements",
+        "Level1": "Level 1",
+        "Level2": "Level 2",
+        "Level3": "Level 3",
+        "Level1Cost": "Level 1 Cost",
+        "Level2Cost": "Level 2 Cost",
+        "Level3Cost": "Level 3 Cost"
       }
     }
   },
@@ -235,7 +245,8 @@
       "feature": "Feature",
       "class": "Class",
       "ability": "Ability",
-      "tactic": "Tactic"
+      "tactic": "Tactic",
+      "schema": "Schema"
     }
   }
 }

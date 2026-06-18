@@ -1,0 +1,29 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="advanced" style="padding: 12px 14px;">
+
+  <div class="dasu-fieldset dasu-fieldset--tabbed dasu-fieldset--editor dasu-fieldset--split" data-split-direction="column">
+    <div class="dasu-fieldset__tabs">
+      <button class="dasu-fieldset__tab active" data-action="fieldsetTab" data-panel="level1" type="button">{{localize "DASU.Item.Schema.Level1"}}</button>
+      <button class="dasu-fieldset__tab" data-action="fieldsetTab" data-panel="level2" type="button">{{localize "DASU.Item.Schema.Level2"}}</button>
+      <button class="dasu-fieldset__tab" data-action="fieldsetTab" data-panel="level3" type="button">{{localize "DASU.Item.Schema.Level3"}}</button>
+      <div class="dasu-fieldset__split-btns">
+        <button class="dasu-fieldset__split-btn active" data-action="fieldsetSplit" data-direction="column" type="button" data-tooltip="Split horizontally">⊞</button>
+      </div>
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="level1">
+      <prose-mirror name="system.level1.description" toggled value="{{item.system.level1.description}}" data-document-uuid="{{item.uuid}}" {{#unless editable}}disabled{{/unless}}>
+        {{{level1DescriptionHTML}}}
+      </prose-mirror>
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="level2">
+      <prose-mirror name="system.level2.description" toggled value="{{item.system.level2.description}}" data-document-uuid="{{item.uuid}}" {{#unless editable}}disabled{{/unless}}>
+        {{{level2DescriptionHTML}}}
+      </prose-mirror>
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="level3">
+      <prose-mirror name="system.level3.description" toggled value="{{item.system.level3.description}}" data-document-uuid="{{item.uuid}}" {{#unless editable}}disabled{{/unless}}>
+        {{{level3DescriptionHTML}}}
+      </prose-mirror>
+    </div>
+  </div>
+
+</section>

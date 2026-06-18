@@ -25,6 +25,8 @@ export class DASUItemSheet extends SheetLayoutMixin(
       addItemEffect: DASUItemSheet.#onAddItemEffect,
       deleteItemEffect: DASUItemSheet.#onDeleteItemEffect,
       clearGrantUuid: DASUItemSheet.#onClearGrantUuid,
+      fieldsetTab: DASUItemSheet.#onFieldsetTab,
+      fieldsetSplit: DASUItemSheet.#onFieldsetSplit,
     },
   };
 
@@ -100,7 +102,11 @@ export class DASUItemSheet extends SheetLayoutMixin(
   /** @override */
   _configureRenderParts(options) {
     const parts = super._configureRenderParts(options);
-    delete parts.advanced;
+    if (this.document.type === 'schema') {
+      parts.advanced = { template: 'systems/dasu/templates/item/parts/schema-advanced.hbs', scrollable: [''] };
+    } else {
+      delete parts.advanced;
+    }
     return parts;
   }
 
@@ -138,6 +144,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     context.isWeapon = item.type === 'weapon';
     context.isAbility = item.type === 'ability';
     context.isTactic = item.type === 'tactic';
+    context.isSchema = item.type === 'schema';
 
     const localize = (obj) =>
       Object.fromEntries(
@@ -211,6 +218,17 @@ export class DASUItemSheet extends SheetLayoutMixin(
 
     // Retrieve the roll data for TinyMCE editors.
     context.rollData = item.getRollData();
+
+    if (context.isSchema) {
+      context.resourceTypeOptions = localize(DASU.resourceTypes);
+      const system = itemData.system;
+      for (const key of ['level1', 'level2', 'level3']) {
+        context[`${key}DescriptionHTML`] = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+          system[key]?.description ?? '',
+          { relativeTo: item, secrets: item.isOwner, rollData: context.rollData }
+        );
+      }
+    }
 
     context.descriptionHTML =
       await foundry.applications.ux.TextEditor.implementation.enrichHTML(
@@ -318,5 +336,36 @@ export class DASUItemSheet extends SheetLayoutMixin(
     if (index < 0 || index >= effects.length) return;
     effects.splice(index, 1);
     await this.item.update({ 'system.effects': effects });
+  }
+
+  static #onFieldsetTab(event, target) {
+    const fieldset = target.closest('.dasu-fieldset--tabbed');
+    if (!fieldset) return;
+    const panel = target.dataset.panel;
+    fieldset.querySelectorAll('.dasu-fieldset__tab').forEach((t) => t.classList.remove('active'));
+    fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => { p.hidden = true; });
+    target.classList.add('active');
+    fieldset.querySelector(`.dasu-fieldset__panel[data-panel="${panel}"]`).hidden = false;
+  }
+
+  static #onFieldsetSplit(event, target) {
+    const fieldset = target.closest('.dasu-fieldset--tabbed');
+    if (!fieldset) return;
+    const direction = target.dataset.direction ?? 'row';
+    const alreadyActive = target.classList.contains('active');
+    fieldset.querySelectorAll('.dasu-fieldset__split-btn').forEach((btn) => btn.classList.remove('active'));
+    if (alreadyActive) {
+      fieldset.classList.remove('dasu-fieldset--split');
+      const activeTab = fieldset.querySelector('.dasu-fieldset__tab.active');
+      const activePanel = activeTab?.dataset.panel;
+      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
+        p.hidden = p.dataset.panel !== activePanel;
+      });
+    } else {
+      target.classList.add('active');
+      fieldset.dataset.splitDirection = direction;
+      fieldset.classList.add('dasu-fieldset--split');
+      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => { p.hidden = false; });
+    }
   }
 }

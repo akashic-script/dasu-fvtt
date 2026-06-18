@@ -812,6 +812,7 @@
     --dasu-accent-affliction: #9b6cc4;
     --dasu-accent-weapon: #7090a8;
     --dasu-accent-tactic: #c45a5a;
+    --dasu-accent-schema: #4a8fc4;
     --dasu-surface-1: rgb(var(--dasu-panel) / 40%);
     --dasu-surface-raised: rgb(255 255 255 / 8%);
     --dasu-panel-accent: rgb(255 255 255 / 8%);
@@ -2341,6 +2342,9 @@
       &.tactic-table .dasu-table__header {
         --section-accent: var(--dasu-accent-tactic);
       }
+      &.schema-table .dasu-table__header {
+        --section-accent: var(--dasu-accent-schema);
+      }
       &.effect-table .dasu-table__header {
         --section-accent: var(--dasu-tab-icon);
       }
@@ -2381,6 +2385,9 @@
       }
       &.tactic-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-tactic);
+      }
+      &.schema-table .dasu-table__row-container.item {
+        --item-accent: var(--dasu-accent-schema);
       }
 
       /* Ability sub-category overrides */
@@ -2645,6 +2652,9 @@
     }
     .feature-table {
       grid-template-columns: [name] auto [controls] 54px;
+    }
+    .schema-table {
+      grid-template-columns: [name] auto [level] 48px [controls] 54px;
     }
     .tactic-table {
       grid-template-columns: [name] auto [damage] 80px [cost] 54px [toLand] 48px [controls] 54px;

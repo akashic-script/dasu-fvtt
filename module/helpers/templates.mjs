@@ -20,5 +20,6 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/dasu/templates/table/header/header-item-controls.hbs',
     'systems/dasu/templates/table/header/header-effect-controls.hbs',
     'systems/dasu/templates/table/expand/expand-item-description-with-tags.hbs',
+    'systems/dasu/templates/table/expand/expand-schema-description.hbs',
   ]);
 };

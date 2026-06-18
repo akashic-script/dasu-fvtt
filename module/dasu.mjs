@@ -40,6 +40,7 @@ Hooks.once('init', function () {
     class: models.DASUClass,
     ability: models.DASUAbility,
     tactic: models.DASUTactic,
+    schema: models.DASUSchema,
   });
 
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
@@ -59,7 +60,7 @@ Hooks.once('init', function () {
     'dasu',
     DASUItemSheet,
     {
-      types: ['item', 'weapon', 'feature', 'class', 'ability', 'tactic'],
+      types: ['item', 'weapon', 'feature', 'class', 'ability', 'tactic', 'schema'],
       makeDefault: true,
       label: 'DASU.SheetLabels.Item',
     }
