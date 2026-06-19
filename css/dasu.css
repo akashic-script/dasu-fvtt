@@ -2282,32 +2282,6 @@
       }
 
       .item {
-        --item-accent: var(--dasu-tab-icon);
-        &[data-item-type='feature'] {
-          --item-accent: var(--dasu-accent-feature);
-        }
-        &[data-item-type='item'] {
-          --item-accent: var(--dasu-accent-item);
-        }
-        &[data-item-type='weapon'] {
-          --item-accent: var(--dasu-accent-weapon);
-        }
-        &[data-item-type='ability'] {
-          --item-accent: var(--dasu-accent-ability);
-          &[data-category='spell'] {
-            --item-accent: var(--dasu-accent-spell);
-          }
-          &[data-category='restorative'] {
-            --item-accent: var(--dasu-accent-restorative);
-          }
-          &[data-category='technique'] {
-            --item-accent: var(--dasu-accent-technique);
-          }
-          &[data-category='affliction'] {
-            --item-accent: var(--dasu-accent-affliction);
-          }
-        }
-
         align-items: stretch;
         height: 30px;
         background: rgb(var(--dasu-panel) / 60%);
