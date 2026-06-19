@@ -13,17 +13,39 @@ import { FeatureTableRenderer } from '../helpers/tables/feature-table-renderer.m
 import { TacticTableRenderer } from '../helpers/tables/tactic-table-renderer.mjs';
 import { SchemaTableRenderer } from '../helpers/tables/schema-table-renderer.mjs';
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
+import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
 
 export class DASUActorSheet extends SheetLayoutMixin(
   HandlebarsApplicationMixin(ActorSheetV2)
 ) {
   static MODES = { PLAY: 1, EDIT: 2 };
 
+  static #moduleTableRegistry = [];
+
+  /**
+   * Register a custom item table to be rendered on the actor sheet.
+   * Call during Hooks.once('init').
+   *
+   * @param {DASUTableRenderer} renderer - instantiated table renderer
+   * @param {'items'|'syn'} tab - actor sheet tab to append the table to
+   */
+  static registerItemTable(renderer, tab = 'items') {
+    DASUActorSheet.#moduleTableRegistry.push({ renderer, tab });
+  }
+
   _mode = null;
 
   #weaponTable = new WeaponTableRenderer();
   #abilityTable = new AbilityTableRenderer();
   #tacticTable = new TacticTableRenderer();
+  #fieldsets = new FieldsetStateManager([
+    {
+      id: 'identity-editor',
+      defaultPanel: 'biography',
+      panels: ['biography', 'notes'],
+    },
+  ]);
+
   #schemaTable = new SchemaTableRenderer();
   #itemTable = new ItemTableRenderer();
   #featureTable = new FeatureTableRenderer();
@@ -138,6 +160,15 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.schemaTable = await this.#schemaTable.renderTable(this.document);
     context.itemTable = await this.#itemTable.renderTable(this.document);
     context.featureTable = await this.#featureTable.renderTable(this.document);
+
+    context.fieldsets = this.#fieldsets.prepareContext(actor);
+
+    context.moduleItemTables = await Promise.all(
+      DASUActorSheet.#moduleTableRegistry.map(async ({ renderer, tab }) => ({
+        tab,
+        html: await renderer.renderTable(this.document),
+      }))
+    );
 
     context.rollData = actor.getRollData();
     context.biographyHTML =
@@ -316,6 +347,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.#schemaTable.activateListeners(this);
     this.#itemTable.activateListeners(this);
     this.#featureTable.activateListeners(this);
+    for (const { renderer } of DASUActorSheet.#moduleTableRegistry) {
+      renderer.activateListeners(this);
+    }
     this.#temporaryEffectsTable.activateListeners(this);
     this.#passiveEffectsTable.activateListeners(this);
     this.#inactiveEffectsTable.activateListeners(this);
@@ -324,6 +358,15 @@ export class DASUActorSheet extends SheetLayoutMixin(
   /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);
+
+    for (const { tab, html } of context.moduleItemTables ?? []) {
+      const container = this.element.querySelector(`[data-application-part="${tab}"]`);
+      if (!container) continue;
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = html;
+      container.append(...wrapper.children);
+    }
+
     this._renderModeToggle();
     this.#bindTriadComboboxes();
     this.element.classList.toggle('edit-mode', this.isEditMode);
@@ -819,46 +862,11 @@ export class DASUActorSheet extends SheetLayoutMixin(
     );
   }
 
-  static #onFieldsetTab(event, target) {
-    const fieldset = target.closest('.dasu-fieldset--tabbed');
-    if (!fieldset) return;
-    const panel = target.dataset.panel;
-    fieldset
-      .querySelectorAll('.dasu-fieldset__tab')
-      .forEach((t) => t.classList.remove('active'));
-    fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
-      p.hidden = true;
-    });
-    target.classList.add('active');
-    fieldset.querySelector(
-      `.dasu-fieldset__panel[data-panel="${panel}"]`
-    ).hidden = false;
+  static async #onFieldsetTab(event, target) {
+    await this.#fieldsets.onTab(event, target, this.document);
   }
 
-  static #onFieldsetSplit(event, target) {
-    const fieldset = target.closest('.dasu-fieldset--tabbed');
-    if (!fieldset) return;
-    const direction = target.dataset.direction ?? 'row';
-    const alreadyActive = target.classList.contains('active');
-
-    fieldset
-      .querySelectorAll('.dasu-fieldset__split-btn')
-      .forEach((btn) => btn.classList.remove('active'));
-
-    if (alreadyActive) {
-      fieldset.classList.remove('dasu-fieldset--split');
-      const activeTab = fieldset.querySelector('.dasu-fieldset__tab.active');
-      const activePanel = activeTab?.dataset.panel;
-      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
-        p.hidden = p.dataset.panel !== activePanel;
-      });
-    } else {
-      target.classList.add('active');
-      fieldset.dataset.splitDirection = direction;
-      fieldset.classList.add('dasu-fieldset--split');
-      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
-        p.hidden = false;
-      });
-    }
+  static async #onFieldsetSplit(event, target) {
+    await this.#fieldsets.onSplit(event, target, this.document);
   }
 }

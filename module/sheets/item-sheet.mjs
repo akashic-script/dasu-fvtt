@@ -4,6 +4,7 @@ import { prepareActiveEffectCategories } from '../helpers/effects.mjs';
 import { DASU } from '../helpers/config.mjs';
 import { SheetLayoutMixin } from './mixins/sheet-layout-mixin.mjs';
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
+import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -82,6 +83,16 @@ export class DASUItemSheet extends SheetLayoutMixin(
   get item() {
     return this.document;
   }
+
+  #fieldsets = new FieldsetStateManager([
+    {
+      id: 'schema-levels',
+      defaultPanel: 'level1',
+      defaultSplit: true,
+      defaultSplitDirection: 'column',
+      panels: ['level1', 'level2', 'level3'],
+    },
+  ]);
 
   #temporaryEffectsTable = new EffectTableRenderer(
     'temporary',
@@ -241,6 +252,8 @@ export class DASUItemSheet extends SheetLayoutMixin(
       }
     }
 
+    context.fieldsets = this.#fieldsets.prepareContext(item);
+
     context.descriptionHTML =
       await foundry.applications.ux.TextEditor.implementation.enrichHTML(
         item.system.description ?? '',
@@ -349,44 +362,11 @@ export class DASUItemSheet extends SheetLayoutMixin(
     await this.item.update({ 'system.effects': effects });
   }
 
-  static #onFieldsetTab(event, target) {
-    const fieldset = target.closest('.dasu-fieldset--tabbed');
-    if (!fieldset) return;
-    const panel = target.dataset.panel;
-    fieldset
-      .querySelectorAll('.dasu-fieldset__tab')
-      .forEach((t) => t.classList.remove('active'));
-    fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
-      p.hidden = true;
-    });
-    target.classList.add('active');
-    fieldset.querySelector(
-      `.dasu-fieldset__panel[data-panel="${panel}"]`
-    ).hidden = false;
+  static async #onFieldsetTab(event, target) {
+    await this.#fieldsets.onTab(event, target, this.document);
   }
 
-  static #onFieldsetSplit(event, target) {
-    const fieldset = target.closest('.dasu-fieldset--tabbed');
-    if (!fieldset) return;
-    const direction = target.dataset.direction ?? 'row';
-    const alreadyActive = target.classList.contains('active');
-    fieldset
-      .querySelectorAll('.dasu-fieldset__split-btn')
-      .forEach((btn) => btn.classList.remove('active'));
-    if (alreadyActive) {
-      fieldset.classList.remove('dasu-fieldset--split');
-      const activeTab = fieldset.querySelector('.dasu-fieldset__tab.active');
-      const activePanel = activeTab?.dataset.panel;
-      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
-        p.hidden = p.dataset.panel !== activePanel;
-      });
-    } else {
-      target.classList.add('active');
-      fieldset.dataset.splitDirection = direction;
-      fieldset.classList.add('dasu-fieldset--split');
-      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
-        p.hidden = false;
-      });
-    }
+  static async #onFieldsetSplit(event, target) {
+    await this.#fieldsets.onSplit(event, target, this.document);
   }
 }

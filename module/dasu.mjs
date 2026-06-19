@@ -5,6 +5,11 @@ import { DASUDaemonActorSheet } from './sheets/daemon-actor-sheet.mjs';
 import { DASUItemSheet } from './sheets/item-sheet.mjs';
 import { preloadHandlebarsTemplates } from './helpers/templates.mjs';
 import { DASU } from './helpers/config.mjs';
+import { FieldsetStateManager } from './helpers/fieldset-state.mjs';
+import { DASUActorSheet } from './sheets/actor-sheet.mjs';
+import { DASUTableRenderer } from './helpers/tables/table-renderer.mjs';
+import { CommonColumns } from './helpers/tables/common-columns.mjs';
+import { CommonDescriptions } from './helpers/tables/common-descriptions.mjs';
 import * as models from './data/_module.mjs';
 
 Hooks.once('init', function () {
@@ -12,6 +17,11 @@ Hooks.once('init', function () {
     DASUActor,
     DASUItem,
     rollItemMacro,
+    FieldsetStateManager,
+    DASUTableRenderer,
+    CommonColumns,
+    CommonDescriptions,
+    registerItemTable: DASUActorSheet.registerItemTable.bind(DASUActorSheet),
   };
 
   CONFIG.DASU = DASU;
