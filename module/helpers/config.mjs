@@ -98,6 +98,25 @@ DASU.damageTypes = {
   untyped: 'DASU.DamageType.Untyped',
 };
 
+DASU.resistanceTypes = [
+  'physical',
+  'fire',
+  'ice',
+  'electric',
+  'wind',
+  'earth',
+  'light',
+  'dark',
+];
+
+DASU.resistanceLevels = {
+  '-1': 'DASU.Resistance.Weak',
+  0: 'DASU.Resistance.Normal',
+  1: 'DASU.Resistance.Resist',
+  2: 'DASU.Resistance.Nullify',
+  3: 'DASU.Resistance.Drain',
+};
+
 DASU.aptitudes = {
   f: 'DASU.Aptitude.Fire.long',
   i: 'DASU.Aptitude.Ice.long',

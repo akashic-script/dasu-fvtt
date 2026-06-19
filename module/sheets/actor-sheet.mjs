@@ -5,6 +5,7 @@ import {
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
 import { SheetLayoutMixin } from './mixins/sheet-layout-mixin.mjs';
+import { DASU } from '../helpers/config.mjs';
 import { WeaponTableRenderer } from '../helpers/tables/weapon-table-renderer.mjs';
 import { AbilityTableRenderer } from '../helpers/tables/ability-table-renderer.mjs';
 import { ItemTableRenderer } from '../helpers/tables/item-table-renderer.mjs';
@@ -53,7 +54,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ['dasu', 'sheet', 'actor'],
-    position: { width: 640, height: 860 },
+    position: { width: 640, height: 900 },
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
@@ -102,6 +103,31 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.cssClass = [...this.options.classes, actor.type].join(' ');
     context.owner = actor.isOwner;
     context.isEditMode = this.isEditMode;
+
+    context.resistanceLevelOptions = DASU.resistanceLevels;
+
+    const RESISTANCE_ABBR = { '-1': 'WK', 0: '–', 1: 'RS', 2: 'NU', 3: 'DR' };
+    const RESISTANCE_CLASS = {
+      '-1': 'resistance--weak',
+      0: '',
+      1: 'resistance--resist',
+      2: 'resistance--nullify',
+      3: 'resistance--drain',
+    };
+    context.resistances = Object.fromEntries(
+      DASU.resistanceTypes.map((key) => {
+        const base = actorData.resistances?.[key]?.base ?? 0;
+        return [
+          key,
+          {
+            base,
+            abbr: RESISTANCE_ABBR[String(base)] ?? '',
+            cssClass: RESISTANCE_CLASS[String(base)] ?? '',
+          },
+        ];
+      })
+    );
+
     context.items = Array.from(actor.items.values());
     context.items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
@@ -267,7 +293,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
           this.element.classList.toggle('edit-mode', this.isEditMode);
           this.element
             .querySelectorAll(
-              'input:not([type="hidden"]):not(.dasu-mode-checkbox), select'
+              'input:not([type="hidden"]):not(.dasu-mode-checkbox), select:not(.actor-header__resistance-select)'
             )
             .forEach((el) => el.toggleAttribute('readonly', !this.isEditMode));
         });
@@ -303,7 +329,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.element.classList.toggle('edit-mode', this.isEditMode);
     this.element
       .querySelectorAll(
-        'input:not([type="hidden"]):not(.dasu-mode-checkbox):not(.dasu-triad__input), select'
+        'input:not([type="hidden"]):not(.dasu-mode-checkbox):not(.dasu-triad__input), select:not(.actor-header__resistance-select)'
       )
       .forEach((el) => el.toggleAttribute('readonly', !this.isEditMode));
 

@@ -1,7 +1,8 @@
 import { DASUTableRenderer } from './table-renderer.mjs';
 import { CommonColumns } from './common-columns.mjs';
 
-const EXPAND_TEMPLATE = 'systems/dasu/templates/table/expand/expand-schema-description.hbs';
+const EXPAND_TEMPLATE =
+  'systems/dasu/templates/table/expand/expand-schema-description.hbs';
 const TextEditor = () => foundry.applications.ux.TextEditor.implementation;
 
 export class SchemaTableRenderer extends DASUTableRenderer {
@@ -28,11 +29,12 @@ export class SchemaTableRenderer extends DASUTableRenderer {
   }
 
   static async #renderDescription(item) {
-    const enrich = (html) => TextEditor().enrichHTML(html ?? '', {
-      relativeTo: item,
-      secrets: item.isOwner,
-      rollData: item.getRollData?.() ?? {},
-    });
+    const enrich = (html) =>
+      TextEditor().enrichHTML(html ?? '', {
+        relativeTo: item,
+        secrets: item.isOwner,
+        rollData: item.getRollData?.() ?? {},
+      });
 
     const [d1, d2, d3] = await Promise.all([
       enrich(item.system.level1?.description),

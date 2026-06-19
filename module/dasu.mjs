@@ -60,7 +60,15 @@ Hooks.once('init', function () {
     'dasu',
     DASUItemSheet,
     {
-      types: ['item', 'weapon', 'feature', 'class', 'ability', 'tactic', 'schema'],
+      types: [
+        'item',
+        'weapon',
+        'feature',
+        'class',
+        'ability',
+        'tactic',
+        'schema',
+      ],
       makeDefault: true,
       label: 'DASU.SheetLabels.Item',
     }
@@ -70,6 +78,10 @@ Hooks.once('init', function () {
 });
 
 Handlebars.registerHelper('toLowerCase', (str) => str.toLowerCase());
+Handlebars.registerHelper('capitalize', (str) =>
+  str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
+);
+Handlebars.registerHelper('concat', (...args) => args.slice(0, -1).join(''));
 
 Hooks.once('ready', function () {
   Hooks.on('hotbarDrop', (bar, data, slot) => createItemMacro(data, slot));

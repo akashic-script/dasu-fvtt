@@ -26,11 +26,27 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
       anathema: new fields.StringField({ required: true, blank: true }),
     });
 
+    const resistanceField = () => new fields.SchemaField({
+      base: new fields.NumberField({ ...requiredInteger, initial: 0, min: -1, max: 3 }),
+    });
+
+    schema.resistances = new fields.SchemaField({
+      physical: resistanceField(),
+      fire:     resistanceField(),
+      ice:      resistanceField(),
+      electric: resistanceField(),
+      wind:     resistanceField(),
+      earth:    resistanceField(),
+      light:    resistanceField(),
+      dark:     resistanceField(),
+    });
+
     schema.stats = new fields.SchemaField({
       avoid: new fields.SchemaField({ bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }) }),
       defense: new fields.SchemaField({ bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }) }),
       hit: new fields.SchemaField({ bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }) }),
       land: new fields.SchemaField({ bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }) }),
+      critical: new fields.SchemaField({ bonus: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }), value: new fields.NumberField({ ...requiredInteger, initial: 11 }) }),
     });
 
     return schema;
@@ -80,5 +96,6 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
     this.stats.defense.value = defenseBase + (this.stats.defense.bonus ?? 0);
     this.stats.hit.value = 0 + (this.stats.hit.bonus ?? 0);
     this.stats.land.value = 0 + (this.stats.land.bonus ?? 0);
+    this.stats.critical.value = Math.max(2, 11 - (this.stats.critical.bonus ?? 0));
   }
 }

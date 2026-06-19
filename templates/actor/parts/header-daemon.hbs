@@ -18,4 +18,17 @@
       <input class="dasu-pill" type="text" name="system.merit" value="{{system.merit}}" data-dtype="Number" />
     </div>
   </div>
+  <div class="actor-header__resistances">
+    {{#each resistances as |resistance key|}}
+    <div class="actor-header__resistance {{resistance.cssClass}}" data-tooltip="{{localize (concat 'DASU.DamageType.' (capitalize key))}}">
+      <div class="actor-header__resistance-top">
+        <img class="actor-header__resistance-icon" src="systems/dasu/assets/resistances/{{key}}.png" alt="{{key}}" />
+        <span class="actor-header__resistance-value">{{resistance.abbr}}</span>
+      </div>
+      <select class="actor-header__resistance-select" name="system.resistances.{{key}}.base" data-dtype="Number">
+        {{selectOptions @root.resistanceLevelOptions selected=resistance.base localize=true}}
+      </select>
+    </div>
+    {{/each}}
+  </div>
 </header>

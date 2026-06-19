@@ -37,6 +37,13 @@
       "Physical": "Physical",
       "Untyped": "Untyped"
     },
+    "Resistance": {
+      "Weak": "Weak",
+      "Normal": "Normal",
+      "Resist": "Resist",
+      "Nullify": "Nullify",
+      "Drain": "Drain"
+    },
     "Aptitude": {
       "Fire": { "long": "Fire", "abbr": "f" },
       "Ice": { "long": "Ice", "abbr": "i" },
@@ -75,15 +82,61 @@
         "Stats": "Stats",
         "Skills": "Skills"
       },
-      "HP": { "long": "Hit Points", "abbr": "HP" },
-      "WP": { "long": "Will Points", "abbr": "WP" },
-      "AP": { "long": "Attribute Points", "abbr": "AP" },
-      "SP": { "long": "Skill Points", "abbr": "SP" },
+      "HP": {
+        "long": "Hit Points",
+        "abbr": "HP",
+        "bonusAbbr": "HP+",
+        "bonusLong": "Hit Points Bonus"
+      },
+      "WP": {
+        "long": "Will Points",
+        "abbr": "WP",
+        "bonusAbbr": "WP+",
+        "bonusLong": "Will Points Bonus"
+      },
+      "AP": {
+        "long": "Attribute Points",
+        "abbr": "AP",
+        "bonusAbbr": "AP+",
+        "bonusLong": "Attribute Points Bonus"
+      },
+      "SP": {
+        "long": "Skill Points",
+        "abbr": "SP",
+        "bonusAbbr": "SP+",
+        "bonusLong": "Skill Points Bonus"
+      },
       "Stat": {
-        "Avoid": { "long": "Avoid", "abbr": "AVO" },
-        "Defense": { "long": "Defense", "abbr": "DEF" },
-        "Hit": { "long": "To Hit", "abbr": "HIT" },
-        "Land": { "long": "To Land", "abbr": "LAND" }
+        "Avoid": {
+          "long": "Avoid",
+          "abbr": "AVO",
+          "bonusAbbr": "AVO+",
+          "bonusLong": "Avoid Bonus"
+        },
+        "Defense": {
+          "long": "Defense",
+          "abbr": "DEF",
+          "bonusAbbr": "DEF+",
+          "bonusLong": "Defense Bonus"
+        },
+        "Hit": {
+          "long": "To Hit",
+          "abbr": "HIT",
+          "bonusAbbr": "HIT+",
+          "bonusLong": "To Hit Bonus"
+        },
+        "Land": {
+          "long": "To Land",
+          "abbr": "LAND",
+          "bonusAbbr": "LAND+",
+          "bonusLong": "To Land Bonus"
+        },
+        "Critical": {
+          "long": "Critical Threshold",
+          "abbr": "CRIT",
+          "bonusAbbr": "CRIT+",
+          "bonusLong": "Critical Threshold Bonus"
+        }
       },
       "Triad": {
         "Virtue": "Virtue",

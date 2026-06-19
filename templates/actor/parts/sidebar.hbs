@@ -53,24 +53,34 @@
     </div>
     <div class="actor-sidebar__stats">
       <div class="stat-score">
-        <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Avoid.long'}}">{{localize "DASU.Actor.Stat.Avoid.abbr"}}</span>
+        <span class="stat-label stat-label--play" data-tooltip="{{localize 'DASU.Actor.Stat.Avoid.long'}}">{{localize "DASU.Actor.Stat.Avoid.abbr"}}</span>
+        <span class="stat-label stat-label--edit" data-tooltip="{{localize 'DASU.Actor.Stat.Avoid.bonusLong'}}">{{localize "DASU.Actor.Stat.Avoid.bonusAbbr"}}</span>
         <span class="stat-value dasu-pill stat-total">{{system.stats.avoid.value}}</span>
         <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">±</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.stats.avoid.bonus" value="{{system.stats.avoid.bonus}}" data-dtype="Number" /></label>
       </div>
       <div class="stat-score">
-        <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Defense.long'}}">{{localize "DASU.Actor.Stat.Defense.abbr"}}</span>
+        <span class="stat-label stat-label--play" data-tooltip="{{localize 'DASU.Actor.Stat.Defense.long'}}">{{localize "DASU.Actor.Stat.Defense.abbr"}}</span>
+        <span class="stat-label stat-label--edit" data-tooltip="{{localize 'DASU.Actor.Stat.Defense.bonusLong'}}">{{localize "DASU.Actor.Stat.Defense.bonusAbbr"}}</span>
         <span class="stat-value dasu-pill stat-total">{{system.stats.defense.value}}</span>
         <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">±</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.stats.defense.bonus" value="{{system.stats.defense.bonus}}" data-dtype="Number" /></label>
       </div>
       <div class="stat-score">
-        <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Hit.long'}}">{{localize "DASU.Actor.Stat.Hit.abbr"}}</span>
+        <span class="stat-label stat-label--play" data-tooltip="{{localize 'DASU.Actor.Stat.Hit.long'}}">{{localize "DASU.Actor.Stat.Hit.abbr"}}</span>
+        <span class="stat-label stat-label--edit" data-tooltip="{{localize 'DASU.Actor.Stat.Hit.bonusLong'}}">{{localize "DASU.Actor.Stat.Hit.bonusAbbr"}}</span>
         <span class="stat-value dasu-pill stat-total">{{system.stats.hit.value}}</span>
         <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">±</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.stats.hit.bonus" value="{{system.stats.hit.bonus}}" data-dtype="Number" /></label>
       </div>
       <div class="stat-score">
-        <span class="stat-label" data-tooltip="{{localize 'DASU.Actor.Stat.Land.long'}}">{{localize "DASU.Actor.Stat.Land.abbr"}}</span>
+        <span class="stat-label stat-label--play" data-tooltip="{{localize 'DASU.Actor.Stat.Land.long'}}">{{localize "DASU.Actor.Stat.Land.abbr"}}</span>
+        <span class="stat-label stat-label--edit" data-tooltip="{{localize 'DASU.Actor.Stat.Land.bonusLong'}}">{{localize "DASU.Actor.Stat.Land.bonusAbbr"}}</span>
         <span class="stat-value dasu-pill stat-total">{{system.stats.land.value}}</span>
         <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">±</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.stats.land.bonus" value="{{system.stats.land.bonus}}" data-dtype="Number" /></label>
+      </div>
+      <div class="stat-score">
+        <span class="stat-label stat-label--play" data-tooltip="{{localize 'DASU.Actor.Stat.Critical.long'}}">{{localize "DASU.Actor.Stat.Critical.abbr"}}</span>
+        <span class="stat-label stat-label--edit" data-tooltip="{{localize 'DASU.Actor.Stat.Critical.bonusLong'}}">{{localize "DASU.Actor.Stat.Critical.bonusAbbr"}}</span>
+        <span class="stat-value dasu-pill stat-total">{{system.stats.critical.value}}</span>
+        <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">-</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.stats.critical.bonus" value="{{system.stats.critical.bonus}}" data-dtype="Number" /></label>
       </div>
     </div>
   </div>

@@ -103,7 +103,10 @@ export class DASUItemSheet extends SheetLayoutMixin(
   _configureRenderParts(options) {
     const parts = super._configureRenderParts(options);
     if (this.document.type === 'schema') {
-      parts.advanced = { template: 'systems/dasu/templates/item/parts/schema-advanced.hbs', scrollable: [''] };
+      parts.advanced = {
+        template: 'systems/dasu/templates/item/parts/schema-advanced.hbs',
+        scrollable: [''],
+      };
     } else {
       delete parts.advanced;
     }
@@ -211,7 +214,10 @@ export class DASUItemSheet extends SheetLayoutMixin(
     }
 
     if (context.isTactic) {
-      context.governOptions = { none: game.i18n.localize("DASU.Item.Tactic.GovernNone"), ...localize(DASU.attributes) };
+      context.governOptions = {
+        none: game.i18n.localize('DASU.Item.Tactic.GovernNone'),
+        ...localize(DASU.attributes),
+      };
       context.resourceTypeOptions = localize(DASU.resourceTypes);
       context.damageTypeOptions = localize(DASU.damageTypes);
     }
@@ -223,10 +229,15 @@ export class DASUItemSheet extends SheetLayoutMixin(
       context.resourceTypeOptions = localize(DASU.resourceTypes);
       const system = itemData.system;
       for (const key of ['level1', 'level2', 'level3']) {
-        context[`${key}DescriptionHTML`] = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-          system[key]?.description ?? '',
-          { relativeTo: item, secrets: item.isOwner, rollData: context.rollData }
-        );
+        context[`${key}DescriptionHTML`] =
+          await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            system[key]?.description ?? '',
+            {
+              relativeTo: item,
+              secrets: item.isOwner,
+              rollData: context.rollData,
+            }
+          );
       }
     }
 
@@ -342,10 +353,16 @@ export class DASUItemSheet extends SheetLayoutMixin(
     const fieldset = target.closest('.dasu-fieldset--tabbed');
     if (!fieldset) return;
     const panel = target.dataset.panel;
-    fieldset.querySelectorAll('.dasu-fieldset__tab').forEach((t) => t.classList.remove('active'));
-    fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => { p.hidden = true; });
+    fieldset
+      .querySelectorAll('.dasu-fieldset__tab')
+      .forEach((t) => t.classList.remove('active'));
+    fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
+      p.hidden = true;
+    });
     target.classList.add('active');
-    fieldset.querySelector(`.dasu-fieldset__panel[data-panel="${panel}"]`).hidden = false;
+    fieldset.querySelector(
+      `.dasu-fieldset__panel[data-panel="${panel}"]`
+    ).hidden = false;
   }
 
   static #onFieldsetSplit(event, target) {
@@ -353,7 +370,9 @@ export class DASUItemSheet extends SheetLayoutMixin(
     if (!fieldset) return;
     const direction = target.dataset.direction ?? 'row';
     const alreadyActive = target.classList.contains('active');
-    fieldset.querySelectorAll('.dasu-fieldset__split-btn').forEach((btn) => btn.classList.remove('active'));
+    fieldset
+      .querySelectorAll('.dasu-fieldset__split-btn')
+      .forEach((btn) => btn.classList.remove('active'));
     if (alreadyActive) {
       fieldset.classList.remove('dasu-fieldset--split');
       const activeTab = fieldset.querySelector('.dasu-fieldset__tab.active');
@@ -365,7 +384,9 @@ export class DASUItemSheet extends SheetLayoutMixin(
       target.classList.add('active');
       fieldset.dataset.splitDirection = direction;
       fieldset.classList.add('dasu-fieldset--split');
-      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => { p.hidden = false; });
+      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
+        p.hidden = false;
+      });
     }
   }
 }
