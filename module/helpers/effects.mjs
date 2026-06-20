@@ -7,11 +7,13 @@
 export function onManageActiveEffect(event, owner, element) {
   event.preventDefault();
   const a = element ?? event.currentTarget;
-  const li = a.closest('li');
-  const effect = li.dataset.effectId
-    ? owner.effects.get(li.dataset.effectId)
-    : null;
-  const effectType = li.dataset.effectType ?? a.dataset.effectType;
+  const row = a.closest('[data-effect-id], [data-key], li');
+  const effectUuid = row?.dataset.key;
+  const effectId = row?.dataset.effectId;
+  const effect =
+    (effectUuid ? fromUuidSync(effectUuid) : null) ??
+    (effectId ? owner.effects.get(effectId) : null);
+  const effectType = row?.dataset.effectType ?? a.dataset.effectType;
   switch (a.dataset.action) {
     case 'create':
       return owner.createEmbeddedDocuments('ActiveEffect', [

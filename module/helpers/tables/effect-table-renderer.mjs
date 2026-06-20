@@ -70,7 +70,7 @@ export class EffectTableRenderer extends DASUTableRenderer {
         ),
       renderCell: async () =>
         foundry.applications.handlebars.renderTemplate(
-          TEMPLATE('cell/cell-item-controls'),
+          TEMPLATE('cell/cell-effect-controls'),
           {
             isGM: game.user.isGM,
             disableEdit: false,

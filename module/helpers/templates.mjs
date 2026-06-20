@@ -15,6 +15,7 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/dasu/templates/table/dasu-table.hbs',
     'systems/dasu/templates/table/cell/cell-item-name.hbs',
     'systems/dasu/templates/table/cell/cell-item-controls.hbs',
+    'systems/dasu/templates/table/cell/cell-effect-controls.hbs',
     'systems/dasu/templates/table/cell/cell-text.hbs',
     'systems/dasu/templates/table/cell/cell-resource.hbs',
     'systems/dasu/templates/table/header/header-item-controls.hbs',
