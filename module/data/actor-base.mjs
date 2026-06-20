@@ -41,6 +41,16 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
       dark:     resistanceField(),
     });
 
+    schema.aptitudes = new fields.ObjectField({
+      required: true,
+      initial: () => {
+        const init = {};
+        for (const key of Object.keys(CONFIG.DASU.aptitudes))
+          init[key] = { bonus: 0 };
+        return init;
+      },
+    });
+
     schema.stats = new fields.SchemaField({
       avoid: new fields.SchemaField({ bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }) }),
       defense: new fields.SchemaField({ bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }) }),
@@ -55,6 +65,36 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
   prepareDerivedData() {
     super.prepareDerivedData();
     this._prepareMeritProgress();
+    this._prepareAptitudes();
+  }
+
+  _prepareAptitudes() {
+    this.aptitudes ??= {};
+    const derived = CONFIG.DASU.derivedAptitudes ?? {};
+    const clamp = (n) => Math.max(0, Math.min(4, n));
+
+    // Normalize entries, resolve base values.
+    for (const key of Object.keys(CONFIG.DASU.aptitudes)) {
+      const apt = (this.aptitudes[key] ??= {});
+      apt.bonus ??= 0;
+      apt.isDerived = key in derived;
+      apt.label = game.i18n.localize(CONFIG.DASU.aptitudes[key]) ?? key;
+      apt.abbr = game.i18n.localize(CONFIG.DASU.aptitudeAbbreviations[key]) ?? key;
+      if (!apt.isDerived) apt.value = clamp(apt.bonus);
+    }
+
+    // Derived aptitudes draw from base values plus their override.
+    for (const [key, def] of Object.entries(derived)) {
+      const apt = this.aptitudes[key];
+      if (!apt) continue;
+      if (def.op === 'flag') {
+        apt.value = apt.bonus > 0 ? 1 : 0;
+        continue;
+      }
+      const inputs = def.from.map((k) => this.aptitudes[k]?.value ?? 0);
+      const composite = def.op === 'max' ? Math.max(...inputs) : Math.min(...inputs);
+      apt.value = clamp(composite + apt.bonus);
+    }
   }
 
   // Summoners advance by Level, reaching the next level's cumulative Merit

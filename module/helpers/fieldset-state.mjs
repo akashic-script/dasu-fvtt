@@ -39,10 +39,15 @@ export class FieldsetStateManager {
       const split = state.split ?? cfg.defaultSplit;
       const splitDirection = state.splitDirection ?? cfg.defaultSplitDirection;
 
-      const panels = Object.fromEntries(cfg.panels.map((p) => [p, {
-        activeClass: activePanel === p ? 'active' : '',
-        hidden: !split && activePanel !== p ? 'hidden' : '',
-      }]));
+      const panels = Object.fromEntries(
+        cfg.panels.map((p) => [
+          p,
+          {
+            activeClass: activePanel === p ? 'active' : '',
+            hidden: !split && activePanel !== p ? 'hidden' : '',
+          },
+        ])
+      );
 
       context[id] = {
         activePanel,
@@ -87,23 +92,34 @@ export class FieldsetStateManager {
 
   #domOnlyTab(fieldset, target) {
     const panel = target.dataset.panel;
-    fieldset.querySelectorAll('.dasu-fieldset__tab').forEach((t) => t.classList.remove('active'));
-    fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => { p.hidden = p.dataset.panel !== panel; });
+    fieldset
+      .querySelectorAll('.dasu-fieldset__tab')
+      .forEach((t) => t.classList.remove('active'));
+    fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
+      p.hidden = p.dataset.panel !== panel;
+    });
     target.classList.add('active');
   }
 
   #domOnlySplit(fieldset, target) {
     const alreadyActive = target.classList.contains('active');
-    fieldset.querySelectorAll('.dasu-fieldset__split-btn').forEach((btn) => btn.classList.remove('active'));
+    fieldset
+      .querySelectorAll('.dasu-fieldset__split-btn')
+      .forEach((btn) => btn.classList.remove('active'));
     if (alreadyActive) {
       fieldset.classList.remove('dasu-fieldset--split');
-      const activePanel = fieldset.querySelector('.dasu-fieldset__tab.active')?.dataset.panel;
-      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => { p.hidden = p.dataset.panel !== activePanel; });
+      const activePanel = fieldset.querySelector('.dasu-fieldset__tab.active')
+        ?.dataset.panel;
+      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
+        p.hidden = p.dataset.panel !== activePanel;
+      });
     } else {
       target.classList.add('active');
       fieldset.dataset.splitDirection = target.dataset.direction ?? 'column';
       fieldset.classList.add('dasu-fieldset--split');
-      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => { p.hidden = false; });
+      fieldset.querySelectorAll('.dasu-fieldset__panel').forEach((p) => {
+        p.hidden = false;
+      });
     }
   }
 }

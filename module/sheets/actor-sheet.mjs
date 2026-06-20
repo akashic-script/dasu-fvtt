@@ -85,6 +85,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
       openResourcePopover: DASUActorSheet.#onOpenResourcePopover,
       openMeritPopover: DASUActorSheet.#onOpenMeritPopover,
       skillStep: DASUActorSheet.#onSkillStep,
+      aptitudeStep: DASUActorSheet.#onAptitudeStep,
       createCustomSkill: DASUActorSheet.#onCreateCustomSkill,
       deleteCustomSkill: DASUActorSheet.#onDeleteCustomSkill,
       advance: DASUActorSheet.#onAdvance,
@@ -147,6 +148,13 @@ export class DASUActorSheet extends SheetLayoutMixin(
             cssClass: RESISTANCE_CLASS[String(base)] ?? '',
           },
         ];
+      })
+    );
+
+    context.aptitudes = Object.fromEntries(
+      Object.keys(DASU.aptitudes).map((key) => {
+        const apt = actorData.aptitudes[key];
+        return [key, { ...apt, isZero: apt.value <= 0 }];
       })
     );
 
@@ -271,13 +279,15 @@ export class DASUActorSheet extends SheetLayoutMixin(
       : suggestions;
     if (!filtered.length) return;
 
+    // Use the input's document so this works in a popped-out window.
+    const doc = input.ownerDocument;
     const rect = input.getBoundingClientRect();
-    const menu = document.createElement('div');
+    const menu = doc.createElement('div');
     menu.className = 'dasu-triad-dropdown';
     menu.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.bottom}px;width:${rect.width}px;z-index:99999`;
 
     for (const val of filtered) {
-      const item = document.createElement('div');
+      const item = doc.createElement('div');
       item.className = 'dasu-triad-option';
       item.textContent = val;
       item.addEventListener('mousedown', (e) => {
@@ -289,7 +299,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
       menu.appendChild(item);
     }
 
-    document.body.appendChild(menu);
+    doc.body.appendChild(menu);
     this._triadDropdown = menu;
   }
 
@@ -360,7 +370,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
     await super._onRender(context, options);
 
     for (const { tab, html } of context.moduleItemTables ?? []) {
-      const container = this.element.querySelector(`[data-application-part="${tab}"]`);
+      const container = this.element.querySelector(
+        `[data-application-part="${tab}"]`
+      );
       if (!container) continue;
       const wrapper = document.createElement('div');
       wrapper.innerHTML = html;
@@ -369,6 +381,13 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
     this._renderModeToggle();
     this.#bindTriadComboboxes();
+
+    this.element.querySelectorAll('.actor-aptitudes__pill').forEach((pill) =>
+      pill.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        this.#cycleAptitude(pill, 0);
+      })
+    );
     this.element.classList.toggle('edit-mode', this.isEditMode);
     this.element
       .querySelectorAll(
@@ -396,6 +415,17 @@ export class DASUActorSheet extends SheetLayoutMixin(
         if (this._wheelPending || !this.isEditMode) return;
         const target = e.target;
         const delta = e.deltaY < 0 ? 1 : -1;
+
+        const aptPill = target.closest('.actor-aptitudes__pill');
+        if (aptPill?.dataset.aptitude) {
+          e.preventDefault();
+          this._wheelPending = true;
+          setTimeout(() => {
+            this._wheelPending = false;
+          }, 300);
+          this.#cycleAptitude(aptPill, delta);
+          return;
+        }
 
         const attrKey =
           target.name?.match(/^system\.attributes\.(\w+)\.value$/)?.[1] ??
@@ -557,9 +587,11 @@ export class DASUActorSheet extends SheetLayoutMixin(
   }
 
   static async #onOpenResourcePopover(event, target) {
+    // Use the sheet's document so this works in a popped-out window.
+    const doc = this.element.ownerDocument;
     const { resource } = target.dataset;
     const popId = `dasu-popover-${resource}`;
-    const existing = document.getElementById(popId);
+    const existing = doc.getElementById(popId);
     if (existing) {
       existing.remove();
       target.classList.remove('popover-open');
@@ -582,7 +614,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
           : 'resource-popover__label--wp',
       }
     );
-    const pop = Object.assign(document.createElement('div'), {
+    const pop = Object.assign(doc.createElement('div'), {
       id: popId,
       className: 'dasu-resource-popover',
       innerHTML: html,
@@ -613,8 +645,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
     };
     const resourcePath = `system.resources.${isHp ? 'hp' : 'wp'}.value`;
     const update = (v) => {
-      this.actor.update({ [resourcePath]: v }, { render: false });
       syncSidebar();
+      return this.actor.update({ [resourcePath]: v }, { render: false });
     };
 
     pop.querySelectorAll('.resource-popover__btn').forEach((btn) =>
@@ -643,20 +675,23 @@ export class DASUActorSheet extends SheetLayoutMixin(
       })
     );
 
-    const close = (e) => {
+    const close = async (e) => {
       if (!pop.contains(e.target) && e.target !== target) {
-        pop.remove();
+        // Commit the field; pointerdown removes the popover before blur fires.
+        doc.removeEventListener('pointerdown', close);
         target.classList.remove('popover-open');
-        document.removeEventListener('pointerdown', close);
+        await update(int('.resource-popover__value'));
+        pop.remove();
         this.render();
       }
     };
-    setTimeout(() => document.addEventListener('pointerdown', close), 0);
+    setTimeout(() => doc.addEventListener('pointerdown', close), 0);
   }
 
   static async #onOpenMeritPopover(event, target) {
+    const doc = this.element.ownerDocument;
     const popId = 'dasu-popover-merit';
-    const existing = document.getElementById(popId);
+    const existing = doc.getElementById(popId);
     if (existing) {
       existing.remove();
       target.classList.remove('popover-open');
@@ -673,7 +708,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
         nextThreshold,
       }
     );
-    const pop = Object.assign(document.createElement('div'), {
+    const pop = Object.assign(doc.createElement('div'), {
       id: popId,
       className: 'dasu-resource-popover',
       innerHTML: html,
@@ -699,8 +734,11 @@ export class DASUActorSheet extends SheetLayoutMixin(
       if (el) el.value = v;
     };
     const update = (v) => {
-      this.actor.update({ 'system.merit': Math.max(0, v) }, { render: false });
       syncHeader();
+      return this.actor.update(
+        { 'system.merit': Math.max(0, v) },
+        { render: false }
+      );
     };
 
     pop.querySelectorAll('.resource-popover__btn').forEach((btn) =>
@@ -726,15 +764,16 @@ export class DASUActorSheet extends SheetLayoutMixin(
       })
     );
 
-    const close = (e) => {
+    const close = async (e) => {
       if (!pop.contains(e.target) && e.target !== target) {
-        pop.remove();
+        doc.removeEventListener('pointerdown', close);
         target.classList.remove('popover-open');
-        document.removeEventListener('pointerdown', close);
+        await update(int('.resource-popover__value'));
+        pop.remove();
         this.render();
       }
     };
-    setTimeout(() => document.addEventListener('pointerdown', close), 0);
+    setTimeout(() => doc.addEventListener('pointerdown', close), 0);
   }
 
   static #onResourceStep(event, target) {
@@ -842,6 +881,49 @@ export class DASUActorSheet extends SheetLayoutMixin(
     const { skill, step } = target.dataset;
     const current = this.actor.system.skills[skill]?.value ?? 0;
     DASUActorSheet.#applySkillDelta(this.actor, skill, current, parseInt(step));
+  }
+
+  // Steps a base aptitude's rank, clamped to 0–4, enforcing the tier
+  // prerequisite: a Lvl 3 requires two aptitudes at Lvl 2+, a Lvl 4 requires
+  // two at Lvl 3+ (the aptitude being raised counts toward its own requirement).
+  #cycleAptitude(target, dir) {
+    if (!this.isEditMode) return;
+    const { aptitude } = target.dataset;
+    if (!aptitude) return;
+
+    // Derived aptitudes (DA/TA/TG/assist) are computed, not directly set.
+    if (aptitude in (DASU.derivedAptitudes ?? {})) return;
+
+    const apts = this.actor.system.aptitudes;
+    const current = apts[aptitude]?.bonus ?? 0;
+    const next = dir === 0 ? 0 : Math.max(0, Math.min(4, current + dir));
+    if (next === current) return;
+
+    // Count how many base aptitudes would sit at each tier after the change.
+    if (next > current && next >= 3) {
+      const requiredTier = next - 1; // L3 needs two at L2+, L4 needs two at L3+
+      let count = 0;
+      for (const key of Object.keys(DASU.aptitudes)) {
+        if (key in (DASU.derivedAptitudes ?? {})) continue;
+        const v = key === aptitude ? next : apts[key]?.bonus ?? 0;
+        if (v >= requiredTier) count++;
+      }
+      if (count < 2) {
+        ui.notifications?.warn(
+          game.i18n.format('DASU.Aptitude.PrereqWarning', {
+            tier: next,
+            requiredTier,
+          })
+        );
+        return;
+      }
+    }
+
+    this.actor.update({ [`system.aptitudes.${aptitude}.bonus`]: next });
+  }
+
+  static #onAptitudeStep(event, target) {
+    this.#cycleAptitude(target, 1);
   }
 
   static #onCreateCustomSkill() {

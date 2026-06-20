@@ -60,7 +60,8 @@
       "TechniqueTechnical": { "long": "Technique (Technical)", "abbr": "tt" },
       "TechniqueGeneral": { "long": "Technique (General)", "abbr": "tg" },
       "TechniqueAlmighty": { "long": "Technique (Almighty)", "abbr": "ta" },
-      "Assist": { "long": "Assist", "abbr": "assist" }
+      "Assist": { "long": "Assist", "abbr": "a" },
+      "PrereqWarning": "Reaching Lvl {tier} requires two aptitudes at Lvl {requiredTier} or higher."
     },
     "Actor": {
       "SummonerNamePlaceholder": "Summoner Name",

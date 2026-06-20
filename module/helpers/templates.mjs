@@ -8,6 +8,7 @@ export const preloadHandlebarsTemplates = async function () {
     // Actor partials.
     'systems/dasu/templates/actor/parts/actor-items.hbs',
     'systems/dasu/templates/actor/parts/actor-effects.hbs',
+    'systems/dasu/templates/actor/parts/aptitudes.hbs',
     // Item partials
     'systems/dasu/templates/item/parts/item-effects.hbs',
     // Table system

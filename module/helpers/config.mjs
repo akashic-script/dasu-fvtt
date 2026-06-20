@@ -155,6 +155,13 @@ DASU.aptitudeAbbreviations = {
   assist: 'DASU.Aptitude.Assist.abbr',
 };
 
+DASU.derivedAptitudes = {
+  da: { op: 'min', from: ['dp', 'dm'] },
+  ta: { op: 'min', from: ['tb', 'tt'] },
+  tg: { op: 'max', from: ['tb', 'tt'] },
+  assist: { op: 'flag' },
+};
+
 DASU.resourceTypes = {
   hp: 'DASU.Resource.HP',
   wp: 'DASU.Resource.WP',
