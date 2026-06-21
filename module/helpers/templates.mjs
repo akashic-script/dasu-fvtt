@@ -9,6 +9,7 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/dasu/templates/actor/parts/actor-items.hbs',
     'systems/dasu/templates/actor/parts/actor-effects.hbs',
     'systems/dasu/templates/actor/parts/aptitudes.hbs',
+    'systems/dasu/templates/actor/parts/planner-table.hbs',
     // Item partials
     'systems/dasu/templates/item/parts/item-effects.hbs',
     // Table system

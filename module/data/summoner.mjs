@@ -41,9 +41,8 @@ export default class DASUSummoner extends DASUActorBase {
 
     this._prepareDerivedStats();
 
-    // AP pool
-    const oddLevels = Math.floor((this.level + 1) / 2);
-    const apMax = oddLevels + 1;
+    const cls = this.parent?.itemTypes?.class?.[0] ?? null;
+    const apMax = cls ? cls.system.apMax(this.level) : Math.floor((this.level + 1) / 2) + 1;
     const apSpent = Object.values(this.attributes).reduce((sum, a) => sum + a.value, 0) - 4;
     this.ap = { max: apMax, spent: apSpent, value: apMax - apSpent };
 
@@ -58,7 +57,7 @@ export default class DASUSummoner extends DASUActorBase {
       s.isCustom = !i18nKey;
     }
 
-    const spMax = 3 + (this.level - 1) * 2;
+    const spMax = cls ? cls.system.spMax(this.level) : 3 + (this.level - 1) * 2;
     const triCost = (r) => (r * (r + 1)) / 2;
     const spSpent = Object.values(this.skills ?? {}).reduce((sum, s) => sum + triCost(s.value ?? 0), 0);
     this.sp = { max: spMax, spent: spSpent, value: spMax - spSpent };

@@ -11,3 +11,10 @@ export {default as DASUClass} from "./class.mjs";
 export {default as DASUAbility} from "./ability.mjs";
 export {default as DASUTactic} from "./tactic.mjs";
 export {default as DASUSchema} from "./schema.mjs";
+
+export * from "./advancements/_module.mjs";
+
+export { PseudoDocument } from "./pseudo/pseudo-document.mjs";
+export { TypedPseudoDocument } from "./pseudo/typed-pseudo-document.mjs";
+export { PseudoDocumentCollectionField } from "./pseudo/pseudo-document-collection-field.mjs";
+export {default as PseudoDocumentCollection} from "./pseudo/pseudo-document-collection.mjs";

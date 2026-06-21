@@ -44,6 +44,8 @@ export class AbilityTableRenderer extends DASUTableRenderer {
       controls: CommonColumns.itemControlsColumn({
         type: 'ability',
         label: 'TYPES.Item.ability',
+        disableDelete: (item) => !(item.parent instanceof Actor),
+        disableEdit: (item) => !(item.parent instanceof Actor),
       }),
     },
   };
@@ -56,7 +58,8 @@ export class AbilityTableRenderer extends DASUTableRenderer {
   }
 
   static #getItems(document) {
-    return document.itemTypes.ability ?? [];
+    const exclude = DASUTableRenderer.slotOriginalIds(document);
+    return (document.itemTypes.ability ?? []).filter((i) => !exclude.has(i.id));
   }
 
   static #formatEffect(item) {

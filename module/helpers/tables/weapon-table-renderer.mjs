@@ -24,6 +24,8 @@ export class WeaponTableRenderer extends DASUTableRenderer {
       controls: CommonColumns.itemControlsColumn({
         type: 'weapon',
         label: 'TYPES.Item.weapon',
+        disableDelete: (item) => !(item.parent instanceof Actor),
+        disableEdit: (item) => !(item.parent instanceof Actor),
       }),
     },
   };
@@ -36,7 +38,8 @@ export class WeaponTableRenderer extends DASUTableRenderer {
   }
 
   static #getItems(document) {
-    return document.itemTypes.weapon ?? [];
+    const exclude = DASUTableRenderer.slotOriginalIds(document);
+    return (document.itemTypes.weapon ?? []).filter((i) => !exclude.has(i.id));
   }
 
   static #getTags(item) {

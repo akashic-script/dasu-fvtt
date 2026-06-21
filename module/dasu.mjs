@@ -22,6 +22,11 @@ Hooks.once('init', function () {
     CommonColumns,
     CommonDescriptions,
     registerItemTable: DASUActorSheet.registerItemTable.bind(DASUActorSheet),
+    advancements: {
+      BaseAdvancement: models.BaseAdvancement,
+      ADVANCEMENT_TYPES: models.ADVANCEMENT_TYPES,
+      register: (cls) => models.BaseAdvancement.registerType(cls),
+    },
   };
 
   CONFIG.DASU = DASU;
@@ -93,8 +98,11 @@ Handlebars.registerHelper('capitalize', (str) =>
 );
 Handlebars.registerHelper('concat', (...args) => args.slice(0, -1).join(''));
 
-Hooks.once('ready', function () {
+Hooks.once('ready', async function () {
   Hooks.on('hotbarDrop', (bar, data, slot) => createItemMacro(data, slot));
+  for (const actor of game.actors) actor.applySchemaUpgrades?.();
+
+  Hooks.callAll('dasu.ready', game.dasu);
 });
 
 async function createItemMacro(data, slot) {

@@ -69,6 +69,7 @@ export class DASUTableRenderer {
   #tableConfig;
   #tableId;
   #application = null;
+  #document = null;
   #expandedItems = {};
   #clickHandler = this.#onClick.bind(this);
   #auxClickHandler = this.#onAuxClick.bind(this);
@@ -212,7 +213,8 @@ export class DASUTableRenderer {
       }
 
       default: {
-        const advancedConfig = config.advancedConfig;
+        const advancedConfig = { ...config.advancedConfig };
+        config.advancedConfig = advancedConfig;
 
         advancedConfig.getKey = advancedConfig.getKey.bind(this);
 
@@ -221,11 +223,12 @@ export class DASUTableRenderer {
           advancedConfig.keyDataAttribute = `data-${advancedConfig.keyDataAttribute}`;
         }
 
-        advancedConfig.additionalRowAttributes ??= [];
-        advancedConfig.additionalRowAttributes.forEach(
-          (value) =>
-            (value.getAttributeValue = value.getAttributeValue.bind(this))
-        );
+        advancedConfig.additionalRowAttributes = (
+          advancedConfig.additionalRowAttributes ?? []
+        ).map((value) => ({
+          ...value,
+          getAttributeValue: value.getAttributeValue.bind(this),
+        }));
 
         advancedConfig.tableClass ??= '';
         advancedConfig.rowClass ??= '';
@@ -255,6 +258,15 @@ export class DASUTableRenderer {
   }
 
   /**
+   * The document this table was last rendered for. Available during render,
+   * before `activateListeners` sets `#application`.
+   * @return {Document|null}
+   */
+  get document() {
+    return this.#application?.document ?? this.#document;
+  }
+
+  /**
    * @returns {String}
    */
   get id() {
@@ -264,34 +276,76 @@ export class DASUTableRenderer {
   /** Hook for subclasses to post-process the merged config before it is frozen. */
   initializeOptions(config) {}
 
+  /**
+   * Embedded item ids that are the un-slotted original of a grant choice and must
+   * be hidden. The slot copy (tracked via `choice.itemId`) is the canonical one.
+   * @param {Actor} actor
+   * @returns {Set<string>}
+   */
+  static slotOriginalIds(actor) {
+    const choices = actor?.getFlag?.('dasu', 'advancementChoices') ?? {};
+    const ids = new Set();
+    for (const choice of Object.values(choices)) {
+      const m = choice?.sourceUuid?.match(/Item\.([^.]+)$/);
+      if (m && m[1] !== choice.itemId && actor.items?.get(m[1])) ids.add(m[1]);
+    }
+    return ids;
+  }
+
   static #onRollItem(event, target) {
     event.preventDefault();
     event.stopPropagation();
+    const actor = this.#application?.document;
     const li = target.closest('[data-item-id]');
-    const item = this.#application?.document?.items?.get(li?.dataset?.itemId);
+    const { item } = DASUTableRenderer.#resolveTableItem(actor, li?.dataset?.itemId);
     item?.roll?.();
+  }
+
+  /**
+   * @param {Actor} actor
+   * @param {string} itemId
+   * @returns {{ item: Item|null, isGrant: boolean }}
+   */
+  static #resolveTableItem(actor, itemId) {
+    if (!itemId) return { item: null, isGrant: false };
+    const item = actor?.items?.get(itemId);
+    if (!item) return { item: null, isGrant: false };
+    const isGrant = !!item.getFlag?.('dasu', 'slotCopy');
+    return { item, isGrant };
   }
 
   static #onEditItem(event, target) {
     event.stopPropagation();
+    const actor = this.#application?.document;
     const li = target.closest('[data-item-id]');
-    const item = this.#application?.document?.items?.get(li?.dataset?.itemId);
+    const { item } = DASUTableRenderer.#resolveTableItem(
+      actor,
+      li?.dataset?.itemId
+    );
     item?.sheet?.render(true);
   }
 
   static async #onDeleteItem(event, target) {
     event.stopPropagation();
+    const actor = this.#application?.document;
     const li = target.closest('[data-item-id]');
-    const item = this.#application?.document?.items?.get(li?.dataset?.itemId);
-    if (!item) return;
+    const { item, isGrant } = DASUTableRenderer.#resolveTableItem(
+      actor,
+      li?.dataset?.itemId
+    );
+    if (!item || isGrant) return;
     await item.delete();
   }
 
   static #onMenuItem(event, target) {
     event.preventDefault();
     event.stopPropagation();
+    const actor = this.#application?.document;
     const li = target.closest('[data-item-id]');
-    const item = this.#application?.document?.items?.get(li?.dataset?.itemId);
+    const { item, isGrant } = DASUTableRenderer.#resolveTableItem(
+      actor,
+      li?.dataset?.itemId
+    );
     if (!item) return;
     const items = [
       {
@@ -299,11 +353,16 @@ export class DASUTableRenderer {
         icon: 'fas fa-edit',
         onClick: () => item.sheet.render(true),
       },
-      {
-        label: game.i18n.localize('DASU.Sheet.DeleteItem'),
-        icon: 'fas fa-trash',
-        onClick: () => item.delete(),
-      },
+      // Delete is suppressed for pseudo-items, managed via the class advancement slot.
+      ...(!isGrant
+        ? [
+            {
+              label: game.i18n.localize('DASU.Sheet.DeleteItem'),
+              icon: 'fas fa-trash',
+              onClick: () => item.delete(),
+            },
+          ]
+        : []),
     ];
     ui.context?.close();
     const menu = new foundry.applications.ux.ContextMenu(
@@ -345,6 +404,7 @@ export class DASUTableRenderer {
    * @return {Promise<string>}
    */
   async renderTable(document, options = {}) {
+    this.#document = document;
     const columns = {};
     const rowCaptions = {};
     const descriptions = {};
@@ -486,7 +546,14 @@ export class DASUTableRenderer {
       return;
     }
 
-    if (event.button === 0 && row && !actionElement && !contextMenuTrigger) {
+    const inExpandZone = event.target.closest('.dasu-table__row-expand');
+    if (
+      event.button === 0 &&
+      row &&
+      !actionElement &&
+      !contextMenuTrigger &&
+      !inExpandZone
+    ) {
       const rowKey = row.dataset.key;
       const expand = row.querySelector('.dasu-table__row-expand');
       if (expand) {

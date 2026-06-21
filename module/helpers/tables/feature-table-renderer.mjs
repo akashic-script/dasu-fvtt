@@ -13,6 +13,8 @@ export class FeatureTableRenderer extends DASUTableRenderer {
       controls: CommonColumns.itemControlsColumn({
         type: 'feature',
         label: 'TYPES.Item.feature',
+        disableDelete: (item) => !(item.parent instanceof Actor),
+        disableEdit: (item) => !(item.parent instanceof Actor),
       }),
     },
   };
@@ -25,6 +27,7 @@ export class FeatureTableRenderer extends DASUTableRenderer {
   }
 
   static #getItems(document) {
-    return document.itemTypes.feature ?? [];
+    const exclude = DASUTableRenderer.slotOriginalIds(document);
+    return (document.itemTypes.feature ?? []).filter((i) => !exclude.has(i.id));
   }
 }

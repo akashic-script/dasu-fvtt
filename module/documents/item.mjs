@@ -1,8 +1,11 @@
+import { EnablePseudoDocumentsMixin } from './enable-pseudo-documents-mixin.mjs';
+
 /**
- * Extend the basic Item document.
+ * Extend the basic Item document. Pseudo-document collections declared on the system data model
+ * (e.g. the class advancement table) are routed through {@link EnablePseudoDocumentsMixin}.
  * @extends {Item}
  */
-export class DASUItem extends Item {
+export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
   /** @override */
   prepareData() {
     super.prepareData();

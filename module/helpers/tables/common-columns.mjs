@@ -114,6 +114,9 @@ function _renderControlsHeader(headerOptions) {
       options.type = options.type.call(this);
     if (Array.isArray(options.type)) options.type = options.type.join(',');
 
+    if (options.disableAdd instanceof Function)
+      options.disableAdd = options.disableAdd.call(this);
+
     return foundry.applications.handlebars.renderTemplate(
       TEMPLATE('header/header-item-controls'),
       options

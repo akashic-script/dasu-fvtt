@@ -21,6 +21,12 @@ export class DASUSummonerActorSheet extends DASUActorSheet {
           icon: 'fas fa-share-nodes',
         },
         {
+          id: 'planner',
+          label: 'DASU.Sheet.Tab.Planner',
+          icon: 'fa-solid fa-angles-up',
+          iconOnly: true,
+        },
+        {
           id: 'items',
           label: 'DASU.Sheet.Tab.Items',
           icon: 'fa-solid fa-suitcase',
@@ -50,6 +56,10 @@ export class DASUSummonerActorSheet extends DASUActorSheet {
     },
     effects: {
       template: 'systems/dasu/templates/actor/parts/effects.hbs',
+      scrollable: [''],
+    },
+    planner: {
+      template: 'systems/dasu/templates/actor/parts/planner.hbs',
       scrollable: [''],
     },
   };

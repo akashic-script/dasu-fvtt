@@ -5,6 +5,9 @@ const EXPAND_TEMPLATE =
   'systems/dasu/templates/table/expand/expand-schema-description.hbs';
 const TextEditor = () => foundry.applications.ux.TextEditor.implementation;
 
+/**
+ * Read-only view of the schemas currently slotted on the actor. Schemas live only in planner slots
+ */
 export class SchemaTableRenderer extends DASUTableRenderer {
   /** @type {TableConfig} */
   static TABLE_CONFIG = {
@@ -12,20 +15,31 @@ export class SchemaTableRenderer extends DASUTableRenderer {
     getItems: SchemaTableRenderer.#getItems,
     renderDescription: SchemaTableRenderer.#renderDescription,
     columns: {
-      name: CommonColumns.itemNameColumn({ columnName: 'TYPES.Item.schema' }),
+      name: CommonColumns.itemAnchorColumn({ columnName: 'TYPES.Item.schema' }),
       level: CommonColumns.textColumn({
         columnLabel: 'DASU.Item.Schema.Level',
         getText: (item) => item.system.level ?? 1,
       }),
-      controls: CommonColumns.itemControlsColumn({
-        type: 'schema',
-        label: 'TYPES.Item.schema',
-      }),
     },
   };
 
+  /**
+   * @param {Actor} document
+   * @returns {Item[]}
+   */
   static #getItems(document) {
-    return document.itemTypes.schema ?? [];
+    const cls = document.itemTypes?.class?.[0];
+    const currentLevel = document.system?.level ?? 1;
+    const choices = document.getFlag?.('dasu', 'advancementChoices') ?? {};
+    const slottedIds = new Set(
+      (cls?.system?.advancements ?? [])
+        .filter((adv) => adv.level <= currentLevel)
+        .map((adv) => choices[adv.id]?.itemId)
+        .filter(Boolean)
+    );
+    return (document.itemTypes.schema ?? []).filter((item) =>
+      slottedIds.has(item.id)
+    );
   }
 
   static async #renderDescription(item) {

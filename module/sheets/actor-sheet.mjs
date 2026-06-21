@@ -11,6 +11,7 @@ import { AbilityTableRenderer } from '../helpers/tables/ability-table-renderer.m
 import { ItemTableRenderer } from '../helpers/tables/item-table-renderer.mjs';
 import { FeatureTableRenderer } from '../helpers/tables/feature-table-renderer.mjs';
 import { TacticTableRenderer } from '../helpers/tables/tactic-table-renderer.mjs';
+import { ClassTableRenderer } from '../helpers/tables/class-table-renderer.mjs';
 import { SchemaTableRenderer } from '../helpers/tables/schema-table-renderer.mjs';
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
@@ -44,8 +45,15 @@ export class DASUActorSheet extends SheetLayoutMixin(
       defaultPanel: 'biography',
       panels: ['biography', 'notes'],
     },
+    {
+      id: 'planner',
+      defaultPanel: 'reached',
+      defaultSplit: true,
+      panels: ['reached', 'future'],
+    },
   ]);
 
+  #classTable = new ClassTableRenderer();
   #schemaTable = new SchemaTableRenderer();
   #itemTable = new ItemTableRenderer();
   #featureTable = new FeatureTableRenderer();
@@ -91,6 +99,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
       advance: DASUActorSheet.#onAdvance,
       fieldsetTab: DASUActorSheet.#onFieldsetTab,
       fieldsetSplit: DASUActorSheet.#onFieldsetSplit,
+      plannerUnslot: DASUActorSheet.#onPlannerUnslot,
+      plannerOpenItem: DASUActorSheet.#onPlannerOpenItem,
+      plannerEditClass: DASUActorSheet.#onPlannerEditClass,
     },
   };
 
@@ -166,6 +177,16 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.abilityTable = await this.#abilityTable.renderTable(this.document);
     context.tacticTable = await this.#tacticTable.renderTable(this.document);
     context.schemaTable = await this.#schemaTable.renderTable(this.document);
+    context.classTable = await this.#classTable.renderTable(this.document);
+    context.planner = this.#preparePlanner(actor);
+    // Aptitude points are granted entirely by class advancements (aptitude-up entries).
+    context.apt = {
+      spent: Object.keys(DASU.aptitudes).reduce(
+        (sum, key) => sum + Math.max(0, actorData.aptitudes[key]?.bonus ?? 0),
+        0
+      ),
+      max: context.planner.aptitudeMax,
+    };
     context.itemTable = await this.#itemTable.renderTable(this.document);
     context.featureTable = await this.#featureTable.renderTable(this.document);
 
@@ -351,10 +372,12 @@ export class DASUActorSheet extends SheetLayoutMixin(
   /** @override */
   async _onFirstRender(context, options) {
     await super._onFirstRender(context, options);
+    this.#bindPlannerSlots();
     this.#weaponTable.activateListeners(this);
     this.#abilityTable.activateListeners(this);
     this.#tacticTable.activateListeners(this);
     this.#schemaTable.activateListeners(this);
+    this.#classTable.activateListeners(this);
     this.#itemTable.activateListeners(this);
     this.#featureTable.activateListeners(this);
     for (const { renderer } of DASUActorSheet.#moduleTableRegistry) {
@@ -560,6 +583,16 @@ export class DASUActorSheet extends SheetLayoutMixin(
         }, 0);
       });
     }
+  }
+
+  /** @override */
+  async _onDropItem(event, item) {
+    // Only one class allowed per actor.
+    if (item?.type === 'class' && this.actor.itemTypes.class.length > 0) {
+      ui.notifications?.warn(game.i18n.localize('DASU.Item.Class.OnlyOne'));
+      return false;
+    }
+    return super._onDropItem(event, item);
   }
 
   static #onRoll(event, target) {
@@ -793,6 +826,144 @@ export class DASUActorSheet extends SheetLayoutMixin(
         Math.max(0, current + delta)
       ),
     });
+  }
+
+  #preparePlanner(actor) {
+    const cls = actor.itemTypes?.class?.[0] ?? null;
+    const merits = CONFIG.DASU.levelMerits ?? {};
+    const currentLevel = actor.system.level ?? 1;
+
+    const byLevel = new Map();
+    if (cls) {
+      for (const adv of cls.system.advancements ?? []) {
+        if (!byLevel.has(adv.level)) byLevel.set(adv.level, []);
+        byLevel.get(adv.level).push(adv);
+      }
+    }
+
+    const meritMax = Object.keys(merits).reduce(
+      (m, k) => Math.max(m, Number(k)),
+      0
+    );
+    const advMax = byLevel.size ? Math.max(...byLevel.keys()) : 0;
+    const maxLevel = Math.max(meritMax, advMax, currentLevel + 5, 1);
+
+    const rows = [];
+    for (let level = 1; level <= maxLevel; level++) {
+      const advs = byLevel.get(level) ?? [];
+
+      let aptitudeUp = 0;
+      const schema = [];
+      const itemGrants = [];
+      for (const a of advs) {
+        for (const entry of a.getPlannerEntries(actor, {
+          level,
+          currentLevel,
+        })) {
+          if (entry.kind === 'apt') aptitudeUp += entry.amount ?? 1;
+          else if (entry.kind === 'schema') schema.push(entry.label);
+          else if (entry.kind === 'item-fixed') {
+            itemGrants.push({ fixed: true, fixedName: entry.label });
+          } else if (entry.kind === 'slot') {
+            itemGrants.push({
+              fixed: false,
+              advancementId: entry.advancementId,
+              type: entry.accentType,
+              typeLabel: entry.typeLabel,
+              itemType: entry.itemType,
+              filled: entry.filled,
+              filledName: entry.filledName,
+            });
+          }
+        }
+      }
+      rows.push({
+        level,
+        isCurrent: level === currentLevel,
+        isReached: level <= currentLevel,
+        meritText: merits[level] ?? '–',
+        spText: cls ? cls.system.spMax(level) : '–',
+        apText: cls ? cls.system.apMax(level) : '–',
+        aptitudeUp,
+        schema,
+        itemGrants,
+        empty: !aptitudeUp && !schema.length && !itemGrants.length,
+      });
+    }
+
+    const reachedRows = rows.filter((r) => r.isReached);
+    return {
+      reachedRows,
+      futureRows: rows.filter((r) => !r.isReached),
+      hasClass: !!cls,
+      className: cls?.name ?? '',
+      aptitudeMax: reachedRows.reduce((sum, r) => sum + r.aptitudeUp, 0),
+    };
+  }
+
+  #slotAdvancement(advancementId) {
+    const cls = this.actor.itemTypes?.class?.[0];
+    const adv = cls?.system.advancements.get(advancementId);
+    return adv?.isFillSlot ? adv : null;
+  }
+
+  static async #onPlannerUnslot(event, target) {
+    const adv = this.#slotAdvancement(target.dataset.advancementId);
+    await adv?.clearFromActor(this.actor);
+  }
+
+  static async #onPlannerOpenItem(event, target) {
+    if (event.target.closest('.planner__slot-clear')) return;
+    const adv = this.#slotAdvancement(target.dataset.advancementId);
+    if (!adv) return;
+    const choice = adv.getChoice(this.actor);
+    if (!choice) return;
+    const item = choice.itemId
+      ? this.actor.items.get(choice.itemId)
+      : choice.sourceUuid
+      ? await fromUuid(choice.sourceUuid)
+      : null;
+    item?.sheet?.render(true);
+  }
+
+  static #onPlannerEditClass() {
+    const cls = this.actor.itemTypes?.class?.[0];
+    cls?.sheet?.render(true);
+  }
+
+  #bindPlannerSlots() {
+    this.element.addEventListener('dragover', (e) => {
+      const slot = e.target.closest('.planner__slot--fillable');
+      if (!slot) return;
+      e.preventDefault();
+      slot.classList.add('drag-over');
+    });
+    this.element.addEventListener('dragleave', (e) => {
+      const slot = e.target.closest('.planner__slot--fillable');
+      if (slot && !slot.contains(e.relatedTarget)) {
+        slot.classList.remove('drag-over');
+      }
+    });
+    this.element.addEventListener(
+      'drop',
+      async (e) => {
+        const slot = e.target.closest('.planner__slot--fillable');
+        if (!slot) return;
+        e.preventDefault();
+        e.stopPropagation();
+        slot.classList.remove('drag-over');
+        let data;
+        try {
+          data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        } catch {
+          return;
+        }
+        if (data.type !== 'Item' || !data.uuid) return;
+        const adv = this.#slotAdvancement(slot.dataset.advancementId);
+        await adv?.slot(this.actor, data.uuid);
+      },
+      true
+    );
   }
 
   static #onAdvance(event, target) {

@@ -1,8 +1,10 @@
 <div class="header-item-controls">
+  {{#unless disableAdd}}
   <a data-action="createItem"
      data-type="{{type}}"
      {{#if subtype}}data-sub-type="{{subtype}}"{{/if}}
      data-tooltip="{{localize 'DOCUMENT.Create'}} {{localize label}}">
     <i class="fas fa-plus"></i>
   </a>
+  {{/unless}}
 </div>

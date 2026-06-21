@@ -1,11 +1,17 @@
-<div class="actor-aptitudes" data-tooltip="{{localize 'DASU.Item.Aptitude'}}">
-  {{#each aptitudes as |apt key|}}
-  <button type="button"
-    class="actor-aptitudes__pill dasu-pill {{#if apt.isZero}}actor-aptitudes__pill--zero{{/if}} {{#if apt.isDerived}}actor-aptitudes__pill--derived{{/if}}"
-    {{#unless apt.isDerived}}data-action="aptitudeStep"{{/unless}}
-    data-aptitude="{{key}}" data-tooltip="{{apt.label}}">
-    <span class="actor-aptitudes__abbr">{{apt.abbr}}</span>
-    <span class="actor-aptitudes__value">{{apt.value}}</span>
-  </button>
-  {{/each}}
+<div class="actor-aptitudes-section">
+  <div class="actor-aptitudes__header">
+    <span class="actor-aptitudes__title">{{localize "DASU.Actor.Section.Aptitudes"}}</span>
+    <span class="actor-aptitudes__counter" data-tooltip="{{localize 'DASU.Actor.APT.long'}}">{{localize "DASU.Actor.APT.abbr"}}: {{apt.spent}}/{{apt.max}}</span>
+  </div>
+  <div class="actor-aptitudes" data-tooltip="{{localize 'DASU.Item.Aptitude'}}">
+    {{#each aptitudes as |apt key|}}
+    <button type="button"
+      class="actor-aptitudes__pill dasu-pill {{#if apt.isZero}}actor-aptitudes__pill--zero{{/if}} {{#if apt.isDerived}}actor-aptitudes__pill--derived{{/if}}"
+      {{#unless apt.isDerived}}data-action="aptitudeStep"{{/unless}}
+      data-aptitude="{{key}}" data-tooltip="{{apt.label}}">
+      <span class="actor-aptitudes__abbr">{{apt.abbr}}</span>
+      <span class="actor-aptitudes__value">{{apt.value}}</span>
+    </button>
+    {{/each}}
+  </div>
 </div>

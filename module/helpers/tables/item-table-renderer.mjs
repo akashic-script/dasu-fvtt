@@ -44,6 +44,8 @@ export class ItemTableRenderer extends DASUTableRenderer {
       controls: CommonColumns.itemControlsColumn({
         type: 'item',
         label: 'TYPES.Item.item',
+        disableDelete: (item) => !(item.parent instanceof Actor),
+        disableEdit: (item) => !(item.parent instanceof Actor),
       }),
     },
   };
@@ -56,7 +58,8 @@ export class ItemTableRenderer extends DASUTableRenderer {
   }
 
   static #getItems(document) {
-    return document.itemTypes.item ?? [];
+    const exclude = DASUTableRenderer.slotOriginalIds(document);
+    return (document.itemTypes.item ?? []).filter((i) => !exclude.has(i.id));
   }
 
   static #getTags(item) {

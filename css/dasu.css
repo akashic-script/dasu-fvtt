@@ -591,11 +591,58 @@
       }
     }
 
+    .planner__class-name {
+      margin: 1px 0 1px auto;
+      height: var(--_tab-h);
+      display: flex;
+      align-items: center;
+      line-height: 1;
+      padding: 0 10px;
+      font-size: 0.9em;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--dasu-hp);
+      white-space: nowrap;
+    }
+
     .dasu-fieldset__split-btns {
       margin-left: auto;
       display: flex;
       position: relative;
       z-index: 3;
+    }
+
+    .planner__class-name ~ .dasu-fieldset__split-btns {
+      margin-left: 0;
+    }
+
+    .planner__class-edit {
+      height: var(--_tab-h);
+      width: var(--_tab-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85em;
+      color: var(--dasu-tab-icon);
+      background: none;
+      border: none;
+      outline: none;
+      box-shadow: none;
+      border-radius: 0;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 120ms ease, color 120ms ease;
+
+      &:focus,
+      &:focus-visible {
+        outline: none;
+        box-shadow: none;
+      }
+      &:hover {
+        opacity: 1;
+        color: var(--dasu-hp);
+      }
     }
 
     .dasu-fieldset__split-btn {
@@ -813,6 +860,7 @@
     --dasu-accent-weapon: #7090a8;
     --dasu-accent-tactic: #c45a5a;
     --dasu-accent-schema: #4a8fc4;
+    --dasu-accent-class: #c4a84a;
     --dasu-surface-1: rgb(var(--dasu-panel) / 40%);
     --dasu-surface-raised: rgb(255 255 255 / 8%);
     --dasu-panel-accent: rgb(255 255 255 / 8%);
@@ -1959,6 +2007,10 @@
         &.active {
           z-index: 6;
         }
+        &:not(:has(.tab-label)) {
+          padding: 0 14px;
+          flex: 0 0 auto;
+        }
       }
     }
 
@@ -2461,6 +2513,9 @@
       &.schema-table .dasu-table__header {
         --section-accent: var(--dasu-accent-schema);
       }
+      &.class-table .dasu-table__header {
+        --section-accent: var(--dasu-accent-class);
+      }
       &.effect-table .dasu-table__header {
         --section-accent: var(--dasu-tab-icon);
       }
@@ -2504,6 +2559,9 @@
       }
       &.schema-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-schema);
+      }
+      &.class-table .dasu-table__row-container.item {
+        --item-accent: var(--dasu-accent-class);
       }
 
       /* Ability sub-category overrides */
@@ -2776,11 +2834,24 @@
     .schema-table {
       grid-template-columns: [name] auto [level] 48px [controls] 54px;
     }
+    .class-table {
+      grid-template-columns: [name] auto [sp] 48px [ap] 48px [controls] 54px;
+    }
     .tactic-table {
       grid-template-columns: [name] auto [damage] 80px [cost] 54px [toLand] 48px [controls] 54px;
     }
     .effect-table {
       grid-template-columns: [name] auto [source] 80px [duration] 64px [controls] 54px;
+    }
+    .advancement-table {
+      grid-template-columns: [level] 46px [aptitudeUp] 80px [grants] 1fr [controls] 32px;
+    }
+    &.advancement-table .dasu-table__header {
+      --section-accent: var(--dasu-accent-class);
+    }
+    &.advancement-table .dasu-table__row-container.advancement {
+      background: rgb(var(--dasu-panel) / 60%);
+      color: var(--dasu-on-panel);
     }
 
     .item-formula {
@@ -2897,14 +2968,58 @@
   }
 }
 
+.dasu.sheet.actor .actor-aptitudes-section {
+  margin-bottom: 8px;
+}
+
+.dasu.sheet.actor .actor-aptitudes__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  height: 22px;
+  padding: 0 0 0 8px;
+  font-size: 0.85em;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dasu-tab-icon);
+  background: rgb(var(--dasu-panel) / 90%);
+  border: var(--dasu-border);
+  border-bottom: var(--dasu-border-subtle);
+}
+
+.dasu.sheet.actor .actor-aptitudes__title {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dasu.sheet.actor .actor-aptitudes__counter {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 10px 0 12px;
+  font-size: 0.95em;
+  letter-spacing: 0.04em;
+  color: var(--dasu-paper);
+  background: var(--dasu-hp);
+  border-radius: 0;
+  clip-path: polygon(6px 0, 100% 0, 100% 100%, 0 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%);
+}
+
 .dasu.sheet.actor .actor-aptitudes {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   gap: 3px;
   padding: 6px;
-  margin-bottom: 8px;
   background: var(--dasu-surface-1);
   border: var(--dasu-border);
+  border-top: none;
 }
 
 .dasu.sheet.actor .actor-aptitudes__pill {
@@ -2952,8 +3067,373 @@
 }
 
 .dasu.sheet.actor:not(.edit-mode)
-  .actor-aptitudes:not(
+  .actor-aptitudes-section:not(
     :has(.actor-aptitudes__pill:not(.actor-aptitudes__pill--zero))
   ) {
   display: none;
+}
+
+/* Class advancement editor (item sheet, Advanced tab) */
+.class-advancement {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Header add button in controls column */
+.advancement-table .dasu-table__header-cell[data-column='controls'] {
+  padding: 0;
+  justify-content: center;
+}
+.advancement-table .dasu-table__header-add {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+  line-height: 1;
+  color: var(--dasu-accent-class);
+}
+
+/* Level cell */
+.cell-adv-level input {
+  width: 40px;
+  text-align: center;
+  border-radius: 0;
+  font-size: 12px;
+}
+
+/* Aptitude cell */
+.cell-adv-apt {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.cell-adv-apt input {
+  width: 36px;
+  text-align: center;
+  border-radius: 0;
+  font-size: 11px;
+}
+.cell-adv-apt__badge {
+  font-size: 10px;
+  padding: 1px 5px;
+  background: rgb(var(--dasu-panel) / 80%);
+  border: 1px solid rgb(255 255 255 / 12%);
+  white-space: nowrap;
+}
+
+/* Grants badges cell */
+.cell-adv-grants {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+}
+.cell-adv-grants__badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.cell-adv-grants__badge--schema {
+  border-color: var(--dasu-accent-class);
+  color: var(--dasu-accent-class);
+}
+.cell-adv-grants__badge--upgrade {
+  border-color: rgb(255 255 255 / 20%);
+  opacity: 0.85;
+}
+.cell-adv-grants__badge--apt {
+  border-color: rgb(255 255 255 / 25%);
+  opacity: 0.9;
+}
+
+/* Type cell */
+.cell-adv-type {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+}
+.cell-adv-type i {
+  opacity: 0.7;
+}
+.cell-adv-grants__badge--any,
+.cell-adv-grants__badge--item,
+.cell-adv-grants__badge--ability,
+.cell-adv-grants__badge--weapon,
+.cell-adv-grants__badge--tactic,
+.cell-adv-grants__badge--feature {
+  border-color: rgb(255 255 255 / 15%);
+  opacity: 0.8;
+}
+
+/* Controls cell */
+.cell-adv-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cell-adv-controls__btn {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+  line-height: 1;
+}
+.cell-adv-controls__btn--danger {
+  color: var(--dasu-accent-tactic);
+}
+
+/* Expand zone */
+.adv-expand {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px 8px;
+  font-size: 11px;
+}
+.adv-expand__description {
+  font-size: 11px;
+  opacity: 0.8;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+}
+/* Per-type editor fields */
+.adv-expand__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.adv-expand__field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+}
+.adv-expand__field > span {
+  opacity: 0.7;
+}
+.adv-expand__field select,
+.adv-expand__field input {
+  border-radius: 0;
+}
+.adv-expand__field--row {
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 6px;
+}
+.adv-expand__field--row input {
+  width: 48px;
+  text-align: center;
+}
+.adv-expand__upgrade-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+}
+.adv-expand__upgrade-row .adv-expand__field {
+  flex: 1;
+}
+.adv-expand__arrow {
+  padding-bottom: 5px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.adv-expand__tier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  min-width: 36px;
+}
+.adv-expand__tier > span {
+  opacity: 0.7;
+  font-size: 10px;
+}
+.adv-expand__tier > strong {
+  font-size: 14px;
+  line-height: 1;
+}
+.adv-expand__hint {
+  font-size: 10px;
+  opacity: 0.5;
+  margin: 0;
+}
+/* Level planner (actor sheet) */
+.dasu-fieldset--planner .dasu-fieldset__panel {
+  overflow: auto;
+  flex: none;
+}
+.planner__empty {
+  opacity: 0.7;
+  font-style: italic;
+  padding: 8px 10px;
+}
+.planner__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85em;
+  margin: 0;
+}
+.planner__table thead tr {
+  height: 24px;
+  background: rgb(var(--dasu-panel) / 95%);
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+}
+.planner__table th {
+  text-align: left;
+  padding: 0 8px;
+  color: var(--dasu-tab-icon);
+  font-size: 0.72em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.planner__table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid rgb(255 255 255 / 6%);
+  vertical-align: middle;
+}
+.planner__table td.planner__col-effects {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.planner__col-level,
+.planner__col-merit,
+.planner__col-sp,
+.planner__col-ap {
+  width: 1%;
+  white-space: nowrap;
+}
+.planner__table th.planner__col-level,
+.planner__table td.planner__col-level,
+.planner__table th.planner__col-merit,
+.planner__table td.planner__col-merit,
+.planner__table th.planner__col-sp,
+.planner__table td.planner__col-sp,
+.planner__table th.planner__col-ap,
+.planner__table td.planner__col-ap {
+  text-align: center;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+.planner__row {
+  opacity: 0.45;
+  background: rgb(var(--dasu-panel) / 60%);
+  color: var(--dasu-on-panel);
+  transition: background 120ms ease, opacity 120ms ease;
+}
+.planner__row--reached {
+  opacity: 1;
+}
+.planner__row:hover {
+  background: rgb(var(--dasu-panel) / 75%);
+}
+.planner__row--current {
+  box-shadow: inset 3px 0 0 0 var(--dasu-accent-class);
+}
+.planner__here {
+  color: var(--dasu-accent-class);
+  margin-left: 4px;
+}
+.planner__effect {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 22px;
+  min-width: 140px;
+  padding: 2px 8px;
+  margin: 2px 4px 2px 0;
+  border-radius: 0;
+  font-size: 0.9em;
+  white-space: nowrap;
+  background: rgb(0 0 0 / 25%);
+  border: 1px solid rgb(255 255 255 / 12%);
+}
+.planner__effect--apt {
+  border-left: 2px solid var(--dasu-accent-feature);
+}
+.planner__effect--schema {
+  border-left: 2px solid var(--dasu-accent-schema);
+}
+.planner__effect--item {
+  border-left: 2px solid var(--dasu-accent-class);
+}
+.planner__effect--none {
+  background: transparent;
+  opacity: 0.5;
+}
+
+.planner__slot {
+  --item-accent: var(--dasu-tab-icon);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  margin: 2px 4px 2px 0;
+  min-width: 140px;
+  font-size: 11px;
+  white-space: nowrap;
+  cursor: copy;
+  background: rgb(0 0 0 / 25%);
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-left: 2px solid var(--item-accent);
+}
+.planner__slot--filled {
+  cursor: pointer;
+  background: rgb(0 0 0 / 35%);
+}
+.planner__slot[data-grant-type='schema'] {
+  --item-accent: var(--dasu-accent-schema);
+}
+.planner__slot[data-grant-type='innate'] {
+  --item-accent: #50c878;
+}
+.planner__slot-type {
+  display: none;
+}
+.planner__slot--typed .planner__slot-type {
+  display: inline;
+}
+.planner__slot--filled .planner__slot-type {
+  display: none;
+}
+.planner__slot--fillable {
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.planner__slot--fillable:hover {
+  background: rgb(0 0 0 / 40%);
+  border-color: var(--item-accent);
+}
+.planner__slot--fillable .planner__slot-drop {
+  cursor: copy;
+  opacity: 0.8;
+}
+.planner__slot--fillable.drag-over {
+  border-color: var(--item-accent);
+  background: rgb(var(--dasu-panel) / 70%);
+}
+.planner__slot-name {
+  font-weight: 600;
+}
+.planner__slot-clear {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--dasu-accent-tactic);
+  background: rgb(255 255 255 / 6%);
+  border: 1px solid rgb(255 255 255 / 15%);
+  transition: background 120ms ease, color 120ms ease;
+}
+.planner__slot-clear:hover {
+  background: var(--dasu-accent-tactic);
+  color: var(--dasu-ink);
 }

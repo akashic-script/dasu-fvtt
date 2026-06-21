@@ -1,0 +1,54 @@
+<div class="adv-expand">
+
+  {{!-- Description --}}
+  <div class="adv-expand__description">
+    {{{description}}}
+  </div>
+
+  {{!-- Per-type editor --}}
+  <div class="adv-expand__fields">
+
+    {{#if (eq type "aptitude")}}
+    <label class="adv-expand__field">
+      <span>{{localize "DASU.Advancement.Aptitude.Amount"}}</span>
+      <input type="number" min="1" step="1" value="{{data.amount}}"
+        data-advancement-id="{{advancementId}}" data-field="amount"
+        {{#unless editable}}disabled{{/unless}} />
+    </label>
+    {{/if}}
+
+    {{#if (eq type "schemaSlot")}}
+    <p class="adv-expand__hint">{{localize "DASU.Item.Class.OpenSlotHint"}}</p>
+    {{/if}}
+
+    {{#if (eq type "schemaUpgrade")}}
+    <div class="adv-expand__upgrade-row">
+      <label class="adv-expand__field">
+        <span>{{localize "DASU.Advancement.SchemaUpgrade.Slot"}}</span>
+        <select data-advancement-id="{{advancementId}}" data-field="targetAdvancementId"
+          {{#unless editable}}disabled{{/unless}}>
+          {{selectOptions data.slotOptions selected=data.targetAdvancementId}}
+        </select>
+      </label>
+      <span class="adv-expand__arrow">&gt;</span>
+      <span class="adv-expand__tier">
+        <span>{{localize "DASU.Advancement.SchemaUpgrade.Tier"}}</span>
+        <strong>{{data.upgradeTo}}</strong>
+      </span>
+    </div>
+    {{/if}}
+
+    {{#if (eq type "itemGrant")}}
+    <label class="adv-expand__field">
+      <span>{{localize "DASU.Advancement.ItemGrant.ItemType"}}</span>
+      <select data-advancement-id="{{advancementId}}" data-field="itemType"
+        {{#unless editable}}disabled{{/unless}}>
+        {{selectOptions itemTypeOptions selected=data.itemType}}
+      </select>
+    </label>
+    <p class="adv-expand__hint">{{localize "DASU.Advancement.ItemGrant.SlotHint"}}</p>
+    {{/if}}
+
+  </div>
+
+</div>

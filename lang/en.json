@@ -81,7 +81,8 @@
       "Section": {
         "Attributes": "Attributes",
         "Stats": "Stats",
-        "Skills": "Skills"
+        "Skills": "Skills",
+        "Aptitudes": "Aptitudes"
       },
       "HP": {
         "long": "Hit Points",
@@ -106,6 +107,10 @@
         "abbr": "SP",
         "bonusAbbr": "SP+",
         "bonusLong": "Skill Points Bonus"
+      },
+      "APT": {
+        "long": "Aptitude Points",
+        "abbr": "APT"
       },
       "Stat": {
         "Avoid": {
@@ -151,8 +156,6 @@
         "AnathemaSuggestions": "Dishonor,Disgrace,Poverty,Helplessness,Insignificance,Sterility,Starvation,Paralysis,Confusion,Subjugation,Blindness,Emptiness"
       },
       "Skill": {
-        "NamePlaceholder": "Custom Skill Name",
-        "AddCustom": "Add Skill",
         "Athletics": "Athletics",
         "Academia": "Academia",
         "Craftsmanship": "Craftsmanship",
@@ -167,19 +170,17 @@
       "EditModeToggle": "Toggle edit mode",
       "MoreOptions": "More",
       "EditItem": "Edit",
-      "CreateFeature": "Create feature",
       "DeleteItem": "Delete",
       "RollFlavorAbility": "[ability]",
       "Tab": {
         "Identity": "Identity",
         "Syn": "SYN",
         "Ack": "ACK",
-        "Abilities": "Abilities",
-        "Features": "Features",
         "Items": "Items",
         "Effects": "Effects",
         "Description": "Description",
-        "Advanced": "Advanced"
+        "Advanced": "Advanced",
+        "Planner": "Level Planner"
       },
       "Section": {
         "MoralTriad": "Moral Triad",
@@ -269,7 +270,6 @@
         "GovernNone": "None",
         "ResourceType": "Cost Type",
         "Cost": "Cost",
-        "ToHit": "To Hit",
         "ToLand": "To Land",
         "IsInfinity": "Auto-pass",
         "Damage": "DMG",
@@ -277,13 +277,67 @@
       },
       "Schema": {
         "Level": "Level",
-        "Requirements": "Requirements",
         "Level1": "Level 1",
         "Level2": "Level 2",
         "Level3": "Level 3",
         "Level1Cost": "Level 1 Cost",
         "Level2Cost": "Level 2 Cost",
         "Level3Cost": "Level 3 Cost"
+      },
+      "Class": {
+        "Identifier": "Identifier",
+        "SpBase": "SP Base",
+        "SpPerLevel": "SP / Level",
+        "ApBase": "AP Base",
+        "ApPerStep": "AP / Step",
+        "ApStepEvery": "AP Step Every",
+        "Advancement": "Advancement",
+        "AddAdvancement": "Add Advancement",
+        "DeleteAdvancement": "Remove Advancement",
+        "Level": "Level",
+        "AptitudeUp": "Aptitude Up",
+        "ItemGrants": "Item Grant",
+        "GrantTypeAny": "Any Type",
+        "OpenSlotHint": "Player chooses on actor",
+        "SchemaUpgrade": "Schema Up",
+        "OnlyOne": "An actor can only have one class."
+      }
+    },
+    "Planner": {
+      "Effects": "Effects",
+      "Reached": "Reached",
+      "Future": "Future",
+      "NoClass": "No class equipped. Add a class item to plan advancement.",
+      "SchemaGrant": "Schema Slot {slot}",
+      "AptitudeBadge": "Apt +{n}",
+      "SchemaUpgrade": "{slot} > Tier {to}",
+      "EmptySlot": "Empty",
+      "SlotHint": "Drag an item here to slot it",
+      "Unslot": "Remove slotted item",
+      "SlotWrongType": "That item must be a {type}."
+    },
+    "Advancement": {
+      "Type": "Type",
+      "ChooseType": "Choose an advancement type to add.",
+      "Base": {
+        "Label": "Advancement"
+      },
+      "Aptitude": {
+        "Amount": "Aptitude-Ups"
+      },
+      "SchemaSlot": {
+        "Label": "Schema Slot",
+        "ItemType": "Slot Type"
+      },
+      "SchemaUpgrade": {
+        "Slot": "Schema Slot",
+        "Tier": "Tier",
+        "ChooseSlot": "Choose Slot",
+        "NoTarget": "?"
+      },
+      "ItemGrant": {
+        "ItemType": "Item Type",
+        "SlotHint": "The player fills this slot on their sheet."
       }
     }
   },

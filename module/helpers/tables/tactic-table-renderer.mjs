@@ -48,12 +48,15 @@ export class TacticTableRenderer extends DASUTableRenderer {
       controls: CommonColumns.itemControlsColumn({
         type: 'tactic',
         label: 'TYPES.Item.tactic',
+        disableDelete: (item) => !(item.parent instanceof Actor),
+        disableEdit: (item) => !(item.parent instanceof Actor),
       }),
     },
   };
 
   static #getItems(document) {
-    return document.itemTypes.tactic ?? [];
+    const exclude = DASUTableRenderer.slotOriginalIds(document);
+    return (document.itemTypes.tactic ?? []).filter((i) => !exclude.has(i.id));
   }
 
   static #getTags(item) {

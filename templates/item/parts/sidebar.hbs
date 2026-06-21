@@ -224,6 +224,37 @@
   </div>
   {{/if}}
 
+  {{#if isClass}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Class.Identifier"}}</label>
+      <input type="text" name="system.identifier" value="{{system.identifier}}" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Class.SpBase"}}</label>
+      <input type="number" name="system.sp.base" value="{{system.sp.base}}" min="0" />
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Class.SpPerLevel"}}</label>
+      <input type="number" name="system.sp.perLevel" value="{{system.sp.perLevel}}" min="0" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Class.ApBase"}}</label>
+      <input type="number" name="system.ap.base" value="{{system.ap.base}}" min="0" />
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Class.ApPerStep"}}</label>
+      <input type="number" name="system.ap.perStep" value="{{system.ap.perStep}}" min="0" />
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Class.ApStepEvery"}}</label>
+      <input type="number" name="system.ap.stepEvery" value="{{system.ap.stepEvery}}" min="1" />
+    </div>
+  </div>
+  {{/if}}
+
   {{#if isAbility}}
   <div class="item-sidebar__fields">
     <div class="item-sidebar__field item-sidebar__field--wide">

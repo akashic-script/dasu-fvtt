@@ -4,6 +4,7 @@ import { prepareActiveEffectCategories } from '../helpers/effects.mjs';
 import { DASU } from '../helpers/config.mjs';
 import { SheetLayoutMixin } from './mixins/sheet-layout-mixin.mjs';
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
+import { AdvancementTableRenderer } from '../helpers/tables/advancement-table-renderer.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
 
 /**
@@ -84,6 +85,8 @@ export class DASUItemSheet extends SheetLayoutMixin(
     return this.document;
   }
 
+  #advancementTable = null;
+
   #fieldsets = new FieldsetStateManager([
     {
       id: 'schema-levels',
@@ -116,6 +119,11 @@ export class DASUItemSheet extends SheetLayoutMixin(
     if (this.document.type === 'schema') {
       parts.advanced = {
         template: 'systems/dasu/templates/item/parts/schema-advanced.hbs',
+        scrollable: [''],
+      };
+    } else if (this.document.type === 'class') {
+      parts.advanced = {
+        template: 'systems/dasu/templates/item/parts/class-advancement.hbs',
         scrollable: [''],
       };
     } else {
@@ -159,6 +167,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     context.isAbility = item.type === 'ability';
     context.isTactic = item.type === 'tactic';
     context.isSchema = item.type === 'schema';
+    context.isClass = item.type === 'class';
 
     const localize = (obj) =>
       Object.fromEntries(
@@ -252,6 +261,16 @@ export class DASUItemSheet extends SheetLayoutMixin(
       }
     }
 
+    if (context.isClass) {
+      if (!this.#advancementTable) {
+        this.#advancementTable = new AdvancementTableRenderer({
+          editable: context.editable,
+          item,
+        });
+      }
+      context.advancementTable = await this.#advancementTable.renderTable(item);
+    }
+
     context.fieldsets = this.#fieldsets.prepareContext(item);
 
     context.descriptionHTML =
@@ -280,6 +299,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     this.#temporaryEffectsTable.activateListeners(this);
     this.#passiveEffectsTable.activateListeners(this);
     this.#inactiveEffectsTable.activateListeners(this);
+    if (this.#advancementTable) this.#advancementTable.activateListeners(this);
   }
 
   /** @override */
@@ -321,6 +341,10 @@ export class DASUItemSheet extends SheetLayoutMixin(
         effects[index].grantUuid = data.uuid;
         await this.item.update({ 'system.effects': effects });
       });
+    }
+
+    if (this.#advancementTable) {
+      this.#advancementTable.activateAdvancementListeners(this.element);
     }
 
     const activeTab =
