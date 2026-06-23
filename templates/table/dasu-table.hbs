@@ -9,6 +9,11 @@
         </div>
       {{/unless}}
     {{/each}}
+    {{#if @root.badge}}
+      <a class="dasu-table__badge"
+         {{#if @root.badge.type}}data-action="createItem" data-type="{{@root.badge.type}}"{{/if}}
+         {{#if @root.badge.tooltip}} data-tooltip="{{@root.badge.tooltip}}"{{/if}}>{{@root.badge.text}}</a>
+    {{/if}}
   </li>
   {{#each items as |row|}}
     <li class="dasu-table__row-container {{@root.config.rowClass}} {{#if @root.config.draggable}}draggable{{/if}} {{lookup @root.rowCssClasses key}} {{#unless visible}}hidden{{/unless}}"

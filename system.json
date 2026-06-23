@@ -41,7 +41,9 @@
       "ability": {},
       "weapon": {},
       "tactic": {},
-      "schema": {}
+      "schema": {},
+      "archetype": {},
+      "subtype": {}
     }
   },
   "styles": [

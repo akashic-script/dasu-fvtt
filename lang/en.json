@@ -1,5 +1,35 @@
 {
   "DASU": {
+    "Archetype": {
+      "Bonuses": "Bonuses",
+      "BonusHint": "Each bonus adds the result of its formula to a stat. Formulas may use roll data such as @lvl and @attributes.pow.value.",
+      "BonusTarget": "Target",
+      "BonusFormula": "Formula",
+      "AddBonus": "Add Bonus",
+      "Identifier": "Identifier",
+      "OnlyOne": "A Daemon can only have one Archetype.",
+      "DaemonOnly": "Archetypes can only be added to Daemons.",
+      "Target": {
+        "HpMax": "Max HP",
+        "WpMax": "Max WP",
+        "Avoid": "Avoid",
+        "Defense": "Defense",
+        "Hit": "To Hit",
+        "Land": "To Land"
+      }
+    },
+    "Subtype": {
+      "Identifier": "Identifier",
+      "StatAllocationBonus": "Stat Allocation Bonus",
+      "MaxAbilitySlots": "Max Ability Slots",
+      "MaxTacticSlots": "Max Tactic Slots",
+      "StatShort": "Stat",
+      "AbilityShort": "Abil",
+      "TacticShort": "Tac",
+      "OnlyOne": "A Daemon can only have one Subtype.",
+      "SlotsFull": "Slot limit reached: this Daemon's subtype allows at most {max} {type} items.",
+      "DaemonOnly": "Subtypes can only be added to Daemons."
+    },
     "Ability": {
       "Pow": {
         "long": "Power",
@@ -174,6 +204,10 @@
       "APT": {
         "long": "Aptitude Points",
         "abbr": "APT"
+      },
+      "Slots": {
+        "AbilityLong": "Ability Slots",
+        "TacticLong": "Tactic Slots"
       },
       "Stat": {
         "Avoid": {
@@ -500,7 +534,9 @@
       "class": "Class",
       "ability": "Ability",
       "tactic": "Tactic",
-      "schema": "Schema"
+      "schema": "Schema",
+      "archetype": "Archetype",
+      "subtype": "Subtype"
     }
   }
 }

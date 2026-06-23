@@ -12,6 +12,8 @@ import { ItemTableRenderer } from '../helpers/tables/item-table-renderer.mjs';
 import { FeatureTableRenderer } from '../helpers/tables/feature-table-renderer.mjs';
 import { TacticTableRenderer } from '../helpers/tables/tactic-table-renderer.mjs';
 import { ClassTableRenderer } from '../helpers/tables/class-table-renderer.mjs';
+import { ArchetypeTableRenderer } from '../helpers/tables/archetype-table-renderer.mjs';
+import { SubtypeTableRenderer } from '../helpers/tables/subtype-table-renderer.mjs';
 import { SchemaTableRenderer } from '../helpers/tables/schema-table-renderer.mjs';
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
@@ -55,6 +57,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
   ]);
 
   #classTable = new ClassTableRenderer();
+  #archetypeTable = new ArchetypeTableRenderer();
+  #subtypeTable = new SubtypeTableRenderer();
   #schemaTable = new SchemaTableRenderer();
   #itemTable = new ItemTableRenderer();
   #featureTable = new FeatureTableRenderer();
@@ -177,8 +181,23 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
     this._prepareItems(context);
     context.weaponTable = await this.#weaponTable.renderTable(this.document);
-    context.abilityTable = await this.#abilityTable.renderTable(this.document);
-    context.tacticTable = await this.#tacticTable.renderTable(this.document);
+    const slots = actorData.slots;
+    context.abilityTable = await this.#abilityTable.renderTable(this.document, {
+      sectionBadge: slots?.ability ? {
+        type: 'ability',
+        tooltip: game.i18n.localize('DASU.Actor.Slots.AbilityLong'),
+        used: slots.ability.used,
+        max: slots.ability.max,
+      } : null,
+    });
+    context.tacticTable = await this.#tacticTable.renderTable(this.document, {
+      sectionBadge: slots?.tactic ? {
+        type: 'tactic',
+        tooltip: game.i18n.localize('DASU.Actor.Slots.TacticLong'),
+        used: slots.tactic.used,
+        max: slots.tactic.max,
+      } : null,
+    });
     context.schemaTable = await this.#schemaTable.renderTable(this.document);
     context.classTable = await this.#classTable.renderTable(this.document);
     context.planner = this.#preparePlanner(actor);
@@ -191,6 +210,11 @@ export class DASUActorSheet extends SheetLayoutMixin(
     };
     context.itemTable = await this.#itemTable.renderTable(this.document);
     context.featureTable = await this.#featureTable.renderTable(this.document);
+
+    context.archetypeTable = await this.#archetypeTable.renderTable(
+      this.document
+    );
+    context.subtypeTable = await this.#subtypeTable.renderTable(this.document);
 
     context.fieldsets = this.#fieldsets.prepareContext(actor);
 
@@ -237,6 +261,10 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.inactiveEffectsTable = await this.#inactiveEffectsTable.renderTable(
       this.document
     );
+
+    context.className = this.actor.itemTypes?.class?.[0]?.name ?? '';
+    context.archetypeName = this.actor.itemTypes?.archetype?.[0]?.name ?? '';
+    context.subtypeName = this.actor.itemTypes?.subtype?.[0]?.name ?? '';
 
     const merit = actorData.meritProgress;
     const isTransform = merit?.mode === 'transform';
@@ -380,6 +408,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.#tacticTable.activateListeners(this);
     this.#schemaTable.activateListeners(this);
     this.#classTable.activateListeners(this);
+    this.#archetypeTable.activateListeners(this);
+    this.#subtypeTable.activateListeners(this);
     this.#itemTable.activateListeners(this);
     this.#featureTable.activateListeners(this);
     for (const { renderer } of DASUActorSheet.#moduleTableRegistry) {
@@ -593,7 +623,43 @@ export class DASUActorSheet extends SheetLayoutMixin(
       ui.notifications?.warn(game.i18n.localize('DASU.Item.Class.OnlyOne'));
       return false;
     }
+    if (
+      (item?.type === 'subtype' || item?.type === 'archetype') &&
+      (this.actor.itemTypes[item.type]?.length ?? 0) > 0
+    ) {
+      ui.notifications?.warn(
+        game.i18n.localize(`DASU.${item.type.capitalize()}.OnlyOne`)
+      );
+      return false;
+    }
+    if (
+      (item?.type === 'ability' || item?.type === 'tactic') &&
+      !this.#canAddSlotItem(item.type)
+    ) {
+      return false;
+    }
     return super._onDropItem(event, item);
+  }
+
+  /**
+   * Whether the daemon's subtype permits adding another ability/tactic. Warns
+   * and returns false when the slot cap is reached.
+   * @param {"ability"|"tactic"} type
+   * @returns {boolean}
+   */
+  #canAddSlotItem(type) {
+    const slot = this.actor.system.slots?.[type];
+    if (!slot || slot.max == null) return true; // no subtype, no cap
+    if (slot.used >= slot.max) {
+      ui.notifications?.warn(
+        game.i18n.format('DASU.Subtype.SlotsFull', {
+          type: game.i18n.localize(`TYPES.Item.${type}`),
+          max: slot.max,
+        })
+      );
+      return false;
+    }
+    return true;
   }
 
   static #onRoll(event, target) {

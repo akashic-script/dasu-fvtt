@@ -7,6 +7,7 @@
     </div>
   </div>
   <div class="actor-header__identity-row">
+    {{#if className}}<span class="actor-header__class-name">{{className}}</span>{{/if}}
     <input class="actor-header__identity" type="text" placeholder="{{localize 'DASU.Actor.ClassPlaceholder'}}" />
     {{#if canAdvance}}
     <button type="button" class="actor-header__levelup" data-action="advance" data-tooltip="{{advanceTooltip}}">

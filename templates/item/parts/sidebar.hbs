@@ -226,7 +226,7 @@
 
   {{#if isClass}}
   <div class="item-sidebar__fields">
-    <div class="item-sidebar__field item-sidebar__field--wide">
+    <div class="item-sidebar__field item-sidebar__field--full">
       <label>{{localize "DASU.Item.Class.Identifier"}}</label>
       <input type="text" name="system.identifier" value="{{system.identifier}}" />
     </div>
@@ -251,6 +251,37 @@
     <div class="item-sidebar__field">
       <label>{{localize "DASU.Item.Class.ApStepEvery"}}</label>
       <input type="number" name="system.ap.stepEvery" value="{{system.ap.stepEvery}}" min="1" />
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if isArchetype}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Archetype.Identifier"}}</label>
+      <input type="text" name="system.identifier" value="{{system.identifier}}" />
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if isSubtype}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Subtype.Identifier"}}</label>
+      <input type="text" name="system.identifier" value="{{system.identifier}}" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Subtype.StatAllocationBonus"}}</label>
+      <input type="number" name="system.statAllocationBonus" value="{{system.statAllocationBonus}}" min="0" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Subtype.MaxAbilitySlots"}}</label>
+      <input type="number" name="system.maxAbilitySlots" value="{{system.maxAbilitySlots}}" min="0" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Subtype.MaxTacticSlots"}}</label>
+      <input type="number" name="system.maxTacticSlots" value="{{system.maxTacticSlots}}" min="0" />
     </div>
   </div>
   {{/if}}

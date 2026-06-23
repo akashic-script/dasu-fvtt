@@ -1,0 +1,35 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="advanced" style="padding: 12px 14px;">
+
+  <div class="dasu-fieldset archetype-bonuses">
+    <div class="dasu-fieldset__legend">{{localize "DASU.Archetype.Bonuses"}}</div>
+    <p class="dasu-fieldset__hint">{{localize "DASU.Archetype.BonusHint"}}</p>
+
+    {{#each system.bonuses as |bonus index|}}
+    <div class="dasu-fieldset__row archetype-bonus" data-index="{{index}}">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Archetype.BonusTarget"}}</label>
+        <select name="system.bonuses.{{index}}.target">
+          {{selectOptions @root.bonusTargetOptions selected=bonus.target}}
+        </select>
+      </div>
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Archetype.BonusFormula"}}</label>
+        <input type="text" name="system.bonuses.{{index}}.formula" value="{{bonus.formula}}" placeholder="@lvl * 2" />
+      </div>
+      {{#if @root.editable}}
+      <a class="archetype-bonus__delete" data-action="deleteArchetypeBonus" data-index="{{index}}"
+         data-tooltip="{{localize 'DASU.Sheet.DeleteItem'}}">
+        <i class="fas fa-trash"></i>
+      </a>
+      {{/if}}
+    </div>
+    {{/each}}
+
+    {{#if editable}}
+    <a class="archetype-bonus__add" data-action="addArchetypeBonus">
+      <i class="fas fa-plus"></i> {{localize "DASU.Archetype.AddBonus"}}
+    </a>
+    {{/if}}
+  </div>
+
+</section>

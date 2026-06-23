@@ -46,8 +46,7 @@ export class TacticTableRenderer extends DASUTableRenderer {
           item.system.isInfinity ? '∞' : item.system.toLand ?? '-',
       }),
       controls: CommonColumns.itemControlsColumn({
-        type: 'tactic',
-        label: 'TYPES.Item.tactic',
+        disableAdd: true,
         disableDelete: (item) => !(item.parent instanceof Actor),
         disableEdit: (item) => !(item.parent instanceof Actor),
       }),

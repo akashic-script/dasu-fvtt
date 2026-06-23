@@ -42,8 +42,7 @@ export class AbilityTableRenderer extends DASUTableRenderer {
         getText: AbilityTableRenderer.#formatAptitude,
       }),
       controls: CommonColumns.itemControlsColumn({
-        type: 'ability',
-        label: 'TYPES.Item.ability',
+        disableAdd: true,
         disableDelete: (item) => !(item.parent instanceof Actor),
         disableEdit: (item) => !(item.parent instanceof Actor),
       }),

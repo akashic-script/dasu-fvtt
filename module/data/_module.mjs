@@ -11,6 +11,8 @@ export {default as DASUClass} from "./class.mjs";
 export {default as DASUAbility} from "./ability.mjs";
 export {default as DASUTactic} from "./tactic.mjs";
 export {default as DASUSchema} from "./schema.mjs";
+export {default as DASUArchetype} from "./archetype.mjs";
+export {default as DASUSubtype} from "./subtype.mjs";
 
 export * from "./advancements/_module.mjs";
 

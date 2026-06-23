@@ -47,11 +47,55 @@ export default class DASUDaemon extends DASUActorBase {
 
     this._prepareDerivedStats();
 
-    // AP pool
+    // AP pool.
+    const subtype = this.parent?.itemTypes?.subtype?.[0]?.system;
     const oddLevels = Math.floor((this.level + 1) / 2);
-    const apMax = oddLevels + 1;
+    const apMax = oddLevels + 1 + (subtype?.statAllocationBonus ?? 0);
     const apSpent = Object.values(this.attributes).reduce((sum, a) => sum + a.value, 0) - 4;
     this.ap = { max: apMax, spent: apSpent, value: apMax - apSpent };
+
+    // Ability/tactic slot capacity, capped by the daemon's subtype.
+    this.slots = {
+      ability: {
+        max: subtype?.maxAbilitySlots ?? null,
+        used: this.parent?.itemTypes?.ability?.length ?? 0,
+      },
+      tactic: {
+        max: subtype?.maxTacticSlots ?? null,
+        used: this.parent?.itemTypes?.tactic?.length ?? 0,
+      },
+    };
+
+    this._applyArchetypeBonuses();
+  }
+
+  /**
+   * Apply the daemon's archetype bonuses. Each bonus is a Roll formula resolved
+   * against this actor's roll data and added to a derived stat path. 
+   * All math lives on the archetype item; nothing is hardcoded here.
+   */
+  _applyArchetypeBonuses() {
+    const archetype = this.parent?.itemTypes?.archetype?.[0];
+    const bonuses = archetype?.system.bonuses;
+    if (!bonuses?.length) return;
+
+    const rollData = this.getRollData();
+    for (const { target, formula } of bonuses) {
+      if (!target || !formula?.trim()) continue;
+      let value;
+      try {
+        value = Roll.safeEval(Roll.replaceFormulaData(formula, rollData));
+      } catch (err) {
+        console.warn(`DASU | Archetype bonus formula failed: "${formula}"`, err);
+        continue;
+      }
+      if (!Number.isFinite(value)) continue;
+      const current = foundry.utils.getProperty(this, target) ?? 0;
+      foundry.utils.setProperty(this, target, current + value);
+    }
+
+    this.resources.hp.value = Math.min(this.resources.hp.value, this.resources.hp.max);
+    this.resources.wp.value = Math.min(this.resources.wp.value, this.resources.wp.max);
   }
 
   getRollData() {

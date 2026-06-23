@@ -9,6 +9,36 @@ import { DASUSchemaDialog } from '../ui/schema-dialog.mjs';
  */
 export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
   /** @override */
+  async _preCreate(data, options, user) {
+    const allowed = await super._preCreate(data, options, user);
+    if (allowed === false) return false;
+
+    // Archetypes and subtypes are daemon-exclusive item types.
+    const DAEMON_ONLY = { archetype: 'DASU.Archetype.DaemonOnly', subtype: 'DASU.Subtype.DaemonOnly' };
+    if (DAEMON_ONLY[data.type] && this.actor && this.actor.type !== 'daemon') {
+      ui.notifications.warn(game.i18n.localize(DAEMON_ONLY[data.type]));
+      return false;
+    }
+
+    // Enforce the subtype's ability/tactic slot cap.
+    if (
+      (data.type === 'ability' || data.type === 'tactic') &&
+      this.actor?.type === 'daemon'
+    ) {
+      const slot = this.actor.system.slots?.[data.type];
+      if (slot?.max != null && slot.used >= slot.max) {
+        ui.notifications.warn(
+          game.i18n.format('DASU.Subtype.SlotsFull', {
+            type: game.i18n.localize(`TYPES.Item.${data.type}`),
+            max: slot.max,
+          })
+        );
+        return false;
+      }
+    }
+  }
+
+  /** @override */
   prepareData() {
     super.prepareData();
   }

@@ -27,6 +27,8 @@ export class DASUItemSheet extends SheetLayoutMixin(
       addItemEffect: DASUItemSheet.#onAddItemEffect,
       deleteItemEffect: DASUItemSheet.#onDeleteItemEffect,
       clearGrantUuid: DASUItemSheet.#onClearGrantUuid,
+      addArchetypeBonus: DASUItemSheet.#onAddArchetypeBonus,
+      deleteArchetypeBonus: DASUItemSheet.#onDeleteArchetypeBonus,
       fieldsetTab: DASUItemSheet.#onFieldsetTab,
       fieldsetSplit: DASUItemSheet.#onFieldsetSplit,
     },
@@ -126,6 +128,11 @@ export class DASUItemSheet extends SheetLayoutMixin(
         template: 'systems/dasu/templates/item/parts/class-advancement.hbs',
         scrollable: [''],
       };
+    } else if (this.document.type === 'archetype') {
+      parts.advanced = {
+        template: 'systems/dasu/templates/item/parts/archetype-advanced.hbs',
+        scrollable: [''],
+      };
     } else {
       delete parts.advanced;
     }
@@ -168,6 +175,8 @@ export class DASUItemSheet extends SheetLayoutMixin(
     context.isTactic = item.type === 'tactic';
     context.isSchema = item.type === 'schema';
     context.isClass = item.type === 'class';
+    context.isArchetype = item.type === 'archetype';
+    context.isSubtype = item.type === 'subtype';
 
     const localize = (obj) =>
       Object.fromEntries(
@@ -259,6 +268,10 @@ export class DASUItemSheet extends SheetLayoutMixin(
             }
           );
       }
+    }
+
+    if (context.isArchetype) {
+      context.bonusTargetOptions = localize(DASU.archetypeBonusTargets);
     }
 
     if (context.isClass) {
@@ -384,6 +397,20 @@ export class DASUItemSheet extends SheetLayoutMixin(
     if (index < 0 || index >= effects.length) return;
     effects.splice(index, 1);
     await this.item.update({ 'system.effects': effects });
+  }
+
+  static async #onAddArchetypeBonus() {
+    const bonuses = this.item.system.toObject().bonuses ?? [];
+    bonuses.push({ target: 'resources.hp.max', formula: '' });
+    await this.item.update({ 'system.bonuses': bonuses });
+  }
+
+  static async #onDeleteArchetypeBonus(event, target) {
+    const index = Number(target.dataset.index);
+    const bonuses = this.item.system.toObject().bonuses ?? [];
+    if (index < 0 || index >= bonuses.length) return;
+    bonuses.splice(index, 1);
+    await this.item.update({ 'system.bonuses': bonuses });
   }
 
   static async #onFieldsetTab(event, target) {

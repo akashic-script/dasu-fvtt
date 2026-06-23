@@ -94,6 +94,20 @@ DASU.levelMerits = {
  */
 DASU.daemonTransformMerits = 100;
 
+/**
+ * Derived actor stat paths an archetype bonus may target. Keyed by the
+ * dot-path written into the actor's system during derived-data prep.
+ * @type {Record<string, string>}
+ */
+DASU.archetypeBonusTargets = {
+  'resources.hp.max': 'DASU.Archetype.Target.HpMax',
+  'resources.wp.max': 'DASU.Archetype.Target.WpMax',
+  'stats.avoid.value': 'DASU.Archetype.Target.Avoid',
+  'stats.defense.value': 'DASU.Archetype.Target.Defense',
+  'stats.hit.value': 'DASU.Archetype.Target.Hit',
+  'stats.land.value': 'DASU.Archetype.Target.Land',
+};
+
 DASU.weaponCategories = {
   small: 'DASU.Item.Weapon.CategorySmall',
   large: 'DASU.Item.Weapon.CategoryLarge',

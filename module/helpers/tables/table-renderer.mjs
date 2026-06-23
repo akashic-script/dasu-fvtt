@@ -491,6 +491,13 @@ export class DASUTableRenderer {
     for (const [key, value] of Object.entries(descriptions))
       descriptions[key] = await value;
 
+    const { sectionBadge } = options;
+    let badge = null;
+    if (sectionBadge) {
+      const { type, tooltip, used, max } = sectionBadge;
+      badge = { type: type ?? null, text: max != null ? `${used}/${max}` : String(used), tooltip: tooltip ?? null };
+    }
+
     return foundry.applications.handlebars.renderTemplate(
       'systems/dasu/templates/table/dasu-table.hbs',
       {
@@ -504,6 +511,7 @@ export class DASUTableRenderer {
         rowCaptions,
         descriptions,
         expandedItems: this.#expandedItems,
+        badge,
       }
     );
   }
