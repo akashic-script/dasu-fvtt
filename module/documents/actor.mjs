@@ -17,11 +17,24 @@ export class DASUActor extends Actor {
   }
 
   /** @override */
-  async _onUpdateEmbeddedDocuments(embeddedName, documents, result, options, userId) {
-    await super._onUpdateEmbeddedDocuments(embeddedName, documents, result, options, userId);
+  async _onUpdateEmbeddedDocuments(
+    embeddedName,
+    documents,
+    result,
+    options,
+    userId
+  ) {
+    await super._onUpdateEmbeddedDocuments(
+      embeddedName,
+      documents,
+      result,
+      options,
+      userId
+    );
     if (embeddedName === 'Item') {
       const touchesSchema = documents.some(
-        (d) => d.type === 'class' || d.type === 'schema' || d.flags?.dasu?.slotCopy
+        (d) =>
+          d.type === 'class' || d.type === 'schema' || d.flags?.dasu?.slotCopy
       );
       if (touchesSchema) await this.applySchemaUpgrades();
     }
@@ -40,9 +53,15 @@ export class DASUActor extends Actor {
 
     const upgradesByAdvId = {};
     for (const adv of advancements) {
-      if (adv.type !== 'schemaUpgrade' || adv.level > currentLevel || !adv.targetAdvancementId) continue;
+      if (
+        adv.type !== 'schemaUpgrade' ||
+        adv.level > currentLevel ||
+        !adv.targetAdvancementId
+      )
+        continue;
       const { targetAdvancementId: id, upgradeTo: tier } = adv;
-      if (!upgradesByAdvId[id] || tier > upgradesByAdvId[id]) upgradesByAdvId[id] = tier;
+      if (!upgradesByAdvId[id] || tier > upgradesByAdvId[id])
+        upgradesByAdvId[id] = tier;
     }
 
     const updates = [];
@@ -51,7 +70,8 @@ export class DASUActor extends Actor {
       const choice = slotAdv.getChoice(this);
       const item = choice?.itemId ? this.items.get(choice.itemId) : null;
       if (!item || item.type !== 'schema') continue;
-      if (item.system.level !== targetLevel) updates.push({ _id: item.id, 'system.level': targetLevel });
+      if (item.system.level !== targetLevel)
+        updates.push({ _id: item.id, 'system.level': targetLevel });
     }
 
     if (updates.length) await this.updateEmbeddedDocuments('Item', updates);

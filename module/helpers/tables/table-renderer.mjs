@@ -297,7 +297,10 @@ export class DASUTableRenderer {
     event.stopPropagation();
     const actor = this.#application?.document;
     const li = target.closest('[data-item-id]');
-    const { item } = DASUTableRenderer.#resolveTableItem(actor, li?.dataset?.itemId);
+    const { item } = DASUTableRenderer.#resolveTableItem(
+      actor,
+      li?.dataset?.itemId
+    );
     item?.roll?.();
   }
 

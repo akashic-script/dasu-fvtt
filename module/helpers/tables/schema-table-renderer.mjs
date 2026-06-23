@@ -15,11 +15,12 @@ export class SchemaTableRenderer extends DASUTableRenderer {
     getItems: SchemaTableRenderer.#getItems,
     renderDescription: SchemaTableRenderer.#renderDescription,
     columns: {
-      name: CommonColumns.itemAnchorColumn({ columnName: 'TYPES.Item.schema' }),
+      name: CommonColumns.itemNameColumn({ columnName: 'TYPES.Item.schema' }),
       level: CommonColumns.textColumn({
         columnLabel: 'DASU.Item.Schema.Level',
         getText: (item) => item.system.level ?? 1,
       }),
+      controls: CommonColumns.itemControlsColumn(),
     },
   };
 

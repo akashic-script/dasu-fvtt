@@ -61,7 +61,7 @@ export class WeaponTableRenderer extends DASUTableRenderer {
       {
         label: 'DASU.Item.Weapon.DamageType',
         value: game.i18n.localize(
-          DASU.damageTypes[item.system.damage?.damageType] ?? ''
+          DASU.damageTypes[item.system.damage?.type] ?? ''
         ),
       },
       {

@@ -14,7 +14,7 @@ export default class DamageData extends foundry.abstract.DataModel {
         initial: 0,
         min: 0,
       }),
-      damageType: new fields.StringField({
+      type: new fields.StringField({
         required: true,
         blank: false,
         initial: 'physical',
@@ -25,6 +25,6 @@ export default class DamageData extends foundry.abstract.DataModel {
 
   /** Localized label for the damage type. */
   get typeLabel() {
-    return game.i18n.localize(DASU.damageTypes[this.damageType] ?? '');
+    return game.i18n.localize(DASU.damageTypes[this.type] ?? '');
   }
 }

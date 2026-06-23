@@ -1,4 +1,6 @@
 import { EnablePseudoDocumentsMixin } from './enable-pseudo-documents-mixin.mjs';
+import { DASURollDialog } from '../ui/roll-dialog.mjs';
+import { DASUSchemaDialog } from '../ui/schema-dialog.mjs';
 
 /**
  * Extend the basic Item document. Pseudo-document collections declared on the system data model
@@ -22,6 +24,31 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
   /** @override */
   async roll() {
     const item = this;
+
+    if (this.actor && game.dasu?.Checks) {
+      const category = item.system?.category;
+      if (item.type === 'schema') {
+        return DASUSchemaDialog.open(this.actor, item);
+      }
+      const NO_DIALOG_TYPES = ['class', 'feature'];
+      if (NO_DIALOG_TYPES.includes(item.type)) {
+        return game.dasu.Checks.displayCheck(this.actor, item);
+      }
+      if (
+        item.type === 'item' ||
+        (item.type === 'ability' &&
+          (category === 'restorative' || category === 'affliction'))
+      ) {
+        return DASURollDialog.openItem(this.actor, item, 'display');
+      }
+      if (item.type === 'weapon' || item.type === 'ability') {
+        return DASURollDialog.openItem(this.actor, item, 'accuracy');
+      }
+      if (item.type === 'tactic') {
+        return DASURollDialog.openItem(this.actor, item, 'tactic');
+      }
+    }
+
     const speaker = ChatMessage.getSpeaker({ actor: this.actor });
     const rollMode = game.settings.get('core', 'rollMode');
     const label = `[${item.type}] ${item.name}`;

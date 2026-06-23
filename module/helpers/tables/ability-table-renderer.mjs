@@ -73,8 +73,10 @@ export class AbilityTableRenderer extends DASUTableRenderer {
           .toUpperCase();
         return `${attr}+${h.value ?? 0} ${h.resourceLabel ?? ''}`.trim();
       }
+      const val = h?.value ?? 0;
+      if (!val) return '-';
       const suffix = h?.mode === 'percent' ? '%' : '';
-      return `${h?.value ?? 0}${suffix} ${h?.resourceLabel ?? ''}`.trim();
+      return `${val}${suffix} ${h?.resourceLabel ?? ''}`.trim();
     }
 
     if (category === 'affliction') {

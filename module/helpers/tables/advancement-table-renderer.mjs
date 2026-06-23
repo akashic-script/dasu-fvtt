@@ -108,14 +108,17 @@ export class AdvancementTableRenderer extends DASUTableRenderer {
     });
 
     const EXCLUDED_ITEM_TYPES = new Set(['class', 'schema']);
-    const itemTypeOptions = adv.type === 'itemGrant' ? {
-      '': game.i18n.localize('DASU.Item.Class.GrantTypeAny'),
-      ...Object.fromEntries(
-        Object.keys(CONFIG.Item.dataModels)
-          .filter((type) => !EXCLUDED_ITEM_TYPES.has(type))
-          .map((type) => [type, game.i18n.localize(`TYPES.Item.${type}`)])
-      ),
-    } : undefined;
+    const itemTypeOptions =
+      adv.type === 'itemGrant'
+        ? {
+            '': game.i18n.localize('DASU.Item.Class.GrantTypeAny'),
+            ...Object.fromEntries(
+              Object.keys(CONFIG.Item.dataModels)
+                .filter((type) => !EXCLUDED_ITEM_TYPES.has(type))
+                .map((type) => [type, game.i18n.localize(`TYPES.Item.${type}`)])
+            ),
+          }
+        : undefined;
 
     return foundry.applications.handlebars.renderTemplate(
       TEMPLATE('expand/expand-advancement'),

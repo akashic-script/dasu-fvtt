@@ -1,10 +1,22 @@
 {
   "DASU": {
     "Ability": {
-      "Pow": { "long": "Power", "abbr": "Pow" },
-      "Dex": { "long": "Dexterity", "abbr": "Dex" },
-      "Wil": { "long": "Willpower", "abbr": "Will" },
-      "Sta": { "long": "Stamina", "abbr": "Sta" }
+      "Pow": {
+        "long": "Power",
+        "abbr": "Pow"
+      },
+      "Dex": {
+        "long": "Dexterity",
+        "abbr": "Dex"
+      },
+      "Wil": {
+        "long": "Willpower",
+        "abbr": "Will"
+      },
+      "Sta": {
+        "long": "Stamina",
+        "abbr": "Sta"
+      }
     },
     "SheetLabels": {
       "Actor": "DASU Actor Sheet",
@@ -22,7 +34,7 @@
       "HP": "HP",
       "WP": "WP",
       "Riches": "Riches",
-      "RichesAbbr": "¤",
+      "RichesAbbr": "\u00a4",
       "CostLabelResource": "Cost",
       "CostLabelRiches": "Price"
     },
@@ -45,29 +57,80 @@
       "Drain": "Drain"
     },
     "Aptitude": {
-      "Fire": { "long": "Fire", "abbr": "f" },
-      "Ice": { "long": "Ice", "abbr": "i" },
-      "Electric": { "long": "Electric", "abbr": "el" },
-      "Wind": { "long": "Wind", "abbr": "w" },
-      "Earth": { "long": "Earth", "abbr": "ea" },
-      "Light": { "long": "Light", "abbr": "l" },
-      "Dark": { "long": "Dark", "abbr": "d" },
-      "DebuffPhysical": { "long": "Debuff (Physical)", "abbr": "dp" },
-      "DebuffMental": { "long": "Debuff (Mental)", "abbr": "dm" },
-      "DebuffAlmighty": { "long": "Debuff (Almighty)", "abbr": "da" },
-      "Heal": { "long": "Heal", "abbr": "h" },
-      "TechniqueBrutal": { "long": "Technique (Brutal)", "abbr": "tb" },
-      "TechniqueTechnical": { "long": "Technique (Technical)", "abbr": "tt" },
-      "TechniqueGeneral": { "long": "Technique (General)", "abbr": "tg" },
-      "TechniqueAlmighty": { "long": "Technique (Almighty)", "abbr": "ta" },
-      "Assist": { "long": "Assist", "abbr": "a" },
+      "Fire": {
+        "long": "Fire",
+        "abbr": "f"
+      },
+      "Ice": {
+        "long": "Ice",
+        "abbr": "i"
+      },
+      "Electric": {
+        "long": "Electric",
+        "abbr": "el"
+      },
+      "Wind": {
+        "long": "Wind",
+        "abbr": "w"
+      },
+      "Earth": {
+        "long": "Earth",
+        "abbr": "ea"
+      },
+      "Light": {
+        "long": "Light",
+        "abbr": "l"
+      },
+      "Dark": {
+        "long": "Dark",
+        "abbr": "d"
+      },
+      "DebuffPhysical": {
+        "long": "Debuff (Physical)",
+        "abbr": "dp"
+      },
+      "DebuffMental": {
+        "long": "Debuff (Mental)",
+        "abbr": "dm"
+      },
+      "DebuffAlmighty": {
+        "long": "Debuff (Almighty)",
+        "abbr": "da"
+      },
+      "Heal": {
+        "long": "Heal",
+        "abbr": "h"
+      },
+      "TechniqueBrutal": {
+        "long": "Technique (Brutal)",
+        "abbr": "tb"
+      },
+      "TechniqueTechnical": {
+        "long": "Technique (Technical)",
+        "abbr": "tt"
+      },
+      "TechniqueGeneral": {
+        "long": "Technique (General)",
+        "abbr": "tg"
+      },
+      "TechniqueAlmighty": {
+        "long": "Technique (Almighty)",
+        "abbr": "ta"
+      },
+      "Assist": {
+        "long": "Assist",
+        "abbr": "a"
+      },
       "PrereqWarning": "Reaching Lvl {tier} requires two aptitudes at Lvl {requiredTier} or higher."
     },
     "Actor": {
       "SummonerNamePlaceholder": "Summoner Name",
       "DaemonNamePlaceholder": "Daemon Name",
       "ClassPlaceholder": "Class / Identity",
-      "Level": { "long": "Level", "abbr": "LVL" },
+      "Level": {
+        "long": "Level",
+        "abbr": "LVL"
+      },
       "Merit": {
         "long": "Merits",
         "abbr": "MER",
@@ -339,9 +402,92 @@
         "ItemType": "Item Type",
         "SlotHint": "The player fills this slot on their sheet."
       }
+    },
+    "Check": {
+      "Tick": "Tick",
+      "ToLand": "To Land",
+      "TN": "TN",
+      "Success": "Success",
+      "Failure": "Failure",
+      "Critical": "Critical",
+      "SnakeEyes": "Snake Eyes",
+      "Hit": "Hit",
+      "Miss": "Miss",
+      "Reroll": "Reroll",
+      "Retarget": "Retarget",
+      "Type": {
+        "Attribute": "Attribute Check",
+        "Skill": "Skill Check",
+        "Accuracy": "Attack",
+        "Tactic": "Tactic",
+        "Initiative": "Initiative",
+        "Open": "Open Check",
+        "Display": "Display"
+      },
+      "Rerolled": "Rerolled",
+      "Retargeted": "Retargeted",
+      "Advantage": "Advantage",
+      "Disadvantage": "Disadvantage",
+      "Cost": "Cost",
+      "Heal": "Heal",
+      "ResistIgnoreResist": "Ignore Resist",
+      "ResistIgnoreNullify": "Ignore Nullify",
+      "ResistIgnoreDrain": "Ignore Drain",
+      "ResistIgnoreWeak": "Ignore Weak",
+      "DeductCost": "Deduct"
+    },
+    "Damage": {
+      "physical": "Physical",
+      "fire": "Fire",
+      "ice": "Ice",
+      "electric": "Electric",
+      "wind": "Wind",
+      "earth": "Earth",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "Difficulty": {
+      "Routine": "Routine",
+      "Standard": "Standard",
+      "Hard": "Hard",
+      "Extreme": "Extreme"
+    },
+    "Dialog": {
+      "Roll": {
+        "Title": "Roll Check",
+        "Attribute": "Attribute",
+        "Skill": "Skill",
+        "Item": "Item",
+        "Modifier": "Modifier",
+        "Formula": "Formula",
+        "Roll": "Roll",
+        "Use": "Use",
+        "Cancel": "Cancel",
+        "Advantage": "Advantage",
+        "Disadvantage": "Disadvantage",
+        "Normal": "Normal",
+        "Difficulty": "Difficulty",
+        "DifficultyNone": "No TN",
+        "Range": "Range",
+        "DamageType": "Damage Type",
+        "Cost": "Cost",
+        "Reduce": "Reduce",
+        "Increase": "Increase",
+        "HealAmount": "Heal Amount",
+        "SchemaLevel": "Level {level}",
+        "SchemaLevelLabel": "Schema Level",
+        "ForceReaction": "Force Reaction",
+        "ResistIgnoreResist": "Ignore Resist",
+        "ResistIgnoreNullify": "Ignore Nullify",
+        "ResistIgnoreDrain": "Ignore Drain",
+        "ResistIgnoreWeak": "Ignore Weak"
+      },
+      "Schema": {
+        "Title": "Use Schema",
+        "Description": "Schema Description"
+      }
     }
   },
-
   "TYPES": {
     "Actor": {
       "summoner": "Summoner",

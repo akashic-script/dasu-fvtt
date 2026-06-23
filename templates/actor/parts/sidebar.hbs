@@ -40,7 +40,7 @@
       {{#each system.attributes as |attribute key|}}
       <div class="actor-sidebar__attr-score">
         <span class="actor-sidebar__attr-label" data-tooltip="{{attribute.label}}">{{attribute.abbr}}</span>
-        <input class="actor-sidebar__attr-value dasu-pill rollable" type="text" name="system.attributes.{{key}}.value" value="{{attribute.value}}" data-dtype="Number" data-action="roll" data-roll="@attributes.{{key}}.value" data-label="{{attribute.label}}" />
+        <input class="actor-sidebar__attr-value dasu-pill rollable" type="text" name="system.attributes.{{key}}.value" value="{{attribute.value}}" data-dtype="Number" data-action="rollAttribute" data-attribute="{{key}}" data-label="{{attribute.label}}" />
       </div>
       {{/each}}
     </div>
@@ -98,7 +98,7 @@
         <input class="actor-sidebar__skill-custom-name" type="text" name="system.skills.{{key}}.customName" value="{{skill.customName}}" placeholder="{{skill.label}}" />
         <div class="actor-sidebar__skill-controls">
           <button type="button" class="actor-sidebar__skill-btn dasu-pill" data-action="skillStep" data-skill="{{key}}" data-step="-1" {{#unless editable}}disabled{{/unless}}>−</button>
-          <input class="actor-sidebar__skill-value dasu-pill" type="number" name="system.skills.{{key}}.value" value="{{skill.value}}" min="0" max="6" step="1" />
+          <input class="actor-sidebar__skill-value dasu-pill rollable" type="number" name="system.skills.{{key}}.value" value="{{skill.value}}" min="0" max="6" step="1" data-action="rollSkill" data-skill="{{key}}" />
           <button type="button" class="actor-sidebar__skill-btn dasu-pill" data-action="skillStep" data-skill="{{key}}" data-step="1" {{#unless editable}}disabled{{/unless}}>+</button>
           {{#if skill.isCustom}}<button type="button" class="actor-sidebar__skill-delete-btn" data-action="deleteCustomSkill" data-id="{{key}}" {{#unless editable}}disabled{{/unless}}><i class="fas fa-trash"></i></button>{{/if}}
         </div>

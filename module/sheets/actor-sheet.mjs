@@ -15,6 +15,7 @@ import { ClassTableRenderer } from '../helpers/tables/class-table-renderer.mjs';
 import { SchemaTableRenderer } from '../helpers/tables/schema-table-renderer.mjs';
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
+import { DASURollDialog } from '../ui/roll-dialog.mjs';
 
 export class DASUActorSheet extends SheetLayoutMixin(
   HandlebarsApplicationMixin(ActorSheetV2)
@@ -89,6 +90,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
     form: { submitOnChange: true },
     actions: {
       roll: DASUActorSheet.#onRoll,
+      rollAttribute: DASUActorSheet.#onRollAttribute,
+      rollSkill: DASUActorSheet.#onRollSkill,
       resourceStep: DASUActorSheet.#onResourceStep,
       openResourcePopover: DASUActorSheet.#onOpenResourcePopover,
       openMeritPopover: DASUActorSheet.#onOpenMeritPopover,
@@ -179,7 +182,6 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.schemaTable = await this.#schemaTable.renderTable(this.document);
     context.classTable = await this.#classTable.renderTable(this.document);
     context.planner = this.#preparePlanner(actor);
-    // Aptitude points are granted entirely by class advancements (aptitude-up entries).
     context.apt = {
       spent: Object.keys(DASU.aptitudes).reduce(
         (sum, key) => sum + Math.max(0, actorData.aptitudes[key]?.bonus ?? 0),
@@ -587,7 +589,6 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   /** @override */
   async _onDropItem(event, item) {
-    // Only one class allowed per actor.
     if (item?.type === 'class' && this.actor.itemTypes.class.length > 0) {
       ui.notifications?.warn(game.i18n.localize('DASU.Item.Class.OnlyOne'));
       return false;
@@ -617,6 +618,18 @@ export class DASUActorSheet extends SheetLayoutMixin(
       });
       return roll;
     }
+  }
+
+  static #onRollAttribute(event, target) {
+    if (this.isEditMode) return;
+    const key = target.dataset.attribute;
+    if (key) DASURollDialog.openAttribute(this.actor, key);
+  }
+
+  static #onRollSkill(event, target) {
+    if (this.isEditMode) return;
+    const key = target.dataset.skill;
+    if (key) DASURollDialog.openSkill(this.actor, key);
   }
 
   static async #onOpenResourcePopover(event, target) {
@@ -1070,7 +1083,6 @@ export class DASUActorSheet extends SheetLayoutMixin(
     const next = dir === 0 ? 0 : Math.max(0, Math.min(4, current + dir));
     if (next === current) return;
 
-    // Count how many base aptitudes would sit at each tier after the change.
     if (next > current && next >= 3) {
       const requiredTier = next - 1; // L3 needs two at L2+, L4 needs two at L3+
       let count = 0;

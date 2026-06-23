@@ -1,0 +1,68 @@
+<form class="dasu theme-dark roll-dialog">
+  <div class="dasu-fieldset dasu-fieldset--active-legend roll-dialog__fieldset">
+    <div class="dasu-fieldset__header">
+      <div class="dasu-fieldset__legend">{{localize "TYPES.Item.schema"}}</div>
+    </div>
+
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.Item"}}</label>
+        <div class="roll-dialog__item-name">{{itemName}}</div>
+      </div>
+    </div>
+
+    {{#if showLevels}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.SchemaLevelLabel"}}</label>
+        <select name="level">
+          {{#each levels}}
+          <option value="{{level}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+    {{#if levelDescription}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field roll-dialog__level-description">
+        <label>{{localize "DASU.Dialog.Schema.Description"}}</label>
+        <div class="roll-dialog__level-description-body">{{{levelDescription}}}</div>
+      </div>
+    </div>
+    {{/if}}
+    {{/if}}
+
+    {{#if showCost}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.Cost"}} &middot; {{localize "DASU.Dialog.Roll.Formula"}} {{baseCost}}</label>
+        <div class="roll-dialog__cost">
+          <select name="costType" class="roll-dialog__cost-type">
+            {{#each resourceTypes}}
+            <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+            {{/each}}
+          </select>
+          <div class="roll-dialog__cost-dir">
+            <button type="button" class="roll-dialog__cost-btn {{#if (eq costDir 'minus')}}is-active{{/if}}" data-action="setCostDir" data-value="minus" title="{{localize 'DASU.Dialog.Roll.Reduce'}}">
+              <i class="fas fa-minus"></i>
+            </button>
+            <button type="button" class="roll-dialog__cost-btn {{#if (eq costDir 'plus')}}is-active{{/if}}" data-action="setCostDir" data-value="plus" title="{{localize 'DASU.Dialog.Roll.Increase'}}">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+          <input type="number" name="costAmount" value="0" min="0" step="1" />
+        </div>
+      </div>
+    </div>
+    {{/if}}
+
+    <div class="roll-dialog__actions">
+      <button type="button" data-action="use" class="roll-dialog__btn roll-dialog__btn--roll">
+        <i class="fas fa-hand-sparkles"></i> {{localize "DASU.Dialog.Roll.Use"}}
+      </button>
+      <button type="button" data-action="cancel" class="roll-dialog__btn roll-dialog__btn--cancel">
+        {{localize "DASU.Dialog.Roll.Cancel"}}
+      </button>
+    </div>
+  </div>
+</form>

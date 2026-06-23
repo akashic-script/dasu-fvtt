@@ -10,12 +10,14 @@ import { DASUActorSheet } from './sheets/actor-sheet.mjs';
 import { DASUTableRenderer } from './helpers/tables/table-renderer.mjs';
 import { CommonColumns } from './helpers/tables/common-columns.mjs';
 import { CommonDescriptions } from './helpers/tables/common-descriptions.mjs';
+import { Checks, initializeChecks } from './checks/checks.mjs';
 import * as models from './data/_module.mjs';
 
 Hooks.once('init', function () {
   game.dasu = {
     DASUActor,
     DASUItem,
+    Checks,
     rollItemMacro,
     FieldsetStateManager,
     DASUTableRenderer,
@@ -30,6 +32,9 @@ Hooks.once('init', function () {
   };
 
   CONFIG.DASU = DASU;
+
+  registerHandlebarsHelpers();
+  initializeChecks();
 
   CONFIG.Combat.initiative = {
     formula: '1d20 + @attributes.dex.value',
@@ -92,11 +97,15 @@ Hooks.once('init', function () {
   return preloadHandlebarsTemplates();
 });
 
-Handlebars.registerHelper('toLowerCase', (str) => str.toLowerCase());
-Handlebars.registerHelper('capitalize', (str) =>
-  str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
-);
-Handlebars.registerHelper('concat', (...args) => args.slice(0, -1).join(''));
+function registerHandlebarsHelpers() {
+  Handlebars.registerHelper('toLowerCase', (str) => str.toLowerCase());
+  Handlebars.registerHelper('capitalize', (str) =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
+  );
+  Handlebars.registerHelper('gte', (a, b) => a >= b);
+  Handlebars.registerHelper('eq', (a, b) => a === b);
+  Handlebars.registerHelper('concat', (...args) => args.slice(0, -1).join(''));
+}
 
 Hooks.once('ready', async function () {
   Hooks.on('hotbarDrop', (bar, data, slot) => createItemMacro(data, slot));

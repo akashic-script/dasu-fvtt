@@ -1,6 +1,38 @@
 export const DASU = {};
 
 /**
+ * The system id, used to scope flags, hooks and template paths.
+ * @type {string}
+ */
+export const SYSTEM = 'dasu';
+
+/**
+ * Check type -> localization key, used for chat flavor titles.
+ * @type {Object<string, string>}
+ */
+DASU.checkTypes = {
+  attribute: 'DASU.Check.Type.Attribute',
+  skill: 'DASU.Check.Type.Skill',
+  accuracy: 'DASU.Check.Type.Accuracy',
+  tactic: 'DASU.Check.Type.Tactic',
+  initiative: 'DASU.Check.Type.Initiative',
+  open: 'DASU.Check.Type.Open',
+  display: 'DASU.Check.Type.Display',
+};
+
+/**
+ * Core check roll constants (DASU: roll N d{faces} + tick, meet/exceed TN).
+ */
+DASU.check = Object.freeze({
+  baseDice: 2,
+  faces: 10,
+  // Crit: doubles where both dice meet the threshold. Starts at 11; on a d10
+  // it only becomes reachable once reduced.
+  defaultCritThreshold: 11,
+  minCritThreshold: 2,
+});
+
+/**
  * The set of Ability Scores used within the system.
  * @type {Object}
  */
@@ -108,6 +140,41 @@ DASU.resistanceTypes = [
   'light',
   'dark',
 ];
+
+/**
+ * Difficulty tiers for skill/attribute checks.
+ * Each entry: { key, i18nKey, tn: [lvl1-4, lvl5-9, lvl10-14, lvl15-19, lvl20-24, lvl25-30] }
+ */
+DASU.difficulties = [
+  {
+    key: 'routine',
+    i18nKey: 'DASU.Difficulty.Routine',
+    baseTn: [11, 12, 13, 14, 15, 16],
+  },
+  {
+    key: 'standard',
+    i18nKey: 'DASU.Difficulty.Standard',
+    baseTn: [13, 14, 15, 16, 17, 18],
+  },
+  {
+    key: 'hard',
+    i18nKey: 'DASU.Difficulty.Hard',
+    baseTn: [15, 16, 17, 18, 19, 20],
+  },
+  {
+    key: 'extreme',
+    i18nKey: 'DASU.Difficulty.Extreme',
+    baseTn: [17, 18, 19, 20, 21, 22],
+  },
+];
+
+/** Returns the TN for a given difficulty key and actor level (1-based). */
+DASU.getDifficultyTn = function (difficultyKey, level) {
+  const diff = DASU.difficulties.find((d) => d.key === difficultyKey);
+  if (!diff) return null;
+  const band = Math.min(Math.floor((Math.max(1, level) - 1) / 5), 5);
+  return diff.baseTn[band];
+};
 
 DASU.resistanceLevels = {
   '-1': 'DASU.Resistance.Weak',
