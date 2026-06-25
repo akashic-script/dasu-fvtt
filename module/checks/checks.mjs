@@ -566,10 +566,10 @@ export function initializeChecks() {
     }
 
     const RESIST_MODE_TAG = {
-      resist: 'DASU.Check.ResistIgnoreResist',
-      nullify: 'DASU.Check.ResistIgnoreNullify',
-      drain: 'DASU.Check.ResistIgnoreDrain',
-      weak: 'DASU.Check.ResistIgnoreWeak',
+      resist: 'DASU.Check.IgnoreResist',
+      nullify: 'DASU.Check.IgnoreNullify',
+      drain: 'DASU.Check.IgnoreDrain',
+      weak: 'DASU.Check.IgnoreWeak',
     };
     for (const mode of inspector.getResistanceModes()) {
       const tagKey = RESIST_MODE_TAG[mode];
@@ -596,11 +596,16 @@ export function initializeChecks() {
 
     const itemUuid = message.getFlag(SYSTEM, Flags.ChatMessage.Item);
     const item = itemUuid ? await fromUuid(itemUuid) : null;
-    const src = item?.img ?? message.speakerActor?.img;
+    const src = result.additionalData?.resistanceImg ?? item?.img ?? message.speakerActor?.img;
     if (src) {
       const img = document.createElement('img');
       img.src = src;
       img.classList.add('check-card-avatar');
+      const target = item ?? message.speakerActor;
+      if (target?.isOwner) {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', () => target.sheet?.render(true));
+      }
       fieldsetHeader.prepend(img);
     }
 
@@ -646,6 +651,17 @@ export function initializeChecks() {
         });
         html.querySelector('.check-card__fieldset')?.append(btn);
       }
+    }
+
+    const speakerName = message.speaker?.alias ?? message.speakerActor?.name;
+    if (speakerName) {
+      const footer = document.createElement('div');
+      footer.classList.add('check-card__footer');
+      const speakerEl = document.createElement('span');
+      speakerEl.classList.add('check-card__footer-speaker');
+      speakerEl.textContent = speakerName;
+      footer.append(speakerEl);
+      html.querySelector('.check-card__fieldset')?.append(footer);
     }
   });
 }

@@ -18,6 +18,13 @@
         "Land": "To Land"
       }
     },
+    "Stock": {
+      "SetActive": "Set Active",
+      "SetInactive": "Set Inactive",
+      "AlreadyAdded": "This daemon is already in stock.",
+      "Active": "Active",
+      "Inactive": "Inactive"
+    },
     "Subtype": {
       "Identifier": "Identifier",
       "StatAllocationBonus": "Stat Allocation Bonus",
@@ -279,6 +286,13 @@
         "Advanced": "Advanced",
         "Planner": "Level Planner"
       },
+      "Syn": {
+        "Innate": "Innate",
+        "Stock": "Stock"
+      },
+      "Items": {
+        "Innate": "Innate"
+      },
       "Section": {
         "MoralTriad": "Moral Triad",
         "Description": "Description",
@@ -464,10 +478,10 @@
       "Disadvantage": "Disadvantage",
       "Cost": "Cost",
       "Heal": "Heal",
-      "ResistIgnoreResist": "Ignore Resist",
-      "ResistIgnoreNullify": "Ignore Nullify",
-      "ResistIgnoreDrain": "Ignore Drain",
-      "ResistIgnoreWeak": "Ignore Weak",
+      "IgnoreResist": "Ignore Resist",
+      "IgnoreNullify": "Ignore Nullify",
+      "IgnoreDrain": "Ignore Drain",
+      "IgnoreWeak": "Ignore Weak",
       "DeductCost": "Deduct"
     },
     "Damage": {
@@ -511,10 +525,10 @@
         "SchemaLevel": "Level {level}",
         "SchemaLevelLabel": "Schema Level",
         "ForceReaction": "Force Reaction",
-        "ResistIgnoreResist": "Ignore Resist",
-        "ResistIgnoreNullify": "Ignore Nullify",
-        "ResistIgnoreDrain": "Ignore Drain",
-        "ResistIgnoreWeak": "Ignore Weak"
+        "IgnoreResist": "Ignore Resist",
+        "IgnoreNullify": "Ignore Nullify",
+        "IgnoreDrain": "Ignore Drain",
+        "IgnoreWeak": "Ignore Weak"
       },
       "Schema": {
         "Title": "Use Schema",

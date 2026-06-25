@@ -27,6 +27,14 @@ export default class DASUSummoner extends DASUActorBase {
       },
     });
 
+    schema.stock = new fields.ArrayField(
+      new fields.SchemaField({
+        uuid: new fields.StringField({ required: true, blank: false }),
+        active: new fields.BooleanField({ initial: false }),
+      }),
+      { required: true, initial: [] }
+    );
+
     return schema;
   }
 

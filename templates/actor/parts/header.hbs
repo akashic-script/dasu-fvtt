@@ -21,8 +21,8 @@
   </div>
   <div class="actor-header__resistances">
     {{#each resistances as |resistance key|}}
-    <div class="actor-header__resistance {{resistance.cssClass}}" data-tooltip="{{localize (concat 'DASU.DamageType.' (capitalize key))}}">
-      <div class="actor-header__resistance-top">
+    <div class="actor-header__resistance {{resistance.cssClass}}" data-resistance="{{key}}" data-tooltip="{{localize (concat 'DASU.DamageType.' (capitalize key))}}">
+      <div class="actor-header__resistance-top" data-action="showResistance" data-resistance="{{key}}">
         <img class="actor-header__resistance-icon" src="systems/dasu/assets/resistances/{{key}}.png" alt="{{key}}" />
         <span class="actor-header__resistance-value">{{resistance.abbr}}</span>
       </div>

@@ -115,7 +115,7 @@
       <div class="dasu-fieldset__field">
         <label>{{localize "DASU.Dialog.Roll.ForceReaction"}}</label>
         <div class="roll-dialog__resist-grid">
-          {{#each resistModes}}
+          {{#each ignoreModes}}
           <div class="roll-dialog__resist-chip">
             <input type="checkbox" name="resistMode" value="{{mode}}" id="resistMode-{{mode}}" />
             <label for="resistMode-{{mode}}">{{label}}</label>

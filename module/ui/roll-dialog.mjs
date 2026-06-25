@@ -243,22 +243,22 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         : '';
     const healSuffix = healMode === 'percent' ? '%' : '';
 
-    const resistModes = [
+    const ignoreModes = [
       {
-        mode: 'ignore',
-        label: game.i18n.localize('DASU.Dialog.Roll.ResistIgnore'),
+        mode: 'resist',
+        label: game.i18n.localize('DASU.Dialog.Roll.IgnoreResist'),
       },
       {
         mode: 'nullify',
-        label: game.i18n.localize('DASU.Dialog.Roll.ResistNullify'),
+        label: game.i18n.localize('DASU.Dialog.Roll.IgnoreNullify'),
       },
       {
         mode: 'drain',
-        label: game.i18n.localize('DASU.Dialog.Roll.ResistDrain'),
+        label: game.i18n.localize('DASU.Dialog.Roll.IgnoreDrain'),
       },
       {
         mode: 'weak',
-        label: game.i18n.localize('DASU.Dialog.Roll.ResistWeak'),
+        label: game.i18n.localize('DASU.Dialog.Roll.IgnoreWeak'),
       },
     ];
 
@@ -277,7 +277,7 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
       resourceTypes,
       costDir: this.#costDir,
       showResistOverrides: showDamageType,
-      resistModes,
+      ignoreModes,
     };
   }
 

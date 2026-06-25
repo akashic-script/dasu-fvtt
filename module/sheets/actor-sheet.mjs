@@ -16,8 +16,12 @@ import { ArchetypeTableRenderer } from '../helpers/tables/archetype-table-render
 import { SubtypeTableRenderer } from '../helpers/tables/subtype-table-renderer.mjs';
 import { SchemaTableRenderer } from '../helpers/tables/schema-table-renderer.mjs';
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
+import { StockTableRenderer } from '../helpers/tables/stock-table-renderer.mjs';
+import { DaemonTables } from '../helpers/tables/daemon-tables.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
 import { DASURollDialog } from '../ui/roll-dialog.mjs';
+import { SYSTEM } from '../helpers/config.mjs';
+import { Flags } from '../helpers/flags.mjs';
 
 export class DASUActorSheet extends SheetLayoutMixin(
   HandlebarsApplicationMixin(ActorSheetV2)
@@ -39,6 +43,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   _mode = null;
 
+  #daemonTableCache = new Map();
+
   #weaponTable = new WeaponTableRenderer();
   #abilityTable = new AbilityTableRenderer();
   #tacticTable = new TacticTableRenderer();
@@ -54,8 +60,15 @@ export class DASUActorSheet extends SheetLayoutMixin(
       defaultSplit: true,
       panels: ['reached', 'future'],
     },
+    {
+      id: 'syn-stock',
+      defaultPanel: 'stock',
+      panels: ['stock'],
+    },
   ]);
 
+  #activeStockTable = new StockTableRenderer('active');
+  #inactiveStockTable = new StockTableRenderer('inactive');
   #classTable = new ClassTableRenderer();
   #archetypeTable = new ArchetypeTableRenderer();
   #subtypeTable = new SubtypeTableRenderer();
@@ -106,6 +119,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
       advance: DASUActorSheet.#onAdvance,
       fieldsetTab: DASUActorSheet.#onFieldsetTab,
       fieldsetSplit: DASUActorSheet.#onFieldsetSplit,
+      showResistance: DASUActorSheet.#onShowResistance,
       plannerUnslot: DASUActorSheet.#onPlannerUnslot,
       plannerOpenItem: DASUActorSheet.#onPlannerOpenItem,
       plannerEditClass: DASUActorSheet.#onPlannerEditClass,
@@ -217,6 +231,38 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.subtypeTable = await this.#subtypeTable.renderTable(this.document);
 
     context.fieldsets = this.#fieldsets.prepareContext(actor);
+
+    if (actor.type === 'summoner') {
+      context.activeStockTable = await this.#activeStockTable.renderTable(this.document, {
+        sectionBadge: { tooltip: game.i18n.localize('DASU.Stock.Active'), used: game.i18n.localize('DASU.Stock.Active') },
+      });
+      context.inactiveStockTable = await this.#inactiveStockTable.renderTable(this.document, {
+        sectionBadge: { tooltip: game.i18n.localize('DASU.Stock.Inactive'), used: game.i18n.localize('DASU.Stock.Inactive') },
+      });
+
+      const activeStock = (actor.system.stock ?? [])
+        .filter(e => e.active)
+        .map(e => fromUuidSync(e.uuid))
+        .filter(d => d?.type === 'daemon');
+
+      const activeUuids = new Set(activeStock.map(d => d.uuid));
+      for (const uuid of this.#daemonTableCache.keys())
+        if (!activeUuids.has(uuid)) this.#daemonTableCache.delete(uuid);
+
+      for (const daemon of activeStock) {
+        if (!this.#daemonTableCache.has(daemon.uuid)) {
+          this.#daemonTableCache.set(daemon.uuid, new DaemonTables(daemon.uuid));
+        }
+      }
+
+      context.daemonTabs = (await Promise.all(
+        [...this.#daemonTableCache.values()].map(t => t.render())
+      )).filter(Boolean);
+      context.daemonAckTabs = (await Promise.all(
+        [...this.#daemonTableCache.values()].map(t => t.renderAck())
+      )).filter(Boolean);
+      context.useDaemonItemTabs = true;
+    }
 
     context.moduleItemTables = await Promise.all(
       DASUActorSheet.#moduleTableRegistry.map(async ({ renderer, tab }) => ({
@@ -418,6 +464,58 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.#temporaryEffectsTable.activateListeners(this);
     this.#passiveEffectsTable.activateListeners(this);
     this.#inactiveEffectsTable.activateListeners(this);
+    if (this.actor.type === 'summoner') {
+      this.#activeStockTable.activateListeners(this);
+      this.#inactiveStockTable.activateListeners(this);
+      for (const tables of this.#daemonTableCache.values())
+        tables.activateListeners(this);
+    }
+  }
+
+  #bindTabBarDrag() {
+    for (const bar of this.element.querySelectorAll('.dasu-fieldset__tabs')) {
+      bar.addEventListener('contextmenu', (e) => {
+        const tab = e.target.closest('.dasu-fieldset__tab[data-panel]');
+        if (!tab) return;
+        const panel = tab.dataset.panel;
+        const uuid = panel.startsWith('ack-') ? panel.slice(4) : panel;
+        const actor = fromUuidSync(uuid);
+        if (!actor) return;
+        e.preventDefault();
+        actor.sheet?.render(true);
+      });
+
+      bar.addEventListener('wheel', (e) => {
+        if (e.deltaY === 0) return;
+        e.preventDefault();
+        bar.scrollLeft += e.deltaY;
+      }, { passive: false });
+
+      bar.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        const startX = e.clientX;
+        const startScroll = bar.scrollLeft;
+        let dragging = false;
+
+        const onMove = (me) => {
+          const dx = startX - me.clientX;
+          if (!dragging && Math.abs(dx) > 8) {
+            dragging = true;
+            bar.dataset.dragging = '1';
+          }
+          if (dragging) bar.scrollLeft = startScroll + dx;
+        };
+
+        const onUp = () => {
+          bar.ownerDocument.removeEventListener('mousemove', onMove);
+          bar.ownerDocument.removeEventListener('mouseup', onUp);
+          setTimeout(() => bar.removeAttribute('data-dragging'), 0);
+        };
+
+        bar.ownerDocument.addEventListener('mousemove', onMove);
+        bar.ownerDocument.addEventListener('mouseup', onUp);
+      });
+    }
   }
 
   /** @override */
@@ -425,9 +523,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
     await super._onRender(context, options);
 
     for (const { tab, html } of context.moduleItemTables ?? []) {
-      const container = this.element.querySelector(
-        `[data-application-part="${tab}"]`
-      );
+      const container = tab === 'items'
+        ? this.element.querySelector('[data-application-part="items"] [data-panel="innate"]')
+        : this.element.querySelector(`[data-application-part="${tab}"]`);
       if (!container) continue;
       const wrapper = document.createElement('div');
       wrapper.innerHTML = html;
@@ -435,6 +533,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     }
 
     this._renderModeToggle();
+    this.#bindTabBarDrag();
     this.#bindTriadComboboxes();
 
     this.element.querySelectorAll('.actor-aptitudes__pill').forEach((pill) =>
@@ -615,6 +714,21 @@ export class DASUActorSheet extends SheetLayoutMixin(
         }, 0);
       });
     }
+  }
+
+  /** @override */
+  async _onDropActor(event, actorData) {
+    if (this.actor.type !== 'summoner') return super._onDropActor(event, actorData);
+    const dropped = await fromUuid(actorData.uuid);
+    if (!dropped || dropped.type !== 'daemon') return false;
+    const stock = foundry.utils.deepClone(this.actor.system.stock ?? []);
+    if (stock.some((e) => e.uuid === actorData.uuid)) {
+      ui.notifications?.warn(game.i18n.localize('DASU.Stock.AlreadyAdded'));
+      return false;
+    }
+    stock.push({ uuid: actorData.uuid, active: false });
+    await this.actor.update({ 'system.stock': stock });
+    return true;
   }
 
   /** @override */
@@ -1191,6 +1305,40 @@ export class DASUActorSheet extends SheetLayoutMixin(
       { 'system.skills': skills },
       { diff: false, recursive: false }
     );
+  }
+
+  static async #onShowResistance(event, target) {
+    const key = target.dataset.resistance;
+    if (!key) return;
+    const actor = this.actor;
+    const base = actor.system.resistances?.[key]?.base ?? 0;
+    const ABBR = { '-1': 'WK', 0: '–', 1: 'RS', 2: 'NU', 3: 'DR' };
+    const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+    const typeLabel = game.i18n.localize(`DASU.DamageType.${capitalize(key)}`);
+    const levelKey = { '-1': 'Weak', 0: 'Normal', 1: 'Resist', 2: 'Nullify', 3: 'Drain' }[String(base)];
+    const levelLabel = game.i18n.localize(`DASU.Resistance.${levelKey}`);
+    const abbr = ABBR[String(base)] ?? '–';
+    const resistImg = `systems/dasu/assets/resistances/${key}.png`;
+
+    const sectionHtml = await foundry.applications.handlebars.renderTemplate(
+      `systems/${SYSTEM}/templates/chat/chat-resistance.hbs`,
+      { resistImg, typeLabel, levelLabel, abbr }
+    );
+
+    const content = await foundry.applications.handlebars.renderTemplate(
+      `systems/${SYSTEM}/templates/chat/chat-check.hbs`,
+      { checkTitle: typeLabel, checkLabel: null, checkType: 'display', sections: [sectionHtml], tags: [] }
+    );
+
+    ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor }),
+      content,
+      flags: {
+        [SYSTEM]: {
+          [Flags.ChatMessage.Check]: { type: 'display', additionalData: { resistanceImg: resistImg } },
+        },
+      },
+    });
   }
 
   static async #onFieldsetTab(event, target) {

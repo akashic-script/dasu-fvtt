@@ -1,0 +1,45 @@
+<div class="stock-expand">
+
+  {{!-- Resources + stats row --}}
+  <div class="stock-expand__stats">
+    <div class="stock-expand__resource" data-tooltip="{{localize 'DASU.Actor.HP.long'}}">
+      <span class="stock-expand__resource-label stock-expand__resource-label--hp">{{localize "DASU.Actor.HP.abbr"}}</span>
+      <span class="stock-expand__resource-val">{{resources.hp.value}}</span>
+      <span class="stock-expand__resource-sep">/</span>
+      <span class="stock-expand__resource-max">{{resources.hp.max}}</span>
+    </div>
+    <div class="stock-expand__resource" data-tooltip="{{localize 'DASU.Actor.WP.long'}}">
+      <span class="stock-expand__resource-label stock-expand__resource-label--wp">{{localize "DASU.Actor.WP.abbr"}}</span>
+      <span class="stock-expand__resource-val">{{resources.wp.value}}</span>
+      <span class="stock-expand__resource-sep">/</span>
+      <span class="stock-expand__resource-max">{{resources.wp.max}}</span>
+    </div>
+    <div class="stock-expand__stat" data-tooltip="{{localize 'DASU.Actor.Stat.Hit.long'}}">
+      <span class="stock-expand__stat-label">{{localize "DASU.Actor.Stat.Hit.abbr"}}</span>
+      <span class="stock-expand__stat-value dasu-pill">{{stats.hit.value}}</span>
+    </div>
+    <div class="stock-expand__stat" data-tooltip="{{localize 'DASU.Actor.Stat.Land.long'}}">
+      <span class="stock-expand__stat-label">{{localize "DASU.Actor.Stat.Land.abbr"}}</span>
+      <span class="stock-expand__stat-value dasu-pill">{{stats.land.value}}</span>
+    </div>
+    <div class="stock-expand__stat" data-tooltip="{{localize 'DASU.Actor.Stat.Critical.long'}}">
+      <span class="stock-expand__stat-label">{{localize "DASU.Actor.Stat.Critical.abbr"}}</span>
+      <span class="stock-expand__stat-value dasu-pill">{{stats.critical.value}}</span>
+    </div>
+    <div class="stock-expand__stat" data-tooltip="{{meritsTooltip}}">
+      <span class="stock-expand__stat-label">{{localize "DASU.Actor.Merit.abbr"}}</span>
+      <span class="stock-expand__stat-value dasu-pill">{{merit}}</span>
+    </div>
+  </div>
+
+  {{!-- Resistances --}}
+  <div class="stock-expand__resistances">
+    {{#each resistances as |resistance key|}}
+    <div class="stock-expand__resistance {{resistance.cssClass}}" data-tooltip="{{localize (concat 'DASU.DamageType.' (capitalize key))}}">
+      <img class="stock-expand__resistance-icon" src="systems/dasu/assets/resistances/{{key}}.png" alt="{{key}}" />
+      <span class="stock-expand__resistance-value">{{resistance.abbr}}</span>
+    </div>
+    {{/each}}
+  </div>
+
+</div>
