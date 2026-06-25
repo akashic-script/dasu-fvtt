@@ -286,6 +286,24 @@
   </div>
   {{/if}}
 
+  {{#if isBond}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Bond.TargetName"}}</label>
+      <input type="text" name="system.targetName" value="{{system.targetName}}" placeholder="{{localize 'DASU.Bond.TargetNameHint'}}" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Bond.Affinity"}}</label>
+      <input type="number" name="system.affinity" value="{{system.affinity}}" min="0" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Bond.Negative"}}</label>
+      <input type="checkbox" name="system.negative" {{checked system.negative}} />
+    </div>
+  </div>
+  {{/if}}
+
   {{#if isAbility}}
   <div class="item-sidebar__fields">
     <div class="item-sidebar__field item-sidebar__field--wide">

@@ -892,6 +892,7 @@
     --dasu-accent-class: #c4a84a;
     --dasu-accent-archetype: #b5683a;
     --dasu-accent-subtype: #6a8c5a;
+    --dasu-accent-bond: #d4a0c8;
     --dasu-accent-stock-active: #4a8fc4;
     --dasu-accent-stock-inactive: #6a6a6a;
     --dasu-surface-1: rgb(var(--dasu-panel) / 40%);
@@ -2580,6 +2581,9 @@
       &.subtype-table .dasu-table__header {
         --section-accent: var(--dasu-accent-subtype);
       }
+      &.bond-table .dasu-table__header {
+        --section-accent: var(--dasu-accent-bond);
+      }
       &.stock-table--active .dasu-table__header {
         --section-accent: var(--dasu-accent-stock-active);
       }
@@ -2662,6 +2666,9 @@
       }
       &.subtype-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-subtype);
+      }
+      &.bond-table .dasu-table__row-container.item {
+        --item-accent: var(--dasu-accent-bond);
       }
       &.stock-table--active .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-stock-active);
@@ -2916,6 +2923,27 @@
         font-size: 0.85em;
       }
 
+      .dasu-expand-description__schema-level-label {
+        padding: 6px 10px 0;
+        font-weight: 700;
+        font-size: 0.82em;
+      }
+
+      .bond-rank__affinity-req {
+        font-weight: 400;
+        color: var(--dasu-muted);
+      }
+
+      .bond-rank__type {
+        font-weight: 400;
+        font-size: 0.92em;
+        color: var(--dasu-accent-bond);
+      }
+
+      .bond-rank--locked {
+        opacity: 0.45;
+      }
+
       /* Stock daemon expand */
       .stock-expand {
         padding: 6px 8px 8px;
@@ -3054,6 +3082,9 @@
     }
     .stock-table {
       grid-template-columns: [name] auto [avoid] 40px [defense] 40px [level] 40px [controls] 54px;
+    }
+    .bond-table {
+      grid-template-columns: [name] auto [affinity] 64px [rank] 100px [controls] 54px;
     }
     .tactic-table {
       grid-template-columns: [name] auto [damage] 80px [cost] 54px [toLand] 48px [controls] 54px;
@@ -3712,6 +3743,17 @@
     p + p {
       margin-top: 0.4em;
     }
+  }
+
+  .roll-dialog__ability-type {
+    color: var(--dasu-muted);
+    font-size: 0.85em;
+  }
+
+  .roll-dialog__empty {
+    color: var(--dasu-muted);
+    font-style: italic;
+    font-size: 0.85em;
   }
 
   .roll-dialog__formula-label {
@@ -4576,3 +4618,175 @@
     letter-spacing: 0.08em;
   }
 }
+
+/* ------------------------------------------ */
+/* Bond expand                                 */
+/* ------------------------------------------ */
+
+/* Bond rank editor (item sheet advanced tab) */
+.bond-rank {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+
+    label {
+      font-size: 0.68em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--dasu-tab-icon);
+    }
+
+    input,
+    select {
+      margin: 0;
+      width: 100%;
+    }
+
+    &--name    { flex: 2; }
+    &--threshold { flex: 0 0 100px; }
+    &--type    { flex: 0 0 120px; }
+    &--effect  { flex: 1; }
+  }
+}
+
+/* Split mode: make each rank form read as its own card with clear gaps. */
+.bond-ranks.dasu-fieldset--split {
+  gap: 10px;
+  padding: 4px;
+
+  .dasu-fieldset__panel.bond-rank {
+    padding: 12px;
+    gap: 10px;
+    background: rgb(0 0 0 / 10%);
+    border-left: 3px solid rgb(var(--dasu-accent-bond-rgb, 212 160 200) / 55%);
+  }
+
+  /* override the base thin between-panel border so our card gaps show through */
+  &[data-split-direction='column']
+    .dasu-fieldset__panel
+    + .dasu-fieldset__panel,
+  &[data-split-direction='row']
+    .dasu-fieldset__panel
+    + .dasu-fieldset__panel {
+    border-top: none;
+    border-left: 3px solid rgb(var(--dasu-accent-bond-rgb, 212 160 200) / 55%);
+  }
+}
+
+.bond-rank-effect-drop-zone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 6px;
+  background: rgb(var(--dasu-panel) / 60%);
+  border: 1px dashed rgb(var(--dasu-border-rgb, 255 255 255) / 20%);
+  cursor: default;
+  overflow: hidden;
+  transition: border-color 0.1s, background 0.1s;
+
+  &--filled {
+    border-style: solid;
+    border-color: rgb(var(--dasu-border-rgb, 255 255 255) / 25%);
+  }
+
+  &.drag-over {
+    border-color: var(--dasu-accent-bond);
+    background: rgb(var(--dasu-panel) / 80%);
+  }
+
+  &__img {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    max-width: 20px;
+    max-height: 20px;
+    object-fit: contain;
+    border: none;
+    border-radius: 0;
+  }
+
+  &__name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.82em;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    color: var(--dasu-accent-bond);
+    &:hover { text-decoration: underline; }
+  }
+
+  &__hint {
+    flex: 1 1 auto;
+    font-size: 0.78em;
+    color: var(--dasu-muted);
+    font-style: italic;
+  }
+
+  &__clear {
+    flex: 0 0 auto;
+    color: var(--dasu-muted);
+    cursor: pointer;
+    font-size: 0.8em;
+    &:hover { color: var(--color-level-error); }
+  }
+}
+
+/* Read-only effect description shown under a filled drop zone. */
+.bond-rank-effect-description {
+  &__body {
+    font-size: 0.85em;
+    line-height: 1.45;
+    padding: 4px 6px;
+    background: rgb(var(--dasu-panel) / 40%);
+    border: var(--dasu-border);
+    color: var(--dasu-on-panel);
+
+    p { margin: 0; }
+    p + p { margin-top: 0.4em; }
+  }
+
+  &__empty {
+    color: var(--dasu-muted);
+    font-style: italic;
+  }
+}
+
+/* Flat, high-specificity fallback so the effect icon can never balloon,
+   regardless of CSS-nesting support or Foundry's global img rules. */
+.dasu .bond-rank-effect-drop-zone {
+  height: 30px !important;
+  overflow: hidden;
+}
+
+/* Pointer cursor over the whole chip once a valid effect is linked. */
+.dasu .bond-rank-effect-drop-zone--filled {
+  cursor: pointer;
+}
+.dasu img.bond-rank-effect-drop-zone__img {
+  flex: 0 0 20px;
+  width: 20px !important;
+  height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  object-fit: contain;
+  border: none;
+}
+

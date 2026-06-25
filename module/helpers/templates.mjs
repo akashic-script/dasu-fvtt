@@ -24,9 +24,11 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/dasu/templates/table/expand/expand-item-description-with-tags.hbs',
     'systems/dasu/templates/table/expand/expand-schema-description.hbs',
     'systems/dasu/templates/table/expand/expand-stock-daemon.hbs',
+    'systems/dasu/templates/table/expand/expand-bond.hbs',
     // Dialogs
     'systems/dasu/templates/dialog/roll-dialog.hbs',
     'systems/dasu/templates/dialog/schema-dialog.hbs',
+    'systems/dasu/templates/dialog/bond-dialog.hbs',
     // Check chat partials
     'systems/dasu/templates/chat/chat-check.hbs',
     'systems/dasu/templates/chat/chat-resistance.hbs',

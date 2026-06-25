@@ -43,7 +43,8 @@
       "tactic": {},
       "schema": {},
       "archetype": {},
-      "subtype": {}
+      "subtype": {},
+      "bond": {}
     }
   },
   "styles": [

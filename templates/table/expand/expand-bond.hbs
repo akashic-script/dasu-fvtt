@@ -1,0 +1,14 @@
+<div class="dasu-expand-description">
+  {{#each ranks}}
+  <div class="dasu-expand-description__schema-level {{#unless (gte ../affinity threshold)}}bond-rank--locked{{/unless}}">
+    <div class="dasu-expand-description__schema-level-label">
+      {{#if name}}{{name}}{{else}}{{localize "DASU.Bond.NoRank"}}{{/if}}
+      <span class="bond-rank__affinity-req">({{threshold}} {{localize "DASU.Bond.Affinity"}})</span>
+      {{#if abilityType}}<span class="bond-rank__type">[{{localize (concat "DASU.Bond.Ability." (capitalize abilityType))}}]</span>{{/if}}
+    </div>
+    {{#if effectDescription}}
+    <div class="dasu-expand-description__body">{{{effectDescription}}}</div>
+    {{/if}}
+  </div>
+  {{/each}}
+</div>

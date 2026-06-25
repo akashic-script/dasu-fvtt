@@ -25,6 +25,28 @@
       "Active": "Active",
       "Inactive": "Inactive"
     },
+    "Bond": {
+      "TargetName": "Bond Target",
+      "TargetNameHint": "Name of the bond",
+      "Affinity": "Affinity",
+      "Negative": "Negative Bond",
+      "RankName": "Rank",
+      "RankThreshold": "Affinity Required",
+      "AbilityType": "Ability Type",
+      "Effect": "Effect (drop active effect)",
+      "EffectNone": "Drop active effect here",
+      "EffectDescription": "Effect Description",
+      "EffectNoDescription": "This effect has no description.",
+      "EffectDropInvalid": "Only Active Effects can be dropped here.",
+      "CurrentRank": "Current Rank",
+      "NoRank": "No rank yet",
+      "SummonerOnly": "Bonds can only be added to Summoners.",
+      "Ability": {
+        "Active": "Active",
+        "Passive": "Passive",
+        "Reactive": "Reactive"
+      }
+    },
     "Subtype": {
       "Identifier": "Identifier",
       "StatAllocationBonus": "Stat Allocation Bonus",
@@ -288,7 +310,8 @@
       },
       "Syn": {
         "Innate": "Innate",
-        "Stock": "Stock"
+        "Stock": "Stock",
+        "Bonds": "Bonds"
       },
       "Items": {
         "Innate": "Innate"
@@ -533,6 +556,14 @@
       "Schema": {
         "Title": "Use Schema",
         "Description": "Schema Description"
+      },
+      "Bond": {
+        "Title": "Use Bond",
+        "RankLabel": "Bond Rank",
+        "RankN": "Rank {n}",
+        "Ability": "Ability",
+        "Description": "Effect",
+        "NoUnlocked": "No bond ranks unlocked yet."
       }
     }
   },
@@ -550,7 +581,8 @@
       "tactic": "Tactic",
       "schema": "Schema",
       "archetype": "Archetype",
-      "subtype": "Subtype"
+      "subtype": "Subtype",
+      "bond": "Bond"
     }
   }
 }

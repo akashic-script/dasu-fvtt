@@ -1,11 +1,13 @@
 import { CheckHooks } from './check-hooks.mjs';
 import { CheckConfiguration } from './check-configuration.mjs';
 import { CommonSections } from './common-sections.mjs';
+import { ChatSectionOrder } from './default-section-order.mjs';
+import { SYSTEM } from '../helpers/config.mjs';
 
 /**
  * Display check: posts an item card with no roll, targets, or outcome.
  * Used by items that are used rather than rolled (restorative/affliction
- * abilities and generic items).
+ * abilities, generic items, schemas, and bonds).
  */
 
 /** @type {PrepareCheckHook} */
@@ -25,6 +27,44 @@ const onPrepareCheck = (check, actor, item) => {
 /** @type {RenderCheckHook} */
 const onRenderCheck = (data, result, actor, item) => {
   if (result.type !== 'display') return;
+
+  if (item?.type === 'bond') {
+    const rankKey = result.additionalData?.bondRank;
+    const rank = item.system?.[rankKey];
+    if (rank?.name) data.tags.push({ tag: rank.name });
+    if (rank?.abilityType) {
+      const typeLabel = `DASU.Bond.Ability.${rank.abilityType.replace(
+        /^./,
+        (c) => c.toUpperCase()
+      )}`;
+      data.tags.push({ tag: typeLabel });
+    }
+
+    let effect = null;
+    try {
+      if (rank?.effectUuid) effect = fromUuidSync(rank.effectUuid);
+    } catch {
+      effect = null;
+    }
+    if (effect?.description) {
+      const effectName = effect.name;
+      const rawDescription = effect.description;
+      data.sections.push(async () => {
+        const TextEditor = foundry.applications.ux.TextEditor.implementation;
+        const html = await TextEditor.enrichHTML(rawDescription, {
+          relativeTo: effect,
+          secrets: false,
+        });
+        return {
+          partial: `systems/${SYSTEM}/templates/chat/partials/chat-check-description.hbs`,
+          order: ChatSectionOrder.addendum,
+          data: { html, label: effectName },
+        };
+      });
+    }
+    return;
+  }
+
   let description = item?.system?.description;
   if (item?.type === 'schema') {
     const level = result.additionalData?.schemaLevel ?? item.system?.level ?? 1;

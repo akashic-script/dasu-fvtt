@@ -1,6 +1,7 @@
 import { EnablePseudoDocumentsMixin } from './enable-pseudo-documents-mixin.mjs';
 import { DASURollDialog } from '../ui/roll-dialog.mjs';
 import { DASUSchemaDialog } from '../ui/schema-dialog.mjs';
+import { DASUBondDialog } from '../ui/bond-dialog.mjs';
 
 /**
  * Extend the basic Item document. Pseudo-document collections declared on the system data model
@@ -59,6 +60,9 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
       const category = item.system?.category;
       if (item.type === 'schema') {
         return DASUSchemaDialog.open(this.actor, item);
+      }
+      if (item.type === 'bond') {
+        return DASUBondDialog.open(this.actor, item);
       }
       const NO_DIALOG_TYPES = ['class', 'feature'];
       if (NO_DIALOG_TYPES.includes(item.type)) {

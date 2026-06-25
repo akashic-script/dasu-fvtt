@@ -7,6 +7,8 @@ import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs
 import { AdvancementTableRenderer } from '../helpers/tables/advancement-table-renderer.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
 
+const BOND_RANK_KEYS = ['rank1', 'rank2', 'rank3'];
+
 /**
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {DocumentSheetV2}
@@ -97,6 +99,12 @@ export class DASUItemSheet extends SheetLayoutMixin(
       defaultSplitDirection: 'column',
       panels: ['level1', 'level2', 'level3'],
     },
+    {
+      id: 'bond-ranks',
+      defaultPanel: 'rank1',
+      defaultSplitDirection: 'column',
+      panels: ['rank1', 'rank2', 'rank3'],
+    },
   ]);
 
   #temporaryEffectsTable = new EffectTableRenderer(
@@ -131,6 +139,11 @@ export class DASUItemSheet extends SheetLayoutMixin(
     } else if (this.document.type === 'archetype') {
       parts.advanced = {
         template: 'systems/dasu/templates/item/parts/archetype-advanced.hbs',
+        scrollable: [''],
+      };
+    } else if (this.document.type === 'bond') {
+      parts.advanced = {
+        template: 'systems/dasu/templates/item/parts/bond-advanced.hbs',
         scrollable: [''],
       };
     } else {
@@ -177,6 +190,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     context.isClass = item.type === 'class';
     context.isArchetype = item.type === 'archetype';
     context.isSubtype = item.type === 'subtype';
+    context.isBond = item.type === 'bond';
 
     const localize = (obj) =>
       Object.fromEntries(
@@ -286,6 +300,42 @@ export class DASUItemSheet extends SheetLayoutMixin(
 
     context.fieldsets = this.#fieldsets.prepareContext(item);
 
+    if (context.isBond) {
+      context.bondAbilityTypeOptions = localize({
+        active: 'DASU.Bond.Ability.Active',
+        passive: 'DASU.Bond.Ability.Passive',
+        reactive: 'DASU.Bond.Ability.Reactive',
+      });
+      const panelState = context.fieldsets['bond-ranks']?.panels ?? {};
+      const rankLabel = game.i18n.localize('DASU.Bond.RankName');
+      context.bondRanks = await Promise.all(
+        BOND_RANK_KEYS.map(async (key, i) => {
+          const rank = itemData.system[key] ?? {};
+          let effect = null;
+          if (rank.effectUuid) {
+            const doc = await fromUuid(rank.effectUuid);
+            if (doc) {
+              const description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+                doc.description ?? '',
+                { relativeTo: doc, secrets: false, rollData: context.rollData }
+              );
+              effect = { uuid: rank.effectUuid, name: doc.name, img: doc.img, description };
+            } else {
+              effect = { uuid: rank.effectUuid, name: rank.effectUuid, img: null, description: '' };
+            }
+          }
+          return {
+            key,
+            rank,
+            effect,
+            tabLabel: rank.name || `${rankLabel} ${i + 1}`,
+            activeClass: panelState[key]?.activeClass ?? '',
+            hidden: panelState[key]?.hidden ?? '',
+          };
+        })
+      );
+    }
+
     context.descriptionHTML =
       await foundry.applications.ux.TextEditor.implementation.enrichHTML(
         item.system.description ?? '',
@@ -354,6 +404,51 @@ export class DASUItemSheet extends SheetLayoutMixin(
         effects[index].grantUuid = data.uuid;
         await this.item.update({ 'system.effects': effects });
       });
+    }
+
+    for (const zone of this.element.querySelectorAll('.bond-rank-effect-drop-zone')) {
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        zone.classList.remove('drag-over');
+        let data;
+        try {
+          data =
+            foundry.applications.ux.TextEditor.implementation.getDragEventData(e);
+        } catch {
+          try {
+            data = JSON.parse(e.dataTransfer.getData('text/plain'));
+          } catch {
+            return;
+          }
+        }
+        const key = zone.dataset.rankKey;
+        if (!BOND_RANK_KEYS.includes(key)) return;
+        if (data?.type !== 'ActiveEffect' || !data.uuid) {
+          ui.notifications?.warn(game.i18n.localize('DASU.Bond.EffectDropInvalid'));
+          return;
+        }
+        await this.item.update({ [`system.${key}.effectUuid`]: data.uuid });
+      });
+      const clearBtn = zone.querySelector('.bond-rank-effect-drop-zone__clear');
+      clearBtn?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const key = zone.dataset.rankKey;
+        if (!BOND_RANK_KEYS.includes(key)) return;
+        await this.item.update({ [`system.${key}.effectUuid`]: '' });
+      });
+      const nameEl = zone.querySelector('.bond-rank-effect-drop-zone__name[data-uuid]');
+      if (nameEl) {
+        zone.addEventListener('click', async () => {
+          const doc = await fromUuid(nameEl.dataset.uuid);
+          doc?.sheet?.render(true);
+        });
+      }
     }
 
     if (this.#advancementTable) {

@@ -18,6 +18,7 @@ import { SchemaTableRenderer } from '../helpers/tables/schema-table-renderer.mjs
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
 import { StockTableRenderer } from '../helpers/tables/stock-table-renderer.mjs';
 import { DaemonTables } from '../helpers/tables/daemon-tables.mjs';
+import { BondTableRenderer } from '../helpers/tables/bond-table-renderer.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
 import { DASURollDialog } from '../ui/roll-dialog.mjs';
 import { SYSTEM } from '../helpers/config.mjs';
@@ -69,6 +70,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   #activeStockTable = new StockTableRenderer('active');
   #inactiveStockTable = new StockTableRenderer('inactive');
+  #bondTable = new BondTableRenderer();
   #classTable = new ClassTableRenderer();
   #archetypeTable = new ArchetypeTableRenderer();
   #subtypeTable = new SubtypeTableRenderer();
@@ -224,6 +226,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
     };
     context.itemTable = await this.#itemTable.renderTable(this.document);
     context.featureTable = await this.#featureTable.renderTable(this.document);
+    if (actor.type === 'summoner') {
+      context.bondTable = await this.#bondTable.renderTable(this.document);
+    }
 
     context.archetypeTable = await this.#archetypeTable.renderTable(
       this.document
@@ -465,6 +470,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.#passiveEffectsTable.activateListeners(this);
     this.#inactiveEffectsTable.activateListeners(this);
     if (this.actor.type === 'summoner') {
+      this.#bondTable.activateListeners(this);
       this.#activeStockTable.activateListeners(this);
       this.#inactiveStockTable.activateListeners(this);
       for (const tables of this.#daemonTableCache.values())
@@ -733,6 +739,10 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   /** @override */
   async _onDropItem(event, item) {
+    if (item?.type === 'bond' && this.actor.type !== 'summoner') {
+      ui.notifications?.warn(game.i18n.localize('DASU.Bond.SummonerOnly'));
+      return false;
+    }
     if (item?.type === 'class' && this.actor.itemTypes.class.length > 0) {
       ui.notifications?.warn(game.i18n.localize('DASU.Item.Class.OnlyOne'));
       return false;

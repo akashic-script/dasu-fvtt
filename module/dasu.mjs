@@ -63,6 +63,7 @@ Hooks.once('init', function () {
     schema: models.DASUSchema,
     archetype: models.DASUArchetype,
     subtype: models.DASUSubtype,
+    bond: models.DASUBond,
   });
 
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
@@ -92,6 +93,7 @@ Hooks.once('init', function () {
         'schema',
         'archetype',
         'subtype',
+        'bond',
       ],
       makeDefault: true,
       label: 'DASU.SheetLabels.Item',
@@ -108,6 +110,7 @@ function registerHandlebarsHelpers() {
   );
   Handlebars.registerHelper('gte', (a, b) => a >= b);
   Handlebars.registerHelper('eq', (a, b) => a === b);
+  Handlebars.registerHelper('add', (a, b) => Number(a) + Number(b));
   Handlebars.registerHelper('concat', (...args) => args.slice(0, -1).join(''));
 }
 
