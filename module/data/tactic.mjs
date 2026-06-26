@@ -16,7 +16,10 @@ export default class DASUTactic extends DASUItemBase {
       choices: { none: "DASU.Item.Tactic.GovernNone", ...DASU.attributes },
     });
 
-    schema.damage = DamageField({ initial: { value: 0, type: 'untyped' } });
+    // Tactic damage always targets WP and never runs through the damage pipeline.
+    schema.damage = DamageField({
+      initial: { value: 0, type: 'untyped', resource: 'wp' },
+    });
     schema.resource = ResourceField({ defaultType: 'wp' });
     schema.toLand = new fields.NumberField({ ...requiredInteger, initial: 0 });
     schema.isInfinity = new fields.BooleanField({ required: true, initial: false });

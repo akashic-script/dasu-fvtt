@@ -1,5 +1,6 @@
 import { CheckHooks } from './check-hooks.mjs';
 import { Checks, CheckInternals } from './checks.mjs';
+import { CheckConfiguration } from './check-configuration.mjs';
 import { SYSTEM } from '../helpers/config.mjs';
 import { Flags } from '../helpers/flags.mjs';
 
@@ -15,6 +16,8 @@ async function reroll(checkId) {
     const check = CheckInternals.checkFromResult(oldResult);
     check.additionalData.rerolled = true;
     const roll = await CheckInternals.rollCheck(check);
+    check.result = roll.total;
+    CheckConfiguration.configure(check).updateTargetResults();
     return { check, roll };
   });
 }
@@ -24,28 +27,33 @@ const onRenderCheck = (data, result) => {
   data.tags.unshift({ tag: 'DASU.Check.Rerolled' });
 };
 
+const messageFromContext = (el) => {
+  const node = el?.jquery ? el[0] : el;
+  const messageId =
+    node?.dataset?.messageId ??
+    node?.closest?.('[data-message-id]')?.dataset.messageId;
+  return messageId ? game.messages.get(messageId) : undefined;
+};
+
 const initialize = () => {
   Hooks.on(CheckHooks.renderCheck, onRenderCheck);
 
   Hooks.on('getChatMessageContextOptions', (html, options) => {
     options.push({
-      name: game.i18n.localize('DASU.Check.Reroll'),
+      label: game.i18n.localize('DASU.Check.Reroll'),
       icon: '<i class="fas fa-dice"></i>',
-      condition: (li) => {
-        const messageId =
-          li.dataset?.messageId ??
-          li.closest('[data-message-id]')?.dataset.messageId;
-        if (!messageId) return false;
-        const message = game.messages.get(messageId);
-        const result = message?.getFlag(SYSTEM, Flags.ChatMessage.Check);
+      visible: (li) => {
+        const result = messageFromContext(li)?.getFlag(
+          SYSTEM,
+          Flags.ChatMessage.Check
+        );
         return !!result && result.type !== 'display';
       },
-      callback: (li) => {
-        const messageId =
-          li.dataset?.messageId ??
-          li.closest('[data-message-id]')?.dataset.messageId;
-        const message = game.messages.get(messageId);
-        const result = message?.getFlag(SYSTEM, Flags.ChatMessage.Check);
+      onClick: (event, target) => {
+        const result = messageFromContext(target)?.getFlag(
+          SYSTEM,
+          Flags.ChatMessage.Check
+        );
         if (result?.id) reroll(result.id);
       },
     });

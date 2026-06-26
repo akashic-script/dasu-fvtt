@@ -19,14 +19,15 @@ async function retarget(checkId) {
     const check = CheckInternals.checkFromResult(oldResult);
     check.additionalData.retargeted = true;
 
-    // Carry the original total so target hits can be re-resolved without rolling.
+    // Keep the original total; only target hits are re-resolved.
     check.result = oldResult.result;
 
     const config = CheckConfiguration.configure(check);
     config.setTargets([]).setDefaultTargets().updateTargetResults();
 
-    // Reuse the stored roll verbatim - retarget never re-rolls.
+    // Reuse the stored roll; flag it evaluated so processResult won't re-roll.
     const roll = Roll.fromData(oldResult.roll);
+    roll._evaluated = true;
     return { check, roll };
   });
 }
@@ -36,27 +37,29 @@ const onRenderCheck = (data, result) => {
   data.tags.unshift({ tag: 'DASU.Check.Retargeted' });
 };
 
+/** Resolve the ChatMessage for a context-menu entry. */
+const messageFromContext = (el) => {
+  const node = el?.jquery ? el[0] : el;
+  const messageId =
+    node?.dataset?.messageId ??
+    node?.closest?.('[data-message-id]')?.dataset.messageId;
+  return messageId ? game.messages.get(messageId) : undefined;
+};
+
 const initialize = () => {
   Hooks.on(CheckHooks.renderCheck, onRenderCheck);
 
   Hooks.on('getChatMessageContextOptions', (html, options) => {
     options.push({
-      name: game.i18n.localize('DASU.Check.Retarget'),
+      label: game.i18n.localize('DASU.Check.Retarget'),
       icon: '<i class="fas fa-crosshairs"></i>',
-      condition: (li) => {
-        const messageId =
-          li.dataset?.messageId ??
-          li.closest('[data-message-id]')?.dataset.messageId;
-        if (!messageId) return false;
-        const message = game.messages.get(messageId);
-        return Checks.isCheck(message, ['accuracy', 'tactic']);
-      },
-      callback: (li) => {
-        const messageId =
-          li.dataset?.messageId ??
-          li.closest('[data-message-id]')?.dataset.messageId;
-        const message = game.messages.get(messageId);
-        const result = message?.getFlag(SYSTEM, Flags.ChatMessage.Check);
+      visible: (li) =>
+        Checks.isCheck(messageFromContext(li), ['accuracy', 'tactic']),
+      onClick: (event, target) => {
+        const result = messageFromContext(target)?.getFlag(
+          SYSTEM,
+          Flags.ChatMessage.Check
+        );
         if (result?.id) retarget(result.id);
       },
     });

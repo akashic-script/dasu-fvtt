@@ -12,7 +12,7 @@
   </div>
   {{#each targets}}
   <div class="check-target{{#if this.hit}} target-hit{{else}} target-miss{{/if}}">
-    <span class="target-name">{{this.name}}</span>
+    <span class="target-name" data-uuid="{{this.uuid}}">{{this.name}}</span>
     {{#unless ../hideTn}}{{#if this.tn}}<span class="target-tn">{{this.tn}}</span>{{/if}}{{/unless}}
     <span class="target-outcome">
       {{#if this.hit}}{{localize "DASU.Check.Hit"}}{{else}}{{localize "DASU.Check.Miss"}}{{/if}}

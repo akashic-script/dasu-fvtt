@@ -33,23 +33,35 @@ export class BondTableRenderer extends DASUTableRenderer {
       DASUBond.RANK_KEYS.map(async (key) => {
         const rank = sys[key];
         const effect = rank.effectUuid ? await fromUuid(rank.effectUuid) : null;
-        const effectDescription = effect
-          ? await TextEditor.enrichHTML(effect.description ?? '', {
-              relativeTo: effect,
-              secrets: false,
-            })
-          : '';
+        let effectDescription = '';
+        if (effect) {
+          const raw = await TextEditor.enrichHTML(effect.description ?? '', {
+            relativeTo: effect,
+            secrets: false,
+          });
+          effectDescription = raw.replace(/^<p>(.*)<\/p>$/s, '$1').trim();
+        }
         return {
           name: rank.name,
           threshold: rank.threshold,
           abilityType: rank.abilityType,
+          effectName: effect?.name ?? '',
           effectDescription,
         };
       })
     );
     return foundry.applications.handlebars.renderTemplate(
       'systems/dasu/templates/table/expand/expand-bond.hbs',
-      { ranks, affinity: sys.affinity }
+      {
+        ranks,
+        affinity: sys.affinity,
+        targetName: sys.resolvedTargetName,
+        negative: sys.negative,
+        description: await TextEditor.enrichHTML(item.system.description ?? '', {
+          relativeTo: item,
+          secrets: false,
+        }).then((r) => r.trim().replace(/^<p>(.*)<\/p>$/s, '$1').trim()),
+      }
     );
   }
 }

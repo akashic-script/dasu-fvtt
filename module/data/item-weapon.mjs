@@ -23,6 +23,13 @@ export default class DASUWeapon extends DASUItemBase {
       choices: DASU.weaponRanges,
     });
 
+    schema.govern = new fields.StringField({
+      required: true,
+      blank: false,
+      initial: "pow",
+      choices: DASU.attributes,
+    });
+
     schema.damage = DamageField();
     schema.toHit = new fields.NumberField({ ...requiredInteger, initial: 0 });
     schema.resource = ResourceField();

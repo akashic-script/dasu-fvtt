@@ -112,6 +112,12 @@
       </select>
     </div>
     <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Govern"}}</label>
+      <select name="system.govern">
+        {{selectOptions governOptions selected=system.govern}}
+      </select>
+    </div>
     <div class="item-sidebar__field">
       <label>{{localize "DASU.Item.Weapon.Damage"}}</label>
       <input type="number" name="system.damage.value" value="{{system.damage.value}}" min="0" />
@@ -120,6 +126,12 @@
       <label>{{localize "DASU.Item.Weapon.DamageType"}}</label>
       <select name="system.damage.type">
         {{selectOptions damageTypeOptions selected=system.damage.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.DamageResource"}}</label>
+      <select name="system.damage.resource">
+        {{selectOptions damageResourceOptions selected=system.damage.resource}}
       </select>
     </div>
     <div class="item-sidebar__field">
@@ -175,8 +187,14 @@
     </div>
     <div class="item-sidebar__field item-sidebar__field--wide">
       <label>{{localize "DASU.Item.Tactic.DamageType"}}</label>
-      <select name="system.damage.type">
-        {{selectOptions damageTypeOptions selected=system.damage.type}}
+      <select name="system.damage.type" disabled>
+        {{selectOptions damageTypeOptions selected="untyped"}}
+      </select>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.DamageResource"}}</label>
+      <select name="system.damage.resource" disabled>
+        {{selectOptions damageResourceOptions selected="wp"}}
       </select>
     </div>
   </div>
@@ -289,6 +307,18 @@
   {{#if isBond}}
   <div class="item-sidebar__fields">
     <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Bond.Target"}}</label>
+      <div class="bond-target-drop-zone {{#if bondTarget}}bond-target-drop-zone--filled{{/if}}">
+        {{#if bondTarget}}
+          {{#if bondTarget.img}}<img class="bond-target-drop-zone__img" src="{{bondTarget.img}}" alt="" />{{/if}}
+          <span class="bond-target-drop-zone__name {{#if bondTarget.missing}}bond-target-drop-zone__name--missing{{/if}}" data-uuid="{{bondTarget.uuid}}">{{bondTarget.name}}</span>
+          <a class="bond-target-drop-zone__clear" data-tooltip="{{localize 'DASU.Sheet.DeleteItem'}}"><i class="fas fa-times"></i></a>
+        {{else}}
+          <span class="bond-target-drop-zone__hint">{{localize "DASU.Bond.TargetNone"}}</span>
+        {{/if}}
+      </div>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--full">
       <label>{{localize "DASU.Bond.TargetName"}}</label>
       <input type="text" name="system.targetName" value="{{system.targetName}}" placeholder="{{localize 'DASU.Bond.TargetNameHint'}}" />
     </div>
@@ -332,6 +362,12 @@
 
     {{#if showAbilityDamage}}
     <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Govern"}}</label>
+      <select name="system.govern">
+        {{selectOptions governOptions selected=system.govern}}
+      </select>
+    </div>
     <div class="item-sidebar__field">
       <label>{{localize "DASU.Item.Ability.Damage"}}</label>
       <input type="number" name="system.damage.value" value="{{system.damage.value}}" min="0" />
@@ -340,6 +376,12 @@
       <label>{{localize "DASU.Item.Ability.DamageType"}}</label>
       <select name="system.damage.type">
         {{selectOptions damageTypeOptions selected=system.damage.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.DamageResource"}}</label>
+      <select name="system.damage.resource">
+        {{selectOptions damageResourceOptions selected=system.damage.resource}}
       </select>
     </div>
     {{/if}}

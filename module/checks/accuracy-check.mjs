@@ -21,9 +21,10 @@ const onPrepareCheck = (check, actor, item) => {
 
   const itemDamage = item?.system?.damage;
   if (itemDamage) {
-    const pow = actor?.system?.attributes?.pow?.value ?? 0;
+    const govern = item?.system?.govern ?? 'pow';
+    const governValue = actor?.system?.attributes?.[govern]?.value ?? 0;
     config.setDamage({
-      amount: pow + (itemDamage.value ?? 0),
+      amount: governValue + (itemDamage.value ?? 0),
       type: itemDamage.type ?? 'physical',
     });
   }

@@ -1,4 +1,9 @@
 <div class="dasu-expand-description">
+  <div class="dasu-expand-description__header">
+    {{#if targetName}}<span class="bond-meta__target">{{localize "DASU.Bond.Target"}}: {{targetName}}</span>{{/if}}
+    {{#if negative}}<span class="bond-meta__tag bond-meta__tag--negative">{{localize "DASU.Bond.Negative"}}</span>{{/if}}
+  </div>
+  {{#if description}}<div class="dasu-expand-description__body">{{{description}}}</div>{{/if}}
   {{#each ranks}}
   <div class="dasu-expand-description__schema-level {{#unless (gte ../affinity threshold)}}bond-rank--locked{{/unless}}">
     <div class="dasu-expand-description__schema-level-label">
@@ -7,7 +12,7 @@
       {{#if abilityType}}<span class="bond-rank__type">[{{localize (concat "DASU.Bond.Ability." (capitalize abilityType))}}]</span>{{/if}}
     </div>
     {{#if effectDescription}}
-    <div class="dasu-expand-description__body">{{{effectDescription}}}</div>
+    <div class="dasu-expand-description__body">{{#if effectName}}<span class="bond-effect__name">{{effectName}}:</span> {{/if}}{{{effectDescription}}}</div>
     {{/if}}
   </div>
   {{/each}}

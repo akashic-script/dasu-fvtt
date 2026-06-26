@@ -101,6 +101,12 @@ class CheckConfigurer {
     return this;
   }
 
+  /** Override the final damage amount while keeping the current type. @param {number} amount @returns {CheckConfigurer} */
+  setDamageValue(amount) {
+    if (amount != null && this.#data[DAMAGE]) this.#data[DAMAGE].amount = amount;
+    return this;
+  }
+
   /**
    * Force target reactions for this roll.
    * @param {Array<'weak'|'resist'|'nullify'|'drain'>} modes

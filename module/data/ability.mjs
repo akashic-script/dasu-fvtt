@@ -16,6 +16,13 @@ export default class DASUAbility extends DASUItemBase {
       choices: DASU.abilityCategories,
     });
 
+    schema.govern = new fields.StringField({
+      required: true,
+      blank: false,
+      initial: "pow",
+      choices: DASU.attributes,
+    });
+
     schema.damage = DamageField();
     schema.heal = HealField();
     schema.resource = ResourceField({ defaultType: 'wp' });

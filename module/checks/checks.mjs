@@ -272,13 +272,15 @@ async function processResult(check, roll, actor, item, callHook = true) {
     check.critThreshold ?? DASU.check.defaultCritThreshold
   );
 
-  // Crit: doubles where both kept dice meet the threshold.
-  // Snake Eyes: both kept dice show 1.
-  const firstTwo = keptDice.slice(0, 2);
-  const isPair = firstTwo.length === 2 && firstTwo[0] === firstTwo[1];
-  const critical = isPair && firstTwo.every((d) => d >= critThreshold);
-  const snakeEyes =
-    firstTwo.length === 2 && firstTwo[0] === 1 && firstTwo[1] === 1;
+  // Crit: a pair of equal dice both meeting the threshold. Advantage may form
+  // the pair from any rolled die so keep-highest can't break it; otherwise only
+  // kept dice count. Snake Eyes (pair of 1s) always uses kept dice only.
+  const advantage = check.advantage && !check.disadvantage;
+  const critDice = advantage ? [...keptDice, ...droppedDice] : keptDice;
+  const hasPairAtLeast = (dice, min) =>
+    dice.some((d, i) => d >= min && dice.slice(i + 1).some((e) => e === d));
+  const critical = hasPairAtLeast(critDice, critThreshold);
+  const snakeEyes = keptDice.filter((d) => d === 1).length >= 2;
 
   const modifierTotal = check.modifiers.reduce((sum, m) => sum + m.value, 0);
 
@@ -476,6 +478,8 @@ export function initializeChecks() {
       const config = CheckConfiguration.configure(check);
       if (overrides.range) config.setRange(overrides.range);
       if (overrides.damageType) config.setDamageType(overrides.damageType);
+      if (overrides.damageValue != null)
+        config.setDamageValue(overrides.damageValue);
       if (overrides.cost) config.setCost(overrides.cost);
       if (overrides.resistanceModes)
         config.setResistanceModes(overrides.resistanceModes);
@@ -607,6 +611,19 @@ export function initializeChecks() {
         img.addEventListener('click', () => target.sheet?.render(true));
       }
       fieldsetHeader.prepend(img);
+    }
+
+    // Clicking a target's name opens its sheet, if the user can view it.
+    for (const nameEl of html.querySelectorAll('.target-name[data-uuid]')) {
+      const uuid = nameEl.dataset.uuid;
+      if (!uuid) continue;
+      const doc = await fromUuid(uuid);
+      // Token uuids resolve to a TokenDocument; open its actor sheet.
+      const actor = doc?.actor ?? doc;
+      const sheet = actor?.sheet;
+      if (!sheet || !actor.testUserPermission?.(game.user, 'LIMITED')) continue;
+      nameEl.style.cursor = 'pointer';
+      nameEl.addEventListener('click', () => sheet.render(true));
     }
 
     const timestamp = html.querySelector('.message-timestamp');

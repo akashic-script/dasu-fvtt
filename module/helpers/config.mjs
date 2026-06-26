@@ -132,6 +132,11 @@ DASU.abilityHealResources = {
   wp: 'DASU.Item.Item.ResourceWP',
 };
 
+DASU.damageResources = {
+  hp: 'DASU.Item.Item.ResourceHP',
+  wp: 'DASU.Item.Item.ResourceWP',
+};
+
 DASU.damageTypes = {
   fire: 'DASU.DamageType.Fire',
   ice: 'DASU.DamageType.Ice',

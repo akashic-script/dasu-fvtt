@@ -27,6 +27,8 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
   #difficulty = null;
   /** @type {'minus'|'plus'} cost adjustment direction (item mode) */
   #costDir = 'minus';
+  /** @type {'minus'|'plus'} damage adjustment direction (item mode) */
+  #damageDir = 'plus';
 
   constructor(actor, mode, key, options = {}) {
     super(options);
@@ -51,6 +53,7 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
       cancel: DASURollDialog.#onCancel,
       setAdvantage: DASURollDialog.#onSetAdvantage,
       setCostDir: DASURollDialog.#onSetCostDir,
+      setDamageDir: DASURollDialog.#onSetDamageDir,
     },
   };
 
@@ -105,6 +108,20 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     const damageType = form.querySelector('[name="damageType"]')?.value || null;
     if (damageType && damageType !== (sys.damage?.type ?? null))
       overrides.damageType = damageType;
+
+    const damageEl = form.querySelector('[name="damageAmount"]');
+    if (damageEl) {
+      const amount = parseInt(damageEl.value) || 0;
+      if (amount !== 0) {
+        const govern = sys.govern ?? 'pow';
+        const governValue =
+          this.#actor?.system?.attributes?.[govern]?.value ?? 0;
+        const baseAmount = governValue + (sys.damage?.value ?? 0);
+        const value =
+          this.#damageDir === 'minus' ? baseAmount - amount : baseAmount + amount;
+        overrides.damageValue = Math.max(0, value);
+      }
+    }
 
     const amountEl = form.querySelector('[name="costAmount"]');
     const costType =
@@ -205,6 +222,11 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     const dmg = sys.damage;
     const showDamageType =
       !isDisplay && dmg != null && dmg.type !== 'untyped';
+    // Rolled damage is the governing attribute + the item's base value; the
+    // field shows and edits that final amount.
+    const govern = sys.govern ?? 'pow';
+    const governValue = this.#actor?.system?.attributes?.[govern]?.value ?? 0;
+    const baseDamage = governValue + (dmg?.value ?? 0);
     const damageTypes = Object.entries(CONFIG.DASU.damageTypes).map(
       ([key, i18nKey]) => ({
         key,
@@ -266,6 +288,8 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
       showRange,
       ranges,
       showDamageType,
+      baseDamage,
+      damageDir: this.#damageDir,
       damageTypes,
       showCost,
       baseCost,
@@ -319,6 +343,18 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     this.#costDir = value;
     for (const btn of this.element.querySelectorAll(
       '[data-action="setCostDir"]'
+    )) {
+      btn.classList.toggle('is-active', btn.dataset.value === value);
+    }
+  }
+
+  /** Exclusive minus/plus damage direction toggle. */
+  static #onSetDamageDir(event, target) {
+    const value = target.dataset.value;
+    if (value !== 'minus' && value !== 'plus') return;
+    this.#damageDir = value;
+    for (const btn of this.element.querySelectorAll(
+      '[data-action="setDamageDir"]'
     )) {
       btn.classList.toggle('is-active', btn.dataset.value === value);
     }

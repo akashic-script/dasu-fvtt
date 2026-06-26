@@ -26,7 +26,10 @@
       "Inactive": "Inactive"
     },
     "Bond": {
-      "TargetName": "Bond Target",
+      "Target": "Bond Target",
+      "TargetNone": "Drop an actor here",
+      "TargetDropInvalid": "Only Actors can be dropped here.",
+      "TargetName": "Bond Target Name",
       "TargetNameHint": "Name of the bond",
       "Affinity": "Affinity",
       "Negative": "Negative Bond",
@@ -297,6 +300,7 @@
       "MoreOptions": "More",
       "EditItem": "Edit",
       "DeleteItem": "Delete",
+      "AddItem": "Add new",
       "RollFlavorAbility": "[ability]",
       "Tab": {
         "Identity": "Identity",
@@ -331,6 +335,8 @@
     },
     "Item": {
       "NamePlaceholder": "Item Name",
+      "Govern": "Governs",
+      "DamageResource": "Target Resource",
       "Roll": {
         "Formula": "Roll Formula:",
         "DiceNum": "Number of Dice",
@@ -541,6 +547,7 @@
         "DifficultyNone": "No TN",
         "Range": "Range",
         "DamageType": "Damage Type",
+        "Damage": "Damage",
         "Cost": "Cost",
         "Reduce": "Reduce",
         "Increase": "Increase",

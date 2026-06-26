@@ -196,7 +196,13 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
     this._prepareItems(context);
-    context.weaponTable = await this.#weaponTable.renderTable(this.document);
+    context.weaponTable = await this.#weaponTable.renderTable(this.document, {
+      sectionBadge: {
+        type: 'weapon',
+        tooltip: game.i18n.localize('DASU.Sheet.AddItem'),
+        used: '+',
+      },
+    });
     const slots = actorData.slots;
     context.abilityTable = await this.#abilityTable.renderTable(this.document, {
       sectionBadge: slots?.ability ? {
@@ -204,7 +210,11 @@ export class DASUActorSheet extends SheetLayoutMixin(
         tooltip: game.i18n.localize('DASU.Actor.Slots.AbilityLong'),
         used: slots.ability.used,
         max: slots.ability.max,
-      } : null,
+      } : {
+        type: 'ability',
+        tooltip: game.i18n.localize('DASU.Sheet.AddItem'),
+        used: '+',
+      },
     });
     context.tacticTable = await this.#tacticTable.renderTable(this.document, {
       sectionBadge: slots?.tactic ? {
@@ -212,7 +222,11 @@ export class DASUActorSheet extends SheetLayoutMixin(
         tooltip: game.i18n.localize('DASU.Actor.Slots.TacticLong'),
         used: slots.tactic.used,
         max: slots.tactic.max,
-      } : null,
+      } : {
+        type: 'tactic',
+        tooltip: game.i18n.localize('DASU.Sheet.AddItem'),
+        used: '+',
+      },
     });
     context.schemaTable = await this.#schemaTable.renderTable(this.document);
     context.classTable = await this.#classTable.renderTable(this.document);
@@ -224,7 +238,13 @@ export class DASUActorSheet extends SheetLayoutMixin(
       ),
       max: context.planner.aptitudeMax,
     };
-    context.itemTable = await this.#itemTable.renderTable(this.document);
+    context.itemTable = await this.#itemTable.renderTable(this.document, {
+      sectionBadge: {
+        type: 'item',
+        tooltip: game.i18n.localize('DASU.Sheet.AddItem'),
+        used: '+',
+      },
+    });
     context.featureTable = await this.#featureTable.renderTable(this.document);
     if (actor.type === 'summoner') {
       context.bondTable = await this.#bondTable.renderTable(this.document);
@@ -453,6 +473,15 @@ export class DASUActorSheet extends SheetLayoutMixin(
   /** @override */
   async _onFirstRender(context, options) {
     await super._onFirstRender(context, options);
+    this.element.addEventListener('auxclick', (e) => {
+      if (e.button !== 1) return;
+      const row = e.target.closest('.dasu-table__row-container[data-key]');
+      if (!row) return;
+      e.preventDefault();
+      const uuid = row.dataset.uuid ?? row.dataset.key;
+      const doc = fromUuidSync(uuid);
+      doc?.sheet?.render(true);
+    });
     this.#bindPlannerSlots();
     this.#weaponTable.activateListeners(this);
     this.#abilityTable.activateListeners(this);

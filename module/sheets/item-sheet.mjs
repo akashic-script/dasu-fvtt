@@ -233,6 +233,8 @@ export class DASUItemSheet extends SheetLayoutMixin(
       context.categoryOptions = localize(DASU.weaponCategories);
       context.rangeOptions = localize(DASU.weaponRanges);
       context.damageTypeOptions = localize(DASU.damageTypes);
+      context.damageResourceOptions = localize(DASU.damageResources);
+      context.governOptions = localize(DASU.attributes);
     }
 
     if (context.isAbility) {
@@ -244,6 +246,8 @@ export class DASUItemSheet extends SheetLayoutMixin(
       context.resourceOptions = localize(DASU.abilityHealResources);
       context.modeOptions = localize(DASU.itemEffectModes);
       context.attributeOptions = localize(DASU.attributes);
+      context.governOptions = localize(DASU.attributes);
+      context.damageResourceOptions = localize(DASU.damageResources);
       context.isSpellAbility = category === 'spell';
       context.isAfflictionAbility = category === 'affliction';
       context.isRestorativeAbility = category === 'restorative';
@@ -263,6 +267,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
       };
       context.resourceTypeOptions = localize(DASU.resourceTypes);
       context.damageTypeOptions = localize(DASU.damageTypes);
+      context.damageResourceOptions = localize(DASU.damageResources);
     }
 
     // Retrieve the roll data for TinyMCE editors.
@@ -306,6 +311,23 @@ export class DASUItemSheet extends SheetLayoutMixin(
         passive: 'DASU.Bond.Ability.Passive',
         reactive: 'DASU.Bond.Ability.Reactive',
       });
+      const targetUuid = itemData.system.targetUuid;
+      let targetActor = null;
+      if (targetUuid) {
+        try {
+          targetActor = await fromUuid(targetUuid);
+        } catch {
+          targetActor = null;
+        }
+      }
+      context.bondTarget = targetUuid
+        ? {
+            uuid: targetUuid,
+            name: targetActor?.name ?? itemData.system.targetName ?? targetUuid,
+            img: targetActor?.img ?? null,
+            missing: !targetActor,
+          }
+        : null;
       const panelState = context.fieldsets['bond-ranks']?.panels ?? {};
       const rankLabel = game.i18n.localize('DASU.Bond.RankName');
       context.bondRanks = await Promise.all(
@@ -443,6 +465,53 @@ export class DASUItemSheet extends SheetLayoutMixin(
         await this.item.update({ [`system.${key}.effectUuid`]: '' });
       });
       const nameEl = zone.querySelector('.bond-rank-effect-drop-zone__name[data-uuid]');
+      if (nameEl) {
+        zone.addEventListener('click', async () => {
+          const doc = await fromUuid(nameEl.dataset.uuid);
+          doc?.sheet?.render(true);
+        });
+      }
+    }
+
+    for (const zone of this.element.querySelectorAll('.bond-target-drop-zone')) {
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        zone.classList.remove('drag-over');
+        let data;
+        try {
+          data =
+            foundry.applications.ux.TextEditor.implementation.getDragEventData(e);
+        } catch {
+          try {
+            data = JSON.parse(e.dataTransfer.getData('text/plain'));
+          } catch {
+            return;
+          }
+        }
+        if (data?.type !== 'Actor' || !data.uuid) {
+          ui.notifications?.warn(
+            game.i18n.localize('DASU.Bond.TargetDropInvalid')
+          );
+          return;
+        }
+        const actor = await fromUuid(data.uuid);
+        await this.item.update({
+          'system.targetUuid': data.uuid,
+          'system.targetName': actor?.name ?? '',
+        });
+      });
+      const clearBtn = zone.querySelector('.bond-target-drop-zone__clear');
+      clearBtn?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        await this.item.update({ 'system.targetUuid': '' });
+      });
+      const nameEl = zone.querySelector('.bond-target-drop-zone__name[data-uuid]');
       if (nameEl) {
         zone.addEventListener('click', async () => {
           const doc = await fromUuid(nameEl.dataset.uuid);
