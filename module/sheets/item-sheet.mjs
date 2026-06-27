@@ -191,6 +191,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     context.isArchetype = item.type === 'archetype';
     context.isSubtype = item.type === 'subtype';
     context.isBond = item.type === 'bond';
+    context.isSpecialAbility = item.type === 'specialAbility';
 
     const localize = (obj) =>
       Object.fromEntries(
@@ -305,6 +306,14 @@ export class DASUItemSheet extends SheetLayoutMixin(
         });
       }
       context.advancementTable = await this.#advancementTable.renderTable(item);
+    }
+
+    if (context.isSpecialAbility) {
+      context.kindOptions = localize({
+        passive: 'DASU.SpecialAbility.Kind.Passive',
+        active: 'DASU.SpecialAbility.Kind.Active',
+        reactive: 'DASU.SpecialAbility.Kind.Reactive',
+      });
     }
 
     context.fieldsets = this.#fieldsets.prepareContext(item);

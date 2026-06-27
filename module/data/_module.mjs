@@ -14,6 +14,7 @@ export {default as DASUSchema} from "./schema.mjs";
 export {default as DASUArchetype} from "./archetype.mjs";
 export {default as DASUSubtype} from "./subtype.mjs";
 export {default as DASUBond} from "./bond.mjs";
+export {default as DASUSpecialAbility} from "./special-ability.mjs";
 
 export * from "./advancements/_module.mjs";
 

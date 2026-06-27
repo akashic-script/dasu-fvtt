@@ -266,6 +266,12 @@ DASU.itemCategories = {
   hoard: 'DASU.Item.Item.CategoryHoard',
 };
 
+DASU.specialAbilityKinds = {
+  passive: 'DASU.SpecialAbility.Kind.Passive',
+  active: 'DASU.SpecialAbility.Kind.Active',
+  reactive: 'DASU.SpecialAbility.Kind.Reactive',
+};
+
 DASU.itemResources = {
   hp: 'DASU.Item.Item.ResourceHP',
   wp: 'DASU.Item.Item.ResourceWP',

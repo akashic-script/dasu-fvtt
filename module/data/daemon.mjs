@@ -16,6 +16,18 @@ export default class DASUDaemon extends DASUActorBase {
       });
     }
     schema.attributes = new fields.SchemaField(attributesSchema);
+    schema.transformations = new fields.ArrayField(
+      new fields.SchemaField({
+        uuid: new fields.StringField({ required: true, blank: false }),
+        meritThreshold: new fields.NumberField({
+          required: true,
+          integer: true,
+          initial: 0,
+          min: 0,
+        }),
+      }),
+      { required: true, initial: [] }
+    );
 
     return schema;
   }
@@ -36,8 +48,31 @@ export default class DASUDaemon extends DASUActorBase {
     };
   }
 
+  // Resolve transformation entries to display rows (target name/img + reached).
+  _prepareTransformations() {
+    const entries = this._source.transformations ?? this.transformations ?? [];
+    this.transformationRows = entries.map((entry, index) => {
+      let actor = null;
+      try {
+        if (entry.uuid) actor = fromUuidSync(entry.uuid);
+      } catch {
+        actor = null;
+      }
+      return {
+        index,
+        uuid: entry.uuid,
+        meritThreshold: entry.meritThreshold ?? 0,
+        name: actor?.name ?? entry.uuid,
+        img: actor?.img ?? 'icons/svg/mystery-man.svg',
+        missing: !actor,
+        reached: this.merit >= (entry.meritThreshold ?? 0),
+      };
+    });
+  }
+
   prepareDerivedData() {
     super.prepareDerivedData();
+    this._prepareTransformations();
     if (!this.attributes) return;
     for (const key in this.attributes) {
       if (!this.attributes[key]) continue;

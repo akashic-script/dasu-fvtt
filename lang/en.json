@@ -25,6 +25,26 @@
       "Active": "Active",
       "Inactive": "Inactive"
     },
+    "SpecialAbility": {
+      "Title": "Special Ability",
+      "Kind": {
+        "Label": "Ability Type",
+        "Passive": "Passive",
+        "Active": "Active",
+        "Reactive": "Reactive"
+      }
+    },
+    "Transformation": {
+      "Title": "Transformations",
+      "MeritThreshold": "Merits",
+      "MeritThresholdShort": "Merit",
+      "Reached": "Ready to Transform",
+      "NotReached": "Not enough Merits",
+      "DropHint": "Drop a daemon to add a form",
+      "AlreadyAdded": "That daemon is already a transformation form.",
+      "DaemonOnly": "Only daemons can be transformation forms.",
+      "Remove": "Remove form"
+    },
     "Bond": {
       "Target": "Bond Target",
       "TargetNone": "Drop an actor here",
@@ -595,7 +615,8 @@
       "schema": "Schema",
       "archetype": "Archetype",
       "subtype": "Subtype",
-      "bond": "Bond"
+      "bond": "Bond",
+      "specialAbility": "Special Ability"
     }
   }
 }

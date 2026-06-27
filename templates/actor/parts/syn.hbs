@@ -21,9 +21,11 @@
     </div>
 
     {{#each @root.daemonAckTabs}}
-    <div class="dasu-fieldset__panel" data-panel="ack-{{uuid}}" hidden>
+    <div class="dasu-fieldset__panel" data-panel="ack-{{uuid}}" data-uuid="{{uuid}}" hidden>
       {{{archetype}}}
       {{{subtype}}}
+      {{{specialAbility}}}
+      {{{transformation}}}
     </div>
     {{/each}}
   </div>

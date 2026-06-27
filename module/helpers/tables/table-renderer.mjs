@@ -422,6 +422,7 @@ export class DASUTableRenderer {
       renderDescription,
       renderRowCaption,
       hideIfEmpty: configHideIfEmpty,
+      defaultExpanded,
       advancedConfig,
     } = this.tableConfig;
 
@@ -459,6 +460,11 @@ export class DASUTableRenderer {
     for (const item of items) {
       const rowKey = advancedConfig.getKey(item);
       const visible = options.isVisible ? options.isVisible(item) : true;
+
+      // Seed only unseen keys so a user collapse still persists.
+      if (defaultExpanded && !(rowKey in this.#expandedItems)) {
+        this.#expandedItems[rowKey] = true;
+      }
 
       // TODO (PseudoItem): walk item.parent chain here to set rowCssClasses/rowTooltips.
       for (const [columnKey, columnConfig] of Object.entries(columnConfigs)) {

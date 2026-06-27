@@ -17,6 +17,8 @@ import { SubtypeTableRenderer } from '../helpers/tables/subtype-table-renderer.m
 import { SchemaTableRenderer } from '../helpers/tables/schema-table-renderer.mjs';
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
 import { StockTableRenderer } from '../helpers/tables/stock-table-renderer.mjs';
+import { SpecialAbilityTableRenderer } from '../helpers/tables/special-ability-table-renderer.mjs';
+import { TransformationTableRenderer } from '../helpers/tables/transformation-table-renderer.mjs';
 import { DaemonTables } from '../helpers/tables/daemon-tables.mjs';
 import { BondTableRenderer } from '../helpers/tables/bond-table-renderer.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
@@ -46,6 +48,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   /** Teardown for the open stepper popover, or null when none is open. */
   #stepperPopoverCleanup = null;
+
+  /** Whether the delegated transformation listeners are bound (bind once). */
+  #transformationListenersBound = false;
 
   #daemonTableCache = new Map();
 
@@ -77,6 +82,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
   #classTable = new ClassTableRenderer();
   #archetypeTable = new ArchetypeTableRenderer();
   #subtypeTable = new SubtypeTableRenderer();
+  #specialAbilityTable = new SpecialAbilityTableRenderer();
+  #transformationTable = new TransformationTableRenderer();
   #schemaTable = new SchemaTableRenderer();
   #itemTable = new ItemTableRenderer();
   #featureTable = new FeatureTableRenderer();
@@ -258,6 +265,14 @@ export class DASUActorSheet extends SheetLayoutMixin(
       this.document
     );
     context.subtypeTable = await this.#subtypeTable.renderTable(this.document);
+
+    // Daemon-only Ack content
+    if (actor.type === 'daemon') {
+      context.specialAbilityTable =
+        await this.#specialAbilityTable.renderTable(this.document);
+      context.transformationTable =
+        await this.#transformationTable.renderTable(this.document);
+    }
 
     context.fieldsets = this.#fieldsets.prepareContext(actor);
 
@@ -495,6 +510,11 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.#classTable.activateListeners(this);
     this.#archetypeTable.activateListeners(this);
     this.#subtypeTable.activateListeners(this);
+    if (this.actor.type === 'daemon') {
+      this.#specialAbilityTable.activateListeners(this);
+      this.#transformationTable.activateListeners(this);
+      this.#activateTransformationListeners();
+    }
     this.#itemTable.activateListeners(this);
     this.#featureTable.activateListeners(this);
     for (const { renderer } of DASUActorSheet.#moduleTableRegistry) {
@@ -758,8 +778,58 @@ export class DASUActorSheet extends SheetLayoutMixin(
     }
   }
 
+  /**
+   * Drag-over highlight for the transformation drop-zone and threshold edits.
+   */
+  #activateTransformationListeners() {
+    if (this.#transformationListenersBound) return;
+    this.#transformationListenersBound = true;
+    const root = this.element;
+
+    const zoneOf = (e) => e.target?.closest?.('.transformation-drop-zone');
+    root.addEventListener('dragenter', (e) => {
+      const zone = zoneOf(e);
+      if (zone) {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      }
+    });
+    root.addEventListener('dragover', (e) => {
+      if (zoneOf(e)) e.preventDefault();
+    });
+    root.addEventListener('dragleave', (e) => {
+      const zone = zoneOf(e);
+      // Ignore leaves into a child element.
+      if (zone && !zone.contains(e.relatedTarget)) {
+        zone.classList.remove('drag-over');
+      }
+    });
+    root.addEventListener('drop', (e) => {
+      zoneOf(e)?.classList.remove('drag-over');
+    });
+
+    root.addEventListener('change', async (e) => {
+      const input = e.target?.closest?.('.transformation__threshold-input');
+      if (!input || input.disabled) return;
+      const li = input.closest('[data-transformation-index]');
+      const index = Number(li?.dataset?.transformationIndex);
+      if (Number.isNaN(index)) return;
+      const list = foundry.utils.deepClone(this.actor.system.transformations ?? []);
+      if (!list[index]) return;
+      list[index].meritThreshold = Math.max(0, parseInt(input.value) || 0);
+      await this.actor.update({ 'system.transformations': list });
+    });
+  }
+
   /** @override */
   async _onDropActor(event, actorData) {
+    // Daemon sheet: a drop onto the transformation zone adds a form.
+    if (
+      this.actor.type === 'daemon' &&
+      event.target?.closest?.('.transformation-drop-zone')
+    ) {
+      return this.#addTransformation(actorData.uuid);
+    }
     if (this.actor.type !== 'summoner') return super._onDropActor(event, actorData);
     const dropped = await fromUuid(actorData.uuid);
     if (!dropped || dropped.type !== 'daemon') return false;
@@ -770,6 +840,29 @@ export class DASUActorSheet extends SheetLayoutMixin(
     }
     stock.push({ uuid: actorData.uuid, active: false });
     await this.actor.update({ 'system.stock': stock });
+    return true;
+  }
+
+  /** Append a daemon form to this daemon's transformations array. */
+  async #addTransformation(uuid) {
+    if (!uuid) return false;
+    const dropped = await fromUuid(uuid);
+    if (!dropped || dropped.type !== 'daemon') {
+      ui.notifications?.warn(
+        game.i18n.localize('DASU.Transformation.DaemonOnly')
+      );
+      return false;
+    }
+    if (dropped.uuid === this.actor.uuid) return false; // can't become itself
+    const list = foundry.utils.deepClone(this.actor.system.transformations ?? []);
+    if (list.some((entry) => entry.uuid === uuid)) {
+      ui.notifications?.warn(
+        game.i18n.localize('DASU.Transformation.AlreadyAdded')
+      );
+      return false;
+    }
+    list.push({ uuid, meritThreshold: 0 });
+    await this.actor.update({ 'system.transformations': list });
     return true;
   }
 

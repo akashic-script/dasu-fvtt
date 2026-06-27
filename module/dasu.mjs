@@ -64,6 +64,7 @@ Hooks.once('init', function () {
     archetype: models.DASUArchetype,
     subtype: models.DASUSubtype,
     bond: models.DASUBond,
+    specialAbility: models.DASUSpecialAbility,
   });
 
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
@@ -94,6 +95,7 @@ Hooks.once('init', function () {
         'archetype',
         'subtype',
         'bond',
+        'specialAbility',
       ],
       makeDefault: true,
       label: 'DASU.SheetLabels.Item',

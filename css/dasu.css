@@ -895,6 +895,8 @@
     --dasu-accent-bond: #d4a0c8;
     --dasu-accent-stock-active: #4a8fc4;
     --dasu-accent-stock-inactive: #6a6a6a;
+    --dasu-accent-special-ability: #c4a04a;
+    --dasu-accent-transformation: #9a6ac4;
     --dasu-surface-1: rgb(var(--dasu-panel) / 40%);
     --dasu-surface-raised: rgb(255 255 255 / 8%);
     --dasu-panel-accent: rgb(255 255 255 / 8%);
@@ -2591,6 +2593,12 @@
       &.subtype-table .dasu-table__header {
         --section-accent: var(--dasu-accent-subtype);
       }
+      &.special-ability-table .dasu-table__header {
+        --section-accent: var(--dasu-accent-special-ability);
+      }
+      &.transformation-table .dasu-table__header {
+        --section-accent: var(--dasu-accent-transformation);
+      }
       &.bond-table .dasu-table__header {
         --section-accent: var(--dasu-accent-bond);
       }
@@ -2676,6 +2684,12 @@
       }
       &.subtype-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-subtype);
+      }
+      &.special-ability-table .dasu-table__row-container.item {
+        --item-accent: var(--dasu-accent-special-ability);
+      }
+      &.transformation-table .dasu-table__row-container.item {
+        --item-accent: var(--dasu-accent-transformation);
       }
       &.bond-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-bond);
@@ -3138,6 +3152,12 @@
     }
     .subtype-table {
       grid-template-columns: [name] auto [stat] 48px [abilities] 48px [tactics] 48px [controls] 54px;
+    }
+    .special-ability-table {
+      grid-template-columns: [name] auto [kind] 1fr [controls] 54px;
+    }
+    .transformation-table {
+      grid-template-columns: [name] auto [threshold] 110px [controls] 54px;
     }
     .stock-table {
       grid-template-columns: [name] auto [avoid] 40px [defense] 40px [level] 40px [controls] 54px;
@@ -4976,6 +4996,89 @@
   object-fit: contain;
 }
 
+/* Transformations */
+.transformation-fieldset {
+  margin-top: 8px;
+}
+
+.transformation-fieldset__legend {
+  height: 22px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  font-size: 0.85em;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dasu-accent-transformation);
+  background: rgb(var(--dasu-panel) / 90%);
+  border: var(--dasu-border);
+  border-bottom: var(--dasu-border-subtle);
+}
+
+.transformation-drop-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 8px;
+  background: rgb(var(--dasu-panel) / 60%);
+  border: 1px dashed rgb(var(--dasu-border-rgb, 255 255 255) / 20%);
+  outline: 0 solid transparent;
+  outline-offset: -2px;
+  cursor: copy;
+  transition: border-color 0.1s, background 0.1s, outline-color 0.1s,
+    box-shadow 0.1s;
+
+  &.drag-over {
+    border-color: var(--dasu-accent-transformation);
+    border-style: solid;
+    background: rgb(var(--dasu-panel) / 85%);
+    outline: 2px solid var(--dasu-accent-transformation);
+    box-shadow: 0 0 8px
+      rgb(from var(--dasu-accent-transformation) r g b / 45%);
+  }
+
+  &.drag-over .transformation-drop-zone__hint {
+    color: var(--dasu-accent-transformation);
+  }
+
+  &__hint {
+    font-size: 0.78em;
+    color: var(--dasu-muted);
+    font-style: italic;
+    transition: color 0.1s;
+  }
+}
+
+.transformation__threshold {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.transformation__threshold-input {
+  width: 52px;
+  height: 20px;
+  text-align: center;
+  border-radius: 0;
+}
+
+.transformation__reached {
+  color: var(--dasu-accent-transformation);
+}
+
+.transformation__not-reached {
+  color: var(--dasu-muted);
+}
+
+.transformation--missing {
+  color: var(--color-level-error);
+  font-style: italic;
+}
+
 /* Read-only effect description shown under a filled drop zone. */
 .bond-rank-effect-description {
   &__body {
@@ -4996,8 +5099,7 @@
   }
 }
 
-/* Flat, high-specificity fallback so the effect icon can never balloon,
-   regardless of CSS-nesting support or Foundry's global img rules. */
+/* Fallback */
 .dasu .bond-rank-effect-drop-zone {
   height: 30px !important;
   overflow: hidden;
