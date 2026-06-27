@@ -11,6 +11,7 @@ import { DASUTableRenderer } from './helpers/tables/table-renderer.mjs';
 import { CommonColumns } from './helpers/tables/common-columns.mjs';
 import { CommonDescriptions } from './helpers/tables/common-descriptions.mjs';
 import { Checks, initializeChecks } from './checks/checks.mjs';
+import { initializePipelines } from './helpers/pipelines/_module.mjs';
 import * as models from './data/_module.mjs';
 
 Hooks.once('init', function () {
@@ -35,6 +36,7 @@ Hooks.once('init', function () {
 
   registerHandlebarsHelpers();
   initializeChecks();
+  initializePipelines();
 
   CONFIG.Combat.initiative = {
     formula: '1d20 + @attributes.dex.value',
@@ -65,6 +67,10 @@ Hooks.once('init', function () {
     subtype: models.DASUSubtype,
     bond: models.DASUBond,
     specialAbility: models.DASUSpecialAbility,
+  });
+
+  Object.assign(CONFIG.ChatMessage.dataModels, {
+    pipeline: models.PipelineMessageModel,
   });
 
   foundry.applications.apps.DocumentSheetConfig.registerSheet(

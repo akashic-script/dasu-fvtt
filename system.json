@@ -46,6 +46,9 @@
       "subtype": {},
       "bond": {},
       "specialAbility": {}
+    },
+    "ChatMessage": {
+      "pipeline": {}
     }
   },
   "styles": [

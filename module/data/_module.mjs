@@ -16,6 +16,8 @@ export {default as DASUSubtype} from "./subtype.mjs";
 export {default as DASUBond} from "./bond.mjs";
 export {default as DASUSpecialAbility} from "./special-ability.mjs";
 
+export {default as PipelineMessageModel} from "./pipeline-message.mjs";
+
 export * from "./advancements/_module.mjs";
 
 export { PseudoDocument } from "./pseudo/pseudo-document.mjs";

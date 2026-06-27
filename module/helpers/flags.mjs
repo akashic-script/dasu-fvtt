@@ -9,6 +9,8 @@ export const Flags = Object.freeze({
   ChatMessage: Object.freeze({
     Check: 'Check',
     Item: 'Item',
+    // Pipeline result state now lives in the message's `system` data
+    // (the `pipeline` ChatMessage subtype), not a flag.
   }),
   Actor: Object.freeze({
     Fieldsets: 'fieldsets',

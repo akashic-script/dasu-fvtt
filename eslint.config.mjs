@@ -10,6 +10,7 @@ const foundryGlobals = {
   CONFIG: 'readonly',
   Hooks: 'readonly',
   foundry: 'readonly',
+  canvas: 'readonly',
   globalThis: 'readonly',
 
   // Documents

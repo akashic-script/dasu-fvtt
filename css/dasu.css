@@ -5119,3 +5119,113 @@
   border: none;
 }
 
+/* Pipeline result cards (per-target) */
+
+.dasu.pipeline-card {
+  .pipeline-card__fieldset {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dasu-fieldset__header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pipeline-card__avatar {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    border: none;
+  }
+
+  .pipeline-card__source {
+    margin-left: auto;
+    font-size: 0.75em;
+    color: var(--dasu-muted);
+  }
+
+  .pipeline-card__body {
+    padding: 6px 10px;
+  }
+
+  .pipeline-card__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px 8px;
+    margin: 0 6px 6px;
+    font-size: 0.72em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border: 1px solid rgb(255 255 255 / 14%);
+    border-radius: 0;
+    background: rgb(255 255 255 / 4%);
+    color: var(--dasu-ink);
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(1.15);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+
+  &.pipeline-card--reverted {
+    opacity: 0.6;
+
+    .pipeline-card__body {
+      text-decoration: line-through;
+    }
+  }
+}
+
+.pipeline-body {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+
+  &__amount {
+    font-weight: 700;
+  }
+
+  &__detail {
+    font-size: 0.85em;
+    color: var(--dasu-muted);
+  }
+}
+
+/* Pipeline action buttons injected into source check cards */
+.pipeline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 6px 6px;
+}
+
+.pipeline-actions__btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  font-size: 0.72em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: none;
+  border-radius: 0;
+  background: var(--check-accent, var(--dasu-hp));
+  color: #1a1520;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.15);
+  }
+}
+

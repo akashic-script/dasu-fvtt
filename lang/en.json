@@ -45,6 +45,17 @@
       "DaemonOnly": "Only daemons can be transformation forms.",
       "Remove": "Remove form"
     },
+    "Pipeline": {
+      "Undo": "Undo",
+      "Redo": "Redo",
+      "NoTargets": "No targets selected or targeted.",
+      "TargetMissing": "The target could not be found.",
+      "ApplyFailed": "Failed to apply to {name}.",
+      "ToggleFailed": "Could not update the result. Try again.",
+      "ApplyDamage": "Apply Damage",
+      "ApplyResource": "Apply Cost",
+      "ApplyEffect": "Apply Effect"
+    },
     "Bond": {
       "Target": "Bond Target",
       "TargetNone": "Drop an actor here",
