@@ -44,6 +44,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   _mode = null;
 
+  /** Teardown for the open stepper popover, or null when none is open. */
+  #stepperPopoverCleanup = null;
+
   #daemonTableCache = new Map();
 
   #weaponTable = new WeaponTableRenderer();
@@ -433,6 +436,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   async _onClose(options) {
     this.#closeTriadDropdown();
+    this.#closeStepperPopover();
     return super._onClose(options);
   }
 
@@ -556,6 +560,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   /** @override */
   async _onRender(context, options) {
+    // A re-render rebuilds the DOM and orphans any open popover.
+    this.#closeStepperPopover();
     await super._onRender(context, options);
 
     for (const { tab, html } of context.moduleItemTables ?? []) {
@@ -852,24 +858,123 @@ export class DASUActorSheet extends SheetLayoutMixin(
     if (key) DASURollDialog.openSkill(this.actor, key);
   }
 
-  static async #onOpenResourcePopover(event, target) {
-    // Use the sheet's document so this works in a popped-out window.
-    const doc = this.element.ownerDocument;
-    const { resource } = target.dataset;
-    const popId = `dasu-popover-${resource}`;
-    const existing = doc.getElementById(popId);
-    if (existing) {
-      existing.remove();
-      target.classList.remove('popover-open');
-      return;
-    }
+  #closeStepperPopover() {
+    this.#stepperPopoverCleanup?.();
+  }
 
-    const isHp = resource === 'health';
-    const val = this.actor.system.resources[isHp ? 'hp' : 'wp'];
+  /**
+   * Shared engine for the resource/merit/riches stepper popovers. Owns the
+   * popover lifecycle (toggle, render, position, commit, cleanup); each caller
+   * passes a config of what differs.
+   * @param {object} cfg
+   * @param {string} cfg.id        Popover id suffix.
+   * @param {string} cfg.template  Handlebars template path.
+   * @param {object} cfg.context   Template render context.
+   * @param {string} cfg.path      Document path written by `actor.update`.
+   * @param {'bar'|'right'} cfg.position  Anchoring strategy.
+   * @param {number|null} [cfg.max]  Upper clamp; null = no cap.
+   * @param {(pop, target, value) => void} [cfg.sync]  Reflect the live value onto the sheet.
+   */
+  async #openStepperPopover(target, cfg) {
+    // ownerDocument keeps this working in a popped-out window.
+    const doc = this.element.ownerDocument;
+    const popId = `dasu-popover-${cfg.id}`;
+
+    // Clicking any anchor while one is open toggles it closed.
+    const wasOpen = doc.getElementById(popId);
+    this.#closeStepperPopover();
+    if (wasOpen) return;
 
     const html = await foundry.applications.handlebars.renderTemplate(
-      'systems/dasu/templates/actor/parts/resource-popover.hbs',
-      {
+      cfg.template,
+      cfg.context
+    );
+    const pop = Object.assign(doc.createElement('div'), {
+      id: popId,
+      className: 'dasu-resource-popover',
+      innerHTML: html,
+    });
+
+    const anchor = this.element;
+    const aRect = anchor.getBoundingClientRect();
+    const rRect = target.getBoundingClientRect();
+    const top = `${rRect.bottom - aRect.top + anchor.scrollTop + 2}px`;
+    if (cfg.position === 'right') {
+      const popWidth = 160;
+      const leftRaw = rRect.right - aRect.left + anchor.scrollLeft - popWidth;
+      Object.assign(pop.style, {
+        top,
+        left: `${Math.max(0, leftRaw)}px`,
+        width: `${popWidth}px`,
+      });
+    } else {
+      Object.assign(pop.style, {
+        top,
+        left: `${rRect.left - aRect.left + anchor.scrollLeft}px`,
+        width: `${rRect.width}px`,
+      });
+    }
+    anchor.appendChild(pop);
+    target.classList.add('popover-open');
+
+    const int = (sel) => parseInt(pop.querySelector(sel)?.value) || 0;
+    const update = (v) => {
+      const clamped =
+        cfg.max != null ? Math.min(cfg.max, Math.max(0, v)) : Math.max(0, v);
+      cfg.sync?.(pop, target, clamped);
+      return this.actor.update({ [cfg.path]: clamped }, { render: false });
+    };
+
+    pop.querySelectorAll('.resource-popover__btn').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const next = Math.max(
+          0,
+          int('.resource-popover__value') +
+            int('.resource-popover__delta') * parseInt(btn.dataset.step)
+        );
+        const clamped = cfg.max != null ? Math.min(cfg.max, next) : next;
+        pop.querySelector('.resource-popover__value').value = clamped;
+        update(clamped);
+      })
+    );
+    pop
+      .querySelector('.resource-popover__value')
+      .addEventListener('change', (e) => update(parseInt(e.target.value) || 0));
+    pop.querySelectorAll('input').forEach((input) =>
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        }
+      })
+    );
+
+    // Shared teardown for outside-click and sheet close/re-render.
+    const cleanup = async ({ commit = false } = {}) => {
+      doc.removeEventListener('pointerdown', onPointerDown);
+      this.#stepperPopoverCleanup = null;
+      target.classList.remove('popover-open');
+      if (commit) await update(int('.resource-popover__value'));
+      pop.remove();
+      if (commit) this.render();
+    };
+    this.#stepperPopoverCleanup = () => cleanup();
+
+    // pointerdown fires before blur, so commit the field here.
+    const onPointerDown = (e) => {
+      if (!pop.contains(e.target) && e.target !== target) cleanup({ commit: true });
+    };
+    setTimeout(() => doc.addEventListener('pointerdown', onPointerDown), 0);
+  }
+
+  static #onOpenResourcePopover(event, target) {
+    const { resource } = target.dataset;
+    const isHp = resource === 'health';
+    const val = this.actor.system.resources[isHp ? 'hp' : 'wp'];
+    return this.#openStepperPopover(target, {
+      id: resource,
+      template: 'systems/dasu/templates/actor/parts/resource-popover.hbs',
+      context: {
         value: val.value,
         max: val.max,
         label: game.i18n.localize(
@@ -878,253 +983,54 @@ export class DASUActorSheet extends SheetLayoutMixin(
         labelClass: isHp
           ? 'resource-popover__label--hp'
           : 'resource-popover__label--wp',
-      }
-    );
-    const pop = Object.assign(doc.createElement('div'), {
-      id: popId,
-      className: 'dasu-resource-popover',
-      innerHTML: html,
+      },
+      path: `system.resources.${isHp ? 'hp' : 'wp'}.value`,
+      position: 'bar',
+      max: val.max,
+      sync: (pop, anchor, v) => {
+        const valEl = anchor.querySelector('.actor-sidebar__resource-val');
+        if (valEl) valEl.textContent = v;
+        const m = parseInt(pop.querySelector('.resource-popover__max')?.value) || 0;
+        const fill = anchor.querySelector('.actor-sidebar__resource-fill');
+        if (fill)
+          fill.style.width = `${m > 0 ? Math.min(100, (v / m) * 100) : 0}%`;
+      },
     });
-
-    const anchor = this.element;
-    const aRect = anchor.getBoundingClientRect();
-    const rRect = target.getBoundingClientRect();
-    Object.assign(pop.style, {
-      top: `${rRect.bottom - aRect.top + anchor.scrollTop + 2}px`,
-      left: `${rRect.left - aRect.left + anchor.scrollLeft}px`,
-      width: `${rRect.width}px`,
-    });
-    anchor.appendChild(pop);
-    target.classList.add('popover-open');
-
-    const int = (sel) => parseInt(pop.querySelector(sel).value) || 0;
-    const syncSidebar = () => {
-      const v = int('.resource-popover__value');
-      const m = int('.resource-popover__max');
-      if (target.querySelector('.actor-sidebar__resource-val'))
-        target.querySelector('.actor-sidebar__resource-val').textContent = v;
-      if (target.querySelector('.actor-sidebar__resource-max'))
-        target.querySelector('.actor-sidebar__resource-max').textContent = m;
-      const fill = target.querySelector('.actor-sidebar__resource-fill');
-      if (fill)
-        fill.style.width = `${m > 0 ? Math.min(100, (v / m) * 100) : 0}%`;
-    };
-    const resourcePath = `system.resources.${isHp ? 'hp' : 'wp'}.value`;
-    const update = (v) => {
-      syncSidebar();
-      return this.actor.update({ [resourcePath]: v }, { render: false });
-    };
-
-    pop.querySelectorAll('.resource-popover__btn').forEach((btn) =>
-      btn.addEventListener('click', () => {
-        const next = Math.min(
-          int('.resource-popover__max'),
-          Math.max(
-            0,
-            int('.resource-popover__value') +
-              int('.resource-popover__delta') * parseInt(btn.dataset.step)
-          )
-        );
-        pop.querySelector('.resource-popover__value').value = next;
-        update(next);
-      })
-    );
-    pop
-      .querySelector('.resource-popover__value')
-      .addEventListener('change', (e) => update(parseInt(e.target.value) || 0));
-    pop.querySelectorAll('input').forEach((input) =>
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          input.blur();
-        }
-      })
-    );
-
-    const close = async (e) => {
-      if (!pop.contains(e.target) && e.target !== target) {
-        // Commit the field; pointerdown removes the popover before blur fires.
-        doc.removeEventListener('pointerdown', close);
-        target.classList.remove('popover-open');
-        await update(int('.resource-popover__value'));
-        pop.remove();
-        this.render();
-      }
-    };
-    setTimeout(() => doc.addEventListener('pointerdown', close), 0);
   }
 
-  static async #onOpenMeritPopover(event, target) {
-    const doc = this.element.ownerDocument;
-    const popId = 'dasu-popover-merit';
-    const existing = doc.getElementById(popId);
-    if (existing) {
-      existing.remove();
-      target.classList.remove('popover-open');
-      return;
-    }
-
-    const currentMerit = this.actor.system.merit;
-    const nextThreshold = this.actor.system.meritProgress?.needed ?? '-';
-    const html = await foundry.applications.handlebars.renderTemplate(
-      'systems/dasu/templates/actor/parts/merit-popover.hbs',
-      {
-        value: currentMerit,
+  static #onOpenMeritPopover(event, target) {
+    return this.#openStepperPopover(target, {
+      id: 'merit',
+      template: 'systems/dasu/templates/actor/parts/merit-popover.hbs',
+      context: {
+        value: this.actor.system.merit,
         label: game.i18n.localize('DASU.Actor.Merit.long'),
-        nextThreshold,
-      }
-    );
-    const pop = Object.assign(doc.createElement('div'), {
-      id: popId,
-      className: 'dasu-resource-popover',
-      innerHTML: html,
+        nextThreshold: this.actor.system.meritProgress?.needed ?? '-',
+      },
+      path: 'system.merit',
+      position: 'right',
+      sync: (pop, anchor, v) => {
+        const el = anchor.querySelector('.dasu-pill');
+        if (el) el.value = v;
+      },
     });
-
-    const anchor = this.element;
-    const aRect = anchor.getBoundingClientRect();
-    const rRect = target.getBoundingClientRect();
-    const popWidth = 160;
-    const leftRaw = rRect.right - aRect.left + anchor.scrollLeft - popWidth;
-    Object.assign(pop.style, {
-      top: `${rRect.bottom - aRect.top + anchor.scrollTop + 2}px`,
-      left: `${Math.max(0, leftRaw)}px`,
-      width: `${popWidth}px`,
-    });
-    anchor.appendChild(pop);
-    target.classList.add('popover-open');
-
-    const int = (sel) => parseInt(pop.querySelector(sel)?.value) || 0;
-    const syncHeader = () => {
-      const v = int('.resource-popover__value');
-      const el = target.querySelector('.dasu-pill');
-      if (el) el.value = v;
-    };
-    const update = (v) => {
-      syncHeader();
-      return this.actor.update(
-        { 'system.merit': Math.max(0, v) },
-        { render: false }
-      );
-    };
-
-    pop.querySelectorAll('.resource-popover__btn').forEach((btn) =>
-      btn.addEventListener('click', () => {
-        const next = Math.max(
-          0,
-          int('.resource-popover__value') +
-            int('.resource-popover__delta') * parseInt(btn.dataset.step)
-        );
-        pop.querySelector('.resource-popover__value').value = next;
-        update(next);
-      })
-    );
-    pop
-      .querySelector('.resource-popover__value')
-      .addEventListener('change', (e) => update(parseInt(e.target.value) || 0));
-    pop.querySelectorAll('input').forEach((input) =>
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          input.blur();
-        }
-      })
-    );
-
-    const close = async (e) => {
-      if (!pop.contains(e.target) && e.target !== target) {
-        doc.removeEventListener('pointerdown', close);
-        target.classList.remove('popover-open');
-        await update(int('.resource-popover__value'));
-        pop.remove();
-        this.render();
-      }
-    };
-    setTimeout(() => doc.addEventListener('pointerdown', close), 0);
   }
 
-  static async #onOpenRichesPopover(event, target) {
-    const doc = this.element.ownerDocument;
-    const popId = 'dasu-popover-riches';
-    const existing = doc.getElementById(popId);
-    if (existing) {
-      existing.remove();
-      target.classList.remove('popover-open');
-      return;
-    }
-
-    const html = await foundry.applications.handlebars.renderTemplate(
-      'systems/dasu/templates/actor/parts/riches-popover.hbs',
-      {
+  static #onOpenRichesPopover(event, target) {
+    return this.#openStepperPopover(target, {
+      id: 'riches',
+      template: 'systems/dasu/templates/actor/parts/riches-popover.hbs',
+      context: {
         value: this.actor.system.riches,
         label: game.i18n.localize('DASU.Resource.Riches'),
-      }
-    );
-    const pop = Object.assign(doc.createElement('div'), {
-      id: popId,
-      className: 'dasu-resource-popover',
-      innerHTML: html,
+      },
+      path: 'system.riches',
+      position: 'right',
+      sync: (pop, anchor, v) => {
+        const el = anchor.querySelector('.dasu-pill');
+        if (el) el.value = v;
+      },
     });
-
-    const anchor = this.element;
-    const aRect = anchor.getBoundingClientRect();
-    const rRect = target.getBoundingClientRect();
-    const popWidth = 160;
-    const leftRaw = rRect.right - aRect.left + anchor.scrollLeft - popWidth;
-    Object.assign(pop.style, {
-      top: `${rRect.bottom - aRect.top + anchor.scrollTop + 2}px`,
-      left: `${Math.max(0, leftRaw)}px`,
-      width: `${popWidth}px`,
-    });
-    anchor.appendChild(pop);
-    target.classList.add('popover-open');
-
-    const int = (sel) => parseInt(pop.querySelector(sel)?.value) || 0;
-    const syncHeader = () => {
-      const v = int('.resource-popover__value');
-      const el = target.querySelector('.dasu-pill');
-      if (el) el.value = v;
-    };
-    const update = (v) => {
-      syncHeader();
-      return this.actor.update(
-        { 'system.riches': Math.max(0, v) },
-        { render: false }
-      );
-    };
-
-    pop.querySelectorAll('.resource-popover__btn').forEach((btn) =>
-      btn.addEventListener('click', () => {
-        const next = Math.max(
-          0,
-          int('.resource-popover__value') +
-            int('.resource-popover__delta') * parseInt(btn.dataset.step)
-        );
-        pop.querySelector('.resource-popover__value').value = next;
-        update(next);
-      })
-    );
-    pop
-      .querySelector('.resource-popover__value')
-      .addEventListener('change', (e) => update(parseInt(e.target.value) || 0));
-    pop.querySelectorAll('input').forEach((input) =>
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          input.blur();
-        }
-      })
-    );
-
-    const close = async (e) => {
-      if (!pop.contains(e.target) && e.target !== target) {
-        doc.removeEventListener('pointerdown', close);
-        target.classList.remove('popover-open');
-        await update(int('.resource-popover__value'));
-        pop.remove();
-        this.render();
-      }
-    };
-    setTimeout(() => doc.addEventListener('pointerdown', close), 0);
   }
 
   static #onResourceStep(event, target) {
