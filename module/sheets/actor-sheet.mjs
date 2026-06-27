@@ -114,6 +114,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
       resourceStep: DASUActorSheet.#onResourceStep,
       openResourcePopover: DASUActorSheet.#onOpenResourcePopover,
       openMeritPopover: DASUActorSheet.#onOpenMeritPopover,
+      openRichesPopover: DASUActorSheet.#onOpenRichesPopover,
       skillStep: DASUActorSheet.#onSkillStep,
       aptitudeStep: DASUActorSheet.#onAptitudeStep,
       createCustomSkill: DASUActorSheet.#onCreateCustomSkill,
@@ -1002,6 +1003,91 @@ export class DASUActorSheet extends SheetLayoutMixin(
       syncHeader();
       return this.actor.update(
         { 'system.merit': Math.max(0, v) },
+        { render: false }
+      );
+    };
+
+    pop.querySelectorAll('.resource-popover__btn').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const next = Math.max(
+          0,
+          int('.resource-popover__value') +
+            int('.resource-popover__delta') * parseInt(btn.dataset.step)
+        );
+        pop.querySelector('.resource-popover__value').value = next;
+        update(next);
+      })
+    );
+    pop
+      .querySelector('.resource-popover__value')
+      .addEventListener('change', (e) => update(parseInt(e.target.value) || 0));
+    pop.querySelectorAll('input').forEach((input) =>
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        }
+      })
+    );
+
+    const close = async (e) => {
+      if (!pop.contains(e.target) && e.target !== target) {
+        doc.removeEventListener('pointerdown', close);
+        target.classList.remove('popover-open');
+        await update(int('.resource-popover__value'));
+        pop.remove();
+        this.render();
+      }
+    };
+    setTimeout(() => doc.addEventListener('pointerdown', close), 0);
+  }
+
+  static async #onOpenRichesPopover(event, target) {
+    const doc = this.element.ownerDocument;
+    const popId = 'dasu-popover-riches';
+    const existing = doc.getElementById(popId);
+    if (existing) {
+      existing.remove();
+      target.classList.remove('popover-open');
+      return;
+    }
+
+    const html = await foundry.applications.handlebars.renderTemplate(
+      'systems/dasu/templates/actor/parts/riches-popover.hbs',
+      {
+        value: this.actor.system.riches,
+        label: game.i18n.localize('DASU.Resource.Riches'),
+      }
+    );
+    const pop = Object.assign(doc.createElement('div'), {
+      id: popId,
+      className: 'dasu-resource-popover',
+      innerHTML: html,
+    });
+
+    const anchor = this.element;
+    const aRect = anchor.getBoundingClientRect();
+    const rRect = target.getBoundingClientRect();
+    const popWidth = 160;
+    const leftRaw = rRect.right - aRect.left + anchor.scrollLeft - popWidth;
+    Object.assign(pop.style, {
+      top: `${rRect.bottom - aRect.top + anchor.scrollTop + 2}px`,
+      left: `${Math.max(0, leftRaw)}px`,
+      width: `${popWidth}px`,
+    });
+    anchor.appendChild(pop);
+    target.classList.add('popover-open');
+
+    const int = (sel) => parseInt(pop.querySelector(sel)?.value) || 0;
+    const syncHeader = () => {
+      const v = int('.resource-popover__value');
+      const el = target.querySelector('.dasu-pill');
+      if (el) el.value = v;
+    };
+    const update = (v) => {
+      syncHeader();
+      return this.actor.update(
+        { 'system.riches': Math.max(0, v) },
         { render: false }
       );
     };

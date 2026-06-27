@@ -3276,6 +3276,56 @@
   }
 }
 
+.dasu.sheet.actor .actor-items__riches {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  height: 22px;
+  margin-bottom: 8px;
+  padding: 0 8px;
+  font-size: 0.85em;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dasu-tab-icon);
+  background: rgb(var(--dasu-panel) / 90%);
+  border: var(--dasu-border);
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.dasu.sheet.actor .actor-items__riches:hover,
+.dasu.sheet.actor .actor-items__riches.popover-open {
+  color: var(--dasu-on-panel);
+  background: rgb(var(--dasu-panel) / 100%);
+}
+
+.dasu.sheet.actor .actor-items__riches-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dasu.sheet.actor .actor-items__riches input.dasu-pill {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 18px;
+  line-height: 18px;
+  padding: 0 6px;
+  font-size: 1em;
+  color: var(--dasu-on-panel);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+  pointer-events: none;
+}
+
 .dasu.sheet.actor .actor-aptitudes-section {
   margin-bottom: 8px;
 }

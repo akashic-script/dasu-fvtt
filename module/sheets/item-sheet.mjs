@@ -198,17 +198,20 @@ export class DASUItemSheet extends SheetLayoutMixin(
       );
 
     if (context.isItem) {
+      context.itemCategoryOptions = localize(DASU.itemCategories);
       context.resourceTypeOptions = localize(DASU.resourceTypes);
       context.resourceOptions = localize(DASU.itemResources);
       context.modeOptions = localize(DASU.itemEffectModes);
       context.statusModeOptions = localize(DASU.itemStatusModes);
       context.clearModeOptions = localize(DASU.itemClearModes);
       context.attributeOptions = localize(DASU.attributes);
+      context.damageTypeOptions = localize(DASU.damageTypes);
       context.itemEffects = (itemData.system.effects ?? []).map((effect, i) => {
         const isStatus = effect.resource === 'status';
+        const isDamage = effect.resource === 'damage';
         const isClear = isStatus && effect.statusMode === 'clear';
         const isGrant = isStatus && effect.statusMode === 'grant';
-        const isNumericTick = !isStatus && effect.mode === 'tick';
+        const isNumericTick = !isStatus && !isDamage && effect.mode === 'tick';
         let grantUuidName = '';
         if (isGrant && effect.grantUuid) {
           const doc = fromUuidSync(effect.grantUuid);
@@ -217,11 +220,12 @@ export class DASUItemSheet extends SheetLayoutMixin(
         return {
           ...effect,
           index: i,
-          showMode: !isStatus,
+          showMode: !isStatus && !isDamage,
           showAttribute: isNumericTick,
           showStatusMode: isStatus,
           showClearMode: isClear,
           showStatusCount: isClear && effect.clearMode === 'choose',
+          showDamage: isDamage,
           showGrantUuid: isGrant,
           grantUuidName,
         };

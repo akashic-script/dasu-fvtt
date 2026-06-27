@@ -8,6 +8,13 @@
   {{#if isItem}}
   <div class="item-sidebar__fields">
     <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Item.Category"}}</label>
+      <select name="system.category">
+        {{selectOptions itemCategoryOptions selected=system.category}}
+      </select>
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
       <label>{{localize "DASU.Item.Item.ResourceType"}}</label>
       <select name="system.resource.type">
         {{selectOptions resourceTypeOptions selected=system.resource.type}}
@@ -73,6 +80,18 @@
     <div class="item-sidebar__field">
       <label>{{localize "DASU.Item.Item.Value"}}</label>
       <input type="number" name="system.effects.{{index}}.value" value="{{value}}" min="1" />
+    </div>
+    {{/if}}
+    {{#if showDamage}}
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Item.Value"}}</label>
+      <input type="number" name="system.effects.{{index}}.value" value="{{value}}" min="0" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Item.DamageType"}}</label>
+      <select name="system.effects.{{index}}.damageType">
+        {{selectOptions ../damageTypeOptions selected=damageType}}
+      </select>
     </div>
     {{/if}}
     {{#if showGrantUuid}}

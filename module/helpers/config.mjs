@@ -260,10 +260,17 @@ DASU.resourceAbbreviations = {
   riches: 'DASU.Resource.RichesAbbr',
 };
 
+DASU.itemCategories = {
+  restorative: 'DASU.Item.Item.CategoryRestorative',
+  element: 'DASU.Item.Item.CategoryElement',
+  hoard: 'DASU.Item.Item.CategoryHoard',
+};
+
 DASU.itemResources = {
   hp: 'DASU.Item.Item.ResourceHP',
   wp: 'DASU.Item.Item.ResourceWP',
   status: 'DASU.Item.Item.ResourceStatus',
+  damage: 'DASU.Item.Item.ResourceDamage',
 };
 
 DASU.itemEffectModes = {

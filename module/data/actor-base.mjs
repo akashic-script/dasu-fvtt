@@ -19,6 +19,7 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
     schema.notes = new fields.StringField({ required: true, blank: true });
     schema.level = new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 });
     schema.merit = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
+    schema.riches = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
 
     schema.triad = new fields.SchemaField({
       virtue:   new fields.StringField({ required: true, blank: true }),

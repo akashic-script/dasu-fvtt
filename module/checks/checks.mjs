@@ -569,6 +569,31 @@ export function initializeChecks() {
       }
     }
 
+    if (item.type === 'item' && Array.isArray(sys.effects)) {
+      for (const effect of sys.effects) {
+        if (effect.resource === 'damage') {
+          if (!(effect.value > 0)) continue;
+          const elem = game.i18n.localize(
+            DASU.damageTypes[effect.damageType] ?? effect.damageType ?? ''
+          );
+          data.tags.push({
+            tag: 'DASU.Item.Item.ResourceDamage',
+            value: `${effect.value} ${elem}`.trim(),
+          });
+        } else if (effect.resource === 'hp' || effect.resource === 'wp') {
+          if (!(effect.value > 0)) continue;
+          const res = game.i18n.localize(
+            DASU.itemResources[effect.resource] ?? effect.resource ?? ''
+          );
+          const suffix = effect.mode === 'percent' ? '%' : '';
+          data.tags.push({
+            tag: 'DASU.Check.Heal',
+            value: `${effect.value}${suffix} ${res}`.trim(),
+          });
+        }
+      }
+    }
+
     const RESIST_MODE_TAG = {
       resist: 'DASU.Check.IgnoreResist',
       nullify: 'DASU.Check.IgnoreNullify',

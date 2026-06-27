@@ -344,11 +344,17 @@
         "DiceBonus": "Roll Modifier"
       },
       "Item": {
+        "Category": "Category",
+        "CategoryRestorative": "Restorative",
+        "CategoryElement": "Element Piece",
+        "CategoryHoard": "Hoard",
         "Effect": "Effect",
         "Resource": "Resource",
         "ResourceHP": "HP",
         "ResourceWP": "WP",
         "ResourceStatus": "Status",
+        "ResourceDamage": "Damage",
+        "DamageType": "Element",
         "Value": "Value",
         "Mode": "Mode",
         "ModeTick": "Tick",

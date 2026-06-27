@@ -1,4 +1,9 @@
 <section class="tab {{tab.cssClass}}" data-group="primary" data-tab="items">
+  <div class="actor-items__riches" data-action="openRichesPopover" data-tooltip="{{localize 'DASU.Resource.Riches'}}">
+    <span class="actor-items__riches-label">{{localize "DASU.Resource.RichesAbbr"}} {{localize "DASU.Resource.Riches"}}</span>
+    <input class="dasu-pill" type="text" name="system.riches" value="{{system.riches}}" data-dtype="Number" readonly />
+  </div>
+
   {{> "systems/dasu/templates/actor/parts/aptitudes.hbs"}}
 
   {{#if useDaemonItemTabs}}

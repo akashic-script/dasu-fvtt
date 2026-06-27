@@ -44,6 +44,12 @@ export default class EffectData extends foundry.abstract.DataModel {
         initial: 'pow',
         choices: DASU.attributes,
       }),
+      damageType: new fields.StringField({
+        required: true,
+        blank: false,
+        initial: 'physical',
+        choices: DASU.damageTypes,
+      }),
       grantUuid: new fields.DocumentUUIDField({ type: 'ActiveEffect' }),
     };
   }
@@ -51,6 +57,16 @@ export default class EffectData extends foundry.abstract.DataModel {
   /** True when the effect targets a status rather than a numeric resource. */
   get isStatus() {
     return this.resource === 'status';
+  }
+
+  /** True when the effect deals elemental damage. */
+  get isDamage() {
+    return this.resource === 'damage';
+  }
+
+  /** Localized label for the damage type. */
+  get damageTypeLabel() {
+    return game.i18n.localize(DASU.damageTypes[this.damageType] ?? '');
   }
 
   /** Localized label for the targeted resource. */
