@@ -1,0 +1,38 @@
+{
+  "name": "Unraveled",
+  "type": "base",
+  "_id": "HCANyN9F4ieHUA27",
+  "img": "icons/svg/downgrade.svg",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>Weak to all damage types.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "unraveled"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "unraveled",
+      "behavior": "weakToAll"
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!HCANyN9F4ieHUA27"
+}

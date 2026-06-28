@@ -1,0 +1,38 @@
+{
+  "name": "Cursed",
+  "type": "base",
+  "_id": "GQLVwQF0dBv60LSv",
+  "img": "icons/svg/sun.svg",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>Status effects applied after this point have their duration doubled. Lasts until the end of the conflict; applies only to future statuses.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "cursed"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "cursed",
+      "behavior": "doubleFutureDurations"
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!GQLVwQF0dBv60LSv"
+}

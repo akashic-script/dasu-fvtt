@@ -1,0 +1,46 @@
+{
+  "name": "Invisible 1",
+  "type": "base",
+  "_id": "bmNWzsFMnI6bmNSz",
+  "img": "icons/svg/invisible.svg",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.stats.avoid.bonus",
+      "mode": 2,
+      "value": "1",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>Gain +1 Avoid. Removed if you perform an Attack action.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "invisible1"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "invisible1",
+      "behavior": "invisible",
+      "tier": 1
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!bmNWzsFMnI6bmNSz"
+}

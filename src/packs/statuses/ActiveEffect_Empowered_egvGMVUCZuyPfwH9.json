@@ -1,0 +1,56 @@
+{
+  "name": "Empowered",
+  "type": "base",
+  "_id": "egvGMVUCZuyPfwH9",
+  "img": "icons/svg/upgrade.svg",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.weapon",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    },
+    {
+      "key": "system.bonuses.damage.spell",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    },
+    {
+      "key": "system.bonuses.damage.negotiation",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>Add +2 to weapon, spell, and tactic damage.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "empowered"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "empowered"
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!egvGMVUCZuyPfwH9"
+}

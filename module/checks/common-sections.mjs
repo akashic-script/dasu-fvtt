@@ -47,8 +47,7 @@ export const CommonSections = Object.freeze({
       data: {
         defense: inspector.getTargetedDefense(),
         targets,
-        // Present only when the check deals damage; gates the apply buttons.
-        canApplyDamage: !!damage,
+        hasTargetActions: true,
         hideTn,
         hideLabel,
       },

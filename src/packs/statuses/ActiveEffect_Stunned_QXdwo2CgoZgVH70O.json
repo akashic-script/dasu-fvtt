@@ -1,0 +1,38 @@
+{
+  "name": "Stunned",
+  "type": "base",
+  "_id": "QXdwo2CgoZgVH70O",
+  "img": "icons/svg/stoned.svg",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>Cannot act. Lasts 1 turn unless otherwise stated.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "stunned"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "stunned",
+      "behavior": "cannotAct"
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!QXdwo2CgoZgVH70O"
+}

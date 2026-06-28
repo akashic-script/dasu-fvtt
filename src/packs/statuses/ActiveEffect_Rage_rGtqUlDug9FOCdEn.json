@@ -1,0 +1,38 @@
+{
+  "name": "Rage",
+  "type": "base",
+  "_id": "rGtqUlDug9FOCdEn",
+  "img": "icons/svg/explosion.svg",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>Double attribute damage and WP costs. Normal attacks cost WP equal to [Level].</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "rage"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "rage",
+      "behavior": "rage"
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!rGtqUlDug9FOCdEn"
+}

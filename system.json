@@ -66,6 +66,15 @@
   ],
   "packs": [
     {
+      "name": "statuses",
+      "label": "Status Effects",
+      "path": "packs/statuses",
+      "type": "ActiveEffect",
+      "system": "dasu",
+      "private": false,
+      "flags": {}
+    },
+    {
       "name": "archetypes",
       "label": "Archetypes",
       "path": "packs/archetypes",
@@ -89,6 +98,11 @@
       "name": "Daemon Building",
       "sorting": "m",
       "packs": ["archetypes", "subtypes"]
+    },
+    {
+      "name": "Effects",
+      "sorting": "m",
+      "packs": ["statuses"]
     }
   ],
   "socket": true,

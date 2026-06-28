@@ -13,6 +13,10 @@ import { OpenCheck } from './open-check.mjs';
 import { DisplayCheck } from './display-check.mjs';
 import { CheckReroll } from './check-reroll.mjs';
 import { CheckRetarget } from './check-retarget.mjs';
+import {
+  getActionBlockingStatus,
+  isSilenced,
+} from '../helpers/status-effects.mjs';
 
 const { DiceTerm } = foundry.dice.terms;
 
@@ -154,6 +158,8 @@ async function prepareCheck(check, actor, item, initialConfigCallback) {
 
   if (!check.type) throw new Error('check type missing');
 
+  warnIfStatusRestricted(check, actor, item);
+
   await initialConfigCallback?.(check, actor, item);
   await invokeWithCallbacks(CheckHooks.prepareCheck, check, actor, item);
 
@@ -161,6 +167,34 @@ async function prepareCheck(check, actor, item, initialConfigCallback) {
   resolveTick(check, actor);
 
   return check;
+}
+
+/**
+ * Advisory (non-blocking) notifications when the acting actor is under a status
+ * that restricts the action: Stunned/Sleep (cannot act) or Silenced (cannot use
+ * abilities). The GM may still proceed; statuses are not hard locks here.
+ * @param {Check} check
+ * @param {Actor} actor
+ * @param {Item} [item]
+ */
+function warnIfStatusRestricted(check, actor, item) {
+  if (!actor) return;
+  const blocker = getActionBlockingStatus(actor);
+  if (blocker) {
+    ui.notifications?.warn(
+      game.i18n.format('DASU.Status.CannotAct', {
+        name: actor.name,
+        status: game.i18n.localize(CONFIG.DASU.statusEffectIndex[blocker].name),
+      })
+    );
+  }
+  // Silenced locks abilities (accuracy checks driven by an ability item).
+  const usesAbility = item?.type === 'ability';
+  if (usesAbility && isSilenced(actor)) {
+    ui.notifications?.warn(
+      game.i18n.format('DASU.Status.SilencedWarn', { name: actor.name })
+    );
+  }
 }
 
 /**
@@ -501,8 +535,11 @@ export function initializeChecks() {
       label: name
         ? game.i18n.format('DASU.Pipeline.ApplyEffectNamed', { name })
         : game.i18n.localize('DASU.Pipeline.ApplyEffect'),
+      effectName: name ?? null,
       icon: 'fas fa-hand-sparkles',
-      input: { effectUuid },
+      // sourceActorUuid lets a granted status snapshot the caster's attributes
+      // (Bleeding/Infected scale with the caster's tick, not the target's).
+      input: { effectUuid, sourceActorUuid: result.actorUuid },
     });
 
     const categoryMap =
@@ -587,13 +624,19 @@ export function initializeChecks() {
         // Tick heals depend on the target's attribute and are resolved at apply
         // time; only flat/percent heals can be applied via a simple pipeline.
         if (h.mode !== 'tick' && (h.resource === 'hp' || h.resource === 'wp')) {
+          // Caster's outgoing-recovery tuning adds to flat heals (percent is
+          // relative to the target's max, so it isn't adjusted here).
+          const outgoing =
+            h.mode === 'percent'
+              ? 0
+              : actor?.system?.bonuses?.outgoingRecovery?.[h.resource] ?? 0;
           pipelineActions.push({
             type: 'resource',
-            label: 'DASU.Pipeline.ApplyResource',
+            label: 'DASU.Pipeline.ApplyHeal',
             icon: 'fas fa-heart',
             input: {
               resource: h.resource,
-              value: healValue,
+              value: Math.max(0, healValue + outgoing),
               op: 'heal',
               mode: h.mode === 'percent' ? 'percent' : 'flat',
             },
@@ -635,7 +678,7 @@ export function initializeChecks() {
           });
           pipelineActions.push({
             type: 'resource',
-            label: 'DASU.Pipeline.ApplyResource',
+            label: 'DASU.Pipeline.ApplyHeal',
             icon: 'fas fa-heart',
             input: {
               resource: effect.resource,
@@ -659,6 +702,18 @@ export function initializeChecks() {
           }
           pipelineActions.push(effectAction(effect.grantUuid, granted?.name));
         }
+      }
+    }
+
+    // Abilities apply their embedded ActiveEffects (the "Apply Effects" tab) to
+    // hit targets; an effect flagged apply-target=self goes to the caster.
+    if (item.type === 'ability') {
+      for (const effect of item.effects ?? []) {
+        const isSelf = effect.flags?.dasu?.applyTarget === 'self';
+        const action = effectAction(effect.uuid, effect.name);
+        if (isSelf) action.uuid = result.actorUuid;
+        pipelineActions.push(action);
+        data.tags.push({ tag: 'DASU.Pipeline.ApplyEffect', value: effect.name });
       }
     }
 
@@ -691,7 +746,33 @@ export function initializeChecks() {
       if (tagKey) data.tags.push({ tag: tagKey });
     }
 
-    // Carry ignored-resistance modes onto damage actions, then publish.
+    // Weapon/ability damage from inspector goes into pipelineActions if not
+    // already covered by a more specific action (e.g. item.type === 'item').
+    const inspectorDamage = inspector.getDamage();
+    const hasDamageAction = pipelineActions.some((a) => a.type === 'damage');
+    if (inspectorDamage?.amount > 0 && !hasDamageAction) {
+      const dmgBonuses = actor?.system?.bonuses?.damage;
+      const vsArchetypeBonuses = dmgBonuses ? {
+        hero: dmgBonuses.hero ?? 0,
+        sage: dmgBonuses.sage ?? 0,
+        rogue: dmgBonuses.rogue ?? 0,
+        trickster: dmgBonuses.trickster ?? 0,
+      } : undefined;
+      pipelineActions.push({
+        type: 'damage',
+        label: game.i18n.localize('DASU.Pipeline.ApplyDamage'),
+        icon: 'fas fa-burst',
+        input: {
+          value: inspectorDamage.amount,
+          damageType: inspectorDamage.type ?? 'physical',
+          resource: 'hp',
+          ignore: ignore.length ? [...ignore] : undefined,
+          vsArchetypeBonuses,
+        },
+      });
+    }
+
+    // Carry ignored-resistance modes onto existing damage actions.
     if (ignore.length) {
       for (const action of pipelineActions) {
         if (action.type === 'damage') action.input.ignore = [...ignore];
@@ -747,6 +828,72 @@ export function initializeChecks() {
       nameEl.addEventListener('click', () => sheet.render(true));
     }
 
+    // Per-target context menu: one entry per target-applicable pipeline action.
+    const targetActions = (result.additionalData?.pipelineActions ?? []).filter(
+      (a) => !a.uuid && (a.type === 'damage' || a.type === 'effect')
+    );
+    if (targetActions.length) {
+      const menuSource = {
+        actorUuid: result.actorUuid,
+        name: result.itemName ?? message.speaker?.alias,
+      };
+      for (const menuBtn of html.querySelectorAll('.target-apply-menu')) {
+        menuBtn.style.display = '';
+        const targetUuid = menuBtn.dataset.targetUuid;
+        const isHit = menuBtn.dataset.targetHit === '1';
+        // Both hit and miss offer every target action; on a miss they are framed
+        // as an "(override)" so the GM can force damage/effects to land anyway.
+        if (!targetActions.length) {
+          menuBtn.style.display = 'none';
+          continue;
+        }
+        menuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          document.querySelectorAll('.target-apply-context-menu').forEach((m) => m.remove());
+          const menu = document.createElement('div');
+          menu.classList.add('target-apply-context-menu');
+          for (const action of targetActions) {
+            const pipeline = getPipeline(action.type);
+            if (!pipeline) continue;
+            const entry = document.createElement('button');
+            entry.type = 'button';
+            // On a miss, relabel as an override per action type.
+            const label = isHit
+              ? game.i18n.localize(action.label) || action.label
+              : action.type === 'damage'
+                ? game.i18n.localize('DASU.Pipeline.ApplyDamageOverride')
+                : game.i18n.format('DASU.Pipeline.ApplyEffectOverride', {
+                    name: action.effectName ?? game.i18n.localize('DASU.Pipeline.ApplyEffect'),
+                  });
+            entry.innerHTML = `<i class="${action.icon}"></i> ${label}`;
+            entry.addEventListener('click', (ev) => {
+              ev.stopPropagation();
+              menu.remove();
+              pipeline.applyToTargets(action.input, menuSource, { uuid: targetUuid });
+            });
+            menu.append(entry);
+          }
+          const rect = menuBtn.getBoundingClientRect();
+          menu.style.position = 'fixed';
+          menu.style.top = `${rect.bottom + 2}px`;
+          menu.style.right = `${window.innerWidth - rect.right}px`;
+          menu.style.left = 'auto';
+          document.body.append(menu);
+          const dismiss = (ev) => {
+            if (!menu.contains(ev.target)) {
+              menu.remove();
+              document.removeEventListener('click', dismiss, true);
+            }
+          };
+          setTimeout(() => document.addEventListener('click', dismiss, true), 0);
+        });
+      }
+    } else {
+      for (const menuBtn of html.querySelectorAll('.target-apply-menu')) {
+        menuBtn.style.display = 'none';
+      }
+    }
+
     // Resource cost is now an undoable pipeline action (PipelineButton.inject),
     // replacing the former one-shot deduct button.
 
@@ -775,54 +922,5 @@ export function initializeChecks() {
 
     html.querySelector('.check-card__fieldset')?.append(footer);
 
-    // Per-target Apply Damage buttons route through the damage pipeline.
-    const damage = result.additionalData?.damage;
-    if (damage?.amount > 0) {
-      const pipeline = getPipeline('damage');
-      const source = {
-        actorUuid: result.actorUuid,
-        name: result.itemName ?? message.speaker?.alias,
-      };
-      const input = {
-        value: damage.amount,
-        damageType: damage.type ?? 'physical',
-        resource: 'hp',
-      };
-      if (pipeline) {
-        for (const btn of html.querySelectorAll('.target-apply-damage')) {
-          btn.addEventListener('click', () =>
-            pipeline.applyToTargets(input, source, {
-              uuid: btn.dataset.targetUuid,
-            })
-          );
-        }
-
-        // "Apply to all hits" shares the bottom actions row with Apply Cost.
-        // Find-or-create it since either render hook may run first.
-        const hitButtons = [...html.querySelectorAll('.target-apply-damage')];
-        if (hitButtons.length) {
-          let row = html.querySelector('.pipeline-actions');
-          if (!row) {
-            row = document.createElement('div');
-            row.classList.add('pipeline-actions');
-            html.querySelector('.check-card__fieldset')?.append(row);
-          }
-          const allBtn = document.createElement('button');
-          allBtn.type = 'button';
-          allBtn.classList.add('pipeline-actions__btn');
-          allBtn.innerHTML = `<i class="fas fa-burst"></i> ${game.i18n.localize(
-            'DASU.Pipeline.ApplyDamageAll'
-          )}`;
-          allBtn.addEventListener('click', () => {
-            for (const b of hitButtons) {
-              pipeline.applyToTargets(input, source, {
-                uuid: b.dataset.targetUuid,
-              });
-            }
-          });
-          row.append(allBtn);
-        }
-      }
-    }
   });
 }

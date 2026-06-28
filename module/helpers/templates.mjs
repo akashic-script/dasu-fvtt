@@ -12,6 +12,8 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/dasu/templates/actor/parts/planner-table.hbs',
     // Item partials
     'systems/dasu/templates/item/parts/item-effects.hbs',
+    // Active Effect config
+    'systems/dasu/templates/effect/stacks.hbs',
     // Table system
     'systems/dasu/templates/table/dasu-table.hbs',
     'systems/dasu/templates/table/cell/cell-item-name.hbs',

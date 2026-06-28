@@ -305,3 +305,186 @@ DASU.skills = {
   stealth: 'DASU.Actor.Skill.Stealth',
   outdoorsmanship: 'DASU.Actor.Skill.Outdoorsmanship',
 };
+
+/**
+ * The compendium that ships the canonical status effect ActiveEffects. The
+ * token HUD and apply-status pipeline both source their documents from here, so
+ * GMs can edit the pack to retune statuses without code changes.
+ * @type {string}
+ */
+DASU.statusEffectsPack = 'dasu.statuses';
+
+/**
+ * Canonical status effect definitions. This is the single source of truth for:
+ *  - registering `CONFIG.statusEffects` (the token HUD palette), and
+ *  - generating the `src/packs/statuses` compendium documents.
+ *
+ * Each entry mirrors the rulebook's Status Effects table. Mechanically simple
+ * statuses carry `changes` that Foundry's ActiveEffect engine applies directly;
+ * statuses needing engine logic (per-turn damage, action prevention, weakness)
+ * are flagged via `dasu.behavior` and handled in the combat-turn automation.
+ *
+ * Stacking statuses declare `stack` with a literal `max` or an attribute key
+ * (`'pow'`/`'sta'`) resolved against the *caster's* tick at apply time.
+ *
+ * @type {Array<object>}
+ */
+DASU.statusEffects = [
+  {
+    id: 'bleeding',
+    name: 'DASU.Status.Bleeding.name',
+    img: 'icons/svg/blood.svg',
+    description: 'DASU.Status.Bleeding.description',
+    stack: { max: 'pow' },
+    flags: { dasu: { behavior: 'perTurnDamage', damageAttr: 'pow' } },
+  },
+  {
+    id: 'charmed',
+    name: 'DASU.Status.Charmed.name',
+    img: 'icons/svg/heal.svg',
+    description: 'DASU.Status.Charmed.description',
+    flags: { dasu: { behavior: 'cannotTargetCaster' } },
+  },
+  {
+    id: 'cursed',
+    name: 'DASU.Status.Cursed.name',
+    img: 'icons/svg/sun.svg',
+    description: 'DASU.Status.Cursed.description',
+    flags: { dasu: { behavior: 'doubleFutureDurations' } },
+  },
+  {
+    id: 'dazed',
+    name: 'DASU.Status.Dazed.name',
+    img: 'icons/svg/daze.svg',
+    description: 'DASU.Status.Dazed.description',
+    stack: { max: 2 },
+    // -1 To Hit per stack; the apply logic scales this change with the stack.
+    changes: [
+      { key: 'system.bonuses.toHit.all', mode: 2, value: '-1', priority: 20 },
+    ],
+  },
+  {
+    id: 'despair',
+    name: 'DASU.Status.Despair.name',
+    img: 'icons/svg/degen.svg',
+    description: 'DASU.Status.Despair.description',
+    flags: { dasu: { behavior: 'halveWillTick' } },
+  },
+  {
+    id: 'empowered',
+    name: 'DASU.Status.Empowered.name',
+    img: 'icons/svg/upgrade.svg',
+    description: 'DASU.Status.Empowered.description',
+    changes: [
+      { key: 'system.bonuses.damage.all', mode: 2, value: '2', priority: 20 },
+    ],
+  },
+  {
+    id: 'focused',
+    name: 'DASU.Status.Focused.name',
+    img: 'icons/svg/target.svg',
+    description: 'DASU.Status.Focused.description',
+    stack: { max: 2 },
+    // +1 To Hit per stack.
+    changes: [
+      { key: 'system.bonuses.toHit.all', mode: 2, value: '1', priority: 20 },
+    ],
+  },
+  {
+    id: 'infected',
+    name: 'DASU.Status.Infected.name',
+    img: 'icons/svg/acid.svg',
+    description: 'DASU.Status.Infected.description',
+    stack: { max: 'sta' },
+    flags: {
+      dasu: { behavior: 'perTurnDamage', damageAttr: 'pow', halvePowerTick: true },
+    },
+  },
+  {
+    id: 'invisible1',
+    name: 'DASU.Status.Invisible1.name',
+    img: 'icons/svg/invisible.svg',
+    description: 'DASU.Status.Invisible1.description',
+    changes: [
+      { key: 'system.stats.avoid.bonus', mode: 2, value: '1', priority: 20 },
+    ],
+    flags: { dasu: { behavior: 'invisible', tier: 1 } },
+  },
+  {
+    id: 'invisible2',
+    name: 'DASU.Status.Invisible2.name',
+    img: 'icons/svg/invisible.svg',
+    description: 'DASU.Status.Invisible2.description',
+    changes: [
+      { key: 'system.stats.avoid.bonus', mode: 2, value: '2', priority: 20 },
+    ],
+    flags: { dasu: { behavior: 'invisible', tier: 2 } },
+  },
+  {
+    id: 'invisible3',
+    name: 'DASU.Status.Invisible3.name',
+    img: 'icons/svg/invisible.svg',
+    description: 'DASU.Status.Invisible3.description',
+    changes: [
+      { key: 'system.stats.avoid.bonus', mode: 2, value: '2', priority: 20 },
+    ],
+    flags: { dasu: { behavior: 'invisible', tier: 3, untargetable: true } },
+  },
+  {
+    id: 'rage',
+    name: 'DASU.Status.Rage.name',
+    img: 'icons/svg/explosion.svg',
+    description: 'DASU.Status.Rage.description',
+    flags: { dasu: { behavior: 'rage' } },
+  },
+  {
+    id: 'restrained',
+    name: 'DASU.Status.Restrained.name',
+    img: 'icons/svg/net.svg',
+    description: 'DASU.Status.Restrained.description',
+    changes: [
+      { key: 'system.bonuses.toHit.all', mode: 2, value: '-2', priority: 20 },
+      { key: 'system.stats.avoid.bonus', mode: 2, value: '-2', priority: 20 },
+    ],
+  },
+  {
+    id: 'silenced',
+    name: 'DASU.Status.Silenced.name',
+    img: 'icons/svg/silenced.svg',
+    description: 'DASU.Status.Silenced.description',
+    flags: { dasu: { behavior: 'silenced' } },
+  },
+  {
+    id: 'sleep',
+    name: 'DASU.Status.Sleep.name',
+    img: 'icons/svg/sleep.svg',
+    description: 'DASU.Status.Sleep.description',
+    flags: { dasu: { behavior: 'cannotAct', wakeOnAttacked: true } },
+  },
+  {
+    id: 'stunned',
+    name: 'DASU.Status.Stunned.name',
+    img: 'icons/svg/stoned.svg',
+    description: 'DASU.Status.Stunned.description',
+    flags: { dasu: { behavior: 'cannotAct' } },
+  },
+  {
+    id: 'unraveled',
+    name: 'DASU.Status.Unraveled.name',
+    img: 'icons/svg/downgrade.svg',
+    description: 'DASU.Status.Unraveled.description',
+    flags: { dasu: { behavior: 'weakToAll' } },
+  },
+];
+
+/**
+ * Status ids that may stack, mapped to their cap (literal number or an
+ * attribute key resolved against the caster's tick). Derived from
+ * {@link DASU.statusEffects} for quick lookup.
+ * @type {Object<string, number|string>}
+ */
+DASU.stackableStatuses = Object.fromEntries(
+  DASU.statusEffects
+    .filter((s) => s.stack)
+    .map((s) => [s.id, s.stack.max])
+);

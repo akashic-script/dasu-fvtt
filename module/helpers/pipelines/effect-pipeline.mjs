@@ -1,11 +1,16 @@
 import { Pipeline } from './pipeline.mjs';
 import { SYSTEM } from '../config.mjs';
+import {
+  applyStatus,
+  isStackable,
+  statusIdOf,
+  stacksOf,
+  resyncStacks,
+} from '../status-effects.mjs';
 
 /**
- * Grant an Active Effect to the target; revert deletes it.
- *
- * Asymmetric vs damage/resource: revert is a delete, and redo creates a fresh
- * effect (new id).
+ * Grant an Active Effect to the target. Revert deletes it; redo creates a fresh
+ * effect with a new id (asymmetric vs the damage/resource pipelines).
  */
 export class EffectPipeline extends Pipeline {
   static type = 'effect';
@@ -26,9 +31,39 @@ export class EffectPipeline extends Pipeline {
       ?? effectData?.system?.description
       ?? effectData?.description
       ?? '';
+
+    // Strip the source _id so repeated applies don't collide on one embedded id.
+    if (effectData) delete effectData._id;
+
+    const statusId =
+      effectData?.flags?.dasu?.statusId ?? effectData?.statuses?.[0] ?? null;
+    const isKnownStatus = !!(statusId && CONFIG.DASU.statusEffectIndex?.[statusId]);
+
+    // Snapshot the caster's attributes for caster-scaled statuses (Bleeding/
+    // Infected, stack caps) so later turns don't depend on the caster existing.
+    let statusSource = null;
+    if (isKnownStatus && input.sourceActorUuid) {
+      const caster = fromUuidSync(input.sourceActorUuid);
+      const attrs = caster?.system?.attributes;
+      if (attrs) {
+        statusSource = {
+          uuid: input.sourceActorUuid,
+          attributes: Object.fromEntries(
+            Object.entries(attrs).map(([k, v]) => [k, v?.value ?? 0])
+          ),
+        };
+        if (effectData) {
+          effectData.flags = effectData.flags ?? {};
+          effectData.flags.dasu = { ...effectData.flags.dasu, statusSource };
+        }
+      }
+    }
+
     return {
       sourceUuid: input.effectUuid ?? null,
       effectData,
+      statusId: isKnownStatus ? statusId : null,
+      statusSource,
       name: effectData?.name ?? game.i18n.localize('DASU.Pipeline.ApplyEffect'),
       img: effectData?.img ?? 'icons/svg/aura.svg',
       description,
@@ -37,6 +72,24 @@ export class EffectPipeline extends Pipeline {
 
   async applyToTarget(outcome, target) {
     if (!outcome.effectData) throw new Error('EffectPipeline: no effect data to apply');
+
+    // Statuses route through applyStatus for stacking; capture prior for revert.
+    if (outcome.statusId) {
+      const prior = target.effects.find(
+        (e) => statusIdOf(e) === outcome.statusId
+      );
+      const priorStacks = prior ? stacksOf(prior) : 0;
+      const effect = await applyStatus(target, outcome.statusId, {
+        source: outcome.statusSource ?? undefined,
+      });
+      return {
+        effectId: effect?.id ?? null,
+        statusId: outcome.statusId,
+        existedBefore: !!prior,
+        priorStacks,
+      };
+    }
+
     const [created] = await target.createEmbeddedDocuments('ActiveEffect', [
       outcome.effectData,
     ]);
@@ -45,8 +98,17 @@ export class EffectPipeline extends Pipeline {
 
   async revert(revertData, target) {
     const id = revertData?.effectId;
-    // Tolerate a missing effect (manually deleted between apply and revert).
     if (!id || !target.effects?.get(id)) return;
+
+    // If a stackable status pre-existed, restore its prior stacks; else delete.
+    if (revertData.statusId && isStackable(revertData.statusId)) {
+      const effect = target.effects.get(id);
+      if (revertData.existedBefore && revertData.priorStacks > 0) {
+        await effect.update({ [`flags.${SYSTEM}.stacks`]: revertData.priorStacks });
+        await resyncStacks(effect);
+        return;
+      }
+    }
     await target.deleteEmbeddedDocuments('ActiveEffect', [id]);
   }
 
@@ -62,7 +124,6 @@ export class EffectPipeline extends Pipeline {
           { secrets: false }
         )
       : '';
-    // Prefer the snapshotted effectData duration; zero values mean unset.
     const rawDur = c.effectData?.duration ?? {};
     const duration = _formatDuration(rawDur);
     return { name: c.name, description, duration };

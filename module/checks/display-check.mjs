@@ -10,6 +10,8 @@ import { SYSTEM } from '../helpers/config.mjs';
  * abilities, generic items, schemas, and bonds).
  */
 
+const TARGETED_ITEM_TYPES = new Set(['ability', 'item']);
+
 /** @type {PrepareCheckHook} */
 const onPrepareCheck = (check, actor, item) => {
   if (check.type !== 'display') return;
@@ -21,7 +23,8 @@ const onPrepareCheck = (check, actor, item) => {
       level,
     })}`;
   }
-  CheckConfiguration.configure(check).setLabel(label);
+  const configurer = CheckConfiguration.configure(check).setLabel(label);
+  if (TARGETED_ITEM_TYPES.has(item.type)) configurer.setDefaultTargets();
 };
 
 /** @type {RenderCheckHook} */
@@ -63,6 +66,11 @@ const onRenderCheck = (data, result, actor, item) => {
       });
     }
     return;
+  }
+
+  if (TARGETED_ITEM_TYPES.has(item?.type)) {
+    const inspector = CheckConfiguration.inspect(result);
+    CommonSections.targets(data, inspector, { hideTn: true, hideLabel: true });
   }
 
   let description = item?.system?.description;

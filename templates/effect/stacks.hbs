@@ -1,0 +1,39 @@
+<div class="tab" data-tab="stacks" data-group="sheet">
+  <div class="form-group">
+    <label>{{localize "DASU.Status.StacksLabel"}}</label>
+    <div class="form-fields">
+      <input type="number" name="flags.dasu.stacks" value="{{stacks.current}}"
+             min="1" max="{{stacks.max}}" step="1" />
+    </div>
+    <p class="hint">{{localize "DASU.Status.StacksCurrentHint" cap=stacks.max}}</p>
+  </div>
+
+  <div class="form-group">
+    <label>{{localize "DASU.Status.MaxOverrideLabel"}}</label>
+    <div class="form-fields">
+      <input type="number" name="flags.dasu.maxStacksOverride"
+             value="{{stacks.override}}" min="1" step="1"
+             placeholder="{{stacks.max}}" />
+    </div>
+    <p class="hint">{{localize "DASU.Status.MaxOverrideHint"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label>{{localize "DASU.Status.StackAttrLabel"}}</label>
+    <div class="form-fields">
+      <select name="flags.dasu.maxStacksAttr">
+        {{selectOptions stacks.attrChoices selected=stacks.attr localize=true}}
+      </select>
+    </div>
+    <p class="hint">{{localize "DASU.Status.StackAttrHint"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label>{{localize "DASU.Status.ScaleLabel"}}</label>
+    <div class="form-fields">
+      <input type="checkbox" name="flags.dasu.scaleWithStacks"
+             {{checked stacks.scaleWithStacks}} />
+    </div>
+    <p class="hint">{{localize "DASU.Status.ScaleHint"}}</p>
+  </div>
+</div>

@@ -1,3 +1,9 @@
+import {
+  applyStatus,
+  isStackable,
+  statusIdOf,
+} from '../helpers/status-effects.mjs';
+
 /**
  * Extend the base Actor document.
  * @extends {Actor}
@@ -6,6 +12,20 @@ export class DASUActor extends Actor {
   /** @override */
   getRollData() {
     return { ...super.getRollData(), ...(this.system.getRollData?.() ?? {}) };
+  }
+
+  /**
+   * @override
+   * Route stackable statuses through {@link applyStatus} so a HUD "toggle on"
+   * of an already-applied stackable status bumps the stack instead of being a
+   * no-op. Explicit deactivation (`active: false`) removes all stacks via core;
+   * non-stackable statuses use core behavior unchanged.
+   */
+  async toggleStatusEffect(statusId, options = {}) {
+    if (!isStackable(statusId) || options.active === false) {
+      return super.toggleStatusEffect(statusId, options);
+    }
+    return applyStatus(this, statusId);
   }
 
   /** @override */

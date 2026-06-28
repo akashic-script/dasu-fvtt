@@ -57,12 +57,20 @@
       "ToggleFailed": "Could not update the result. Try again.",
       "ApplyDamage": "Apply Damage",
       "ApplyDamageAll": "Apply to All Hits",
+      "ApplyDamageOverride": "Apply Damage (override)",
+      "ApplyEffectOverride": "Apply {name} (override)",
+      "ApplyToAllHits": "to All Hits",
       "ApplyResource": "Apply Cost",
+      "ApplyHeal": "Apply Heal",
       "ApplyEffect": "Apply Effect",
       "ApplyEffectNamed": "Apply {name}",
       "EffectFor": "for",
       "DurationRounds": "{n} rounds",
       "DurationTurns": "{n} turns"
+    },
+    "Duration": {
+      "Rounds": "Rounds",
+      "Turns": "Turns"
     },
     "Bond": {
       "Target": "Bond Target",
@@ -121,7 +129,8 @@
     },
     "SheetLabels": {
       "Actor": "DASU Actor Sheet",
-      "Item": "DASU Item Sheet"
+      "Item": "DASU Item Sheet",
+      "Effect": "DASU Effect Config"
     },
     "Effect": {
       "Source": "Source",
@@ -130,6 +139,90 @@
       "Temporary": "Temporary Effects",
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects"
+    },
+    "Status": {
+      "TickDamage": "{name} takes {amount} damage from {status} ({stacks} stack(s)).",
+      "CannotAct": "{name} is {status} and cannot act.",
+      "SilencedWarn": "{name} is Silenced and cannot use abilities.",
+      "StacksTab": "Stacks",
+      "StacksLabel": "Current Stacks",
+      "StacksHint": "Current stack count (max {cap}). Per-stack effects scale automatically.",
+      "StacksCurrentHint": "How many stacks are active (capped at {cap}).",
+      "MaxOverrideLabel": "Max Stacks Override",
+      "MaxOverrideHint": "Force a maximum stack count. Leave blank to use the caster-derived or default cap (shown as the placeholder).",
+      "StackAttrLabel": "Cap From Attribute",
+      "StackAttrHint": "Derive the max stacks from the caster's tick in this attribute. Choose None to use a fixed cap.",
+      "StackAttrNone": "None (fixed cap)",
+      "ScaleLabel": "Scale With Stacks",
+      "ScaleHint": "When enabled, this effect's changes multiply by the current stack count.",
+      "Bleeding": {
+        "name": "Bleeding",
+        "description": "<p>Take [Caster's POW Tick × Rank] damage each turn. Stacks up to the caster's POW Tick; Rank equals the current stacks.</p>"
+      },
+      "Charmed": {
+        "name": "Charmed",
+        "description": "<p>Cannot attack the caster.</p>"
+      },
+      "Cursed": {
+        "name": "Cursed",
+        "description": "<p>Status effects applied after this point have their duration doubled. Lasts until the end of the conflict; applies only to future statuses.</p>"
+      },
+      "Dazed": {
+        "name": "Dazed",
+        "description": "<p>-1 To Hit per stack. Stacks up to 2.</p>"
+      },
+      "Despair": {
+        "name": "Despair",
+        "description": "<p>Halve WILL Tick and lose half of current WP.</p>"
+      },
+      "Empowered": {
+        "name": "Empowered",
+        "description": "<p>Add +2 to weapon, spell, and tactic damage.</p>"
+      },
+      "Focused": {
+        "name": "Focused",
+        "description": "<p>+1 To Hit per stack. Stacks up to 2.</p>"
+      },
+      "Infected": {
+        "name": "Infected",
+        "description": "<p>Take [Caster's POW Tick × Rank] damage each turn and halve Power Tick. Stacks up to the caster's STA Tick; Power halving does not stack.</p>"
+      },
+      "Invisible1": {
+        "name": "Invisible 1",
+        "description": "<p>Gain +1 Avoid. Removed if you perform an Attack action.</p>"
+      },
+      "Invisible2": {
+        "name": "Invisible 2",
+        "description": "<p>Gain +2 Avoid.</p>"
+      },
+      "Invisible3": {
+        "name": "Invisible 3",
+        "description": "<p>Gain +2 Avoid. Cannot be directly targeted by single-target Abilities; can be applied to allies.</p>"
+      },
+      "Rage": {
+        "name": "Rage",
+        "description": "<p>Double attribute damage and WP costs. Normal attacks cost WP equal to [Level].</p>"
+      },
+      "Restrained": {
+        "name": "Restrained",
+        "description": "<p>Take a -2 penalty to To Hit and Avoid.</p>"
+      },
+      "Silenced": {
+        "name": "Silenced",
+        "description": "<p>Cannot use abilities. (The Negotiation version locks Tactics instead.)</p>"
+      },
+      "Sleep": {
+        "name": "Sleep",
+        "description": "<p>Cannot act until attacked. Ends when attacked.</p>"
+      },
+      "Stunned": {
+        "name": "Stunned",
+        "description": "<p>Cannot act. Lasts 1 turn unless otherwise stated.</p>"
+      },
+      "Unraveled": {
+        "name": "Unraveled",
+        "description": "<p>Weak to all damage types.</p>"
+      }
     },
     "Resource": {
       "HP": "HP",
@@ -444,7 +537,14 @@
         "Heal": "Heal",
         "HealResource": "Resource",
         "HealMode": "Mode",
-        "Attribute": "Attribute"
+        "Attribute": "Attribute",
+        "ApplyEffects": "Apply Effects",
+        "EffectDrop": "Drop an Active Effect here to add",
+        "EffectDropInvalid": "Only Active Effects can be dropped here.",
+        "ApplyTarget": {
+          "Target": "Target",
+          "Self": "Self"
+        }
       },
       "Tactic": {
         "Govern": "Governs",

@@ -12,6 +12,8 @@ import { CommonColumns } from './helpers/tables/common-columns.mjs';
 import { CommonDescriptions } from './helpers/tables/common-descriptions.mjs';
 import { Checks, initializeChecks } from './checks/checks.mjs';
 import { initializePipelines } from './helpers/pipelines/_module.mjs';
+import { initializeStatusEffects } from './helpers/status-effects.mjs';
+import { DASUActiveEffectConfig } from './sheets/active-effect-config.mjs';
 import * as models from './data/_module.mjs';
 
 Hooks.once('init', function () {
@@ -37,6 +39,7 @@ Hooks.once('init', function () {
   registerHandlebarsHelpers();
   initializeChecks();
   initializePipelines();
+  initializeStatusEffects();
 
   CONFIG.Combat.initiative = {
     formula: '1d20 + @attributes.dex.value',
@@ -106,6 +109,13 @@ Hooks.once('init', function () {
       makeDefault: true,
       label: 'DASU.SheetLabels.Item',
     }
+  );
+
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(
+    ActiveEffect,
+    'dasu',
+    DASUActiveEffectConfig,
+    { makeDefault: true, label: 'DASU.SheetLabels.Effect' }
   );
 
   return preloadHandlebarsTemplates();

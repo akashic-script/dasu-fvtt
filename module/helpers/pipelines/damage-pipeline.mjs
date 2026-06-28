@@ -1,5 +1,6 @@
 import { Pipeline } from './pipeline.mjs';
 import { SYSTEM } from '../config.mjs';
+import { isUnraveled, wakeIfSleeping } from '../status-effects.mjs';
 import { sumDamageBonus } from '../../data/bonuses.mjs';
 
 // Resistance level (-1..3) -> { mode, multiplier }. x0.5 rounds down; drain
@@ -27,7 +28,10 @@ export class DamagePipeline extends Pipeline {
     const max = pool.max ?? 0;
     const priorValue = pool.value ?? 0;
 
-    const level = target.system?.resistances?.[damageType]?.base ?? 0;
+    let level = target.system?.resistances?.[damageType]?.base ?? 0;
+    // Unraveled: weak to all damage types. Only worsens resistance, never
+    // overriding an even weaker (already negative) value.
+    if (isUnraveled(target)) level = Math.min(level, -1);
     let { mode, multiplier } = RESIST[String(level)] ?? RESIST['0'];
     // An ignored mode is treated as a normal hit.
     if (input.ignore?.includes(mode)) {
@@ -67,6 +71,8 @@ export class DamagePipeline extends Pipeline {
     await target.update({
       [`system.resources.${outcome.resource}.value`]: outcome.newValue,
     });
+    // Sleep ends when the sleeper is attacked (took non-drain damage).
+    if (!outcome.drain && outcome.finalAmount > 0) await wakeIfSleeping(target);
     return { resource: outcome.resource, priorValue: outcome.priorValue };
   }
 

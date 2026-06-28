@@ -1,0 +1,47 @@
+{
+  "name": "Invisible 3",
+  "type": "base",
+  "_id": "2PMuOEWyaECbixe0",
+  "img": "icons/svg/invisible.svg",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.stats.avoid.bonus",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>Gain +2 Avoid. Cannot be directly targeted by single-target Abilities; can be applied to allies.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "invisible3"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "invisible3",
+      "behavior": "invisible",
+      "tier": 3,
+      "untargetable": true
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!2PMuOEWyaECbixe0"
+}

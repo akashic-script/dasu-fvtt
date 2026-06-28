@@ -143,6 +143,12 @@ export class DASUItemSheet extends SheetLayoutMixin(
         template: 'systems/dasu/templates/item/parts/bond-advanced.hbs',
         scrollable: [''],
       };
+    } else if (this.document.type === 'ability') {
+      // Every ability sub-category gets the "Apply Effects" advanced tab.
+      parts.advanced = {
+        template: 'systems/dasu/templates/item/parts/ability-effects-advanced.hbs',
+        scrollable: [''],
+      };
     } else {
       delete parts.advanced;
     }
@@ -260,6 +266,24 @@ export class DASUItemSheet extends SheetLayoutMixin(
         context.isSpellAbility ||
         context.isAfflictionAbility ||
         context.isTechniqueAbility;
+      // Every ability category exposes the "Apply Effects" advanced tab.
+      context.abilityEffects = item.effects.map((e) => ({
+        id: e.id,
+        uuid: e.uuid,
+        name: e.name,
+        img: e.img,
+        durationValue: e.duration?.value ?? null,
+        durationUnits: e.duration?.units ?? 'rounds',
+        applyTarget: e.flags?.dasu?.applyTarget ?? 'target',
+      }));
+      context.durationUnitsOptions = {
+        rounds: game.i18n.localize('DASU.Duration.Rounds'),
+        turns: game.i18n.localize('DASU.Duration.Turns'),
+      };
+      context.applyTargetOptions = {
+        target: game.i18n.localize('DASU.Item.Ability.ApplyTarget.Target'),
+        self: game.i18n.localize('DASU.Item.Ability.ApplyTarget.Self'),
+      };
     }
 
     if (context.isTactic) {
@@ -526,6 +550,66 @@ export class DASUItemSheet extends SheetLayoutMixin(
         zone.addEventListener('click', async () => {
           const doc = await fromUuid(nameEl.dataset.uuid);
           doc?.sheet?.render(true);
+        });
+      }
+    }
+
+    // Ability "Apply Effects" advanced tab (all ability categories).
+    const abilityEffectZone = this.element.querySelector('.ability-effect-drop-zone');
+    if (abilityEffectZone) {
+      abilityEffectZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        abilityEffectZone.classList.add('drag-over');
+      });
+      abilityEffectZone.addEventListener('dragleave', () => abilityEffectZone.classList.remove('drag-over'));
+      abilityEffectZone.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        abilityEffectZone.classList.remove('drag-over');
+        let data;
+        try {
+          data = foundry.applications.ux.TextEditor.implementation.getDragEventData(e);
+        } catch {
+          try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch { return; }
+        }
+        if (data?.type !== 'ActiveEffect' || !data.uuid) {
+          ui.notifications?.warn(game.i18n.localize('DASU.Item.Ability.EffectDropInvalid'));
+          return;
+        }
+        const src = await fromUuid(data.uuid);
+        if (!src) return;
+        const effectData = typeof src.toObject === 'function'
+          ? src.toObject()
+          : foundry.utils.deepClone(src._source ?? src);
+        delete effectData._id;
+        await this.item.createEmbeddedDocuments('ActiveEffect', [effectData]);
+      });
+
+      for (const row of this.element.querySelectorAll('.ability-effect-row')) {
+        const effectId = row.dataset.effectId;
+
+        row.querySelector('.ability-effect__delete')?.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
+        });
+
+        row.querySelector('.ability-effect__name')?.addEventListener('click', async () => {
+          const effect = this.item.effects.get(effectId);
+          effect?.sheet?.render(true);
+        });
+
+        const valInput = row.querySelector('.ability-effect__duration-value');
+        const unitsSelect = row.querySelector('.ability-effect__duration-units');
+        const targetSelect = row.querySelector('.ability-effect__apply-target');
+        const updateDuration = async () => {
+          const value = parseInt(valInput?.value) || null;
+          const units = unitsSelect?.value ?? 'rounds';
+          await this.item.effects.get(effectId)?.update({ 'duration.value': value, 'duration.units': units });
+        };
+        valInput?.addEventListener('change', updateDuration);
+        unitsSelect?.addEventListener('change', updateDuration);
+        targetSelect?.addEventListener('change', async () => {
+          await this.item.effects.get(effectId)?.update({ 'flags.dasu.applyTarget': targetSelect.value });
         });
       }
     }

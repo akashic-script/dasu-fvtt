@@ -13,11 +13,12 @@
     <span class="target-outcome">
       {{#if this.hit}}{{localize "DASU.Check.Hit"}}{{else}}{{localize "DASU.Check.Miss"}}{{/if}}
     </span>
-    {{#if this.hit}}{{#if ../canApplyDamage}}
-    <button type="button" class="target-apply-damage" data-action="applyDamage" data-target-uuid="{{this.uuid}}" data-tooltip="Apply Damage">
-      <i class="fa-solid fa-heart-crack"></i>
+    {{#if ../hasTargetActions}}
+    <button type="button" class="target-apply-menu" data-target-uuid="{{this.uuid}}"
+            data-target-hit="{{#if this.hit}}1{{else}}0{{/if}}">
+      <i class="fas fa-ellipsis-v"></i>
     </button>
-    {{/if}}{{/if}}
+    {{/if}}
   </div>
   {{/each}}
 </div>

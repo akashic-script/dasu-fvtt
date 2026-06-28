@@ -1,0 +1,38 @@
+{
+  "name": "Despair",
+  "type": "base",
+  "_id": "aPhGKuTXSO2GSRGF",
+  "img": "icons/svg/degen.svg",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>Halve WILL Tick and lose half of current WP.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "despair"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "despair",
+      "behavior": "halveWillTick"
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!aPhGKuTXSO2GSRGF"
+}

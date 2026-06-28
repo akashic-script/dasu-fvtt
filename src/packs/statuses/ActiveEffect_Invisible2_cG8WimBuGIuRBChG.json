@@ -1,0 +1,46 @@
+{
+  "name": "Invisible 2",
+  "type": "base",
+  "_id": "cG8WimBuGIuRBChG",
+  "img": "icons/svg/invisible.svg",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.stats.avoid.bonus",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>Gain +2 Avoid.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "invisible2"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "invisible2",
+      "behavior": "invisible",
+      "tier": 2
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!cG8WimBuGIuRBChG"
+}

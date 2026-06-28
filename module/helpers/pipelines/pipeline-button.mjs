@@ -1,12 +1,6 @@
 import { SYSTEM } from '../config.mjs';
 import { Flags } from '../flags.mjs';
 
-/**
- * Injects pipeline Apply buttons into a source check card. A check supplies
- * `result.additionalData.pipelineActions` ({ type, label, icon, input }[]);
- * each becomes a button that resolves targets and runs the matching pipeline.
- */
-
 const registry = new Map();
 
 function register(pipeline) {
@@ -31,18 +25,47 @@ function inject(message, html) {
   const row = document.createElement('div');
   row.classList.add('pipeline-actions');
 
+  // Pinned actions (cost/self): apply to their fixed uuid.
   for (const action of actions) {
+    if (!action.uuid) continue;
     const pipeline = registry.get(action.type);
     if (!pipeline) continue;
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.classList.add('pipeline-actions__btn');
-    btn.innerHTML = `${action.icon ? `<i class="${action.icon}"></i> ` : ''}${game.i18n.localize(action.label)}`;
+    const label = game.i18n.localize(action.label) || action.label;
+    btn.innerHTML = `${action.icon ? `<i class="${action.icon}"></i> ` : ''}${label}`;
     btn.addEventListener('click', async (event) => {
       event.preventDefault();
-      await pipeline.applyToTargets(action.input, source, {
-        uuid: action.uuid,
-      });
+      await pipeline.applyToTargets(action.input, source, { uuid: action.uuid });
+    });
+    row.append(btn);
+  }
+
+  // Target actions: one "Apply X to All Hits" button per action, applying to all hit targets.
+  const targetActions = actions.filter(
+    (a) => !a.uuid && (a.type === 'damage' || a.type === 'effect')
+  );
+  const hitUuids = [...html.querySelectorAll('.check-target.target-hit .target-name[data-uuid]')]
+    .map((el) => el.dataset.uuid)
+    .filter(Boolean);
+
+  const targetButtons = hitUuids.length ? targetActions : [];
+  for (const action of targetButtons) {
+    const pipeline = registry.get(action.type);
+    if (!pipeline) continue;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.classList.add('pipeline-actions__btn');
+    const actionLabel = game.i18n.localize(action.label) || action.label;
+    const allHitsLabel = game.i18n.localize('DASU.Pipeline.ApplyToAllHits');
+    btn.innerHTML = `${action.icon ? `<i class="${action.icon}"></i> ` : ''}${actionLabel} ${allHitsLabel}`;
+    btn.addEventListener('click', async (event) => {
+      event.preventDefault();
+      // Apply only to targets that were hit; never fall back to all targets.
+      for (const uuid of hitUuids) {
+        await pipeline.applyToTargets(action.input, source, { uuid });
+      }
     });
     row.append(btn);
   }

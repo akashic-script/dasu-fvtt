@@ -1,0 +1,30 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="advanced" style="padding: 12px 14px;">
+
+  <div class="dasu-fieldset dasu-fieldset--active-legend">
+    <div class="dasu-fieldset__header">
+      <div class="dasu-fieldset__legend">{{localize "DASU.Item.Ability.ApplyEffects"}}</div>
+    </div>
+
+    <div class="ability-effects-list">
+      {{#each abilityEffects as |e|}}
+      <div class="ability-effect-row" data-effect-id="{{e.id}}">
+        <span class="ability-effect__name">{{e.name}}</span>
+        <input class="ability-effect__duration-value" type="number" value="{{e.durationValue}}" min="1" placeholder="--" />
+        <select class="ability-effect__duration-units">
+          {{selectOptions @root.durationUnitsOptions selected=e.durationUnits}}
+        </select>
+        <select class="ability-effect__apply-target">
+          {{selectOptions @root.applyTargetOptions selected=e.applyTarget}}
+        </select>
+        <a class="ability-effect__delete" data-tooltip="{{localize 'DASU.Sheet.DeleteItem'}}"><i class="fas fa-times"></i></a>
+      </div>
+      {{/each}}
+
+      <div class="ability-effect-drop-zone">
+        <i class="fas fa-hand-sparkles"></i>
+        <span>{{localize "DASU.Item.Ability.EffectDrop"}}</span>
+      </div>
+    </div>
+  </div>
+
+</section>
