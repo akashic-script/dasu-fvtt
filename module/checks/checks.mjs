@@ -1,5 +1,6 @@
 import { CheckHooks } from './check-hooks.mjs';
 import { CheckConfiguration } from './check-configuration.mjs';
+import { getPipeline } from '../helpers/pipelines/_module.mjs';
 import { DASU, SYSTEM } from '../helpers/config.mjs';
 import { Flags } from '../helpers/flags.mjs';
 import { renderCheck } from './check-render.mjs';
@@ -370,15 +371,8 @@ const checkFromResult = (result) => ({
  * @param {CheckId} checkId
  * @param {(check: CheckResult, actor: FUActor, item: FUItem) => Promise<{check?: Check, roll?: Roll}|boolean|void>} callback
  */
-const modifyCheck = async (checkId, callback) => {
-  const message = game.messages.search({
-    filters: [
-      {
-        field: `flags.${SYSTEM}.${Flags.ChatMessage.Check}.id`,
-        value: checkId,
-      },
-    ],
-  })[0];
+const modifyCheck = async (messageId, callback) => {
+  const message = game.messages.get(messageId);
   if (!message) throw new Error('Check to be modified not found.');
 
   const oldResult = foundry.utils.duplicate(
@@ -499,6 +493,18 @@ export function initializeChecks() {
     result.additionalData.itemType = item.type;
     if (sys.category) result.additionalData.itemCategory = sys.category;
 
+    const pipelineActions = [];
+
+    // Effect apply action, labeled "Apply {name}" when the effect resolves.
+    const effectAction = (effectUuid, name) => ({
+      type: 'effect',
+      label: name
+        ? game.i18n.format('DASU.Pipeline.ApplyEffectNamed', { name })
+        : game.i18n.localize('DASU.Pipeline.ApplyEffect'),
+      icon: 'fas fa-hand-sparkles',
+      input: { effectUuid },
+    });
+
     const categoryMap =
       item.type === 'weapon'
         ? DASU.weaponCategories
@@ -541,8 +547,20 @@ export function initializeChecks() {
         tag: 'DASU.Check.Cost',
         value: `${costNum} ${game.i18n.localize(resAbbr)}`,
       });
-      // Store for the deduct button in renderChatMessage.
-      result.additionalData.resourceCost = { type: resType, value: costNum };
+      // Cost is paid by the speaker, so pin its apply to the source actor.
+      if (resType === 'hp' || resType === 'wp') {
+        pipelineActions.push({
+          type: 'resource',
+          label: 'DASU.Pipeline.ApplyResource',
+          icon: 'fas fa-fire-flame-curved',
+          uuid: result.actorUuid,
+          input: {
+            resource: resType,
+            value: costNum,
+            op: 'cost',
+          },
+        });
+      }
     }
 
     if (item.type === 'ability' && sys.category === 'restorative' && sys.heal) {
@@ -566,6 +584,21 @@ export function initializeChecks() {
           tag: 'DASU.Check.Heal',
           value: `${valueStr} ${healRes}`.trim(),
         });
+        // Tick heals depend on the target's attribute and are resolved at apply
+        // time; only flat/percent heals can be applied via a simple pipeline.
+        if (h.mode !== 'tick' && (h.resource === 'hp' || h.resource === 'wp')) {
+          pipelineActions.push({
+            type: 'resource',
+            label: 'DASU.Pipeline.ApplyResource',
+            icon: 'fas fa-heart',
+            input: {
+              resource: h.resource,
+              value: healValue,
+              op: 'heal',
+              mode: h.mode === 'percent' ? 'percent' : 'flat',
+            },
+          });
+        }
       }
     }
 
@@ -580,6 +613,16 @@ export function initializeChecks() {
             tag: 'DASU.Item.Item.ResourceDamage',
             value: `${effect.value} ${elem}`.trim(),
           });
+          pipelineActions.push({
+            type: 'damage',
+            label: 'DASU.Pipeline.ApplyDamage',
+            icon: 'fas fa-burst',
+            input: {
+              value: effect.value,
+              damageType: effect.damageType ?? 'physical',
+              resource: 'hp',
+            },
+          });
         } else if (effect.resource === 'hp' || effect.resource === 'wp') {
           if (!(effect.value > 0)) continue;
           const res = game.i18n.localize(
@@ -590,7 +633,49 @@ export function initializeChecks() {
             tag: 'DASU.Check.Heal',
             value: `${effect.value}${suffix} ${res}`.trim(),
           });
+          pipelineActions.push({
+            type: 'resource',
+            label: 'DASU.Pipeline.ApplyResource',
+            icon: 'fas fa-heart',
+            input: {
+              resource: effect.resource,
+              value: effect.value,
+              op: 'heal',
+              mode: effect.mode === 'percent' ? 'percent' : 'flat',
+            },
+          });
+        } else if (
+          effect.resource === 'status' &&
+          effect.statusMode === 'grant' &&
+          effect.grantUuid
+        ) {
+          // A granted status applies an Active Effect to the target.
+          const granted = fromUuidSync(effect.grantUuid);
+          if (granted) {
+            data.tags.push({
+              tag: 'DASU.Pipeline.ApplyEffect',
+              value: granted.name,
+            });
+          }
+          pipelineActions.push(effectAction(effect.grantUuid, granted?.name));
         }
+      }
+    }
+
+    // Bonds grant the chosen rank's Active Effect (rank picked in the dialog,
+    // stashed as additionalData.bondRank).
+    if (item.type === 'bond') {
+      const rankKey = result.additionalData?.bondRank;
+      const effectUuid = rankKey ? sys[rankKey]?.effectUuid : null;
+      if (effectUuid) {
+        const granted = fromUuidSync(effectUuid);
+        if (granted) {
+          data.tags.push({
+            tag: 'DASU.Pipeline.ApplyEffect',
+            value: granted.name,
+          });
+        }
+        pipelineActions.push(effectAction(effectUuid, granted?.name));
       }
     }
 
@@ -600,9 +685,20 @@ export function initializeChecks() {
       drain: 'DASU.Check.IgnoreDrain',
       weak: 'DASU.Check.IgnoreWeak',
     };
-    for (const mode of inspector.getResistanceModes()) {
+    const ignore = inspector.getResistanceModes() ?? [];
+    for (const mode of ignore) {
       const tagKey = RESIST_MODE_TAG[mode];
       if (tagKey) data.tags.push({ tag: tagKey });
+    }
+
+    // Carry ignored-resistance modes onto damage actions, then publish.
+    if (ignore.length) {
+      for (const action of pipelineActions) {
+        if (action.type === 'damage') action.input.ignore = [...ignore];
+      }
+    }
+    if (pipelineActions.length) {
+      result.additionalData.pipelineActions = pipelineActions;
     }
   });
 
@@ -651,59 +747,82 @@ export function initializeChecks() {
       nameEl.addEventListener('click', () => sheet.render(true));
     }
 
-    const timestamp = html.querySelector('.message-timestamp');
-    if (timestamp) {
-      timestamp.classList.add('check-card-timestamp');
-      fieldsetHeader.append(timestamp);
-    }
-    const deleteBtn = html.querySelector('.message-delete');
-    if (deleteBtn) fieldsetHeader.append(deleteBtn);
+    // Resource cost is now an undoable pipeline action (PipelineButton.inject),
+    // replacing the former one-shot deduct button.
 
-    const resourceCost = result.additionalData?.resourceCost;
-    if (resourceCost && result.actorUuid) {
-      const actor = await fromUuid(result.actorUuid);
-      const resourceKey =
-        resourceCost.type === 'hp'
-          ? 'resources.hp.value'
-          : resourceCost.type === 'wp'
-          ? 'resources.wp.value'
-          : null;
-      if (actor?.isOwner && resourceKey) {
-        const resAbbr = game.i18n.localize(
-          DASU.resourceAbbreviations[resourceCost.type] ??
-            resourceCost.type.toUpperCase()
-        );
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.classList.add('check-card__cost-btn');
-        btn.innerHTML = `<i class="fas fa-fire-flame-curved"></i> ${game.i18n.localize(
-          'DASU.Check.DeductCost'
-        )} ${resourceCost.value} ${resAbbr}`;
-        btn.addEventListener('click', async () => {
-          const current =
-            foundry.utils.getProperty(actor.system, resourceKey) ?? 0;
-          await actor.update({
-            [`system.${resourceKey}`]: Math.max(
-              0,
-              current - resourceCost.value
-            ),
-          });
-          btn.disabled = true;
-          btn.classList.add('is-spent');
-        });
-        html.querySelector('.check-card__fieldset')?.append(btn);
-      }
-    }
+    // Footer
+    const footer = document.createElement('div');
+    footer.classList.add('check-card__footer');
 
     const speakerName = message.speaker?.alias ?? message.speakerActor?.name;
     if (speakerName) {
-      const footer = document.createElement('div');
-      footer.classList.add('check-card__footer');
       const speakerEl = document.createElement('span');
       speakerEl.classList.add('check-card__footer-speaker');
       speakerEl.textContent = speakerName;
       footer.append(speakerEl);
-      html.querySelector('.check-card__fieldset')?.append(footer);
+    }
+
+    const meta = document.createElement('span');
+    meta.classList.add('check-card__footer-meta');
+    const timestamp = html.querySelector('.message-timestamp');
+    if (timestamp) {
+      timestamp.classList.add('check-card-timestamp');
+      meta.append(timestamp);
+    }
+    const deleteBtn = html.querySelector('.message-delete');
+    if (deleteBtn) meta.append(deleteBtn);
+    footer.append(meta);
+
+    html.querySelector('.check-card__fieldset')?.append(footer);
+
+    // Per-target Apply Damage buttons route through the damage pipeline.
+    const damage = result.additionalData?.damage;
+    if (damage?.amount > 0) {
+      const pipeline = getPipeline('damage');
+      const source = {
+        actorUuid: result.actorUuid,
+        name: result.itemName ?? message.speaker?.alias,
+      };
+      const input = {
+        value: damage.amount,
+        damageType: damage.type ?? 'physical',
+        resource: 'hp',
+      };
+      if (pipeline) {
+        for (const btn of html.querySelectorAll('.target-apply-damage')) {
+          btn.addEventListener('click', () =>
+            pipeline.applyToTargets(input, source, {
+              uuid: btn.dataset.targetUuid,
+            })
+          );
+        }
+
+        // "Apply to all hits" shares the bottom actions row with Apply Cost.
+        // Find-or-create it since either render hook may run first.
+        const hitButtons = [...html.querySelectorAll('.target-apply-damage')];
+        if (hitButtons.length) {
+          let row = html.querySelector('.pipeline-actions');
+          if (!row) {
+            row = document.createElement('div');
+            row.classList.add('pipeline-actions');
+            html.querySelector('.check-card__fieldset')?.append(row);
+          }
+          const allBtn = document.createElement('button');
+          allBtn.type = 'button';
+          allBtn.classList.add('pipeline-actions__btn');
+          allBtn.innerHTML = `<i class="fas fa-burst"></i> ${game.i18n.localize(
+            'DASU.Pipeline.ApplyDamageAll'
+          )}`;
+          allBtn.addEventListener('click', () => {
+            for (const b of hitButtons) {
+              pipeline.applyToTargets(input, source, {
+                uuid: b.dataset.targetUuid,
+              });
+            }
+          });
+          row.append(allBtn);
+        }
+      }
     }
   });
 }

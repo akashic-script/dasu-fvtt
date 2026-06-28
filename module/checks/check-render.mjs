@@ -67,14 +67,14 @@ export async function renderCheck(result, actor, item, flags = {}) {
     content,
     rolls,
     flags: foundry.utils.mergeObject(
+      foundry.utils.mergeObject(flags, additionalFlags, { inplace: false }),
       {
         [SYSTEM]: {
           // Deep-clone: `result` is frozen, but Foundry mutates flag values while cleaning.
           [Flags.ChatMessage.Check]: foundry.utils.deepClone(result),
           [Flags.ChatMessage.Item]: item?.uuid,
         },
-      },
-      foundry.utils.mergeObject(flags, additionalFlags, { inplace: false })
+      }
     ),
   };
 

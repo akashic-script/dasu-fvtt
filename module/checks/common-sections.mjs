@@ -40,12 +40,15 @@ export const CommonSections = Object.freeze({
   targets(data, inspector, { hideTn = false, hideLabel = false } = {}) {
     const targets = inspector.getTargets();
     if (!targets.length) return;
+    const damage = inspector.getDamage();
     data.sections.push({
       partial: tpl('chat-check-targets'),
       order: ChatSectionOrder.details,
       data: {
         defense: inspector.getTargetedDefense(),
         targets,
+        // Present only when the check deals damage; gates the apply buttons.
+        canApplyDamage: !!damage,
         hideTn,
         hideLabel,
       },

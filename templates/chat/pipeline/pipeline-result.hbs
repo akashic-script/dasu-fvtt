@@ -1,7 +1,7 @@
 <div class="dasu theme-dark pipeline-card pipeline-card--{{type}} {{#unless applied}}pipeline-card--reverted{{/unless}}">
   <div class="dasu-fieldset dasu-fieldset--active-legend pipeline-card__fieldset">
     <div class="dasu-fieldset__header">
-      <img class="pipeline-card__avatar" src="{{targetImg}}" alt="" />
+      <img class="pipeline-card__avatar" src="{{targetImg}}" alt="" style="display:inline-block;width:24px;height:24px;max-width:24px;" />
       <div class="dasu-fieldset__legend pipeline-card__target target-name" data-uuid="{{state.target.actorUuid}}">{{targetName}}</div>
       {{#if sourceName}}<span class="pipeline-card__source">{{sourceName}}</span>{{/if}}
     </div>

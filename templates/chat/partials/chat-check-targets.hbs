@@ -1,15 +1,11 @@
 <div class="check-targets">
+  {{#unless hideLabel}}
   <div class="check-targets-header">
-    {{#unless hideLabel}}
     <span class="check-targets-label">
       {{#if (eq defense "defense")}}{{localize "DASU.Actor.Stat.Defense.long"}}{{else}}{{localize "DASU.Actor.Stat.Avoid.long"}}{{/if}}
     </span>
-    {{/unless}}
-    <button type="button" class="target-apply-damage-all" data-tooltip="Apply Damage to All Hits" disabled>
-      <i class="fa-solid fa-heart-crack"></i>
-      <i class="fa-solid fa-angles-right"></i>
-    </button>
   </div>
+  {{/unless}}
   {{#each targets}}
   <div class="check-target{{#if this.hit}} target-hit{{else}} target-miss{{/if}}">
     <span class="target-name" data-uuid="{{this.uuid}}">{{this.name}}</span>
@@ -17,11 +13,11 @@
     <span class="target-outcome">
       {{#if this.hit}}{{localize "DASU.Check.Hit"}}{{else}}{{localize "DASU.Check.Miss"}}{{/if}}
     </span>
-    {{#if this.hit}}
-    <button type="button" class="target-apply-damage" data-target-id="{{this.id}}" data-tooltip="Apply Damage" disabled>
+    {{#if this.hit}}{{#if ../canApplyDamage}}
+    <button type="button" class="target-apply-damage" data-action="applyDamage" data-target-uuid="{{this.uuid}}" data-tooltip="Apply Damage">
       <i class="fa-solid fa-heart-crack"></i>
     </button>
-    {{/if}}
+    {{/if}}{{/if}}
   </div>
   {{/each}}
 </div>

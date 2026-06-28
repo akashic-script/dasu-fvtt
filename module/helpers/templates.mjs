@@ -31,7 +31,9 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/dasu/templates/dialog/bond-dialog.hbs',
     // Pipeline chat
     'systems/dasu/templates/chat/pipeline/pipeline-result.hbs',
-    'systems/dasu/templates/chat/pipeline/body-stub.hbs',
+    'systems/dasu/templates/chat/pipeline/body-damage.hbs',
+    'systems/dasu/templates/chat/pipeline/body-resource.hbs',
+    'systems/dasu/templates/chat/pipeline/body-effect.hbs',
     // Check chat partials
     'systems/dasu/templates/chat/chat-check.hbs',
     'systems/dasu/templates/chat/chat-resistance.hbs',

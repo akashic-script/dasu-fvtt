@@ -58,6 +58,20 @@ async function activate(message, html) {
   if (!state) return;
   html.classList.add('pipeline-message', `pipeline-message--${state.type}`);
 
+  const deleteBtn = html.querySelector('.message-delete');
+  const cardHeader = html.querySelector('.pipeline-card__fieldset .dasu-fieldset__header');
+  if (deleteBtn && cardHeader) cardHeader.append(deleteBtn);
+
+  // Clicking the target avatar opens its sheet, if the user can view it.
+  const avatar = html.querySelector('.pipeline-card__avatar');
+  if (avatar) {
+    const actor = await TargetResolver.resolveActor(state.target.actorUuid);
+    if (actor?.sheet && actor.testUserPermission?.(game.user, 'LIMITED')) {
+      avatar.style.cursor = 'pointer';
+      avatar.addEventListener('click', () => actor.sheet.render(true));
+    }
+  }
+
   const pipeline = registry.get(state.type);
   if (!pipeline) return;
 

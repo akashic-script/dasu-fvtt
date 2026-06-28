@@ -40,7 +40,9 @@ function inject(message, html) {
     btn.innerHTML = `${action.icon ? `<i class="${action.icon}"></i> ` : ''}${game.i18n.localize(action.label)}`;
     btn.addEventListener('click', async (event) => {
       event.preventDefault();
-      await pipeline.applyToTargets(action.input, source);
+      await pipeline.applyToTargets(action.input, source, {
+        uuid: action.uuid,
+      });
     });
     row.append(btn);
   }

@@ -53,8 +53,13 @@
       "ApplyFailed": "Failed to apply to {name}.",
       "ToggleFailed": "Could not update the result. Try again.",
       "ApplyDamage": "Apply Damage",
+      "ApplyDamageAll": "Apply to All Hits",
       "ApplyResource": "Apply Cost",
-      "ApplyEffect": "Apply Effect"
+      "ApplyEffect": "Apply Effect",
+      "ApplyEffectNamed": "Apply {name}",
+      "EffectFor": "for",
+      "DurationRounds": "{n} rounds",
+      "DurationTurns": "{n} turns"
     },
     "Bond": {
       "Target": "Bond Target",

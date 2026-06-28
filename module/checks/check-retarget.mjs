@@ -1,8 +1,6 @@
 import { CheckHooks } from './check-hooks.mjs';
 import { Checks, CheckInternals } from './checks.mjs';
 import { CheckConfiguration } from './check-configuration.mjs';
-import { SYSTEM } from '../helpers/config.mjs';
-import { Flags } from '../helpers/flags.mjs';
 
 /**
  * Generic retarget: re-resolves a stored check against the user's *current*
@@ -14,8 +12,8 @@ import { Flags } from '../helpers/flags.mjs';
  * a "Retargeted" tag at the top of the card.
  */
 
-async function retarget(checkId) {
-  await Checks.modifyCheck(checkId, async (oldResult) => {
+async function retarget(messageId) {
+  await Checks.modifyCheck(messageId, async (oldResult) => {
     const check = CheckInternals.checkFromResult(oldResult);
     check.additionalData.retargeted = true;
 
@@ -56,11 +54,8 @@ const initialize = () => {
       visible: (li) =>
         Checks.isCheck(messageFromContext(li), ['accuracy', 'tactic']),
       onClick: (event, target) => {
-        const result = messageFromContext(target)?.getFlag(
-          SYSTEM,
-          Flags.ChatMessage.Check
-        );
-        if (result?.id) retarget(result.id);
+        const message = messageFromContext(target);
+        if (message?.id) retarget(message.id);
       },
     });
   });

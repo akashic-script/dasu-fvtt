@@ -4553,8 +4553,7 @@
 .dasu.check-card .check-targets-header {
   display: flex;
   align-items: center;
-  padding-left: 8px;
-  padding-bottom: 2px;
+  padding: 0 8px 2px;
   margin-bottom: 2px;
   border-bottom: 1px solid rgb(255 255 255 / 8%);
 }
@@ -4565,20 +4564,6 @@
   letter-spacing: 0.1em;
   color: var(--dasu-tab-icon);
   flex: 1;
-}
-
-.dasu.check-card .target-apply-damage-all {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 6px;
-  background: none;
-  border: none;
-  color: var(--dasu-tab-icon);
-  font-size: 0.75em;
-  cursor: not-allowed;
-  opacity: 0.4;
 }
 
 .dasu.check-card .check-target {
@@ -4592,19 +4577,41 @@
   position: relative;
 }
 
+/* Per-target apply-damage chip: matches the dice-result boxes. */
 .dasu.check-card .target-apply-damage {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  gap: 2px;
+  width: 22px;
+  height: 22px;
   padding: 0;
-  background: none;
-  border: none;
+  font-size: 0.7em;
   color: var(--dasu-tab-icon);
-  font-size: 0.75em;
-  cursor: not-allowed;
-  opacity: 0.4;
+  background: linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 10%),
+      rgb(var(--dasu-panel) / 15%) 45%,
+      rgb(var(--dasu-panel) / 55%)
+    ),
+    var(--dasu-resource-bg);
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 0;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%),
+    inset 0 -1px 0 rgb(var(--dasu-panel) / 50%),
+    0 1px 2px rgb(var(--dasu-panel) / 45%);
+  cursor: pointer;
+  transition: color 0.1s, border-color 0.1s;
+
+  &:hover {
+    color: var(--dasu-accent-weapon);
+    border-color: var(--dasu-accent-weapon);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
 }
 
 .dasu.check-card .check-target.target-hit {
@@ -4761,6 +4768,39 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   opacity: 0.5;
+}
+
+.dasu.check-card .check-card__footer-meta {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dasu.check-card .check-card__footer .check-card-timestamp {
+  margin: 0;
+  padding: 0;
+  font-size: 0.62em;
+  opacity: 0.4;
+}
+
+.dasu.check-card .check-card__footer .message-delete {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  color: var(--dasu-muted);
+  opacity: 0.5;
+  cursor: pointer;
+  transition: color 0.1s, opacity 0.1s;
+
+  &:hover {
+    opacity: 1;
+    color: var(--dasu-accent-tactic);
+  }
 }
 
 .dasu-resistance-card {
@@ -5120,8 +5160,72 @@
 }
 
 /* Pipeline result cards (per-target) */
+/* The chat-message wrapper; matches the check card so it isn't washed out by
+   Foundry's default light chat styling. */
+.pipeline-message {
+  --dasu-hp: #d9a800;
+  --dasu-wp: #6ab4d8;
+  --dasu-ink: #eeede0;
+  --dasu-muted: rgb(255 255 255 / 55%);
+  --dasu-panel: 0 0 0;
+  --dasu-panel-solid: #1a1520;
+  --dasu-border: 1px solid rgb(255 255 255 / 12%);
+
+  background: var(--dasu-panel-solid) !important;
+  border: var(--dasu-border) !important;
+  border-left: 2px solid var(--pipeline-accent, rgb(255 255 255 / 20%)) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--dasu-ink);
+  padding: 0 !important;
+  margin-bottom: 2px;
+  overflow: hidden;
+}
+
+.pipeline-message--damage {
+  --pipeline-accent: #d96a6a;
+}
+.pipeline-message--resource {
+  --pipeline-accent: var(--dasu-wp);
+}
+.pipeline-message--effect {
+  --pipeline-accent: #9a6ac4;
+}
+
+/* The card renders its own header; hide Foundry's default and relocate delete. */
+.pipeline-message .message-header,
+.pipeline-message .flavor-text,
+.pipeline-message .whisper-to {
+  display: none;
+}
+
+.pipeline-message .message-delete {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  background: none;
+  border: none;
+  border-left: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 0;
+  color: var(--dasu-muted);
+  opacity: 0;
+  transition: opacity 150ms ease, color 150ms ease;
+
+  &:hover {
+    color: var(--pipeline-accent, var(--dasu-ink));
+  }
+}
+
+.pipeline-message:hover .message-delete {
+  opacity: 1;
+}
+
 
 .dasu.pipeline-card {
+  color: var(--dasu-ink);
+
   .pipeline-card__fieldset {
     display: flex;
     flex-direction: column;
@@ -5134,10 +5238,14 @@
   }
 
   .pipeline-card__avatar {
-    width: 24px;
-    height: 24px;
+    display: inline-block !important;
+    width: 24px !important;
+    height: 24px !important;
+    max-width: 24px !important;
     object-fit: contain;
-    border: none;
+    border: none !important;
+    border-radius: 2px;
+    flex-shrink: 0;
   }
 
   .pipeline-card__source {
@@ -5161,14 +5269,14 @@
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    border: 1px solid rgb(255 255 255 / 14%);
+    border: 1px solid rgb(255 255 255 / 22%);
     border-radius: 0;
-    background: rgb(255 255 255 / 4%);
+    background: rgb(255 255 255 / 8%);
     color: var(--dasu-ink);
     cursor: pointer;
 
     &:hover {
-      filter: brightness(1.15);
+      background: rgb(255 255 255 / 14%);
     }
 
     &:disabled {
@@ -5188,36 +5296,125 @@
 
 .pipeline-body {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
 
   &__amount {
     font-weight: 700;
+    font-size: 1.05em;
+
+    &--heal {
+      color: var(--dasu-hp);
+    }
+    &--cost {
+      color: var(--dasu-wp);
+    }
+  }
+
+  &__type {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85em;
+  }
+
+  &__icon {
+    display: inline-block !important;
+    width: 16px !important;
+    height: 16px !important;
+    max-width: 16px !important;
+    object-fit: contain;
+    border: none !important;
+  }
+
+  &__name {
+    font-weight: 600;
+  }
+
+  &__verdict {
+    padding: 1px 6px;
+    font-size: 0.7em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+
+    &--weak {
+      background: rgb(224 85 85 / 20%);
+      color: rgb(244 130 130);
+    }
+    &--resist {
+      background: rgb(85 153 224 / 20%);
+      color: rgb(130 180 244);
+    }
+    &--nullify {
+      background: rgb(200 200 200 / 14%);
+      color: rgb(200 200 200);
+    }
+    &--drain {
+      background: rgb(85 187 119 / 20%);
+      color: rgb(130 214 160);
+    }
   }
 
   &__detail {
+    margin-left: auto;
     font-size: 0.85em;
     color: var(--dasu-muted);
+  }
+
+  /* Damage that drains heals the target, so show the amount as a gain. */
+  &--drain &__amount {
+    color: rgb(130 214 160);
+  }
+
+
+  &__effect-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9em;
+  }
+}
+
+.pipeline-body.pipeline-body--effect {
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 4px;
+}
+
+.pipeline-body__description {
+  font-size: 0.85em;
+  line-height: 1.35;
+  color: rgb(255 255 255 / 78%);
+
+  p:first-child {
+    margin-top: 0;
+  }
+  p:last-child {
+    margin-bottom: 0;
   }
 }
 
 /* Pipeline action buttons injected into source check cards */
 .pipeline-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 0 6px 6px;
+  gap: 4px;
+  padding: 4px 8px;
+  border-top: 1px solid rgb(255 255 255 / 8%);
 }
 
 .pipeline-actions__btn {
-  display: flex;
+  flex: 1;
+  display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 8px;
-  font-size: 0.72em;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 0.68em;
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   border: none;
   border-radius: 0;
   background: var(--check-accent, var(--dasu-hp));

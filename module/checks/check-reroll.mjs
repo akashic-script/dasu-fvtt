@@ -11,8 +11,8 @@ import { Flags } from '../helpers/flags.mjs';
  * can inject a "Rerolled" tag at the top of the card.
  */
 
-async function reroll(checkId) {
-  await Checks.modifyCheck(checkId, async (oldResult, actor, item) => {
+async function reroll(messageId) {
+  await Checks.modifyCheck(messageId, async (oldResult, actor, item) => {
     const check = CheckInternals.checkFromResult(oldResult);
     check.additionalData.rerolled = true;
     const roll = await CheckInternals.rollCheck(check);
@@ -50,11 +50,8 @@ const initialize = () => {
         return !!result && result.type !== 'display';
       },
       onClick: (event, target) => {
-        const result = messageFromContext(target)?.getFlag(
-          SYSTEM,
-          Flags.ChatMessage.Check
-        );
-        if (result?.id) reroll(result.id);
+        const message = messageFromContext(target);
+        if (message?.id) reroll(message.id);
       },
     });
   });
