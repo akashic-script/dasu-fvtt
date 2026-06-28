@@ -1,3 +1,5 @@
+import BonusesDataModel from './bonuses.mjs';
+
 export default class DASUActorBase extends foundry.abstract.TypeDataModel {
 
   static defineSchema() {
@@ -59,6 +61,9 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
       land: new fields.SchemaField({ bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }) }),
       critical: new fields.SchemaField({ bonus: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }), value: new fields.NumberField({ ...requiredInteger, initial: 11 }) }),
     });
+
+    // AE-targetable tuning layer; see BonusesDataModel.
+    schema.bonuses = new fields.EmbeddedDataField(BonusesDataModel);
 
     return schema;
   }

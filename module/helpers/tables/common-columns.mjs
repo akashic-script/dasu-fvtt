@@ -79,6 +79,7 @@ function _renderNameCell(renderCaption, cssClass, options) {
  * @typedef ItemControlsColumnOptions
  * @property {string | string[] | (() => string | string[])} [type]   item type(s) for the create button
  * @property {string | (() => string)} [label]                         header label i18n key
+ * @property {string} [compendium]                                     pack id; renders a Browse button (instead of create) that opens the compendium
  * @property {"start" | "center" | "end"} [headerAlignment]
  * @property {boolean | ((item: Item) => boolean)} [disableEdit]
  * @property {boolean | ((item: Item) => boolean)} [disableMenu]

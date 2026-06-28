@@ -13,11 +13,13 @@ const onPrepareCheck = (check, actor, item) => {
 
   const itemToLand = item?.system?.toLand ?? 0;
   const actorLand = actor?.system?.stats?.land?.value ?? 0;
-  check.tick = actorLand + itemToLand;
+  const landBonus = actor?.system?.bonuses?.toLand?.all ?? 0;
+  check.tick = actorLand + itemToLand + landBonus;
 
   const config = CheckConfiguration.configure(check);
   config.setTargetedDefense('defense').setDefaultTargets();
   if (item?.name) config.setLabel(item.name);
+  if (item?.system?.isInfinity) config.setAutoHit();
 };
 
 /** @type {ProcessCheckHook} */

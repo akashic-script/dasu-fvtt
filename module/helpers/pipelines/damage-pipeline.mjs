@@ -1,5 +1,6 @@
 import { Pipeline } from './pipeline.mjs';
 import { SYSTEM } from '../config.mjs';
+import { sumDamageBonus } from '../../data/bonuses.mjs';
 
 // Resistance level (-1..3) -> { mode, multiplier }. x0.5 rounds down; drain
 // flips damage into healing (applied to the target only).
@@ -34,7 +35,14 @@ export class DamagePipeline extends Pipeline {
       multiplier = 1;
     }
 
-    const raw = input.value ?? 0;
+    // Incoming-damage tuning (blanket + per-type) adjusts the raw amount before
+    // the resistance multiplier. Positive = takes more; clamped at 0.
+    const incoming = sumDamageBonus(target.system?.bonuses?.incomingDamage, {
+      type: damageType,
+    });
+    const vsArchetype = target.itemTypes?.archetype?.[0]?.system?.dsid;
+    const vsBonus = vsArchetype ? (input.vsArchetypeBonuses?.[vsArchetype] ?? 0) : 0;
+    const raw = Math.max(0, (input.value ?? 0) + incoming + vsBonus);
     const finalAmount = Math.floor(raw * Math.abs(multiplier));
     const drain = multiplier < 0;
     const newValue = drain

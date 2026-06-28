@@ -26,9 +26,7 @@ export class SubtypeTableRenderer extends DASUTableRenderer {
       controls: CommonColumns.itemControlsColumn({
         type: 'subtype',
         label: 'TYPES.Item.subtype',
-        disableAdd() {
-          return (this.document?.itemTypes?.subtype?.length ?? 0) > 0;
-        },
+        compendium: 'dasu.subtypes',
       }),
     },
   };

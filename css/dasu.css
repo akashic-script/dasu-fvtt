@@ -1436,6 +1436,10 @@
             flex: 0 0 52px;
           }
 
+          &.item-sidebar__field--dsid label {
+            flex: 0 0 16px;
+          }
+
           &.item-sidebar__field--full {
             height: auto;
             flex-direction: column;
@@ -1450,6 +1454,52 @@
 
             input, select {
               width: 100%;
+            }
+          }
+
+          .item-sidebar__input-adornment {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            min-width: 0;
+            box-sizing: border-box;
+
+            input {
+              flex: 1 1 auto;
+              min-width: 0;
+              width: auto;
+              height: 22px;
+              box-sizing: border-box;
+            }
+
+            .item-sidebar__regenerate-dsid {
+              flex: 0 0 22px;
+              align-self: center;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 22px;
+              height: 22px;
+              min-height: 0;
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+              line-height: 1;
+              background: rgb(var(--dasu-panel) / 40%);
+              border: 1px solid rgb(255 255 255 / 12%);
+              border-radius: 0;
+              color: var(--dasu-on-panel);
+              cursor: pointer;
+
+              &:hover {
+                background: rgb(var(--dasu-panel) / 70%);
+                color: var(--dasu-accent, #f0a500);
+              }
+
+              i {
+                font-size: 0.8em;
+              }
             }
           }
 
@@ -4578,7 +4628,7 @@
 }
 
 /* Per-target apply-damage chip: matches the dice-result boxes. */
-.dasu.check-card .target-apply-damage {
+.dasu.check-card .target-apply-menu {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -4616,6 +4666,35 @@
 
 .dasu.check-card .check-target.target-hit {
   box-shadow: inset 3px 0 0 0 var(--dasu-accent-restorative);
+}
+
+.target-apply-context-menu {
+  z-index: 10000;
+  background: var(--dasu-panel-solid, #1a1520);
+  border: 1px solid rgb(255 255 255 / 18%);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 60%);
+  min-width: 140px;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: none;
+    border: none;
+    border-bottom: 1px solid rgb(255 255 255 / 8%);
+    color: var(--dasu-ink, #eeede0);
+    cursor: pointer;
+    text-align: left;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: rgb(255 255 255 / 8%); }
+  }
 }
 
 .dasu.check-card .check-target.target-miss {
@@ -5157,6 +5236,75 @@
   max-height: 20px !important;
   object-fit: contain;
   border: none;
+}
+
+/* Affliction advanced tab - embedded effect list */
+.ability-effects-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.ability-effect-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+}
+
+.ability-effect__name {
+  flex: 1;
+  font-size: 0.85em;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.ability-effect__duration-value {
+  width: 40px;
+  text-align: center;
+  border-radius: 0;
+  background: rgb(var(--dasu-panel) / 40%);
+  border: none;
+  border-bottom: 1px solid rgb(255 255 255 / 15%);
+  color: var(--dasu-ink);
+}
+
+.ability-effect__duration-units,
+.ability-effect__apply-target {
+  border-radius: 0;
+  font-size: 0.85em;
+}
+
+.ability-effect__delete {
+  color: var(--dasu-muted, #aaa);
+  cursor: pointer;
+  padding: 0 2px;
+
+  &:hover {
+    color: #d96a6a;
+  }
+}
+
+.ability-effect-drop-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  color: var(--dasu-muted, #aaa);
+  font-size: 0.8em;
+  font-style: italic;
+  border: 1px dashed rgb(255 255 255 / 15%);
+  margin: 6px 10px;
+  transition: border-color 150ms ease, background 150ms ease;
+
+  &.drag-over {
+    border-color: rgb(154 106 196 / 70%);
+    background: rgb(154 106 196 / 10%);
+  }
 }
 
 /* Pipeline result cards (per-target) */

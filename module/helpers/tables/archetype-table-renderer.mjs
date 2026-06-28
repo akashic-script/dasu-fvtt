@@ -19,9 +19,7 @@ export class ArchetypeTableRenderer extends DASUTableRenderer {
       controls: CommonColumns.itemControlsColumn({
         type: 'archetype',
         label: 'TYPES.Item.archetype',
-        disableAdd() {
-          return (this.document?.itemTypes?.archetype?.length ?? 0) > 0;
-        },
+        compendium: 'dasu.archetypes',
       }),
     },
   };

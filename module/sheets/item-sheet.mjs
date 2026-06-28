@@ -29,6 +29,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
       addItemEffect: DASUItemSheet.#onAddItemEffect,
       deleteItemEffect: DASUItemSheet.#onDeleteItemEffect,
       clearGrantUuid: DASUItemSheet.#onClearGrantUuid,
+      regenerateDsid: DASUItemSheet.#onRegenerateDsid,
       addArchetypeBonus: DASUItemSheet.#onAddArchetypeBonus,
       deleteArchetypeBonus: DASUItemSheet.#onDeleteArchetypeBonus,
       fieldsetTab: DASUItemSheet.#onFieldsetTab,
@@ -69,10 +70,6 @@ export class DASUItemSheet extends SheetLayoutMixin(
     },
     description: {
       template: 'systems/dasu/templates/item/parts/description.hbs',
-      scrollable: [''],
-    },
-    advanced: {
-      template: 'systems/dasu/templates/item/parts/advanced.hbs',
       scrollable: [''],
     },
     effects: {
@@ -553,6 +550,12 @@ export class DASUItemSheet extends SheetLayoutMixin(
   }
 
   /* -------------------------------------------- */
+
+  static async #onRegenerateDsid() {
+    const name = this.item.name ?? '';
+    const dsid = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    await this.item.update({ 'system.dsid': dsid });
+  }
 
   static async #onAddItemEffect() {
     const effects = this.item.system.toObject().effects ?? [];

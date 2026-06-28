@@ -1,10 +1,18 @@
 <div class="header-item-controls">
-  {{#unless disableAdd}}
-  <a data-action="createItem"
-     data-type="{{type}}"
-     {{#if subtype}}data-sub-type="{{subtype}}"{{/if}}
-     data-tooltip="{{localize 'DOCUMENT.Create'}} {{localize label}}">
-    <i class="fas fa-plus"></i>
+  {{#if compendium}}
+  <a data-action="browseCompendium"
+     data-compendium="{{compendium}}"
+     data-tooltip="{{localize 'DASU.Table.BrowseCompendium'}} {{localize label}}">
+    <i class="fas fa-magnifying-glass"></i>
   </a>
-  {{/unless}}
+  {{else}}
+    {{#unless disableAdd}}
+    <a data-action="createItem"
+       data-type="{{type}}"
+       {{#if subtype}}data-sub-type="{{subtype}}"{{/if}}
+       data-tooltip="{{localize 'DOCUMENT.Create'}} {{localize label}}">
+      <i class="fas fa-plus"></i>
+    </a>
+    {{/unless}}
+  {{/if}}
 </div>

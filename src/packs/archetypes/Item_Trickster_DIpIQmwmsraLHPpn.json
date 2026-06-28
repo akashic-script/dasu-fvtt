@@ -1,0 +1,21 @@
+{
+  "name": "Trickster",
+  "type": "archetype",
+  "_id": "DIpIQmwmsraLHPpn",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "<p>An impish individual. They are known to lead many astray. The Trickster has used its understanding of magics to change the fate of humanity for as long as humans have been. Despite their ghoulish nature, the Trickster doesn't intrinsically hold nefarious thoughts. They do sometimes, but not always. Know well that while the Trickster lives in the shadows, they hold a great deal of power over the lives of mortal men and thus deserve their place in the Akashic Records.</p><ul><li><p>Daemons of the Trickster Archetype add +1 to all damage that targets WP.</p></li></ul>",
+    "dsid": "trickster",
+    "bonuses": [
+      { "target": "bonuses.damage.negotiation", "formula": "1" }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!DIpIQmwmsraLHPpn"
+}

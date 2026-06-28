@@ -2,6 +2,7 @@ import { CheckHooks } from './check-hooks.mjs';
 import { CheckConfiguration } from './check-configuration.mjs';
 import { CHECK_ROLL } from './default-section-order.mjs';
 import { CommonSections } from './common-sections.mjs';
+import { sumDamageBonus } from '../data/bonuses.mjs';
 
 /**
  * Combat attack: 2d10 + stats.hit + item.toHit vs the target's Avoid.
@@ -13,19 +14,27 @@ const onPrepareCheck = (check, actor, item) => {
 
   const itemToHit = item?.system?.toHit ?? 0;
   const actorHit = actor?.system?.stats?.hit?.value ?? 0;
-  check.tick = actorHit + itemToHit;
+  const bonuses = actor?.system?.bonuses;
+  const hitKey = item?.system?.category;
+  const toHitBonus =
+    (bonuses?.toHit?.all ?? 0) + (hitKey ? bonuses?.toHit?.[hitKey] ?? 0 : 0);
+  check.tick = actorHit + itemToHit + toHitBonus;
 
   const config = CheckConfiguration.configure(check);
   config.setTargetedDefense('avoid').setDefaultTargets();
   if (item?.name) config.setLabel(item.name);
+  if (item?.system?.isInfinity) config.setAutoHit();
 
   const itemDamage = item?.system?.damage;
-  if (itemDamage) {
+  if (itemDamage && item?.system?.category !== 'affliction') {
     const govern = item?.system?.govern ?? 'pow';
     const governValue = actor?.system?.attributes?.[govern]?.value ?? 0;
+    const type = itemDamage.type ?? 'physical';
+    const kind = item?.type === 'weapon' ? 'weapon' : (item?.system?.category ?? 'spell');
+    const dmgBonus = sumDamageBonus(bonuses?.damage, { kind, type });
     config.setDamage({
-      amount: governValue + (itemDamage.value ?? 0),
-      type: itemDamage.type ?? 'physical',
+      amount: governValue + (itemDamage.value ?? 0) + dmgBonus,
+      type,
     });
   }
 };

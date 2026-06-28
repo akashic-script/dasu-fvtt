@@ -19,6 +19,7 @@ const LABEL = 'label';
 const RANGE = 'range';
 const RESISTANCE_MODES = 'resistanceModes';
 const COST = 'cost';
+const AUTO_HIT = 'autoHit';
 
 /**
  * @typedef CheckTarget
@@ -56,6 +57,17 @@ class CheckConfigurer {
   /** @param {'avoid'|'defense'} stat @returns {CheckConfigurer} */
   setTargetedDefense(stat) {
     this.#data[TARGETED_DEFENSE] = stat;
+    return this;
+  }
+
+  /**
+   * Mark this check as an auto-hit (auto-pass To Hit / To Land). Every target is
+   * treated as hit regardless of the roll total.
+   * @param {boolean} [value=true]
+   * @returns {CheckConfigurer}
+   */
+  setAutoHit(value = true) {
+    this.#data[AUTO_HIT] = !!value;
     return this;
   }
 
@@ -137,8 +149,11 @@ class CheckConfigurer {
   updateTargetResults() {
     const total = this.#check.result;
     if (total == null) return this;
+    const autoHit = this.#data[AUTO_HIT] === true;
     for (const target of this.#data[TARGETS] ?? []) {
-      if (target.tn != null) target.hit = total >= target.tn;
+      // Auto-pass To Hit / To Land guarantees the hit on every target.
+      if (autoHit) target.hit = true;
+      else if (target.tn != null) target.hit = total >= target.tn;
     }
     return this;
   }

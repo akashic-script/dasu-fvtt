@@ -15,10 +15,19 @@ export class ResourcePipeline extends Pipeline {
     const max = pool.max ?? 0;
     const priorValue = pool.value ?? 0;
 
-    const base =
+    const rawBase =
       input.mode === 'percent'
         ? Math.floor((max * (input.value ?? 0)) / 100)
         : input.value ?? 0;
+
+    // Situational recovery/loss tuning on the receiving actor.
+    const bonuses = target.system?.bonuses;
+    const tune =
+      input.op === 'cost'
+        ? bonuses?.incomingLoss?.[resource] ?? 0
+        : bonuses?.incomingRecovery?.[resource] ?? 0;
+    const base = Math.max(0, rawBase + tune);
+
     const delta = input.op === 'cost' ? -base : base;
     const newValue = Math.max(0, Math.min(max, priorValue + delta));
 

@@ -45,6 +45,9 @@
       "DaemonOnly": "Only daemons can be transformation forms.",
       "Remove": "Remove form"
     },
+    "Table": {
+      "BrowseCompendium": "Browse"
+    },
     "Pipeline": {
       "Undo": "Undo",
       "Redo": "Redo",
@@ -371,14 +374,10 @@
     },
     "Item": {
       "NamePlaceholder": "Item Name",
+      "Dsid": "ID",
+      "DsidRegenerate": "Regenerate from name",
       "Govern": "Governs",
       "DamageResource": "Target Resource",
-      "Roll": {
-        "Formula": "Roll Formula:",
-        "DiceNum": "Number of Dice",
-        "DiceSize": "Die Size",
-        "DiceBonus": "Roll Modifier"
-      },
       "Item": {
         "Category": "Category",
         "CategoryRestorative": "Restorative",

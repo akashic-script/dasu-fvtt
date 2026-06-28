@@ -5,7 +5,6 @@ export default class DASUArchetype extends DASUItemBase {
     const fields = foundry.data.fields;
     const schema = super.defineSchema();
 
-    schema.identifier = new fields.StringField({ required: true, blank: true });
     schema.bonuses = new fields.ArrayField(
       new fields.SchemaField({
         target: new fields.StringField({

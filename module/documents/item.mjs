@@ -70,8 +70,7 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
       }
       if (
         item.type === 'item' ||
-        (item.type === 'ability' &&
-          (category === 'restorative' || category === 'affliction'))
+        (item.type === 'ability' && category === 'restorative')
       ) {
         return DASURollDialog.openItem(this.actor, item, 'display');
       }
@@ -87,18 +86,11 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
     const rollMode = game.settings.get('core', 'rollMode');
     const label = `[${item.type}] ${item.name}`;
 
-    if (!this.system.formula) {
-      await ChatMessage.create({
-        speaker,
-        rollMode,
-        flavor: label,
-        content: item.system.description ?? '',
-      });
-    } else {
-      const rollData = this.getRollData();
-      const roll = new Roll(rollData.formula, rollData);
-      await roll.toMessage({ speaker, rollMode, flavor: label });
-      return roll;
-    }
+    await ChatMessage.create({
+      speaker,
+      rollMode,
+      flavor: label,
+      content: item.system.description ?? '',
+    });
   }
 }

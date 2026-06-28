@@ -1,0 +1,21 @@
+{
+  "name": "Hero",
+  "type": "archetype",
+  "_id": "PTfbdQyneK1u7GzA",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "<p>A noble individual. They often have some aspect of themselves they hold dear. Sometimes they have a strong sense of justice or duty. Most important to the Hero is the Journey. Often, a Hero has some form of a quest that they must undergo, be it to obtain some sort of magical artifact or to stop some magnanimous force from ending the world. Heroes are the most common daemon as they are the most driven and the willing to do something of note.</p><ul><li><p>Daemons of the Hero Archetype add their Lvl x2 to HP</p></li></ul>",
+    "dsid": "hero",
+    "bonuses": [
+      { "target": "resources.hp.max", "formula": "@lvl * 2" }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!PTfbdQyneK1u7GzA"
+}

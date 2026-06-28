@@ -62,6 +62,7 @@ export class DASUTableRenderer {
       editItem: DASUTableRenderer.#onEditItem,
       deleteItem: DASUTableRenderer.#onDeleteItem,
       createItem: DASUTableRenderer.#onCreateItem,
+      browseCompendium: DASUTableRenderer.#onBrowseCompendium,
       menuItem: DASUTableRenderer.#onMenuItem,
     },
   };
@@ -399,6 +400,14 @@ export class DASUTableRenderer {
       },
       { parent: this.#application?.document }
     );
+  }
+
+  static async #onBrowseCompendium(event, target) {
+    event.preventDefault();
+    const id = target.dataset.compendium;
+    if (!id) return;
+    const pack = game.packs.get(id) ?? game.packs.get(`dasu.${id}`);
+    return pack?.render(true);
   }
 
   /**

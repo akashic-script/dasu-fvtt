@@ -64,8 +64,33 @@
       "path": "lang/en.json"
     }
   ],
-  "packs": [],
-  "packFolders": [],
+  "packs": [
+    {
+      "name": "archetypes",
+      "label": "Archetypes",
+      "path": "packs/archetypes",
+      "type": "Item",
+      "system": "dasu",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "name": "subtypes",
+      "label": "Subtypes",
+      "path": "packs/subtypes",
+      "type": "Item",
+      "system": "dasu",
+      "private": false,
+      "flags": {}
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "Daemon Building",
+      "sorting": "m",
+      "packs": ["archetypes", "subtypes"]
+    }
+  ],
   "socket": true,
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
