@@ -14,13 +14,10 @@
   ],
   "disabled": false,
   "duration": {
-    "startTime": null,
-    "seconds": null,
-    "combat": null,
-    "rounds": null,
-    "turns": null,
-    "startRound": null,
-    "startTurn": null
+    "value": 3,
+    "units": "turns",
+    "expiry": "turnStart",
+    "expired": false
   },
   "description": "<p>Gain +2 Avoid.</p>",
   "origin": null,

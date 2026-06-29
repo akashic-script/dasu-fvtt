@@ -1,3 +1,4 @@
+import { SYSTEM } from '../config.mjs';
 import { PipelineMessage } from './pipeline-message.mjs';
 import { PipelineButton } from './pipeline-button.mjs';
 import { DamagePipeline } from './damage-pipeline.mjs';
@@ -37,5 +38,11 @@ export function initializePipelines() {
   Hooks.on('renderChatMessageHTML', (message, html) => {
     PipelineButton.inject(message, html);
     PipelineMessage.activate(message, html);
+    const msgType = message.getFlag(SYSTEM, 'messageType');
+    if (msgType === 'turn-summary') {
+      html.classList.add('pipeline-message', 'pipeline-message--turn-summary');
+    } else if (msgType === 'status-damage') {
+      html.classList.add('pipeline-message', 'pipeline-message--status-damage');
+    }
   });
 }

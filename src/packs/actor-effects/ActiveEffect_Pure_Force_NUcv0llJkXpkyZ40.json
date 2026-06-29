@@ -1,0 +1,36 @@
+{
+  "name": "Pure Force",
+  "type": "base",
+  "_id": "NUcv0llJkXpkyZ40",
+  "img": "icons/magic/control/silhouette-hold-beam-blue.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.untyped",
+      "mode": 2,
+      "value": "3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+3 to untyped damage.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "agrBME97EKt2yEjB",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!NUcv0llJkXpkyZ40"
+}

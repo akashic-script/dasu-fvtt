@@ -1,0 +1,17 @@
+{
+  "name": "Outgoing Damage",
+  "type": "ActiveEffect",
+  "_id": "51zpx1yWL5ckwrji",
+  "description": "",
+  "color": "#8d3f2a",
+  "sort": 200,
+  "folder": null,
+  "sorting": "a",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!folders!51zpx1yWL5ckwrji"
+}

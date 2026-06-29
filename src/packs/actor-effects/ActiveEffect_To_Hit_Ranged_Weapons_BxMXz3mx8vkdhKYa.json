@@ -1,0 +1,36 @@
+{
+  "name": "To Hit: Ranged Weapons",
+  "type": "base",
+  "_id": "BxMXz3mx8vkdhKYa",
+  "img": "icons/weapons/bows/bow-recurve-black.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.toHit.ranged",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+2 To Hit with ranged weapons.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "iqrOlv9MnuBSf2Zv",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!BxMXz3mx8vkdhKYa"
+}

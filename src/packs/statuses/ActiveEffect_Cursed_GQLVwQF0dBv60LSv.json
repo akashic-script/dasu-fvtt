@@ -7,13 +7,10 @@
   "changes": [],
   "disabled": false,
   "duration": {
-    "startTime": null,
-    "seconds": null,
-    "combat": null,
-    "rounds": null,
-    "turns": null,
-    "startRound": null,
-    "startTurn": null
+    "value": null,
+    "units": "turns",
+    "expiry": "combatEnd",
+    "expired": false
   },
   "description": "<p>Status effects applied after this point have their duration doubled. Lasts until the end of the conflict; applies only to future statuses.</p>",
   "origin": null,

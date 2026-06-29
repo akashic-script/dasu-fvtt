@@ -1,0 +1,36 @@
+{
+  "name": "To Hit: Small Weapons",
+  "type": "base",
+  "_id": "tcuDtEpTi6Wxkit9",
+  "img": "icons/skills/melee/hand-grip-sword-orange.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.toHit.small",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+2 To Hit with small weapons.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "iqrOlv9MnuBSf2Zv",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!tcuDtEpTi6Wxkit9"
+}

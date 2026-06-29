@@ -1,0 +1,36 @@
+{
+  "name": "To Land",
+  "type": "base",
+  "_id": "8ykORNP7y5kHJ9uA",
+  "img": "icons/skills/social/diplomacy-handshake-yellow.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.toLand.all",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+2 To Land on every tactic check.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "iqrOlv9MnuBSf2Zv",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!8ykORNP7y5kHJ9uA"
+}

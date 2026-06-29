@@ -20,13 +20,10 @@
   ],
   "disabled": false,
   "duration": {
-    "startTime": null,
-    "seconds": null,
-    "combat": null,
-    "rounds": null,
-    "turns": null,
-    "startRound": null,
-    "startTurn": null
+    "value": 3,
+    "units": "turns",
+    "expiry": "turnStart",
+    "expired": false
   },
   "description": "<p>Take a -2 penalty to To Hit and Avoid.</p>",
   "origin": null,

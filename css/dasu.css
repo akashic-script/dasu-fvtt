@@ -5307,9 +5307,36 @@
   }
 }
 
+/* The whole Effects tab accepts effect drops; highlight while dragging over. */
+section[data-tab='effects'].drag-over {
+  outline: 1px dashed rgb(154 106 196 / 70%);
+  outline-offset: -4px;
+  background: rgb(154 106 196 / 8%);
+}
+
 /* Pipeline result cards (per-target) */
-/* The chat-message wrapper; matches the check card so it isn't washed out by
-   Foundry's default light chat styling. */
+.chat-message:has(.pipeline-card--turn) {
+  --pipeline-accent: #7a9e7a;
+  background: #1a1520 !important;
+  border: 1px solid rgb(255 255 255 / 12%) !important;
+  border-left: 2px solid var(--pipeline-accent) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-bottom: 2px;
+  overflow: hidden;
+
+  .message-header,
+  .flavor-text,
+  .whisper-to {
+    display: none;
+  }
+
+  .message-delete {
+    display: none;
+  }
+}
+
 .pipeline-message {
   --dasu-hp: #d9a800;
   --dasu-wp: #6ab4d8;
@@ -5339,9 +5366,70 @@
 .pipeline-message--effect {
   --pipeline-accent: #9a6ac4;
 }
+.pipeline-message--turn-summary {
+  --pipeline-accent: #7a9e7a;
+}
+.pipeline-message--status-damage {
+  --pipeline-accent: #d96a6a;
+}
 
-/* The card renders its own header; hide Foundry's default and relocate delete. */
-.pipeline-message .message-header,
+.dasu.pipeline-card--turn {
+  --dasu-hp: #d9a800;
+  --dasu-wp: #6ab4d8;
+  --dasu-ink: #eeede0;
+  --dasu-muted: rgb(255 255 255 / 55%);
+  --dasu-panel: 0 0 0;
+  --dasu-panel-solid: #1a1520;
+  --dasu-border: 1px solid rgb(255 255 255 / 12%);
+  --pipeline-accent: #7a9e7a;
+
+  background: var(--dasu-panel-solid);
+  border: var(--dasu-border);
+  border-left: 2px solid var(--pipeline-accent);
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--dasu-ink);
+  overflow: hidden;
+
+  .pipeline-card__header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px 4px 6px;
+    background: rgb(var(--dasu-panel) / 80%);
+    border-bottom: var(--dasu-border);
+    min-height: 32px;
+  }
+
+  .pipeline-card__name {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--dasu-ink);
+  }
+
+  .pipeline-card__avatar {
+    width: 20px;
+    height: 20px;
+    max-width: 20px;
+    flex-shrink: 0;
+    object-fit: contain;
+    border: none;
+    border-radius: 2px;
+  }
+
+  .pipeline-card__source {
+    margin-left: auto;
+    margin-right: 6px;
+    font-size: 0.75em;
+    color: var(--dasu-muted);
+  }
+
+  .pipeline-card__body {
+    padding: 6px 10px;
+  }
+}
+
+.pipeline-message:not(.pipeline-message--status-damage) .message-header,
 .pipeline-message .flavor-text,
 .pipeline-message .whisper-to {
   display: none;
@@ -5370,6 +5458,23 @@
   opacity: 1;
 }
 
+.pipeline-message--status-damage {
+  .message-header {
+    padding: 4px 8px;
+    border-bottom: 1px solid rgb(255 255 255 / 10%);
+
+    .message-sender {
+      font-size: 0.85em;
+      color: var(--dasu-muted);
+    }
+  }
+
+  .message-content {
+    padding: 6px 8px;
+    font-size: 0.9em;
+    color: var(--dasu-ink);
+  }
+}
 
 .dasu.pipeline-card {
   color: var(--dasu-ink);
@@ -5440,6 +5545,58 @@
       text-decoration: line-through;
     }
   }
+}
+
+.turn-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.turn-summary__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.turn-summary__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.turn-summary__icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  max-width: 18px;
+  flex: 0 0 18px;
+  border: none;
+  object-fit: contain;
+}
+.turn-summary__name {
+  flex: 1;
+  font-weight: 600;
+}
+.turn-summary__remaining {
+  opacity: 0.7;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+.turn-summary__none {
+  opacity: 0.6;
+  font-style: italic;
+}
+.turn-summary__expired-label {
+  margin-top: 4px;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+}
+.turn-summary__list--expired .turn-summary__row {
+  opacity: 0.55;
+  text-decoration: line-through;
 }
 
 .pipeline-body {
@@ -5546,7 +5703,8 @@
 
 /* Pipeline action buttons injected into source check cards */
 .pipeline-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 4px;
   padding: 4px 8px;
   border-top: 1px solid rgb(255 255 255 / 8%);

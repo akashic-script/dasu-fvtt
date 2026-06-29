@@ -35,6 +35,8 @@ export class EffectPipeline extends Pipeline {
     // Strip the source _id so repeated applies don't collide on one embedded id.
     if (effectData) delete effectData._id;
 
+    if (effectData) normalizeDuration(effectData);
+
     const statusId =
       effectData?.flags?.dasu?.statusId ?? effectData?.statuses?.[0] ?? null;
     const isKnownStatus = !!(statusId && CONFIG.DASU.statusEffectIndex?.[statusId]);
@@ -130,15 +132,25 @@ export class EffectPipeline extends Pipeline {
   }
 }
 
+function normalizeDuration(effectData) {
+  const dur = effectData.duration;
+  if (!dur || !dur.value || !dur.units) return;
+  const n = Number(dur.value);
+  if (!Number.isFinite(n) || n <= 0) return;
+  effectData.duration = {
+    ...dur,
+    rounds: dur.units === 'rounds' ? n : null,
+    turns: dur.units === 'turns' ? n : null,
+    value: undefined,
+    units: undefined,
+  };
+}
+
 function _formatDuration(dur) {
   if (!dur) return null;
-  if (dur.value && dur.units) {
-    const key = dur.units === 'rounds'
-      ? 'DASU.Pipeline.DurationRounds'
-      : dur.units === 'turns'
-        ? 'DASU.Pipeline.DurationTurns'
-        : null;
-    return key ? game.i18n.format(key, { n: dur.value }) : null;
-  }
+  const rounds = dur.rounds ?? (dur.units === 'rounds' ? dur.value : null);
+  const turns = dur.turns ?? (dur.units === 'turns' ? dur.value : null);
+  if (rounds) return game.i18n.format('DASU.Pipeline.DurationRounds', { n: rounds });
+  if (turns) return game.i18n.format('DASU.Pipeline.DurationTurns', { n: turns });
   return null;
 }

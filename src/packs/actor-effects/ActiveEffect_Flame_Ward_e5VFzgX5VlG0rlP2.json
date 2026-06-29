@@ -1,0 +1,36 @@
+{
+  "name": "Fire Ward",
+  "type": "base",
+  "_id": "e5VFzgX5VlG0rlP2",
+  "img": "icons/magic/defensive/shield-barrier-flaming-diamond-red.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.incomingDamage.fire",
+      "mode": 2,
+      "value": "-3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>Reduce incoming fire damage by 3.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "fWE164PM75o1be96",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!e5VFzgX5VlG0rlP2"
+}

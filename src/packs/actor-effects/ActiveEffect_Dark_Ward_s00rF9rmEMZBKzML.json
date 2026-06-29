@@ -1,0 +1,36 @@
+{
+  "name": "Dark Ward",
+  "type": "base",
+  "_id": "s00rF9rmEMZBKzML",
+  "img": "icons/magic/defensive/shield-barrier-glowing-triangle-purple-orange.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.incomingDamage.dark",
+      "mode": 2,
+      "value": "-3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>Reduce incoming dark damage by 3.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "fWE164PM75o1be96",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!s00rF9rmEMZBKzML"
+}

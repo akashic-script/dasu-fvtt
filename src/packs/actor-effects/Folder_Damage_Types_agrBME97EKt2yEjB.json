@@ -1,0 +1,17 @@
+{
+  "name": "Damage Types",
+  "type": "ActiveEffect",
+  "_id": "agrBME97EKt2yEjB",
+  "description": "",
+  "color": "#8d652a",
+  "sort": 300,
+  "folder": null,
+  "sorting": "a",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!folders!agrBME97EKt2yEjB"
+}

@@ -1,0 +1,36 @@
+{
+  "name": "Hero Killer",
+  "type": "base",
+  "_id": "W009VD8QU0bQOcnA",
+  "img": "icons/environment/people/cleric-grey.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.hero",
+      "mode": 2,
+      "value": "5",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>Gain +5 bonus damage against Heroes.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "nqyrlWbtmnQ8ZVR9",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!W009VD8QU0bQOcnA"
+}

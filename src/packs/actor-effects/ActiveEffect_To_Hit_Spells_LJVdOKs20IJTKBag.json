@@ -1,0 +1,36 @@
+{
+  "name": "To Hit: Spells",
+  "type": "base",
+  "_id": "LJVdOKs20IJTKBag",
+  "img": "icons/magic/light/orb-lightbulb-gray.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.toHit.spell",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+2 To Hit with spell abilities.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "iqrOlv9MnuBSf2Zv",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!LJVdOKs20IJTKBag"
+}

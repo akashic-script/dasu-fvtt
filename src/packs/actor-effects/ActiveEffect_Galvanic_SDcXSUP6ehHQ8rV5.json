@@ -1,0 +1,36 @@
+{
+  "name": "Galvanic",
+  "type": "base",
+  "_id": "SDcXSUP6ehHQ8rV5",
+  "img": "icons/magic/lightning/bolt-strike-blue.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.electric",
+      "mode": 2,
+      "value": "3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+3 to electric damage.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "agrBME97EKt2yEjB",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!SDcXSUP6ehHQ8rV5"
+}

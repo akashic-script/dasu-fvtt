@@ -1,0 +1,36 @@
+{
+  "name": "To Hit: All",
+  "type": "base",
+  "_id": "WMMCrlOi7Fby65ne",
+  "img": "icons/skills/targeting/target-strike-triple-blue.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.toHit.all",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+2 To Hit on every accuracy check.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "iqrOlv9MnuBSf2Zv",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!WMMCrlOi7Fby65ne"
+}

@@ -1,0 +1,36 @@
+{
+  "name": "WP Restoration Dealt",
+  "type": "base",
+  "_id": "jbkZio9MiRYJiBdt",
+  "img": "icons/magic/control/buff-flight-wings-runes-blue-white.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.outgoingRecovery.wp",
+      "mode": 2,
+      "value": "3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+3 to WP restoration you grant others (flat).</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "bU5MqJvrLuP8EVY2",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!jbkZio9MiRYJiBdt"
+}

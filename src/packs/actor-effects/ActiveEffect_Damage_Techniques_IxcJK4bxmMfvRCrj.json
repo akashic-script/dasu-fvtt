@@ -1,0 +1,36 @@
+{
+  "name": "Damage: Techniques",
+  "type": "base",
+  "_id": "IxcJK4bxmMfvRCrj",
+  "img": "icons/skills/melee/strike-flail-spiked-pink.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.technique",
+      "mode": 2,
+      "value": "3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+3 to technique damage.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "51zpx1yWL5ckwrji",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!IxcJK4bxmMfvRCrj"
+}

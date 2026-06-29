@@ -1,7 +1,7 @@
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { DocumentSheetV2 } = foundry.applications.api;
 import { prepareActiveEffectCategories } from '../helpers/effects.mjs';
-import { DASU } from '../helpers/config.mjs';
+import { DASU, SYSTEM } from '../helpers/config.mjs';
 import { SheetLayoutMixin } from './mixins/sheet-layout-mixin.mjs';
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
 import { AdvancementTableRenderer } from '../helpers/tables/advancement-table-renderer.mjs';
@@ -25,6 +25,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     form: {
       submitOnChange: true,
     },
+    dragDrop: [{ dragSelector: '[data-drag]', dropSelector: null }],
     actions: {
       addItemEffect: DASUItemSheet.#onAddItemEffect,
       deleteItemEffect: DASUItemSheet.#onDeleteItemEffect,
@@ -36,6 +37,49 @@ export class DASUItemSheet extends SheetLayoutMixin(
       fieldsetSplit: DASUItemSheet.#onFieldsetSplit,
     },
   };
+
+  get _dragDrop() {
+    return (this.#dragDrop ??= (this.options.dragDrop ?? []).map(
+      (d) =>
+        new foundry.applications.ux.DragDrop.implementation({
+          ...d,
+          permissions: {
+            dragstart: () => this.isEditable,
+            drop: () => this.isEditable,
+          },
+          callbacks: {
+            drop: this._onDrop.bind(this),
+          },
+        })
+    ));
+  }
+
+  #dragDrop = null;
+
+  async _onDrop(event) {
+    if (!this.isEditable || !this.item.isOwner) return;
+    const zone = event.target.closest(
+      '.ability-effect-drop-zone, section[data-tab="effects"]'
+    );
+    if (!zone) return;
+    zone.classList.remove('drag-over');
+    const data =
+      foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
+    if (data?.type !== 'ActiveEffect' || !data.uuid) return;
+    const src = await fromUuid(data.uuid);
+    if (!src || src.parent === this.item) return;
+    const effectData = src.toObject();
+    delete effectData._id;
+    if (zone.classList.contains('ability-effect-drop-zone')) {
+      effectData.flags = effectData.flags ?? {};
+      effectData.flags.dasu = {
+        applyTarget: 'target',
+        ...effectData.flags.dasu,
+        applied: true,
+      };
+    }
+    await this.item.createEmbeddedDocuments('ActiveEffect', [effectData]);
+  }
 
   /** @override */
   static TABS = {
@@ -104,20 +148,23 @@ export class DASUItemSheet extends SheetLayoutMixin(
     },
   ]);
 
+  #ownEffects = (doc) =>
+    doc.effects.filter((e) => !e.getFlag(SYSTEM, 'applied'));
+
   #temporaryEffectsTable = new EffectTableRenderer(
     'temporary',
     'DASU.Effect.Temporary',
-    (doc) => prepareActiveEffectCategories(doc.effects).temporary.effects
+    (doc) => prepareActiveEffectCategories(this.#ownEffects(doc)).temporary.effects
   );
   #passiveEffectsTable = new EffectTableRenderer(
     'passive',
     'DASU.Effect.Passive',
-    (doc) => prepareActiveEffectCategories(doc.effects).passive.effects
+    (doc) => prepareActiveEffectCategories(this.#ownEffects(doc)).passive.effects
   );
   #inactiveEffectsTable = new EffectTableRenderer(
     'inactive',
     'DASU.Effect.Inactive',
-    (doc) => prepareActiveEffectCategories(doc.effects).inactive.effects
+    (doc) => prepareActiveEffectCategories(this.#ownEffects(doc)).inactive.effects
   );
 
   /** @override */
@@ -266,19 +313,20 @@ export class DASUItemSheet extends SheetLayoutMixin(
         context.isSpellAbility ||
         context.isAfflictionAbility ||
         context.isTechniqueAbility;
-      // Every ability category exposes the "Apply Effects" advanced tab.
-      context.abilityEffects = item.effects.map((e) => ({
-        id: e.id,
-        uuid: e.uuid,
-        name: e.name,
-        img: e.img,
-        durationValue: e.duration?.value ?? null,
-        durationUnits: e.duration?.units ?? 'rounds',
-        applyTarget: e.flags?.dasu?.applyTarget ?? 'target',
-      }));
+      context.abilityEffects = item.effects
+        .filter((e) => e.getFlag(SYSTEM, 'applied'))
+        .map((e) => ({
+          id: e.id,
+          uuid: e.uuid,
+          name: e.name,
+          img: e.img,
+          durationValue: e.duration?.value ?? null,
+          durationUnits: e.duration?.units ?? 'turns',
+          applyTarget: e.flags?.dasu?.applyTarget ?? 'target',
+        }));
       context.durationUnitsOptions = {
-        rounds: game.i18n.localize('DASU.Duration.Rounds'),
         turns: game.i18n.localize('DASU.Duration.Turns'),
+        rounds: game.i18n.localize('DASU.Duration.Rounds'),
       };
       context.applyTargetOptions = {
         target: game.i18n.localize('DASU.Item.Ability.ApplyTarget.Target'),
@@ -424,6 +472,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
   /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);
+    this._dragDrop.forEach((d) => d.bind(this.element));
 
     for (const nameEl of this.element.querySelectorAll(
       '.effect-drop-zone__name[data-grant-uuid]'
@@ -554,37 +603,18 @@ export class DASUItemSheet extends SheetLayoutMixin(
       }
     }
 
-    // Ability "Apply Effects" advanced tab (all ability categories).
+    for (const zone of this.element.querySelectorAll(
+      '.ability-effect-drop-zone, section[data-tab="effects"]'
+    )) {
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    }
+
     const abilityEffectZone = this.element.querySelector('.ability-effect-drop-zone');
     if (abilityEffectZone) {
-      abilityEffectZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        abilityEffectZone.classList.add('drag-over');
-      });
-      abilityEffectZone.addEventListener('dragleave', () => abilityEffectZone.classList.remove('drag-over'));
-      abilityEffectZone.addEventListener('drop', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        abilityEffectZone.classList.remove('drag-over');
-        let data;
-        try {
-          data = foundry.applications.ux.TextEditor.implementation.getDragEventData(e);
-        } catch {
-          try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch { return; }
-        }
-        if (data?.type !== 'ActiveEffect' || !data.uuid) {
-          ui.notifications?.warn(game.i18n.localize('DASU.Item.Ability.EffectDropInvalid'));
-          return;
-        }
-        const src = await fromUuid(data.uuid);
-        if (!src) return;
-        const effectData = typeof src.toObject === 'function'
-          ? src.toObject()
-          : foundry.utils.deepClone(src._source ?? src);
-        delete effectData._id;
-        await this.item.createEmbeddedDocuments('ActiveEffect', [effectData]);
-      });
-
       for (const row of this.element.querySelectorAll('.ability-effect-row')) {
         const effectId = row.dataset.effectId;
 
@@ -603,7 +633,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
         const targetSelect = row.querySelector('.ability-effect__apply-target');
         const updateDuration = async () => {
           const value = parseInt(valInput?.value) || null;
-          const units = unitsSelect?.value ?? 'rounds';
+          const units = unitsSelect?.value ?? 'turns';
           await this.item.effects.get(effectId)?.update({ 'duration.value': value, 'duration.units': units });
         };
         valInput?.addEventListener('change', updateDuration);

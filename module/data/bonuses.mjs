@@ -66,7 +66,6 @@ export class DamageBonusesDataModel extends foundry.abstract.DataModel {
       weapon: intField(),
       spell: intField(),
       technique: intField(),
-      affliction: intField(),
       // Per target archetype.
       hero: intField(),
       sage: intField(),
@@ -105,7 +104,7 @@ export default class BonusesDataModel extends foundry.abstract.DataModel {
  * Layers: all + (combat|negotiation) + source-kind + damage-type + target-archetype.
  * @param {DamageBonusesDataModel} model
  * @param {object} [opts]
- * @param {string} [opts.kind]         source-kind key (weapon/spell/technique/affliction/tactic)
+ * @param {string} [opts.kind]         source-kind key (weapon/spell/technique/tactic)
  * @param {string} [opts.type]         damage-type key (fire/ice/.../physical)
  * @param {string} [opts.vsArchetype]  target's archetype identifier (hero/sage/rogue/trickster)
  * @returns {number}

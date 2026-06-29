@@ -1,0 +1,36 @@
+{
+  "name": "Physical Ward",
+  "type": "base",
+  "_id": "OaVFNoRwWS5X3hEq",
+  "img": "icons/equipment/shield/heater-steel-grey.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.incomingDamage.physical",
+      "mode": 2,
+      "value": "-3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>Reduce incoming physical damage by 3.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "fWE164PM75o1be96",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!OaVFNoRwWS5X3hEq"
+}

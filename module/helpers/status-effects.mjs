@@ -175,6 +175,7 @@ export async function applyStatus(actor, statusId, { source, bumpBy = 1 } = {}) 
           : maxStacksOf(existing);
     const next = Math.min(cap, stacksOf(existing) + bumpBy);
     update[`flags.${SYSTEM}.stacks`] = next;
+    update.name = stackedName(baseNameOf(existing), next);
     update.changes = scaledChanges(
       statusId,
       next,
@@ -202,8 +203,9 @@ async function createStatus(actor, statusId, { source } = {}) {
         ...(typeof rawCap === 'string' ? { maxStacksAttr: rawCap } : {}),
       }
     : {};
+  const base = game.i18n.localize(def.name);
   const data = {
-    name: game.i18n.localize(def.name),
+    name: base,
     img: def.img,
     statuses: [statusId],
     changes: scaledChanges(statusId, 1),
@@ -213,6 +215,7 @@ async function createStatus(actor, statusId, { source } = {}) {
     flags: {
       [SYSTEM]: {
         statusId,
+        baseName: base,
         ...stackFlags,
         ...(source ? { statusSource: source } : {}),
       },
@@ -220,6 +223,20 @@ async function createStatus(actor, statusId, { source } = {}) {
   };
   const [created] = await actor.createEmbeddedDocuments('ActiveEffect', [data]);
   return created ?? null;
+}
+
+function stackedName(base, stacks) {
+  return stacks > 1 ? `${base} (${stacks})` : base;
+}
+
+/** The unsuffixed base name of a status effect (stored on create). */
+function baseNameOf(effect) {
+  return (
+    effect?.getFlag?.(SYSTEM, 'baseName') ??
+    game.i18n.localize(
+      CONFIG.DASU.statusEffectIndex[statusIdOf(effect)]?.name ?? effect?.name ?? ''
+    )
+  );
 }
 
 /** Whether an effect's per-stack changes auto-scale (default true). */
@@ -255,6 +272,7 @@ export async function resyncStacks(effect) {
   const cap = maxStacksOf(effect);
   const clamped = Math.max(1, Math.min(cap, stacksOf(effect)));
   const update = {
+    name: stackedName(baseNameOf(effect), clamped),
     changes: scaledChanges(statusId, clamped, scaleWithStacksOf(effect)),
   };
   // Only write the stack flag back if the GM's input was out of range.
@@ -262,12 +280,8 @@ export async function resyncStacks(effect) {
   await effect.update(update);
 }
 
-/**
- * At the start of a combatant's turn, apply per-turn status damage
- * (Bleeding/Infected). Damage = caster's snapshotted POW tick x stacks, dealt
- * directly to HP and announced in chat.
- */
-async function onCombatTurn(combat, prior, current) {
+/** Apply per-turn status damage and reap finished durations at turn start. */
+async function onCombatTurn(combat, _prior, current) {
   if (!game.users.activeGM?.isSelf) return; // single executor
   const combatant = current?.combatantId
     ? combat.combatants.get(current.combatantId)
@@ -293,6 +307,56 @@ async function onCombatTurn(combat, prior, current) {
     });
     await announceStatusDamage(actor, statusId, amount, stacks);
   }
+
+  const summary = await reapDurations(actor);
+  await postTurnSummary(actor, summary);
+}
+
+/** @returns {Promise<{active: object[], expired: object[]}>} */
+async function reapDurations(actor) {
+  const active = [];
+  const expired = [];
+  for (const effect of actor.effects ?? []) {
+    const d = effect.duration;
+    if (!d?.type || d.type === 'none') continue; // no finite combat duration
+    const remaining = d.remaining ?? 0;
+    if (remaining <= 0) {
+      expired.push({ name: effect.name, img: effect.img });
+      await effect.delete();
+    } else {
+      active.push({
+        name: effect.name,
+        img: effect.img,
+        remaining,
+        units: d.rounds != null ? 'rounds' : 'turns',
+      });
+    }
+  }
+  return { active, expired };
+}
+
+async function postTurnSummary(actor, { active, expired }) {
+  if (!active.length && !expired.length) return;
+  const unitLabel = (units) =>
+    game.i18n.localize(units === 'turns' ? 'DASU.Duration.Turns' : 'DASU.Duration.Rounds');
+  const content = await foundry.applications.handlebars.renderTemplate(
+    `systems/${SYSTEM}/templates/chat/turn-summary.hbs`,
+    {
+      actorName: actor.name,
+      actorImg: actor.img ?? 'icons/svg/mystery-man.svg',
+      active: active.map((e) => ({
+        name: e.name,
+        img: e.img,
+        remainingLabel: `${e.remaining} ${unitLabel(e.units)}`,
+      })),
+      expired,
+    }
+  );
+  await ChatMessage.create({
+    content,
+    speaker: ChatMessage.getSpeaker({ actor }),
+    flags: { [SYSTEM]: { messageType: 'turn-summary' } },
+  });
 }
 
 /** Post a brief chat message for status-tick damage. */
@@ -307,6 +371,7 @@ async function announceStatusDamage(actor, statusId, amount, stacks) {
   await ChatMessage.create({
     content,
     speaker: ChatMessage.getSpeaker({ actor }),
+    flags: { [SYSTEM]: { messageType: 'status-damage' } },
   });
 }
 

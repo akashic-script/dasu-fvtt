@@ -1,0 +1,36 @@
+{
+  "name": "Damage: All",
+  "type": "base",
+  "_id": "pD3ETemt7Pfh8L4P",
+  "img": "icons/skills/melee/strike-weapons-orange.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.all",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+2 to all damage you deal.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "51zpx1yWL5ckwrji",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!pD3ETemt7Pfh8L4P"
+}

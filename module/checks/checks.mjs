@@ -705,10 +705,11 @@ export function initializeChecks() {
       }
     }
 
-    // Abilities apply their embedded ActiveEffects (the "Apply Effects" tab) to
+    // Abilities apply their "Apply Effects" entries (flagged dasu.applied) to
     // hit targets; an effect flagged apply-target=self goes to the caster.
     if (item.type === 'ability') {
       for (const effect of item.effects ?? []) {
+        if (!effect.flags?.dasu?.applied) continue;
         const isSelf = effect.flags?.dasu?.applyTarget === 'self';
         const action = effectAction(effect.uuid, effect.name);
         if (isSelf) action.uuid = result.actorUuid;

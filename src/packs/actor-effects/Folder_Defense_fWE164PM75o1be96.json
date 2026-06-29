@@ -1,0 +1,17 @@
+{
+  "name": "Defense",
+  "type": "ActiveEffect",
+  "_id": "fWE164PM75o1be96",
+  "description": "",
+  "color": "#316646",
+  "sort": 500,
+  "folder": null,
+  "sorting": "a",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!folders!fWE164PM75o1be96"
+}

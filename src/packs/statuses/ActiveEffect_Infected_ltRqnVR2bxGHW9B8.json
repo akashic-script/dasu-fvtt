@@ -7,15 +7,12 @@
   "changes": [],
   "disabled": false,
   "duration": {
-    "startTime": null,
-    "seconds": null,
-    "combat": null,
-    "rounds": null,
-    "turns": null,
-    "startRound": null,
-    "startTurn": null
+    "value": 3,
+    "units": "turns",
+    "expiry": "turnStart",
+    "expired": false
   },
-  "description": "<p>Take [Caster's POW Tick × Rank] damage each turn and halve Power Tick. Stacks up to the caster's STA Tick; Power halving does not stack.</p>",
+  "description": "<p>Take [Caster's POW Tick \u00d7 Rank] damage each turn and halve Power Tick. Stacks up to the caster's STA Tick; Power halving does not stack.</p>",
   "origin": null,
   "tint": "#ffffff",
   "transfer": false,

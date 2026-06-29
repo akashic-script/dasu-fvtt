@@ -1,0 +1,36 @@
+{
+  "name": "Galeforce",
+  "type": "base",
+  "_id": "pfH9BPC7tY76B66E",
+  "img": "icons/magic/air/wind-tornado-funnel-blue.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.wind",
+      "mode": 2,
+      "value": "3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+3 to wind damage.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "agrBME97EKt2yEjB",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!pfH9BPC7tY76B66E"
+}

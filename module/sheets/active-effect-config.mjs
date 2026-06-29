@@ -1,6 +1,5 @@
 import { SYSTEM } from '../helpers/config.mjs';
 import {
-  isStackable,
   statusIdOf,
   stacksOf,
   maxStacksOf,
@@ -10,13 +9,9 @@ import {
 const { ActiveEffectConfig } = foundry.applications.sheets;
 
 /**
- * ActiveEffect config sheet with an extra "Stacks" tab for stackable status
- * effects. The tab exposes the current stack count, a max-stacks override, the
- * caster attribute the cap derives from, and a per-stack auto-scale toggle -
- * all stored under `flags.dasu.*` and consumed by the status-effects helpers.
- *
- * The tab is only shown for effects that represent a stackable status; for any
- * other ActiveEffect this behaves exactly like the core config.
+ * ActiveEffect config sheet with an extra "Stacks" tab on all effects.
+ * Exposes the current stack count, max-stacks override, caster attribute cap,
+ * and per-stack auto-scale toggle stored under `flags.dasu.*`.
  */
 export class DASUActiveEffectConfig extends ActiveEffectConfig {
   static PARTS = (() => {
@@ -46,23 +41,14 @@ export class DASUActiveEffectConfig extends ActiveEffectConfig {
     return tabs;
   })();
 
-  /** True when the edited effect is a stackable status. */
-  get _isStackable() {
-    return isStackable(statusIdOf(this.document));
-  }
-
-  /** @override Drop the Stacks part entirely for non-stackable effects. */
+  /** @override Always show the Stacks part. */
   _configureRenderParts(options) {
-    const parts = super._configureRenderParts(options);
-    if (!this._isStackable) delete parts.stacks;
-    return parts;
+    return super._configureRenderParts(options);
   }
 
-  /** @override Hide the Stacks tab control for non-stackable effects. */
+  /** @override Always show the Stacks tab. */
   _prepareTabs(group) {
-    const tabs = super._prepareTabs(group);
-    if (!this._isStackable) delete tabs.stacks;
-    return tabs;
+    return super._prepareTabs(group);
   }
 
   /** @override Provide stacks context to the Stacks part. */

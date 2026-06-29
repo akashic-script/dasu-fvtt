@@ -75,6 +75,15 @@
       "flags": {}
     },
     {
+      "name": "actor-effects",
+      "label": "Actor Effects",
+      "path": "packs/actor-effects",
+      "type": "ActiveEffect",
+      "system": "dasu",
+      "private": false,
+      "flags": {}
+    },
+    {
       "name": "archetypes",
       "label": "Archetypes",
       "path": "packs/archetypes",
@@ -102,7 +111,7 @@
     {
       "name": "Effects",
       "sorting": "m",
-      "packs": ["statuses"]
+      "packs": ["statuses", "actor-effects"]
     }
   ],
   "socket": true,
