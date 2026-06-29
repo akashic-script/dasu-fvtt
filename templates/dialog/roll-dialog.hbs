@@ -152,6 +152,20 @@
     </div>
     {{/unless}}
 
+    {{#if hasSpecialties}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.Specialty"}}</label>
+        <div class="roll-dialog__specialties">
+          <button type="button" class="roll-dialog__spec-btn {{#if specialtyNone}}is-active{{/if}}" data-action="setSpecialty" data-index="-1">{{localize "DASU.Dialog.Roll.SpecialtyNone"}}</button>
+          {{#each specialties}}
+          <button type="button" class="roll-dialog__spec-btn {{#if active}}is-active{{/if}}" data-action="setSpecialty" data-index="{{index}}">{{name}} <span class="roll-dialog__spec-bonus">+1</span></button>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+    {{/if}}
+
     {{#unless isDisplay}}
     <div class="roll-dialog__adv-row">
       <label class="roll-dialog__adv-btn {{#if (eq advantage 'advantage')}}is-active{{/if}}" data-action="setAdvantage" data-value="advantage">

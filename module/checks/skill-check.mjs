@@ -19,6 +19,27 @@ const onRenderCheck = (data, result, actor, item) => {
   if (result.type !== 'skill') return;
   CommonSections.rollResult(data, result, CHECK_ROLL);
   CommonSections.outcome(data, result, CheckConfiguration.inspect(result));
+
+  // A skill ability seeds its name + threshold as tags and injects its description.
+  const sa = result.additionalData?.skillAbility;
+  if (sa) {
+    if (sa.name) data.tags.unshift({ tag: sa.name });
+    const thresholdTag =
+      sa.thresholdType === 'fixed'
+        ? { tag: 'DASU.SkillAbility.Threshold.Label', value: `TN ${sa.fixedTN}` }
+        : {
+            tag: 'DASU.SkillAbility.Threshold.Label',
+            value:
+              sa.thresholdType === 'defense'
+                ? 'DASU.SkillAbility.Threshold.Defense'
+                : 'DASU.SkillAbility.Threshold.Avoid',
+          };
+    data.tags.push(thresholdTag);
+    CommonSections.description(data, sa.description, {
+      relativeTo: actor,
+      label: sa.name,
+    });
+  }
 };
 
 const initialize = () => {

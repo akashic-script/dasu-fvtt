@@ -70,6 +70,7 @@ Hooks.once('init', function () {
     subtype: models.DASUSubtype,
     bond: models.DASUBond,
     specialAbility: models.DASUSpecialAbility,
+    skillAbility: models.DASUSkillAbility,
   });
 
   Object.assign(CONFIG.ChatMessage.dataModels, {
@@ -105,6 +106,7 @@ Hooks.once('init', function () {
         'subtype',
         'bond',
         'specialAbility',
+        'skillAbility',
       ],
       makeDefault: true,
       label: 'DASU.SheetLabels.Item',

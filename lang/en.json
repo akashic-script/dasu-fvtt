@@ -37,6 +37,19 @@
         "Reactive": "Reactive"
       }
     },
+    "SkillAbility": {
+      "Title": "Skill Ability",
+      "Skill": "Skill",
+      "SkillAny": "Any / chosen at roll",
+      "CostsMainAction": "Costs Main Action",
+      "FixedTN": "Fixed TN",
+      "Threshold": {
+        "Label": "Difficulty Threshold",
+        "Avoid": "Target's Avoid",
+        "Defense": "Target's Defense",
+        "Fixed": "Fixed TN"
+      }
+    },
     "Transformation": {
       "Title": "Transformations",
       "MeritThreshold": "Merits",
@@ -437,6 +450,13 @@
         "Perceiving": "Perceiving",
         "Stealth": "Stealth",
         "Outdoorsmanship": "Outdoorsmanship"
+      },
+      "Specialty": {
+        "Manage": "Manage specialties",
+        "Add": "Add specialty",
+        "Remove": "Remove specialty",
+        "Budget": "Specialties used / available",
+        "Placeholder": "e.g. Long Jumping"
       }
     },
     "Sheet": {
@@ -645,6 +665,19 @@
       "Miss": "Miss",
       "Reroll": "Reroll",
       "Retarget": "Retarget",
+      "Aid": {
+        "Action": "Aid Skill Check",
+        "Flavor": "{helper} aids {target}'s {skill} check",
+        "Effect": "{mod} to the target's result",
+        "NoEffect": "no effect",
+        "Success": "Success",
+        "Crit": "Critical",
+        "SnakeEyes": "Snake Eyes",
+        "Fail": "No Aid",
+        "NoActor": "Select a token or assign a character to aid with.",
+        "SelfAid": "An actor cannot aid their own check.",
+        "NeedsTick": "Your actor needs at least +1 tick in that skill to aid."
+      },
       "Type": {
         "Attribute": "Attribute Check",
         "Skill": "Skill Check",
@@ -698,6 +731,9 @@
         "Normal": "Normal",
         "Difficulty": "Difficulty",
         "DifficultyNone": "No TN",
+        "Specialty": "Specialty",
+        "SpecialtyNone": "None",
+        "SpecialtyMod": "{name} (specialty)",
         "Range": "Range",
         "DamageType": "Damage Type",
         "Damage": "Damage",
@@ -743,7 +779,8 @@
       "archetype": "Archetype",
       "subtype": "Subtype",
       "bond": "Bond",
-      "specialAbility": "Special Ability"
+      "specialAbility": "Special Ability",
+      "skillAbility": "Skill Ability"
     }
   }
 }

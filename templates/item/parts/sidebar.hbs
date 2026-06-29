@@ -458,4 +458,31 @@
     </div>
   </div>
   {{/if}}
+
+  {{#if isSkillAbility}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.SkillAbility.Skill"}}</label>
+      <select name="system.skill">
+        {{selectOptions skillOptions selected=system.skill}}
+      </select>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.SkillAbility.Threshold.Label"}}</label>
+      <select name="system.thresholdType">
+        {{selectOptions thresholdTypeOptions selected=system.thresholdType}}
+      </select>
+    </div>
+    {{#if (eq system.thresholdType "fixed")}}
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.SkillAbility.FixedTN"}}</label>
+      <input type="number" name="system.fixedTN" value="{{system.fixedTN}}" min="0" step="1" />
+    </div>
+    {{/if}}
+    <label class="item-sidebar__field item-sidebar__checkbox">
+      <input type="checkbox" name="system.costsMainAction" {{checked system.costsMainAction}} />
+      <span>{{localize "DASU.SkillAbility.CostsMainAction"}}</span>
+    </label>
+  </div>
+  {{/if}}
 </div>

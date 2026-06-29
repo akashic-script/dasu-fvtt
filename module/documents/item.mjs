@@ -80,6 +80,11 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
       if (item.type === 'tactic') {
         return DASURollDialog.openItem(this.actor, item, 'tactic');
       }
+      if (item.type === 'skillAbility') {
+        return DASURollDialog.openSkill(this.actor, item.system.skill || null, {
+          skillAbility: item,
+        });
+      }
     }
 
     const speaker = ChatMessage.getSpeaker({ actor: this.actor });

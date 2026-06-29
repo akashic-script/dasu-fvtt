@@ -12,6 +12,7 @@ import { InitiativeCheck } from './initiative-check.mjs';
 import { OpenCheck } from './open-check.mjs';
 import { DisplayCheck } from './display-check.mjs';
 import { CheckReroll } from './check-reroll.mjs';
+import { CheckAid } from './check-aid.mjs';
 import { CheckRetarget } from './check-retarget.mjs';
 import {
   getActionBlockingStatus,
@@ -325,6 +326,9 @@ async function processResult(check, roll, actor, item, callHook = true) {
     actorUuid: actor.uuid,
     itemUuid: item?.uuid,
     itemName: item?.name,
+    skill: check.skill ?? null,
+    primary: check.primary ?? null,
+    secondary: check.secondary ?? null,
     roll: roll.toJSON(),
     additionalRolls: [],
     dice: Object.freeze([...keptDice]),
@@ -490,6 +494,7 @@ export function initializeChecks() {
   DisplayCheck.initialize();
   CheckReroll.initialize();
   CheckRetarget.initialize();
+  CheckAid.initialize();
 
   Hooks.on(CheckHooks.renderCheck, (data, result) => {
     const adv = result.advantage && !result.disadvantage;

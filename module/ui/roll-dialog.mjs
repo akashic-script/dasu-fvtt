@@ -29,6 +29,10 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
   #costDir = 'minus';
   /** @type {'minus'|'plus'} damage adjustment direction (item mode) */
   #damageDir = 'plus';
+  /** @type {number} index of the chosen specialty for a skill check, or -1 for none */
+  #specialty = -1;
+  /** @type {FUItem|null} skill ability whose description seeds the check card */
+  #skillAbility = null;
 
   constructor(actor, mode, key, options = {}) {
     super(options);
@@ -37,6 +41,7 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     this.#key = key;
     this.#item = options.item ?? null;
     this.#itemCheckType = options.itemCheckType ?? null;
+    this.#skillAbility = options.skillAbility ?? null;
   }
 
   static DEFAULT_OPTIONS = {
@@ -52,6 +57,7 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
       roll: DASURollDialog.#onRoll,
       cancel: DASURollDialog.#onCancel,
       setAdvantage: DASURollDialog.#onSetAdvantage,
+      setSpecialty: DASURollDialog.#onSetSpecialty,
       setCostDir: DASURollDialog.#onSetCostDir,
       setDamageDir: DASURollDialog.#onSetDamageDir,
     },
@@ -182,6 +188,16 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
     const overrideCtx = isItem ? this.#overrideContext() : {};
 
+    // Specialties of the selected skill, shown as exclusive toggles (skill mode).
+    const specialtySource =
+      mode === 'skill' ? system.skills?.[selectedKey]?.specialties ?? [] : [];
+    const specialties = specialtySource.map((s, i) => ({
+      index: i,
+      name: s.name,
+      active: this.#specialty === i,
+    }));
+    const specialtyMod = this.#specialty >= 0 && this.#specialty < specialties.length ? 1 : 0;
+
     return {
       mode,
       isItem,
@@ -192,12 +208,15 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
       actorName: this.#actor.name,
       attributes,
       skills,
+      specialties,
+      hasSpecialties: specialties.length > 0,
+      specialtyNone: this.#specialty < 0,
       tick,
       mod: this.#mod,
       advantage: this.#advantage,
       difficulty: this.#difficulty,
       difficulties,
-      formula: `${dicePart} + ${tick + this.#mod}`,
+      formula: `${dicePart} + ${tick + this.#mod + specialtyMod}`,
       ...overrideCtx,
     };
   }
@@ -321,12 +340,27 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
       if (previewEl) previewEl.textContent = `${dicePart} + ${total}`;
     };
 
-    htmlElement
-      .querySelector('[name="key"]')
-      ?.addEventListener('change', updatePreview);
+    htmlElement.querySelector('[name="key"]')?.addEventListener('change', (e) => {
+      // In skill mode the specialty list depends on the skill, so re-render to
+      // refresh it (and reset the chosen specialty); otherwise just preview.
+      if (this.#mode === 'skill') {
+        this.#key = e.target.value;
+        this.#specialty = -1;
+        this.render();
+      } else {
+        updatePreview();
+      }
+    });
     htmlElement
       .querySelector('[name="mod"]')
       ?.addEventListener('input', updatePreview);
+  }
+
+  /** Exclusive specialty toggle: clicking the active one clears it (none). */
+  static #onSetSpecialty(event, target) {
+    const idx = Number(target.dataset.index);
+    this.#specialty = this.#specialty === idx ? -1 : idx;
+    this.render();
   }
 
   static #onSetAdvantage(event, target) {
@@ -377,6 +411,12 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
     const overrides = this.#mode === 'item' ? this.#readOverrides(form) : null;
 
+    // Resolve the chosen specialty (skill mode) to a +1 named modifier.
+    const specialtyName =
+      this.#mode === 'skill' && this.#specialty >= 0
+        ? this.#actor.system?.skills?.[key]?.specialties?.[this.#specialty]?.name
+        : null;
+
     const configCallback = (check) => {
       if (mod)
         check.modifiers.push({
@@ -384,10 +424,25 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
           value: mod,
           source: 'dialog',
         });
+      if (specialtyName)
+        check.modifiers.push({
+          label: game.i18n.format('DASU.Dialog.Roll.SpecialtyMod', { name: specialtyName }),
+          value: 1,
+          source: 'specialty',
+        });
       if (advantage === 'advantage') check.advantage = true;
       if (advantage === 'disadvantage') check.disadvantage = true;
       if (tn != null) CheckConfiguration.configure(check).setTargetNumber(tn);
       if (overrides) check.additionalData.dialogOverrides = overrides;
+      if (this.#skillAbility) {
+        const sa = this.#skillAbility;
+        check.additionalData.skillAbility = {
+          name: sa.name,
+          description: sa.system.description ?? '',
+          thresholdType: sa.system.thresholdType,
+          fixedTN: sa.system.fixedTN,
+        };
+      }
     };
 
     if (this.#mode === 'item') {
@@ -420,8 +475,8 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     return new DASURollDialog(actor, 'attribute', attributeKey).render(true);
   }
 
-  static openSkill(actor, skillKey) {
-    return new DASURollDialog(actor, 'skill', skillKey).render(true);
+  static openSkill(actor, skillKey, options = {}) {
+    return new DASURollDialog(actor, 'skill', skillKey, options).render(true);
   }
 
   /**

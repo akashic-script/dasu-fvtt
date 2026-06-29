@@ -45,7 +45,8 @@
       "archetype": {},
       "subtype": {},
       "bond": {},
-      "specialAbility": {}
+      "specialAbility": {},
+      "skillAbility": {}
     },
     "ChatMessage": {
       "pipeline": {}

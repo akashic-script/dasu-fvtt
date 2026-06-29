@@ -242,6 +242,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     context.isSubtype = item.type === 'subtype';
     context.isBond = item.type === 'bond';
     context.isSpecialAbility = item.type === 'specialAbility';
+    context.isSkillAbility = item.type === 'skillAbility';
 
     const localize = (obj) =>
       Object.fromEntries(
@@ -382,6 +383,30 @@ export class DASUItemSheet extends SheetLayoutMixin(
         passive: 'DASU.SpecialAbility.Kind.Passive',
         active: 'DASU.SpecialAbility.Kind.Active',
         reactive: 'DASU.SpecialAbility.Kind.Reactive',
+      });
+    }
+
+    if (context.isSkillAbility) {
+      context.skillOptions = {
+        '': game.i18n.localize('DASU.SkillAbility.SkillAny'),
+        ...localize(DASU.skills),
+      };
+      // When owned by an actor, also offer that actor's custom skills (stored by
+      // random id), so an ability can be tied to a homebrew skill.
+      const owner = item.parent instanceof Actor ? item.parent : null;
+      for (const [key, s] of Object.entries(owner?.system?.skills ?? {})) {
+        if (key in DASU.skills) continue;
+        const label = s.customName?.trim() || s.label || key;
+        if (label) context.skillOptions[key] = label;
+      }
+      // A saved skill id that no longer resolves still needs to display.
+      if (item.system.skill && !(item.system.skill in context.skillOptions)) {
+        context.skillOptions[item.system.skill] = item.system.skill;
+      }
+      context.thresholdTypeOptions = localize({
+        avoid: 'DASU.SkillAbility.Threshold.Avoid',
+        defense: 'DASU.SkillAbility.Threshold.Defense',
+        fixed: 'DASU.SkillAbility.Threshold.Fixed',
       });
     }
 

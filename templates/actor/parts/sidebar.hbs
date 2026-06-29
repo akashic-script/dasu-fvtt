@@ -94,7 +94,10 @@
     <div class="actor-sidebar__skills">
       {{#each system.skills as |skill key|}}
       <div class="actor-sidebar__skill-row {{#if skill.isCustom}}actor-sidebar__skill-row--custom{{/if}}" data-skill="{{key}}">
-        <span class="actor-sidebar__skill-label">{{skill.label}}</span>
+        <button type="button" class="actor-sidebar__skill-spec-btn dasu-pill" data-action="openSpecialtiesPopover" data-skill="{{key}}" data-tooltip="{{localize 'DASU.Actor.Specialty.Manage'}}"><i class="fas fa-wrench"></i></button>
+        <span class="actor-sidebar__skill-label">
+          {{skill.label}}{{#if skill.specialties.length}} <span class="actor-sidebar__skill-spec-badge" data-tooltip="{{localize 'DASU.Actor.Specialty.Manage'}}">{{skill.specialties.length}}</span>{{/if}}
+        </span>
         <input class="actor-sidebar__skill-custom-name" type="text" name="system.skills.{{key}}.customName" value="{{skill.customName}}" placeholder="{{skill.label}}" />
         <div class="actor-sidebar__skill-controls">
           <button type="button" class="actor-sidebar__skill-btn dasu-pill" data-action="skillStep" data-skill="{{key}}" data-step="-1" {{#unless editable}}disabled{{/unless}}>−</button>

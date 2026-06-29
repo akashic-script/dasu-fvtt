@@ -66,7 +66,21 @@ export default class DASUSummoner extends DASUActorBase {
       const defaultLabel = i18nKey ? game.i18n.localize(i18nKey) : key;
       s.label = s.customName?.trim() || defaultLabel;
       s.isCustom = !i18nKey;
+      // Normalize specialties to an array of { name } entries.
+      s.specialties = (Array.isArray(s.specialties) ? s.specialties : [])
+        .map((sp) => (typeof sp === 'string' ? { name: sp } : { name: sp?.name ?? '' }))
+        .filter((sp) => sp.name.trim());
     }
+
+    // Specialty budget: 3 to start, +1 every 9 levels. Derived, not a cap on storage.
+    const specialtiesUsed = Object.values(this.skills ?? {}).reduce(
+      (sum, s) => sum + (s.specialties?.length ?? 0),
+      0
+    );
+    this.specialties = {
+      max: 3 + Math.floor(this.level / 9),
+      used: specialtiesUsed,
+    };
 
     const spMax = cls ? cls.system.spMax(this.level) : 3 + (this.level - 1) * 2;
     const triCost = (r) => (r * (r + 1)) / 2;

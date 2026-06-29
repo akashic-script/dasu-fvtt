@@ -21,6 +21,7 @@ import { SpecialAbilityTableRenderer } from '../helpers/tables/special-ability-t
 import { TransformationTableRenderer } from '../helpers/tables/transformation-table-renderer.mjs';
 import { DaemonTables } from '../helpers/tables/daemon-tables.mjs';
 import { BondTableRenderer } from '../helpers/tables/bond-table-renderer.mjs';
+import { SkillAbilityTableRenderer } from '../helpers/tables/skill-ability-table-renderer.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
 import { DASURollDialog } from '../ui/roll-dialog.mjs';
 import { SYSTEM } from '../helpers/config.mjs';
@@ -48,6 +49,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   /** Teardown for the open stepper popover, or null when none is open. */
   #stepperPopoverCleanup = null;
+
+  /** Teardown for the open specialties popover, or null when none is open. */
+  #specialtiesPopoverCleanup = null;
 
   /** Whether the delegated transformation listeners are bound (bind once). */
   #transformationListenersBound = false;
@@ -79,6 +83,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
   #activeStockTable = new StockTableRenderer('active');
   #inactiveStockTable = new StockTableRenderer('inactive');
   #bondTable = new BondTableRenderer();
+  #skillAbilityTable = new SkillAbilityTableRenderer();
   #classTable = new ClassTableRenderer();
   #archetypeTable = new ArchetypeTableRenderer();
   #subtypeTable = new SubtypeTableRenderer();
@@ -129,6 +134,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
       aptitudeStep: DASUActorSheet.#onAptitudeStep,
       createCustomSkill: DASUActorSheet.#onCreateCustomSkill,
       deleteCustomSkill: DASUActorSheet.#onDeleteCustomSkill,
+      openSpecialtiesPopover: DASUActorSheet.#onOpenSpecialtiesPopover,
       advance: DASUActorSheet.#onAdvance,
       fieldsetTab: DASUActorSheet.#onFieldsetTab,
       fieldsetSplit: DASUActorSheet.#onFieldsetSplit,
@@ -259,6 +265,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.featureTable = await this.#featureTable.renderTable(this.document);
     if (actor.type === 'summoner') {
       context.bondTable = await this.#bondTable.renderTable(this.document);
+      context.skillAbilityTable = await this.#skillAbilityTable.renderTable(this.document);
     }
 
     context.archetypeTable = await this.#archetypeTable.renderTable(
@@ -457,6 +464,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
   async _onClose(options) {
     this.#closeTriadDropdown();
     this.#closeStepperPopover();
+    this.#specialtiesPopoverCleanup?.();
     return super._onClose(options);
   }
 
@@ -530,6 +538,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.#inactiveEffectsTable.activateListeners(this);
     if (this.actor.type === 'summoner') {
       this.#bondTable.activateListeners(this);
+      this.#skillAbilityTable.activateListeners(this);
       this.#activeStockTable.activateListeners(this);
       this.#inactiveStockTable.activateListeners(this);
       for (const tables of this.#daemonTableCache.values())
@@ -587,6 +596,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
   async _onRender(context, options) {
     // A re-render rebuilds the DOM and orphans any open popover.
     this.#closeStepperPopover();
+    this.#specialtiesPopoverCleanup?.();
     await super._onRender(context, options);
 
     for (const { tab, html } of context.moduleItemTables ?? []) {
@@ -1434,6 +1444,118 @@ export class DASUActorSheet extends SheetLayoutMixin(
       { 'system.skills': skills },
       { diff: false, recursive: false }
     );
+  }
+
+  /**
+   * Open the list-style popover that manages a skill's Specialties. Rows can be
+   * added, edited, and removed; the array is committed to the actor on close.
+   */
+  static async #onOpenSpecialtiesPopover(event, target) {
+    const key = target.dataset.skill;
+    if (!key) return;
+    const doc = this.element.ownerDocument;
+    const popId = 'dasu-popover-specialties';
+
+    const wasOpen = doc.getElementById(popId);
+    this.#specialtiesPopoverCleanup?.();
+    if (wasOpen) return;
+
+    const skill = this.actor.system.skills?.[key];
+    const spec = this.actor.system.specialties ?? { used: 0, max: 3 };
+    const render = () =>
+      foundry.applications.handlebars.renderTemplate(
+        'systems/dasu/templates/actor/parts/specialties-popover.hbs',
+        {
+          label: skill?.label ?? key,
+          specialties: (skill?.specialties ?? []).map((s) => ({ name: s.name })),
+          used: spec.used,
+          max: spec.max,
+          over: spec.used > spec.max,
+        }
+      );
+
+    const pop = Object.assign(doc.createElement('div'), {
+      id: popId,
+      className: 'dasu-resource-popover dasu-specialties-popover',
+      innerHTML: await render(),
+    });
+
+    const anchor = this.element;
+    const aRect = anchor.getBoundingClientRect();
+    const rRect = target.getBoundingClientRect();
+    const popWidth = 220;
+    Object.assign(pop.style, {
+      top: `${rRect.bottom - aRect.top + anchor.scrollTop + 2}px`,
+      left: `${Math.max(0, rRect.left - aRect.left + anchor.scrollLeft)}px`,
+      width: `${popWidth}px`,
+    });
+    anchor.appendChild(pop);
+    target.classList.add('popover-open');
+
+    // Read the live input values into a clean specialties array.
+    const collect = () =>
+      [...pop.querySelectorAll('.specialties-popover__input')]
+        .map((i) => ({ name: i.value.trim() }))
+        .filter((s) => s.name);
+
+    const commit = () =>
+      this.actor.update(
+        { [`system.skills.${key}.specialties`]: collect() },
+        { render: false }
+      );
+
+    // Add/remove mutate the actor immediately so the popover re-renders fresh.
+    pop.querySelector('.specialties-popover__add')?.addEventListener('click', async () => {
+      const next = [...collect(), { name: '' }];
+      await this.actor.update(
+        { [`system.skills.${key}.specialties`]: next },
+        { render: false }
+      );
+      skill.specialties = next;
+      pop.innerHTML = await render();
+      bindRowActions();
+      pop.querySelector('.specialties-popover__input:last-of-type')?.focus();
+    });
+
+    const bindRowActions = () => {
+      pop.querySelectorAll('[data-action="removeSpecialty"]').forEach((btn) =>
+        btn.addEventListener('click', async () => {
+          const idx = Number(btn.dataset.index);
+          const next = collect().filter((_, i) => i !== idx);
+          await this.actor.update(
+            { [`system.skills.${key}.specialties`]: next },
+            { render: false }
+          );
+          skill.specialties = next;
+          pop.innerHTML = await render();
+          bindRowActions();
+        })
+      );
+      pop.querySelectorAll('.specialties-popover__input').forEach((input) =>
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            input.blur();
+          }
+        })
+      );
+    };
+    bindRowActions();
+
+    const cleanup = async ({ commitOnClose = false } = {}) => {
+      doc.removeEventListener('pointerdown', onPointerDown);
+      this.#specialtiesPopoverCleanup = null;
+      target.classList.remove('popover-open');
+      if (commitOnClose) await commit();
+      pop.remove();
+      if (commitOnClose) this.render();
+    };
+    this.#specialtiesPopoverCleanup = () => cleanup();
+
+    const onPointerDown = (e) => {
+      if (!pop.contains(e.target) && e.target !== target) cleanup({ commitOnClose: true });
+    };
+    setTimeout(() => doc.addEventListener('pointerdown', onPointerDown), 0);
   }
 
   static async #onShowResistance(event, target) {

@@ -141,6 +141,99 @@
     }
   }
 
+  .dasu .dasu-specialties-popover {
+    gap: 6px;
+    background: var(--dasu-panel-solid);
+    color: var(--dasu-on-panel);
+
+    .specialties-popover__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.75em;
+      font-weight: bold;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--dasu-on-panel);
+    }
+
+    .specialties-popover__budget {
+      flex: 0 0 auto;
+      opacity: 0.7;
+
+      &.specialties-popover__budget--over {
+        color: #d96a6a;
+        opacity: 1;
+      }
+    }
+
+    .specialties-popover__list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .specialties-popover__row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .specialties-popover__input {
+      flex: 1 1 0;
+      min-width: 0;
+      height: 24px;
+      background: rgb(0 0 0 / 30%);
+      border: 1px solid rgb(255 255 255 / 15%);
+      color: var(--dasu-on-panel);
+      padding: 0 6px;
+    }
+
+    .specialties-popover__remove {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: rgb(255 255 255 / 6%);
+      border: 1px solid rgb(255 255 255 / 15%);
+      border-radius: 0;
+      color: var(--dasu-on-panel);
+      cursor: pointer;
+
+      &:hover {
+        color: #d96a6a;
+        background: rgb(255 255 255 / 12%);
+      }
+    }
+
+    .specialties-popover__add {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 26px;
+      background: rgb(255 255 255 / 10%);
+      border: 1px solid rgb(255 255 255 / 18%);
+      border-radius: 0;
+      color: var(--dasu-on-panel);
+      font-size: 0.72em;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+
+      &:hover {
+        background: rgb(255 255 255 / 18%);
+      }
+    }
+  }
+
   .rollable:hover,
   .rollable:focus {
     text-shadow: 0 0 8px rgb(255 255 255 / 80%);
@@ -2021,6 +2114,44 @@
           flex: 1;
         }
 
+        .actor-sidebar__skill-spec-btn {
+          display: none;
+          flex: 0 0 auto;
+          align-items: center;
+          justify-content: center;
+          width: 18px;
+          height: 18px;
+          padding: 0;
+          background: transparent;
+          border: none;
+          color: var(--dasu-tab-icon);
+          font-size: 0.8em;
+          cursor: pointer;
+
+          &:hover {
+            color: var(--dasu-tab-icon-active);
+          }
+
+          .edit-mode & {
+            display: inline-flex;
+          }
+        }
+
+        .actor-sidebar__skill-spec-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 14px;
+          height: 14px;
+          padding: 0 3px;
+          font-size: 0.7em;
+          font-weight: bold;
+          color: var(--dasu-paper);
+          background: var(--dasu-accent-restorative);
+          border-radius: 0;
+          vertical-align: middle;
+        }
+
         .actor-sidebar__skill-custom-name {
           display: none;
           flex: 1;
@@ -2679,6 +2810,9 @@
       &.bond-table .dasu-table__header {
         --section-accent: var(--dasu-accent-bond);
       }
+      &.skill-ability-table .dasu-table__header {
+        --section-accent: var(--dasu-accent-restorative);
+      }
       &.stock-table--active .dasu-table__header {
         --section-accent: var(--dasu-accent-stock-active);
       }
@@ -2770,6 +2904,9 @@
       }
       &.bond-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-bond);
+      }
+      &.skill-ability-table .dasu-table__row-container.item {
+        --item-accent: var(--dasu-accent-restorative);
       }
       &.stock-table--active .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-stock-active);
@@ -3245,6 +3382,9 @@
     .bond-table {
       grid-template-columns: [name] auto [affinity] 64px [rank] 100px [controls] 54px;
     }
+    .skill-ability-table {
+      grid-template-columns: [name] auto [skill] 90px [threshold] 90px [controls] 54px;
+    }
     .tactic-table {
       grid-template-columns: [name] auto [damage] 80px [cost] 54px [toLand] 48px [controls] 54px;
     }
@@ -3357,7 +3497,7 @@
   nav.sheet-tabs {
     background: rgb(20 12 36 / 80%) !important;
   }
-  .dasu-resource-popover {
+  .dasu-resource-popover:not(.dasu-specialties-popover) {
     background: #f0ecff;
     color: var(--dasu-ink);
   }
@@ -4176,6 +4316,45 @@
     --check-accent: var(--dasu-accent-tactic);
     border-color: var(--dasu-accent-tactic);
     background: rgb(from var(--dasu-accent-tactic) r g b / 20%);
+  }
+
+  .roll-dialog__specialties {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .roll-dialog__spec-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 24px;
+    padding: 0 8px;
+    font-size: 0.72em;
+    font-weight: bold;
+    cursor: pointer;
+    background: rgb(var(--dasu-panel) / 40%);
+    border: 1px solid rgb(255 255 255 / 12%);
+    color: var(--dasu-tab-icon);
+    transition: background 100ms ease, color 100ms ease, border-color 100ms ease;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--dasu-ink);
+      background: rgb(var(--dasu-panel) / 70%);
+    }
+
+    &.is-active {
+      --check-accent: var(--dasu-accent-restorative);
+      color: var(--dasu-ink);
+      border-color: var(--dasu-accent-restorative);
+      background: rgb(from var(--dasu-accent-restorative) r g b / 20%);
+    }
+  }
+
+  .roll-dialog__spec-bonus {
+    opacity: 0.7;
+    font-size: 0.9em;
   }
 
   .roll-dialog__actions {
