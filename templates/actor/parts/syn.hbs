@@ -37,6 +37,12 @@
       <button class="dasu-fieldset__tab {{lookup panels.stock "activeClass"}}" data-action="fieldsetTab" data-panel="stock" type="button">
         <span class="dasu-fieldset__tab-label">{{localize "DASU.Sheet.Syn.Stock"}}</span>
       </button>
+      <span class="dasu-fieldset__counter syn-stock__strain{{#if @root.willStrain.over}} syn-stock__strain--over{{/if}}" data-tooltip="{{localize 'DASU.Actor.Stat.Strain.long'}}">
+        <span class="syn-stock__strain-label">{{localize "DASU.Actor.Stat.Strain.abbr"}}</span>
+        <span class="syn-stock__strain-val">{{@root.willStrain.used}}</span>
+        <span class="syn-stock__strain-sep">/</span>
+        <span class="syn-stock__strain-max">{{@root.willStrain.cap}}</span>
+      </span>
     </div>
     <div class="dasu-fieldset__panel" data-panel="stock" {{lookup panels.stock "hidden"}}>
       {{{@root.activeStockTable}}}

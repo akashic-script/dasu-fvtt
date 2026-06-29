@@ -31,6 +31,9 @@ export default class DASUSummoner extends DASUActorBase {
       new fields.SchemaField({
         uuid: new fields.StringField({ required: true, blank: false }),
         active: new fields.BooleanField({ initial: false }),
+        // Channelers may channel one daemon as a separate layer; it does not
+        // count toward Will Strain like fielded (active) daemons do.
+        channeled: new fields.BooleanField({ initial: false }),
       }),
       { required: true, initial: [] }
     );
@@ -69,6 +72,21 @@ export default class DASUSummoner extends DASUActorBase {
     const triCost = (r) => (r * (r + 1)) / 2;
     const spSpent = Object.values(this.skills ?? {}).reduce((sum, s) => sum + triCost(s.value ?? 0), 0);
     this.sp = { max: spMax, spent: spSpent, value: spMax - spSpent };
+
+    // Will Strain Cap = base WILL tick x party multiplier. Uses the source value
+    // so WILL-reducing status effects (e.g. Despair) never lower the cap.
+    const baseWil = this.parent?._source?.system?.attributes?.wil?.value ?? this.attributes.wil?.value ?? 0;
+    this.willStrain = {
+      cap: baseWil * (CONFIG.DASU.willStrainMultiplier ?? 2),
+    };
+
+    // Channelers may channel one daemon as a layer separate from fielded stock.
+    // dsid may be stored or derived-from-name; fall back to the class name.
+    const classDsid =
+      cls?.system?.dsid ||
+      cls?._source?.system?.dsid ||
+      (cls?.name ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    this.isChanneler = classDsid === 'channeler';
   }
 
   getRollData() {

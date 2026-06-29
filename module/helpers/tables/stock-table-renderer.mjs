@@ -61,9 +61,9 @@ export class StockTableRenderer extends DASUTableRenderer {
         columnLabel: 'DASU.Actor.Stat.Defense.abbr',
         getText: (entry) => entry.actor?.system?.stats?.defense?.value ?? '?',
       }),
-      level: CommonColumns.textColumn({
-        columnLabel: 'DASU.Actor.Level.abbr',
-        getText: (entry) => entry.actor?.system?.level ?? '?',
+      strain: CommonColumns.textColumn({
+        columnLabel: 'DASU.Actor.Stat.Strain.abbr',
+        getText: (entry) => entry.actor?.system?.strain?.value ?? '?',
       }),
       controls: {
         hideHeader: true,
@@ -73,6 +73,7 @@ export class StockTableRenderer extends DASUTableRenderer {
     renderDescription: StockTableRenderer.#renderDescription,
     actions: {
       stockToggle: StockTableRenderer.#onToggle,
+      stockChannel: StockTableRenderer.#onChannel,
       stockMenu: StockTableRenderer.#onMenu,
     },
   };
@@ -92,7 +93,18 @@ export class StockTableRenderer extends DASUTableRenderer {
     const toggleLabel = entry.active
       ? game.i18n.localize('DASU.Stock.SetInactive')
       : game.i18n.localize('DASU.Stock.SetActive');
+    // Channelers get a bolt toggle first in the row, separate from the active layer.
+    let channelBtn = '';
+    if (entry.isChanneler) {
+      const channelIcon = entry.channeled ? 'fa-solid fa-bolt' : 'fa-regular fa-bolt';
+      const channelLabel = entry.channeled
+        ? game.i18n.localize('DASU.Stock.StopChannel')
+        : game.i18n.localize('DASU.Stock.Channel');
+      const channelCls = entry.channeled ? ' cell-item-controls__control--active' : '';
+      channelBtn = `<a class="cell-item-controls__control${channelCls}" data-action="stockChannel" data-tooltip="${channelLabel}"><i class="${channelIcon}"></i></a>`;
+    }
     return `<div class="cell-item-controls">
+      ${channelBtn}
       <a class="cell-item-controls__control" data-action="stockToggle" data-tooltip="${toggleLabel}"><i class="fa-regular ${toggleIcon}"></i></a>
       <a class="cell-item-controls__control" data-action="stockMenu" data-tooltip="${game.i18n.localize('DASU.Sheet.MoreOptions')}"><i class="fas fa-bars"></i></a>
     </div>`;
@@ -105,7 +117,36 @@ export class StockTableRenderer extends DASUTableRenderer {
     if (!actor) return;
     const stock = foundry.utils.deepClone(actor.system.stock ?? []);
     if (!stock[index]) return;
-    stock[index].active = !stock[index].active;
+    const activating = !stock[index].active;
+    stock[index].active = activating;
+    await actor.update({ 'system.stock': stock });
+
+    // Fielding a daemon may exceed the summoner's Will Strain Cap; warn but allow.
+    if (activating) {
+      const cap = actor.system.willStrain?.cap ?? 0;
+      const used = stock
+        .filter((e) => e.active)
+        .reduce((sum, e) => sum + (fromUuidSync(e.uuid)?.system?.strain?.value ?? 0), 0);
+      if (used > cap) {
+        ui.notifications?.warn(
+          game.i18n.format('DASU.Stock.OverStrain', { used, cap })
+        );
+      }
+    }
+  }
+
+  // Channelers channel one daemon at a time, a layer separate from Will Strain.
+  static async #onChannel(event, target) {
+    const li = target.closest('[data-stock-index]');
+    const index = Number(li?.dataset?.stockIndex);
+    const actor = this.document;
+    if (!actor) return;
+    const stock = foundry.utils.deepClone(actor.system.stock ?? []);
+    if (!stock[index]) return;
+    const channeling = !stock[index].channeled;
+    // Only one daemon may be channeled; clear any other before setting this one.
+    if (channeling) for (const e of stock) e.channeled = false;
+    stock[index].channeled = channeling;
     await actor.update({ 'system.stock': stock });
   }
 
@@ -172,10 +213,12 @@ export class StockTableRenderer extends DASUTableRenderer {
 
   async getItems(document) {
     const slot = this._slot;
+    const isChanneler = !!document.system.isChanneler;
     return (document.system.stock ?? [])
       .map((entry, index) => ({
         ...entry,
         index,
+        isChanneler,
         actor: fromUuidSync(entry.uuid) ?? null,
       }))
       .filter((entry) => (slot === 'active' ? entry.active : !entry.active));

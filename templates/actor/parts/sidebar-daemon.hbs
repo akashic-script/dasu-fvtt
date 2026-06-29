@@ -82,6 +82,12 @@
         <span class="stat-value dasu-pill stat-total">{{system.stats.critical.value}}</span>
         <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">-</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.stats.critical.bonus" value="{{system.stats.critical.bonus}}" data-dtype="Number" /></label>
       </div>
+      <div class="stat-score">
+        <span class="stat-label stat-label--play" data-tooltip="{{localize 'DASU.Actor.Stat.Strain.long'}}">{{localize "DASU.Actor.Stat.Strain.abbr"}}</span>
+        <span class="stat-label stat-label--edit" data-tooltip="{{localize 'DASU.Actor.Stat.Strain.bonusLong'}}">{{localize "DASU.Actor.Stat.Strain.bonusAbbr"}}</span>
+        <span class="stat-value dasu-pill stat-total">{{system.strain.value}}</span>
+        <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">±</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.strain.bonus" value="{{system.strain.bonus}}" data-dtype="Number" /></label>
+      </div>
     </div>
   </div>
 

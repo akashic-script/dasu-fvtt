@@ -21,6 +21,12 @@ DASU.checkTypes = {
 };
 
 /**
+ * Will Strain: a summoner's cap on fielded daemons is base WILL tick x the
+ * party-size multiplier (default x2; raise for small parties, lower for large).
+ */
+DASU.willStrainMultiplier = 2;
+
+/**
  * Core check roll constants (DASU: roll N d{faces} + tick, meet/exceed TN).
  */
 DASU.check = Object.freeze({

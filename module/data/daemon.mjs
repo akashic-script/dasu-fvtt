@@ -16,6 +16,13 @@ export default class DASUDaemon extends DASUActorBase {
       });
     }
     schema.attributes = new fields.SchemaField(attributesSchema);
+
+    // Will Strain cost this daemon imposes on its summoner when fielded.
+    // Derived from level (see prepareDerivedData); the bonus is an AE hook.
+    schema.strain = new fields.SchemaField({
+      bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+    });
+
     schema.transformations = new fields.ArrayField(
       new fields.SchemaField({
         uuid: new fields.StringField({ required: true, blank: false }),
@@ -82,6 +89,9 @@ export default class DASUDaemon extends DASUActorBase {
 
     this._prepareDerivedStats();
 
+    // Will Strain cost = max(2, ceil(Lvl / 5)), plus any AE bonus.
+    this.strain.value = Math.max(2, Math.ceil(this.level / 5)) + (this.strain.bonus ?? 0);
+
     // AP pool.
     const subtype = this.parent?.itemTypes?.subtype?.[0]?.system;
     const oddLevels = Math.floor((this.level + 1) / 2);
@@ -144,6 +154,7 @@ export default class DASUDaemon extends DASUActorBase {
     data.lvl = this.level;
     data.ap = foundry.utils.deepClone(this.ap);
     data.stats = foundry.utils.deepClone(this.stats);
+    data.strain = foundry.utils.deepClone(this.strain);
     return data;
   }
 }

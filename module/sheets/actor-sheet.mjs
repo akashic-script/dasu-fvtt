@@ -289,6 +289,11 @@ export class DASUActorSheet extends SheetLayoutMixin(
         .map(e => fromUuidSync(e.uuid))
         .filter(d => d?.type === 'daemon');
 
+      // Current Will Strain = sum of fielded daemons' WSC, vs the summoner's cap.
+      const cap = actor.system.willStrain?.cap ?? 0;
+      const used = activeStock.reduce((sum, d) => sum + (d.system.strain?.value ?? 0), 0);
+      context.willStrain = { used, cap, over: used > cap };
+
       const activeUuids = new Set(activeStock.map(d => d.uuid));
       for (const uuid of this.#daemonTableCache.keys())
         if (!activeUuids.has(uuid)) this.#daemonTableCache.delete(uuid);

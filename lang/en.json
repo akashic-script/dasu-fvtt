@@ -23,7 +23,10 @@
       "SetInactive": "Set Inactive",
       "AlreadyAdded": "This daemon is already in stock.",
       "Active": "Active",
-      "Inactive": "Inactive"
+      "Inactive": "Inactive",
+      "Channel": "Channel",
+      "StopChannel": "Stop Channeling",
+      "OverStrain": "Fielded daemons ({used}) exceed your Will Strain Cap ({cap}). They risk breaking free of your will."
     },
     "SpecialAbility": {
       "Title": "Special Ability",
@@ -406,6 +409,12 @@
           "abbr": "CRIT",
           "bonusAbbr": "CRIT+",
           "bonusLong": "Critical Threshold Bonus"
+        },
+        "Strain": {
+          "long": "Will Strain Cost",
+          "abbr": "WSC",
+          "bonusAbbr": "WSC+",
+          "bonusLong": "Will Strain Cost Bonus"
         }
       },
       "Triad": {
