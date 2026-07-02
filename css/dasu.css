@@ -125,8 +125,12 @@
       &.resource-popover__label--wp {
         --_c: var(--dasu-wp);
       }
+      &.resource-popover__label--tactic {
+        --_c: var(--dasu-accent-tactic);
+      }
       &.resource-popover__label--hp,
-      &.resource-popover__label--wp {
+      &.resource-popover__label--wp,
+      &.resource-popover__label--tactic {
         background: var(--_c);
         border: 1px solid var(--_c);
       }
@@ -1235,12 +1239,16 @@
       }
 
       .actor-header__level--merit {
-        cursor: help;
+        cursor: pointer;
         .actor-header__level-label {
           background: var(--dasu-wp);
         }
         input {
           width: 4.5em;
+          pointer-events: none;
+        }
+        &:hover .actor-header__level-label {
+          filter: brightness(1.15);
         }
       }
 
@@ -2735,6 +2743,29 @@
     }
 
     /* DASUTableRenderer table system */
+    .syn-identity-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0 2px;
+      align-items: start;
+
+      .dasu-table {
+        min-width: 0;
+      }
+
+      .dasu-table + .dasu-table {
+        margin-top: 0;
+      }
+
+      .class-table {
+        grid-template-columns: [name] minmax(0, 1fr) [controls] 44px;
+      }
+
+      .dejection-table {
+        grid-template-columns: [name] minmax(0, 1fr) [controls] 44px;
+      }
+    }
+
     .dasu-table {
       --item-accent: var(--dasu-tab-icon);
 
@@ -2812,6 +2843,10 @@
       }
       &.skill-ability-table .dasu-table__header {
         --section-accent: var(--dasu-accent-restorative);
+      }
+      &.dejection-table .dasu-table__header,
+      &.scar-table .dasu-table__header {
+        --section-accent: var(--dasu-accent-tactic);
       }
       &.stock-table--active .dasu-table__header {
         --section-accent: var(--dasu-accent-stock-active);
@@ -2907,6 +2942,10 @@
       }
       &.skill-ability-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-restorative);
+      }
+      &.dejection-table .dasu-table__row-container.item,
+      &.scar-table .dasu-table__row-container.item {
+        --item-accent: var(--dasu-accent-tactic);
       }
       &.stock-table--active .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-stock-active);
@@ -3362,7 +3401,7 @@
       grid-template-columns: [name] auto [level] 48px [controls] 54px;
     }
     .class-table {
-      grid-template-columns: [name] auto [sp] 48px [ap] 48px [controls] 54px;
+      grid-template-columns: [name] auto [controls] 54px;
     }
     .archetype-table {
       grid-template-columns: [name] auto [bonuses] 1fr [controls] 54px;
@@ -3384,6 +3423,12 @@
     }
     .skill-ability-table {
       grid-template-columns: [name] auto [skill] 90px [threshold] 90px [controls] 54px;
+    }
+    .dejection-table {
+      grid-template-columns: [name] auto [controls] 54px;
+    }
+    .scar-table {
+      grid-template-columns: [name] auto [controls] 54px;
     }
     .tactic-table {
       grid-template-columns: [name] auto [damage] 80px [cost] 54px [toLand] 48px [controls] 54px;
@@ -3933,10 +3978,6 @@
 .planner__row--current {
   box-shadow: inset 3px 0 0 0 var(--dasu-accent-class);
 }
-.planner__here {
-  color: var(--dasu-accent-class);
-  margin-left: 4px;
-}
 .planner__effect {
   display: inline-flex;
   align-items: center;
@@ -4034,6 +4075,24 @@
 .planner__slot-clear:hover {
   background: var(--dasu-accent-tactic);
   color: var(--dasu-ink);
+}
+
+/* Dejection planner */
+.planner__effect--dejection {
+  border-left: 2px solid var(--dasu-accent-tactic);
+}
+.dejection-planner__table {
+  flex: 1;
+}
+.dejection-planner__col-threshold {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+.dejection-planner__row--current {
+  box-shadow: inset 3px 0 0 0 var(--dasu-accent-tactic);
 }
 
 /* Roll dialog */
@@ -5941,3 +6000,17 @@ section[data-tab='effects'].drag-over {
   }
 }
 
+
+/* Relentless Curse penalty editor grid (advancement expand) */
+.adv-expand__curse-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.adv-expand__field--check {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}

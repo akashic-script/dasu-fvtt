@@ -27,6 +27,13 @@ DASU.checkTypes = {
 DASU.willStrainMultiplier = 2;
 
 /**
+ * Combined cap on Critical Threshold *reduction* from Dejection, Killer, and
+ * Hatred sources (after they're summed). The threshold itself never drops below
+ * DASU.check.minCritThreshold.
+ */
+DASU.critReductionCap = 10;
+
+/**
  * Core check roll constants (DASU: roll N d{faces} + tick, meet/exceed TN).
  */
 DASU.check = Object.freeze({

@@ -71,6 +71,8 @@ Hooks.once('init', function () {
     bond: models.DASUBond,
     specialAbility: models.DASUSpecialAbility,
     skillAbility: models.DASUSkillAbility,
+    scar: models.DASUScar,
+    dejection: models.DASUDejection,
   });
 
   Object.assign(CONFIG.ChatMessage.dataModels, {
@@ -107,6 +109,8 @@ Hooks.once('init', function () {
         'bond',
         'specialAbility',
         'skillAbility',
+        'scar',
+        'dejection',
       ],
       makeDefault: true,
       label: 'DASU.SheetLabels.Item',

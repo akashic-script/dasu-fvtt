@@ -10,6 +10,8 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/dasu/templates/actor/parts/actor-effects.hbs',
     'systems/dasu/templates/actor/parts/aptitudes.hbs',
     'systems/dasu/templates/actor/parts/planner-table.hbs',
+    'systems/dasu/templates/actor/parts/dejection-planner-table.hbs',
+    'systems/dasu/templates/actor/parts/dejection-popover.hbs',
     // Item partials
     'systems/dasu/templates/item/parts/item-effects.hbs',
     // Active Effect config

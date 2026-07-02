@@ -68,6 +68,27 @@ const onRenderCheck = (data, result, actor, item) => {
     return;
   }
 
+  if (item?.type === 'dejection') {
+    const dejectionLevel = actor?.system?.dejection ?? 0;
+    data.tags.push({
+      tag: 'DASU.Dejection.Level',
+      value: `${dejectionLevel}`,
+    });
+  }
+
+  if (item?.type === 'class') {
+    const level = actor?.system?.level ?? 1;
+    data.tags.push(
+      { tag: 'DASU.Actor.Level.abbr', value: `${level}` },
+      { tag: 'DASU.Actor.SP.abbr', value: `${item.system.spMax(level)}` },
+      { tag: 'DASU.Actor.AP.abbr', value: `${item.system.apMax(level)}` },
+      {
+        tag: 'DASU.Item.Class.AptitudeUp',
+        value: `${item.system.aptitudeUpsTotal(level)}`,
+      }
+    );
+  }
+
   if (TARGETED_ITEM_TYPES.has(item?.type)) {
     const inspector = CheckConfiguration.inspect(result);
     CommonSections.targets(data, inspector, { hideTn: true, hideLabel: true });

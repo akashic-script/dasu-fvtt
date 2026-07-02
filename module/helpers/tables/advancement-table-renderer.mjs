@@ -27,10 +27,13 @@ export class AdvancementTableRenderer extends DASUTableRenderer {
     },
   };
 
-  constructor({ editable, item }) {
+  constructor({ editable, item, levelLabel, addTooltip, allowedTypes } = {}) {
     super();
     this._editable = editable;
     this._item = item;
+    this._levelLabel = levelLabel ?? 'DASU.Item.Class.Level';
+    this._addTooltip = addTooltip ?? 'DASU.Item.Class.AddAdvancement';
+    this._allowedTypes = allowedTypes ?? null;
   }
 
   initializeOptions(config) {
@@ -42,7 +45,7 @@ export class AdvancementTableRenderer extends DASUTableRenderer {
     config.renderDescription = (adv) => this.#renderExpand(adv);
 
     config.columns.level = {
-      renderHeader: () => game.i18n.localize('DASU.Item.Class.Level'),
+      renderHeader: () => game.i18n.localize(this._levelLabel),
       renderCell: (adv) => this.#renderLevelCell(adv),
     };
     config.columns.type = {
@@ -57,9 +60,7 @@ export class AdvancementTableRenderer extends DASUTableRenderer {
       renderHeader: () => {
         if (!this._editable) return '';
         return `<button type="button" class="dasu-table__header-add" data-action="advancementCreate"
-          data-tooltip="${game.i18n.localize(
-            'DASU.Item.Class.AddAdvancement'
-          )}">
+          data-tooltip="${game.i18n.localize(this._addTooltip)}">
           <i class="fas fa-plus"></i>
         </button>`;
       },
@@ -142,7 +143,9 @@ export class AdvancementTableRenderer extends DASUTableRenderer {
         const advancement = this._item.system.advancements.get(advancementId);
         if (!advancement) return;
         let value = el.value;
-        if (el.type === 'number') {
+        if (el.type === 'checkbox') {
+          value = el.checked;
+        } else if (el.type === 'number') {
           value = el.value === '' ? null : Number(el.value);
         }
         await advancement.update({ [field]: value });
@@ -152,15 +155,21 @@ export class AdvancementTableRenderer extends DASUTableRenderer {
 
   static async #onAdvancementCreate() {
     const item = this._item;
-    const type = await AdvancementTableRenderer.#promptType();
+    const type = await this.#promptType();
     if (!type) return;
     const levels = [...item.system.advancements].map((a) => a.level);
     const level = levels.length ? Math.max(...levels) + 1 : 1;
     await item.createEmbeddedDocuments('Advancement', [{ type, level }]);
   }
 
-  static async #promptType() {
-    const buttons = ADVANCEMENT_TYPES.map((cls) => ({
+  async #promptType() {
+    let types = ADVANCEMENT_TYPES;
+    if (this._allowedTypes) {
+      types = types.filter((cls) => this._allowedTypes.includes(cls.TYPE));
+    }
+    // A single allowed type needs no dialog.
+    if (types.length === 1) return types[0].TYPE;
+    const buttons = types.map((cls) => ({
       action: cls.TYPE,
       label: game.i18n.localize(cls.LABEL),
       icon: cls.ICON,

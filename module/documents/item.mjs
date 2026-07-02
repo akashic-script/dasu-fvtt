@@ -21,6 +21,18 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
       return false;
     }
 
+    // Dejection is summoner-exclusive and limited to one per actor.
+    if (data.type === 'dejection') {
+      if (this.actor && this.actor.type !== 'summoner') {
+        ui.notifications.warn(game.i18n.localize('DASU.Dejection.SummonerOnly'));
+        return false;
+      }
+      if (this.actor?.itemTypes?.dejection?.length) {
+        ui.notifications.warn(game.i18n.localize('DASU.Dejection.OnlyOne'));
+        return false;
+      }
+    }
+
     // Enforce the subtype's ability/tactic slot cap.
     if (
       (data.type === 'ability' || data.type === 'tactic') &&
@@ -63,6 +75,9 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
       }
       if (item.type === 'bond') {
         return DASUBondDialog.open(this.actor, item);
+      }
+      if (item.type === 'dejection') {
+        return game.dasu.Checks.displayCheck(this.actor, item);
       }
       const NO_DIALOG_TYPES = ['class', 'feature'];
       if (NO_DIALOG_TYPES.includes(item.type)) {

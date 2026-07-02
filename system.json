@@ -46,7 +46,9 @@
       "subtype": {},
       "bond": {},
       "specialAbility": {},
-      "skillAbility": {}
+      "skillAbility": {},
+      "scar": {},
+      "dejection": {}
     },
     "ChatMessage": {
       "pipeline": {}

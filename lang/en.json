@@ -50,6 +50,29 @@
         "Fixed": "Fixed TN"
       }
     },
+    "Scar": {
+      "Title": "Scar"
+    },
+    "Dejection": {
+      "Title": "Dejection",
+      "Track": "Dejection",
+      "abbr": "DEJ",
+      "TrackTooltip": "Adjust Dejection (0-15). <br> 15 = Perish.",
+      "Level": "Dejection Level",
+      "NoItem": "No Dejection item found. Add one in the SYN tab.",
+      "OnlyOne": "A Summoner can only have one Dejection item.",
+      "SummonerOnly": "Dejection items can only be added to Summoners.",
+      "Perished": "Your will is extinguished, your life is gone.",
+      "Curse": {
+        "Label": "Relentless Curse",
+        "Add": "Add Relentless Curse",
+        "Count": "Curses",
+        "WpMaxPct": "Max WP %",
+        "WpMaxFlat": "Max WP",
+        "GrantsScar": "Grants a Scar slot",
+        "ScarSlotHint": "Drop a Scar item here from the actor's planner to fill this slot."
+      }
+    },
     "Transformation": {
       "Title": "Transformations",
       "MeritThreshold": "Merits",
@@ -413,8 +436,8 @@
         },
         "Land": {
           "long": "To Land",
-          "abbr": "LAND",
-          "bonusAbbr": "LAND+",
+          "abbr": "LAN",
+          "bonusAbbr": "LAN+",
           "bonusLong": "To Land Bonus"
         },
         "Critical": {
@@ -780,7 +803,9 @@
       "subtype": "Subtype",
       "bond": "Bond",
       "specialAbility": "Special Ability",
-      "skillAbility": "Skill Ability"
+      "skillAbility": "Skill Ability",
+      "scar": "Scar",
+      "dejection": "Dejection"
     }
   }
 }
