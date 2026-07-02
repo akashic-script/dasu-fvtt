@@ -119,6 +119,8 @@ export class StockTableRenderer extends DASUTableRenderer {
     if (!stock[index]) return;
     const activating = !stock[index].active;
     stock[index].active = activating;
+    // An inactive daemon cannot be channeled; drop the channel when it leaves the field.
+    if (!activating) stock[index].channeled = false;
     await actor.update({ 'system.stock': stock });
 
     // Fielding a daemon may exceed the summoner's Will Strain Cap; warn but allow.
@@ -144,8 +146,12 @@ export class StockTableRenderer extends DASUTableRenderer {
     const stock = foundry.utils.deepClone(actor.system.stock ?? []);
     if (!stock[index]) return;
     const channeling = !stock[index].channeled;
-    // Only one daemon may be channeled; clear any other before setting this one.
-    if (channeling) for (const e of stock) e.channeled = false;
+    // Channeling an inactive daemon also fields it; a daemon can't be channeled off-field.
+    if (channeling) {
+      stock[index].active = true;
+      // Only one daemon may be channeled; clear any other before setting this one.
+      for (const e of stock) e.channeled = false;
+    }
     stock[index].channeled = channeling;
     await actor.update({ 'system.stock': stock });
   }
