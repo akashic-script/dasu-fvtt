@@ -122,6 +122,20 @@ DASU.levelMerits = {
 DASU.daemonTransformMerits = 100;
 
 /**
+ * Daemon combat Roles. Purely descriptive (no mechanical effect); a daemon may
+ * carry several. Keys are stored on the actor; values are localization keys.
+ * @type {Object<string, string>}
+ */
+DASU.daemonRoles = {
+  fighter: 'DASU.Daemon.Role.Fighter',
+  magus: 'DASU.Daemon.Role.Magus',
+  assist: 'DASU.Daemon.Role.Assist',
+  healer: 'DASU.Daemon.Role.Healer',
+  debuffer: 'DASU.Daemon.Role.Debuffer',
+  mediator: 'DASU.Daemon.Role.Mediator',
+};
+
+/**
  * Derived actor stat paths an archetype bonus may target. Keyed by the
  * dot-path written into the actor's system during derived-data prep.
  * @type {Record<string, string>}

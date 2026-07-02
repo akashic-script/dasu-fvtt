@@ -9,6 +9,17 @@
   <div class="actor-header__identity-row">
     {{#if archetypeName}}<span class="actor-header__class-name">{{archetypeName}}</span>{{else}}<span class="actor-header__class-name actor-header__class-name--empty">{{localize "DASU.Archetype.Placeholder"}}</span>{{/if}}
     {{#if subtypeName}}<span class="actor-header__class-name">{{subtypeName}}</span>{{else}}<span class="actor-header__class-name actor-header__class-name--empty">{{localize "DASU.Subtype.Placeholder"}}</span>{{/if}}
+    <span class="actor-header__roles">
+      {{#each daemonRoles as |role|}}
+      <span class="actor-header__role" data-role="{{role.key}}">
+        {{role.label}}
+        <button type="button" class="actor-header__role-remove" data-action="toggleDaemonRole" data-role="{{role.key}}" data-tooltip="{{localize 'DASU.Daemon.Role.Remove'}}"><i class="fas fa-times"></i></button>
+      </span>
+      {{/each}}
+      {{#if hasAddableRoles}}
+      <button type="button" class="actor-header__role-add" data-action="openRolesPopover" data-tooltip="{{localize 'DASU.Daemon.Role.Add'}}"><i class="fas fa-plus"></i></button>
+      {{/if}}
+    </span>
     <input class="actor-header__identity" type="text" placeholder="{{localize 'DASU.Actor.ClassPlaceholder'}}" />
     {{#if canAdvance}}
     <button type="button" class="actor-header__levelup" data-action="advance" data-tooltip="{{advanceTooltip}}">

@@ -1131,11 +1131,21 @@
       background: var(--dasu-panel-solid);
       color: var(--dasu-on-panel);
 
-      .actor-header__name-row,
-      .actor-header__identity-row {
+      .actor-header__name-row {
         display: flex;
         align-items: center;
         gap: 8px;
+      }
+
+      .actor-header__identity-row {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+
+        .actor-header__level,
+        .actor-header__levelup {
+          align-self: center;
+        }
       }
 
       .actor-header__class-name {
@@ -1178,8 +1188,8 @@
       h1 {
         flex: 1;
         min-width: 0;
-        margin: 0 !important;
-        font-size: 1.6em;
+        margin: 0;
+        font-size: 2em;
         font-weight: bold;
         font-family: var(--dasu-font-title);
         color: inherit;
@@ -6046,4 +6056,133 @@ section[data-tab='effects'].drag-over {
   flex-direction: row;
   align-items: center;
   gap: 6px;
+}
+
+.dasu.sheet.actor .actor-header__roles {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.dasu.sheet.actor .actor-header__roles ~ .actor-header__identity {
+  flex: 0 1 0;
+}
+
+.dasu.sheet.actor .actor-header__roles::-webkit-scrollbar {
+  height: 4px;
+}
+
+.dasu.sheet.actor .actor-header__roles::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.dasu.sheet.actor .actor-header__role {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--dasu-font-body);
+  font-size: 0.8em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dasu.sheet.actor .actor-header__role + .actor-header__role::before {
+  content: '·';
+  margin: 0 3px;
+  opacity: 0.6;
+}
+
+.dasu.sheet.actor .actor-header__role-remove {
+  display: none;
+  padding: 0 0 0 1px;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: 0.85em;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.dasu.sheet.actor .actor-header__role-remove:hover {
+  opacity: 1;
+}
+
+.dasu.sheet.actor.edit-mode .actor-header__role {
+  opacity: 0.85;
+}
+
+.dasu.sheet.actor.edit-mode .actor-header__role-remove {
+  display: inline-flex;
+}
+
+.dasu.sheet.actor .actor-header__role-add {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  color: var(--dasu-tab-icon);
+  font-size: 0.75em;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.dasu.sheet.actor.edit-mode .actor-header__role-add {
+  display: inline-flex;
+}
+
+.dasu.sheet.actor .actor-header__role-add:hover {
+  opacity: 1;
+}
+
+.dasu-roles-popover {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+}
+
+.dasu-roles-popover__option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  color: var(--dasu-tab-icon);
+  font-family: var(--dasu-font-body);
+  font-size: 0.85em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dasu-roles-popover__option:hover {
+  background: rgb(var(--dasu-panel) / 60%);
+}
+
+.dasu-roles-popover__option--active {
+  color: var(--dasu-tab-icon-active);
+}
+
+.dasu-roles-popover__check {
+  width: 1em;
+  opacity: 0.9;
+}
+
+.dasu-roles-popover__empty {
+  padding: 6px;
+  font-size: 0.8em;
+  opacity: 0.6;
 }

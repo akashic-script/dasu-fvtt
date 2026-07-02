@@ -55,6 +55,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
   /** Teardown for the open specialties popover, or null when none is open. */
   #specialtiesPopoverCleanup = null;
 
+  /** Teardown for the open daemon-roles popover, or null when none is open. */
+  #rolesPopoverCleanup = null;
+
   /** Whether the delegated transformation listeners are bound (bind once). */
   #transformationListenersBound = false;
 
@@ -148,6 +151,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
       plannerOpenItem: DASUActorSheet.#onPlannerOpenItem,
       plannerEditClass: DASUActorSheet.#onPlannerEditClass,
       plannerEditDejection: DASUActorSheet.#onPlannerEditDejection,
+      toggleDaemonRole: DASUActorSheet.#onToggleDaemonRole,
+      openRolesPopover: DASUActorSheet.#onOpenRolesPopover,
     },
   };
 
@@ -291,6 +296,15 @@ export class DASUActorSheet extends SheetLayoutMixin(
         await this.#specialAbilityTable.renderTable(this.document);
       context.transformationTable =
         await this.#transformationTable.renderTable(this.document);
+      const activeSet = new Set(actorData.roles ?? []);
+      context.daemonRoles = Object.keys(DASU.daemonRoles)
+        .filter((key) => activeSet.has(key))
+        .map((key) => ({
+          key,
+          label: game.i18n.localize(DASU.daemonRoles[key]),
+        }));
+      context.hasAddableRoles =
+        activeSet.size < Object.keys(DASU.daemonRoles).length;
     }
 
     context.fieldsets = this.#fieldsets.prepareContext(actor);
@@ -466,6 +480,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.#closeTriadDropdown();
     this.#closeStepperPopover();
     this.#specialtiesPopoverCleanup?.();
+    this.#rolesPopoverCleanup?.();
     return super._onClose(options);
   }
 
@@ -600,6 +615,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     // A re-render rebuilds the DOM and orphans any open popover.
     this.#closeStepperPopover();
     this.#specialtiesPopoverCleanup?.();
+    this.#rolesPopoverCleanup?.();
     await super._onRender(context, options);
 
     for (const { tab, html } of context.moduleItemTables ?? []) {
@@ -1404,6 +1420,94 @@ export class DASUActorSheet extends SheetLayoutMixin(
       return;
     }
     this.actor.update({ 'system.level': this.actor.system.level + 1 });
+  }
+
+  /**
+   * Add or remove a daemon Role, writing the result back in canonical config
+   * order. Returns the update Promise so callers can await it.
+   */
+  #toggleRole(key, { render = true } = {}) {
+    if (!(key in CONFIG.DASU.daemonRoles)) return;
+    const current = new Set(this.actor.system.roles ?? []);
+    if (current.has(key)) current.delete(key);
+    else current.add(key);
+    const ordered = Object.keys(CONFIG.DASU.daemonRoles).filter((k) =>
+      current.has(k)
+    );
+    return this.actor.update({ 'system.roles': ordered }, { render });
+  }
+
+  static async #onToggleDaemonRole(event, target) {
+    event.preventDefault();
+    await this.#toggleRole(target.dataset.role);
+  }
+
+  static async #onOpenRolesPopover(event, target) {
+    event.preventDefault();
+    const doc = this.element.ownerDocument;
+    const popId = 'dasu-popover-roles';
+
+    const wasOpen = doc.getElementById(popId);
+    this.#rolesPopoverCleanup?.();
+    if (wasOpen) return;
+
+    const render = () => {
+      const active = new Set(this.actor.system.roles ?? []);
+      const options = Object.entries(CONFIG.DASU.daemonRoles).map(
+        ([key, i18n]) => ({
+          key,
+          label: game.i18n.localize(i18n),
+          active: active.has(key),
+        })
+      );
+      return foundry.applications.handlebars.renderTemplate(
+        'systems/dasu/templates/actor/parts/roles-popover.hbs',
+        { options }
+      );
+    };
+
+    const pop = Object.assign(doc.createElement('div'), {
+      id: popId,
+      className: 'dasu-resource-popover dasu-roles-popover',
+      innerHTML: await render(),
+    });
+
+    const anchor = this.element;
+    const aRect = anchor.getBoundingClientRect();
+    const rRect = target.getBoundingClientRect();
+    Object.assign(pop.style, {
+      top: `${rRect.bottom - aRect.top + anchor.scrollTop + 2}px`,
+      left: `${Math.max(0, rRect.left - aRect.left + anchor.scrollLeft)}px`,
+      width: '160px',
+    });
+    anchor.appendChild(pop);
+    target.classList.add('popover-open');
+
+    const bindOptions = () => {
+      pop.querySelectorAll('.dasu-roles-popover__option').forEach((btn) =>
+        btn.addEventListener('click', async () => {
+          await this.#toggleRole(btn.dataset.role, { render: false });
+          pop.innerHTML = await render();
+          bindOptions();
+        })
+      );
+    };
+    bindOptions();
+
+    const cleanup = ({ rerender = false } = {}) => {
+      doc.removeEventListener('pointerdown', onPointerDown);
+      this.#rolesPopoverCleanup = null;
+      target.classList.remove('popover-open');
+      pop.remove();
+      if (rerender) this.render();
+    };
+    this.#rolesPopoverCleanup = () => cleanup();
+
+    const onPointerDown = (e) => {
+      if (!pop.contains(e.target) && e.target !== target)
+        cleanup({ rerender: true });
+    };
+    setTimeout(() => doc.addEventListener('pointerdown', onPointerDown), 0);
   }
 
   static #canRaiseAttribute(attributes, ap, key, next, level) {

@@ -23,6 +23,13 @@ export default class DASUDaemon extends DASUActorBase {
       bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }),
     });
 
+    // Descriptive combat Roles (fighter, magus, ...). No mechanical effect;
+    // a daemon may have several. Validated against CONFIG.DASU.daemonRoles.
+    schema.roles = new fields.ArrayField(new fields.StringField(), {
+      required: true,
+      initial: [],
+    });
+
     schema.transformations = new fields.ArrayField(
       new fields.SchemaField({
         uuid: new fields.StringField({ required: true, blank: false }),
@@ -80,6 +87,10 @@ export default class DASUDaemon extends DASUActorBase {
   prepareDerivedData() {
     super.prepareDerivedData();
     this._prepareTransformations();
+
+    // Drop any stored role keys that aren't in the config (stale/invalid).
+    const roleKeys = Object.keys(CONFIG.DASU.daemonRoles ?? {});
+    this.roles = (this.roles ?? []).filter((r) => roleKeys.includes(r));
     if (!this.attributes) return;
     for (const key in this.attributes) {
       if (!this.attributes[key]) continue;

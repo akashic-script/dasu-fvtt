@@ -74,6 +74,19 @@
         "ScarSlotHint": "Drop a Scar item here from the actor's planner to fill this slot."
       }
     },
+    "Daemon": {
+      "Role": {
+        "Title": "Roles",
+        "Add": "Add role",
+        "Remove": "Remove role",
+        "Fighter": "Fighter",
+        "Magus": "Magus",
+        "Assist": "Assist",
+        "Healer": "Healer",
+        "Debuffer": "Debuffer",
+        "Mediator": "Mediator"
+      }
+    },
     "Transformation": {
       "Title": "Transformations",
       "MeritThreshold": "Merits",
