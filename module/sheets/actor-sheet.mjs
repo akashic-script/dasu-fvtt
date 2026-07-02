@@ -22,6 +22,8 @@ import { TransformationTableRenderer } from '../helpers/tables/transformation-ta
 import { DaemonTables } from '../helpers/tables/daemon-tables.mjs';
 import { BondTableRenderer } from '../helpers/tables/bond-table-renderer.mjs';
 import { SkillAbilityTableRenderer } from '../helpers/tables/skill-ability-table-renderer.mjs';
+import { DejectionTableRenderer } from '../helpers/tables/dejection-table-renderer.mjs';
+import { ScarTableRenderer } from '../helpers/tables/scar-table-renderer.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
 import { DASURollDialog } from '../ui/roll-dialog.mjs';
 import { SYSTEM } from '../helpers/config.mjs';
@@ -71,7 +73,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
       id: 'planner',
       defaultPanel: 'reached',
       defaultSplit: true,
-      panels: ['reached', 'future'],
+      panels: ['reached', 'future', 'dejection'],
     },
     {
       id: 'syn-stock',
@@ -84,6 +86,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
   #inactiveStockTable = new StockTableRenderer('inactive');
   #bondTable = new BondTableRenderer();
   #skillAbilityTable = new SkillAbilityTableRenderer();
+  #dejectionTable = new DejectionTableRenderer();
+  #scarTable = new ScarTableRenderer();
   #classTable = new ClassTableRenderer();
   #archetypeTable = new ArchetypeTableRenderer();
   #subtypeTable = new SubtypeTableRenderer();
@@ -130,6 +134,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
       openResourcePopover: DASUActorSheet.#onOpenResourcePopover,
       openMeritPopover: DASUActorSheet.#onOpenMeritPopover,
       openRichesPopover: DASUActorSheet.#onOpenRichesPopover,
+      openDejectionPopover: DASUActorSheet.#onOpenDejectionPopover,
       skillStep: DASUActorSheet.#onSkillStep,
       aptitudeStep: DASUActorSheet.#onAptitudeStep,
       createCustomSkill: DASUActorSheet.#onCreateCustomSkill,
@@ -142,6 +147,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
       plannerUnslot: DASUActorSheet.#onPlannerUnslot,
       plannerOpenItem: DASUActorSheet.#onPlannerOpenItem,
       plannerEditClass: DASUActorSheet.#onPlannerEditClass,
+      plannerEditDejection: DASUActorSheet.#onPlannerEditDejection,
     },
   };
 
@@ -248,6 +254,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.schemaTable = await this.#schemaTable.renderTable(this.document);
     context.classTable = await this.#classTable.renderTable(this.document);
     context.planner = this.#preparePlanner(actor);
+    if (actor.type === 'summoner') {
+      context.planner.dejection = this.#prepareDejectionPlanner(actor);
+    }
     context.apt = {
       spent: Object.keys(DASU.aptitudes).reduce(
         (sum, key) => sum + Math.max(0, actorData.aptitudes[key]?.bonus ?? 0),
@@ -266,6 +275,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
     if (actor.type === 'summoner') {
       context.bondTable = await this.#bondTable.renderTable(this.document);
       context.skillAbilityTable = await this.#skillAbilityTable.renderTable(this.document);
+      context.dejectionTable = await this.#dejectionTable.renderTable(this.document);
+      context.scarTable = await this.#scarTable.renderTable(this.document);
     }
 
     context.archetypeTable = await this.#archetypeTable.renderTable(
@@ -528,6 +539,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
     if (this.actor.type === 'summoner') {
       this.#bondTable.activateListeners(this);
       this.#skillAbilityTable.activateListeners(this);
+      this.#dejectionTable.activateListeners(this);
+      this.#scarTable.activateListeners(this);
       this.#activeStockTable.activateListeners(this);
       this.#inactiveStockTable.activateListeners(this);
       for (const tables of this.#daemonTableCache.values())
@@ -1142,6 +1155,25 @@ export class DASUActorSheet extends SheetLayoutMixin(
     });
   }
 
+  static #onOpenDejectionPopover(event, target) {
+    return this.#openStepperPopover(target, {
+      id: 'dejection',
+      template: 'systems/dasu/templates/actor/parts/dejection-popover.hbs',
+      context: {
+        value: this.actor.system.dejection,
+        label: game.i18n.localize('DASU.Dejection.Track'),
+        abbr: game.i18n.localize('DASU.Dejection.abbr'),
+      },
+      path: 'system.dejection',
+      position: 'bar',
+      max: 15,
+      sync: (pop, anchor, v) => {
+        const el = anchor.querySelector('.stat-total');
+        if (el) el.textContent = v;
+      },
+    });
+  }
+
   static #onResourceStep(event, target) {
     const resource = target.dataset.resource;
     const isHp = resource === 'health';
@@ -1234,10 +1266,55 @@ export class DASUActorSheet extends SheetLayoutMixin(
     };
   }
 
+  #prepareDejectionPlanner(actor) {
+    const dej = actor.itemTypes?.dejection?.[0] ?? null;
+    const currentDejection = actor.system.dejection ?? 0;
+    const MAX = 15;
+
+    const byThreshold = new Map();
+    if (dej) {
+      for (const adv of dej.system.advancements ?? []) {
+        const t = adv.level ?? 1;
+        if (!byThreshold.has(t)) byThreshold.set(t, []);
+        byThreshold.get(t).push(adv);
+      }
+    }
+
+    const rows = [];
+    for (let threshold = 1; threshold <= MAX; threshold++) {
+      const advs = byThreshold.get(threshold) ?? [];
+      const penalties = [];
+      const scarSlots = [];
+      for (const adv of advs) {
+        if (adv.constructor.TYPE !== 'relentlessCurse') continue;
+        for (const badge of adv.getBadges()) {
+          if (badge.type === 'scar') {
+            scarSlots.push(adv._slotPlannerEntry(actor, { level: threshold, currentLevel: currentDejection }));
+          } else {
+            penalties.push(badge.label);
+          }
+        }
+      }
+      rows.push({
+        threshold,
+        isActive: threshold <= currentDejection,
+        isCurrent: threshold === currentDejection,
+        penalties,
+        scarSlots,
+        empty: !penalties.length && !scarSlots.length,
+      });
+    }
+
+    return { rows, hasDejection: !!dej, currentDejection };
+  }
+
   #slotAdvancement(advancementId) {
     const cls = this.actor.itemTypes?.class?.[0];
-    const adv = cls?.system.advancements.get(advancementId);
-    return adv?.isFillSlot ? adv : null;
+    const clsAdv = cls?.system.advancements.get(advancementId);
+    if (clsAdv?.isFillSlot) return clsAdv;
+    const dej = this.actor.itemTypes?.dejection?.[0];
+    const dejAdv = dej?.system.advancements.get(advancementId);
+    return dejAdv?.isFillSlot ? dejAdv : null;
   }
 
   static async #onPlannerUnslot(event, target) {
@@ -1262,6 +1339,11 @@ export class DASUActorSheet extends SheetLayoutMixin(
   static #onPlannerEditClass() {
     const cls = this.actor.itemTypes?.class?.[0];
     cls?.sheet?.render(true);
+  }
+
+  static #onPlannerEditDejection() {
+    const dej = this.actor.itemTypes?.dejection?.[0];
+    dej?.sheet?.render(true);
   }
 
   #bindPlannerSlots() {

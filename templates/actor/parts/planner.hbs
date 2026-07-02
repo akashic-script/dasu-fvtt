@@ -13,6 +13,7 @@
     <div class="dasu-fieldset__tabs">
       <button class="dasu-fieldset__tab {{lookup panels.reached "activeClass"}}" data-action="fieldsetTab" data-panel="reached" type="button">{{localize "DASU.Planner.Reached"}}</button>
       <button class="dasu-fieldset__tab {{lookup panels.future "activeClass"}}" data-action="fieldsetTab" data-panel="future" type="button">{{localize "DASU.Planner.Future"}}</button>
+      <button class="dasu-fieldset__tab {{lookup panels.dejection "activeClass"}}" data-action="fieldsetTab" data-panel="dejection" type="button">{{localize "DASU.Dejection.Track"}}</button>
       {{#if @root.planner.className}}
       <span class="planner__class-name">{{@root.planner.className}}</span>
       <button class="planner__class-edit" data-action="plannerEditClass" type="button" data-tooltip="{{localize 'DASU.Sheet.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -27,6 +28,13 @@
     </div>
     <div class="dasu-fieldset__panel" data-panel="future" {{lookup panels.future "hidden"}}>
       {{> "systems/dasu/templates/actor/parts/planner-table.hbs" rows=@root.planner.futureRows}}
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="dejection" {{lookup panels.dejection "hidden"}}>
+      {{#if @root.planner.dejection.hasDejection}}
+      {{> "systems/dasu/templates/actor/parts/dejection-planner-table.hbs" rows=@root.planner.dejection.rows}}
+      {{else}}
+      <p class="planner__empty">{{localize "DASU.Dejection.NoItem"}}</p>
+      {{/if}}
     </div>
   </div>
   {{/with}}

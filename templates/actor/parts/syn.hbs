@@ -14,11 +14,15 @@
     </div>
 
     <div class="dasu-fieldset__panel" data-panel="innate">
-      {{{@root.classTable}}}
+      <div class="syn-identity-grid">
+        {{{@root.classTable}}}
+        {{{@root.dejectionTable}}}
+      </div>
       {{{@root.schemaTable}}}
       {{{@root.featureTable}}}
       {{{@root.bondTable}}}
       {{{@root.skillAbilityTable}}}
+      {{{@root.scarTable}}}
     </div>
 
     {{#each @root.daemonAckTabs}}

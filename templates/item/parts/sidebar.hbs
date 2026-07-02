@@ -297,6 +297,15 @@
   </div>
   {{/if}}
 
+  {{#if isDejection}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Dejection.Level"}}</label>
+      <input class="dejection-level-input" type="number" value="{{dejectionLevel}}" min="0" max="15" />
+    </div>
+  </div>
+  {{/if}}
+
   {{#if isSubtype}}
   <div class="item-sidebar__fields">
     <div class="item-sidebar__field item-sidebar__field--full">

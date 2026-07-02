@@ -4094,6 +4094,17 @@
 .dejection-planner__row--current {
   box-shadow: inset 3px 0 0 0 var(--dasu-accent-tactic);
 }
+.dejection-planner__col-effects {
+  position: relative;
+}
+.dejection-planner__edit-btn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: var(--_tab-h);
+  width: var(--_tab-h);
+}
 
 /* Roll dialog */
 .roll-dialog {

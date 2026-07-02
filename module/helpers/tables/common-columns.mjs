@@ -84,6 +84,7 @@ function _renderNameCell(renderCaption, cssClass, options) {
  * @property {boolean | ((item: Item) => boolean)} [disableEdit]
  * @property {boolean | ((item: Item) => boolean)} [disableMenu]
  * @property {boolean | ((item: Item) => boolean)} [disableDelete]
+ * @property {boolean | ((item: Item) => boolean)} [hideEdit]
  */
 
 /**
@@ -134,12 +135,14 @@ function _renderControls(options) {
     disableEdit = false,
     disableMenu = false,
     disableDelete = false,
+    hideEdit = false,
   } = options;
   return async function (item) {
     return foundry.applications.handlebars.renderTemplate(
       TEMPLATE('cell/cell-item-controls'),
       {
         isGM: game.user.isGM,
+        item,
         disableEdit:
           disableEdit instanceof Function
             ? disableEdit.call(this, item)
@@ -152,6 +155,8 @@ function _renderControls(options) {
           disableDelete instanceof Function
             ? disableDelete.call(this, item)
             : disableDelete,
+        hideEdit:
+          hideEdit instanceof Function ? hideEdit.call(this, item) : hideEdit,
         hideDelete: true,
       }
     );

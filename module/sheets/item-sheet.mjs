@@ -180,6 +180,11 @@ export class DASUItemSheet extends SheetLayoutMixin(
         template: 'systems/dasu/templates/item/parts/class-advancement.hbs',
         scrollable: [''],
       };
+    } else if (this.document.type === 'dejection') {
+      parts.advanced = {
+        template: 'systems/dasu/templates/item/parts/dejection-advancement.hbs',
+        scrollable: [''],
+      };
     } else if (this.document.type === 'archetype') {
       parts.advanced = {
         template: 'systems/dasu/templates/item/parts/archetype-advanced.hbs',
@@ -243,6 +248,9 @@ export class DASUItemSheet extends SheetLayoutMixin(
     context.isBond = item.type === 'bond';
     context.isSpecialAbility = item.type === 'specialAbility';
     context.isSkillAbility = item.type === 'skillAbility';
+    context.isScar = item.type === 'scar';
+    context.isDejection = item.type === 'dejection';
+    context.dejectionLevel = item.actor?.system?.dejection ?? 0;
 
     const localize = (obj) =>
       Object.fromEntries(
@@ -373,6 +381,20 @@ export class DASUItemSheet extends SheetLayoutMixin(
         this.#advancementTable = new AdvancementTableRenderer({
           editable: context.editable,
           item,
+          allowedTypes: ['aptitude', 'schemaSlot', 'schemaUpgrade', 'itemGrant'],
+        });
+      }
+      context.advancementTable = await this.#advancementTable.renderTable(item);
+    }
+
+    if (context.isDejection) {
+      if (!this.#advancementTable) {
+        this.#advancementTable = new AdvancementTableRenderer({
+          editable: context.editable,
+          item,
+          levelLabel: 'DASU.Item.Class.Level',
+          addTooltip: 'DASU.Dejection.Curse.Add',
+          allowedTypes: ['relentlessCurse'],
         });
       }
       context.advancementTable = await this.#advancementTable.renderTable(item);
@@ -498,6 +520,15 @@ export class DASUItemSheet extends SheetLayoutMixin(
   async _onRender(context, options) {
     await super._onRender(context, options);
     this._dragDrop.forEach((d) => d.bind(this.element));
+
+    const dejectionInput = this.element.querySelector('.dejection-level-input');
+    dejectionInput?.addEventListener('change', async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const value = Math.min(15, Math.max(0, parseInt(dejectionInput.value) || 0));
+      dejectionInput.value = value;
+      await this.item.actor?.update({ 'system.dejection': value });
+    });
 
     for (const nameEl of this.element.querySelectorAll(
       '.effect-drop-zone__name[data-grant-uuid]'

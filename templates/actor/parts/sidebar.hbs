@@ -82,6 +82,12 @@
         <span class="stat-value dasu-pill stat-total">{{system.stats.critical.value}}</span>
         <label class="stat-bonus-wrap"><span class="actor-sidebar__stat-bonus-sign">-</span><input class="stat-value dasu-pill actor-sidebar__stat-bonus" type="text" name="system.stats.critical.bonus" value="{{system.stats.critical.bonus}}" data-dtype="Number" /></label>
       </div>
+      {{#if (eq actor.type "summoner")}}
+      <div class="stat-score stat-score--dejection" data-action="openDejectionPopover" data-tooltip="{{localize 'DASU.Dejection.TrackTooltip'}}">
+        <span class="stat-label stat-label--play">{{localize "DASU.Dejection.abbr"}}</span>
+        <span class="stat-value dasu-pill stat-total">{{system.dejection}}</span>
+      </div>
+      {{/if}}
     </div>
   </div>
 

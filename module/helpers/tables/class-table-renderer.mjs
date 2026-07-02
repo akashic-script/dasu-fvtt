@@ -11,14 +11,6 @@ export class ClassTableRenderer extends DASUTableRenderer {
     ),
     columns: {
       name: CommonColumns.itemNameColumn({ columnName: 'TYPES.Item.class' }),
-      sp: CommonColumns.textColumn({
-        columnLabel: 'DASU.Actor.SP.abbr',
-        getText: (item) => item.system.spMax(item.actor?.system?.level ?? 1),
-      }),
-      ap: CommonColumns.textColumn({
-        columnLabel: 'DASU.Actor.AP.abbr',
-        getText: (item) => item.system.apMax(item.actor?.system?.level ?? 1),
-      }),
       controls: CommonColumns.itemControlsColumn({
         type: 'class',
         label: 'TYPES.Item.class',

@@ -1,9 +1,15 @@
 <div class="cell-item-controls">
-  <a class="cell-item-controls__control {{#if disableEdit}}cell-item-controls__control--disabled{{/if}}"
-     data-action="editItem"
-     data-tooltip="{{localize 'DASU.Sheet.EditItem'}}">
-    <i class="fas fa-edit"></i>
-  </a>
+  {{#unless hideEdit}}
+    {{#unless (eq item.type "class")}}
+      {{#unless (eq item.type "dejection")}}
+        <a class="cell-item-controls__control {{#if disableEdit}}cell-item-controls__control--disabled{{/if}}"
+           data-action="editItem"
+           data-tooltip="{{localize 'DASU.Sheet.EditItem'}}">
+          <i class="fas fa-edit"></i>
+        </a>
+      {{/unless}}
+    {{/unless}}
+  {{/unless}}
   {{#unless hideDelete}}
     <a class="cell-item-controls__control {{#if disableDelete}}cell-item-controls__control--disabled{{/if}}"
        data-action="deleteItem"

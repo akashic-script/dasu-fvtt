@@ -49,6 +49,49 @@
     <p class="adv-expand__hint">{{localize "DASU.Advancement.ItemGrant.SlotHint"}}</p>
     {{/if}}
 
+    {{#if (eq type "relentlessCurse")}}
+    <div class="adv-expand__curse-grid">
+      <label class="adv-expand__field">
+        <span>{{localize "DASU.Dejection.Curse.WpMaxPct"}}</span>
+        <input type="number" min="0" max="100" step="1" value="{{data.wpMaxPct}}"
+          data-advancement-id="{{advancementId}}" data-field="wpMaxPct"
+          {{#unless editable}}disabled{{/unless}} />
+      </label>
+      <label class="adv-expand__field">
+        <span>{{localize "DASU.Dejection.Curse.WpMaxFlat"}}</span>
+        <input type="number" min="0" step="1" value="{{data.wpMaxFlat}}"
+          data-advancement-id="{{advancementId}}" data-field="wpMaxFlat"
+          {{#unless editable}}disabled{{/unless}} />
+      </label>
+      <label class="adv-expand__field">
+        <span>{{localize "DASU.Actor.Stat.Avoid.abbr"}}</span>
+        <input type="number" min="0" step="1" value="{{data.avoid}}"
+          data-advancement-id="{{advancementId}}" data-field="avoid"
+          {{#unless editable}}disabled{{/unless}} />
+      </label>
+      <label class="adv-expand__field">
+        <span>{{localize "DASU.Actor.Stat.Hit.abbr"}}</span>
+        <input type="number" min="0" step="1" value="{{data.hit}}"
+          data-advancement-id="{{advancementId}}" data-field="hit"
+          {{#unless editable}}disabled{{/unless}} />
+      </label>
+      <label class="adv-expand__field">
+        <span>{{localize "DASU.Actor.Stat.Critical.abbr"}}</span>
+        <input type="number" min="0" step="1" value="{{data.crit}}"
+          data-advancement-id="{{advancementId}}" data-field="crit"
+          {{#unless editable}}disabled{{/unless}} />
+      </label>
+      <label class="adv-expand__field adv-expand__field--check">
+        <input type="checkbox" data-advancement-id="{{advancementId}}" data-field="grantsScar"
+          {{#if data.grantsScar}}checked{{/if}} {{#unless editable}}disabled{{/unless}} />
+        <span>{{localize "DASU.Dejection.Curse.GrantsScar"}}</span>
+      </label>
+    </div>
+    {{#if data.grantsScar}}
+    <p class="adv-expand__hint">{{localize "DASU.Dejection.Curse.ScarSlotHint"}}</p>
+    {{/if}}
+    {{/if}}
+
   </div>
 
 </div>
