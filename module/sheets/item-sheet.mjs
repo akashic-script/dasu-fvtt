@@ -259,6 +259,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
 
     if (context.isItem) {
       context.itemCategoryOptions = localize(DASU.itemCategories);
+      context.isFoodOfGods = itemData.system.category === 'foodOfGods';
       context.resourceTypeOptions = localize(DASU.resourceTypes);
       context.resourceOptions = localize(DASU.itemResources);
       context.modeOptions = localize(DASU.itemEffectModes);

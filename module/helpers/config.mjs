@@ -305,6 +305,7 @@ DASU.itemCategories = {
   restorative: 'DASU.Item.Item.CategoryRestorative',
   element: 'DASU.Item.Item.CategoryElement',
   hoard: 'DASU.Item.Item.CategoryHoard',
+  foodOfGods: 'DASU.Item.Item.CategoryFoodOfGods',
 };
 
 DASU.specialAbilityKinds = {
