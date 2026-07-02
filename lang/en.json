@@ -401,6 +401,9 @@
         "bonusAbbr": "AP+",
         "bonusLong": "Attribute Points Bonus"
       },
+      "Attributes": {
+        "TickMaxHint": "Maximum tick any single attribute can be raised to at this level."
+      },
       "SP": {
         "long": "Skill Points",
         "abbr": "SP",
@@ -514,7 +517,7 @@
       },
       "Warn": {
         "NoAP": "Not enough Attribute Points.",
-        "RuleOfTwo": "Rule of Two: another attribute must be at {value} first.",
+        "TickCapped": "Attribute is capped at {value} for this level.",
         "AttrCapped": "Attribute is already at maximum (6).",
         "NoSP": "Not enough Skill Points.",
         "SkillCapped": "Skill is already at maximum (6)."

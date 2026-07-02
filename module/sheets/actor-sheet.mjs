@@ -180,6 +180,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.flags = actor.flags;
     if (actorData.ap) context.ap = actorData.ap;
     if (actorData.sp) context.sp = actorData.sp;
+    context.attributeTickMax = DASU.attributeTickMax(actorData.level);
     context.cssClass = [...this.options.classes, actor.type].join(' ');
     context.owner = actor.isOwner;
     context.isEditMode = this.isEditMode;
@@ -704,6 +705,14 @@ export class DASUActorSheet extends SheetLayoutMixin(
     for (const input of this.element.querySelectorAll(
       'input.actor-sidebar__attr-value'
     )) {
+      // Dim the input once it's at its level-banded cap.
+      const tickMax = Number(input.dataset.tickMax);
+      if (Number.isFinite(tickMax)) {
+        input.classList.toggle(
+          'is-at-cap',
+          (parseInt(input.value) || 0) >= tickMax
+        );
+      }
       input.addEventListener(
         'change',
         (e) => {
@@ -714,14 +723,16 @@ export class DASUActorSheet extends SheetLayoutMixin(
           const next = parseInt(input.value) || 1;
           const prev = this.actor.system.attributes[key]?.value ?? 1;
           if (next <= prev) return;
+          const level = this.actor.system.level;
           const warn = DASUActorSheet.#canRaiseAttribute(
             this.actor.system.attributes,
             this.actor.system.ap,
             key,
-            next
+            next,
+            level
           );
           if (warn) {
-            DASUActorSheet.#warnAttribute(warn, next);
+            DASUActorSheet.#warnAttribute(warn, next, level);
             e.stopImmediatePropagation();
             input.value = prev;
           }
@@ -1395,23 +1406,22 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.actor.update({ 'system.level': this.actor.system.level + 1 });
   }
 
-  static #canRaiseAttribute(attributes, ap, key, next) {
+  static #canRaiseAttribute(attributes, ap, key, next, level) {
     if (next > 6) return 'DASU.Sheet.Warn.AttrCapped';
     if (next < 1) return null;
     if (ap?.value <= 0) return 'DASU.Sheet.Warn.NoAP';
-    if (next >= 3) {
-      const others = Object.entries(attributes).filter(([k]) => k !== key);
-      if (others.filter(([, a]) => a.value >= next - 1).length < 1)
-        return 'DASU.Sheet.Warn.RuleOfTwo';
-    }
+    const tickMax = CONFIG.DASU.attributeTickMax(level);
+    if (next > tickMax) return 'DASU.Sheet.Warn.TickCapped';
     return null;
   }
 
-  static #warnAttribute(reason, next) {
+  static #warnAttribute(reason, next, level) {
     if (!reason) return;
     const msg =
-      reason === 'DASU.Sheet.Warn.RuleOfTwo'
-        ? game.i18n.format(reason, { value: next - 1 })
+      reason === 'DASU.Sheet.Warn.TickCapped'
+        ? game.i18n.format(reason, {
+            value: CONFIG.DASU.attributeTickMax(level),
+          })
         : game.i18n.localize(reason);
     ui.notifications.warn(msg);
   }
@@ -1420,14 +1430,16 @@ export class DASUActorSheet extends SheetLayoutMixin(
     const next = current + delta;
     if (delta < 0 && next < 1) return;
     if (delta > 0) {
+      const level = actor.system.level;
       const warn = DASUActorSheet.#canRaiseAttribute(
         actor.system.attributes,
         actor.system.ap,
         key,
-        next
+        next,
+        level
       );
       if (warn) {
-        DASUActorSheet.#warnAttribute(warn, next);
+        DASUActorSheet.#warnAttribute(warn, next, level);
         return;
       }
     }

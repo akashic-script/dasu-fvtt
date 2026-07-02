@@ -2022,6 +2022,15 @@
           border-radius: 0;
           clip-path: polygon(6px 0, 100% 0, 100% 100%, 0 100%);
           box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%);
+
+          /* Level-banded attribute tick cap, divided from the AP value. */
+          .actor-sidebar__counter-cap {
+            margin-left: 4px;
+            padding-left: 5px;
+            border-left: 1px solid rgb(255 255 255 / 35%);
+            font-weight: bold;
+            opacity: 0.9;
+          }
         }
       }
 
@@ -2077,6 +2086,12 @@
 
       .actor-sidebar__attributes .actor-sidebar__attr-value {
         cursor: pointer;
+      }
+
+      /* Attribute at its level-banded tick cap: dim to signal it can't be
+         raised further (block-raise only; the value is still editable down). */
+      .actor-sidebar__attributes .actor-sidebar__attr-value.is-at-cap {
+        opacity: 0.55;
       }
 
       .actor-sidebar__stats {

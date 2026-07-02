@@ -64,6 +64,20 @@ DASU.attributeAbbreviations = {
 };
 
 /**
+ * Maximum tick a single attribute may be raised to, banded by character level.
+ *   Levels  1–5 -> 3
+ *   Levels  6–10 -> 4
+ *   Levels 11–15 -> 5
+ *   Levels 16–20 -> 6
+ * @param {number} level
+ * @returns {number}
+ */
+DASU.attributeTickMax = function (level) {
+  const lvl = Math.max(1, Number(level) || 1);
+  return Math.min(6, 3 + Math.floor((Math.min(lvl, 20) - 1) / 5));
+};
+
+/**
  * Cumulative merits required to reach each level.
  * @type {Object<number, number>}
  */
