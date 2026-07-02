@@ -374,18 +374,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.advanceTooltip = game.i18n.localize(
       isTransform ? 'DASU.Actor.Merit.Transform' : 'DASU.Actor.Merit.LevelUp'
     );
-    if (merit?.atMax) {
-      context.meritTooltip = game.i18n.localize('DASU.Actor.Merit.AtMax');
-    } else if (isTransform) {
-      context.meritTooltip = game.i18n.format('DASU.Actor.Merit.ToTransform', {
-        count: merit?.toNext ?? 0,
-      });
-    } else {
-      context.meritTooltip = game.i18n.format('DASU.Actor.Merit.ToNext', {
-        count: merit?.toNext ?? 0,
-        level: merit?.nextLevel ?? actorData.level + 1,
-      });
-    }
+    context.meritTooltip = this.#getMeritTooltip();
 
     return context;
   }
@@ -1106,6 +1095,17 @@ export class DASUActorSheet extends SheetLayoutMixin(
     });
   }
 
+  #getMeritTooltip() {
+    const merit = this.actor.system.meritProgress;
+    const isTransform = merit?.mode === 'transform';
+    if (merit?.atMax) return game.i18n.localize('DASU.Actor.Merit.AtMax');
+    if (isTransform) return game.i18n.format('DASU.Actor.Merit.ToTransform', { count: merit?.toNext ?? 0 });
+    return game.i18n.format('DASU.Actor.Merit.ToNext', {
+      count: merit?.toNext ?? 0,
+      level: merit?.nextLevel ?? (this.actor.system.level ?? 1) + 1,
+    });
+  }
+
   static #onOpenMeritPopover(event, target) {
     return this.#openStepperPopover(target, {
       id: 'merit',
@@ -1114,6 +1114,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
         value: this.actor.system.merit,
         label: game.i18n.localize('DASU.Actor.Merit.long'),
         nextThreshold: this.actor.system.meritProgress?.needed ?? '-',
+        tooltip: this.#getMeritTooltip(),
       },
       path: 'system.merit',
       position: 'right',

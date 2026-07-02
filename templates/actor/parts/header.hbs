@@ -14,7 +14,7 @@
       <i class="fa-solid fa-angles-up"></i>
     </button>
     {{/if}}
-    <div class="actor-header__level actor-header__level--merit" data-action="openMeritPopover" data-tooltip="{{meritTooltip}}">
+    <div class="actor-header__level actor-header__level--merit" data-action="openMeritPopover">
       <span class="actor-header__level-label">{{localize "DASU.Actor.Merit.long"}}</span>
       <input class="dasu-pill" type="text" name="system.merit" value="{{system.merit}}" data-dtype="Number" {{#unless editable}}readonly{{/unless}} />
     </div>
