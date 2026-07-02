@@ -1149,6 +1149,13 @@
         border-right: 1px solid color-mix(in srgb, currentColor 25%, transparent);
       }
 
+      /* Placeholder chip when a daemon has no archetype/subtype assigned. */
+      .actor-header__class-name--empty {
+        font-style: italic;
+        font-weight: 400;
+        opacity: 0.5;
+      }
+
       .actor-header__identity {
         flex: 1;
         min-width: 0;

@@ -9,6 +9,7 @@
       "Identifier": "Identifier",
       "OnlyOne": "A Daemon can only have one Archetype.",
       "DaemonOnly": "Archetypes can only be added to Daemons.",
+      "Placeholder": "No Archetype",
       "Target": {
         "HpMax": "Max HP",
         "WpMax": "Max WP",
@@ -146,7 +147,8 @@
       "TacticShort": "Tac",
       "OnlyOne": "A Daemon can only have one Subtype.",
       "SlotsFull": "Slot limit reached: this Daemon's subtype allows at most {max} {type} items.",
-      "DaemonOnly": "Subtypes can only be added to Daemons."
+      "DaemonOnly": "Subtypes can only be added to Daemons.",
+      "Placeholder": "No Subtype"
     },
     "Ability": {
       "Pow": {
