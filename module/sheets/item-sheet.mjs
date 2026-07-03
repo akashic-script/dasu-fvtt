@@ -333,6 +333,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
           durationValue: e.duration?.value ?? null,
           durationUnits: e.duration?.units ?? 'turns',
           applyTarget: e.flags?.dasu?.applyTarget ?? 'target',
+          dcThreshold: e.flags?.dasu?.dcThreshold ?? null,
         }));
       context.durationUnitsOptions = {
         turns: game.i18n.localize('DASU.Duration.Turns'),
@@ -674,10 +675,14 @@ export class DASUItemSheet extends SheetLayoutMixin(
     if (abilityEffectZone) {
       for (const row of this.element.querySelectorAll('.ability-effect-row')) {
         const effectId = row.dataset.effectId;
+        const details = this.element.querySelector(`.ability-effect-details[data-effect-id="${effectId}"]`);
 
-        row.querySelector('.ability-effect__delete')?.addEventListener('click', async (e) => {
+        row.querySelector('.ability-effect__expand')?.addEventListener('click', (e) => {
           e.stopPropagation();
-          await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
+          const expanded = !details?.hidden;
+          if (details) details.hidden = expanded;
+          row.querySelector('.ability-effect__expand i')?.classList.toggle('fa-chevron-down', expanded);
+          row.querySelector('.ability-effect__expand i')?.classList.toggle('fa-chevron-up', !expanded);
         });
 
         row.querySelector('.ability-effect__name')?.addEventListener('click', async () => {
@@ -697,6 +702,16 @@ export class DASUItemSheet extends SheetLayoutMixin(
         unitsSelect?.addEventListener('change', updateDuration);
         targetSelect?.addEventListener('change', async () => {
           await this.item.effects.get(effectId)?.update({ 'flags.dasu.applyTarget': targetSelect.value });
+        });
+
+        details?.querySelector('.ability-effect__dc-threshold')?.addEventListener('change', async (e) => {
+          const value = parseInt(e.target.value) || null;
+          await this.item.effects.get(effectId)?.update({ 'flags.dasu.dcThreshold': value });
+        });
+
+        details?.querySelector('.ability-effect__delete')?.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
         });
       }
     }

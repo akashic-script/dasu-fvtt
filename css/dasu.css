@@ -5013,6 +5013,26 @@
   opacity: 0.75;
 }
 
+.dasu.check-card .check-target.target-partial {
+  box-shadow: inset 3px 0 0 0 var(--dasu-accent-feature);
+}
+
+.dasu.check-card .check-target.target-partial .target-outcome {
+  color: var(--dasu-accent-feature);
+}
+
+.dasu.check-card .target-outcome-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+}
+
+.dasu.check-card .target-dc-info {
+  font-size: 0.8em;
+  color: var(--dasu-accent-feature);
+}
+
 .dasu.check-card .target-name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5589,7 +5609,43 @@
   font-size: 0.85em;
 }
 
+.ability-effect__expand {
+  color: var(--dasu-muted, #aaa);
+  cursor: pointer;
+  padding: 0 2px;
+
+  &:hover {
+    color: var(--dasu-ink);
+  }
+}
+
+.ability-effect-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 8px 10px;
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+  background: rgb(var(--dasu-panel) / 20%);
+}
+
+.ability-effect-details__label {
+  font-size: 0.8em;
+  color: var(--dasu-muted, #aaa);
+  white-space: nowrap;
+}
+
+.ability-effect__dc-threshold {
+  width: 48px;
+  text-align: center;
+  border-radius: 0;
+  background: rgb(var(--dasu-panel) / 40%);
+  border: none;
+  border-bottom: 1px solid rgb(255 255 255 / 15%);
+  color: var(--dasu-ink);
+}
+
 .ability-effect__delete {
+  margin-left: auto;
   color: var(--dasu-muted, #aaa);
   cursor: pointer;
   padding: 0 2px;
@@ -5997,6 +6053,12 @@ section[data-tab='effects'].drag-over {
   align-items: flex-start;
   text-align: left;
   gap: 4px;
+}
+
+.pipeline-body__dc-skipped {
+  font-size: 0.85em;
+  color: var(--dasu-muted, #aaa);
+  font-style: italic;
 }
 
 .pipeline-body__description {

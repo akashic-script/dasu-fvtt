@@ -62,8 +62,14 @@ function inject(message, html) {
     btn.innerHTML = `${action.icon ? `<i class="${action.icon}"></i> ` : ''}${actionLabel} ${allHitsLabel}`;
     btn.addEventListener('click', async (event) => {
       event.preventDefault();
-      // Apply only to targets that were hit; never fall back to all targets.
       for (const uuid of hitUuids) {
+        // For DC-gated effects, skip targets that didn't pass the DC threshold.
+        if (action.type === 'effect' && action.input.dcThreshold != null && action.input.rollTotal != null) {
+          const doc = fromUuidSync(uuid);
+          const targetActor = doc?.actor ?? (doc instanceof Actor ? doc : null);
+          const avoid = targetActor?.system?.stats?.avoid?.value ?? 0;
+          if (action.input.rollTotal < avoid + action.input.dcThreshold) continue;
+        }
         await pipeline.applyToTargets(action.input, source, { uuid });
       }
     });

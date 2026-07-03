@@ -61,6 +61,16 @@ export class EffectPipeline extends Pipeline {
       }
     }
 
+    const dcThreshold = input.dcThreshold ?? null;
+    const rollTotal = input.rollTotal ?? null;
+    let dcSkipped = false;
+    let effectiveDC = null;
+    if (dcThreshold != null && rollTotal != null) {
+      const baseTN = target?.system?.stats?.avoid?.value ?? 0;
+      effectiveDC = baseTN + dcThreshold;
+      dcSkipped = rollTotal < effectiveDC;
+    }
+
     return {
       sourceUuid: input.effectUuid ?? null,
       effectData,
@@ -69,10 +79,15 @@ export class EffectPipeline extends Pipeline {
       name: effectData?.name ?? game.i18n.localize('DASU.Pipeline.ApplyEffect'),
       img: effectData?.img ?? 'icons/svg/aura.svg',
       description,
+      dcThreshold,
+      rollTotal,
+      effectiveDC,
+      dcSkipped,
     };
   }
 
   async applyToTarget(outcome, target) {
+    if (outcome.dcSkipped) return { dcSkipped: true };
     if (!outcome.effectData) throw new Error('EffectPipeline: no effect data to apply');
 
     // Statuses route through applyStatus for stacking; capture prior for revert.
@@ -99,6 +114,7 @@ export class EffectPipeline extends Pipeline {
   }
 
   async revert(revertData, target) {
+    if (revertData?.dcSkipped) return;
     const id = revertData?.effectId;
     if (!id || !target.effects?.get(id)) return;
 
@@ -128,7 +144,14 @@ export class EffectPipeline extends Pipeline {
       : '';
     const rawDur = c.effectData?.duration ?? {};
     const duration = _formatDuration(rawDur);
-    return { name: c.name, description, duration };
+    return {
+      name: c.name,
+      description,
+      duration,
+      dcSkipped: c.dcSkipped ?? false,
+      effectiveDC: c.effectiveDC ?? null,
+      rollTotal: c.rollTotal ?? null,
+    };
   }
 }
 

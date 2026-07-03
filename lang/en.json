@@ -119,7 +119,9 @@
       "ApplyEffectNamed": "Apply {name}",
       "EffectFor": "for",
       "DurationRounds": "{n} rounds",
-      "DurationTurns": "{n} turns"
+      "DurationTurns": "{n} turns",
+      "DCNotMet": "DC not met",
+      "ApplyEffectDC": "{name} (DC{dc})"
     },
     "Duration": {
       "Rounds": "Rounds",
@@ -615,6 +617,8 @@
         "ApplyEffects": "Apply Effects",
         "EffectDrop": "Drop an Active Effect here to add",
         "EffectDropInvalid": "Only Active Effects can be dropped here.",
+        "EffectSettings": "Effect settings",
+        "DCThreshold": "DC Threshold",
         "ApplyTarget": {
           "Target": "Target",
           "Self": "Self"
@@ -705,6 +709,7 @@
       "SnakeEyes": "Snake Eyes",
       "Hit": "Hit",
       "Miss": "Miss",
+      "Partial": "Partial",
       "Reroll": "Reroll",
       "Retarget": "Retarget",
       "Aid": {

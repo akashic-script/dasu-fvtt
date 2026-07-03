@@ -16,7 +16,12 @@
         <select class="ability-effect__apply-target">
           {{selectOptions @root.applyTargetOptions selected=e.applyTarget}}
         </select>
-        <a class="ability-effect__delete" data-tooltip="{{localize 'DASU.Sheet.DeleteItem'}}"><i class="fas fa-times"></i></a>
+        <a class="ability-effect__expand" data-tooltip="{{localize 'DASU.Item.Ability.EffectSettings'}}"><i class="fas fa-chevron-down"></i></a>
+      </div>
+      <div class="ability-effect-details" data-effect-id="{{e.id}}" hidden>
+        <label class="ability-effect-details__label">{{localize "DASU.Item.Ability.DCThreshold"}}</label>
+        <input class="ability-effect__dc-threshold" type="number" value="{{e.dcThreshold}}" min="0" placeholder="--" />
+        <a class="ability-effect__delete" data-tooltip="{{localize 'DASU.Sheet.DeleteItem'}}"><i class="fas fa-trash"></i></a>
       </div>
       {{/each}}
 
