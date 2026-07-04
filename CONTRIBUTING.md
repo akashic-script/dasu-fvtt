@@ -70,6 +70,24 @@
    git branch -d feat/name-of-feature
    ```
 
+## Versioning
+
+We use a Foundry version scheme, **not** strict SemVer. The version is
+`MAJOR.MINOR.PATCH`, read as:
+
+| Segment | Meaning                             | Bumped when                                                            |
+| ------- | ----------------------------------- | ---------------------------------------------------------------------- |
+| `MAJOR` | Foundry VTT major version we target | We move to a new Foundry generation (e.g. 14 to 15). **Set manually.** |
+| `MINOR` | New features                        | A release adds features. Use `npm run release:minor`.                  |
+| `PATCH` | Fixes, hotfixes, and small changes  | A release only fixes things. Use `npm run release:patch`.              |
+
+We currently target **Foundry v14**, so releases are `14.x.y` (first release:
+`14.0.0`). When Foundry v15 ships and we verify against it, we jump to `15.0.0`.
+
+Bump `MAJOR` by hand alongside the `compatibility` fields in `system.json`, never
+via `release:major`. Breaking changes to our own data model go in the changelog
+and release notes; they do not bump `MAJOR`.
+
 ## Release
 
 1. Branch from `dev`:
@@ -82,10 +100,12 @@
 2. Run the release script:
 
    ```bash
-   npm run release:patch   # or :minor / :major
+   npm run release:minor   # new features
+   npm run release:patch   # fixes / hotfixes only
    ```
 
    This bumps the version, generates the changelog, and creates a GitHub release.
+   Do not use `release:major`; see [Versioning](#versioning).
 
 3. Merge into `main` and tag:
 
