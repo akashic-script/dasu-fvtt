@@ -799,6 +799,13 @@ export function initializeChecks() {
       result.additionalData.pipelineActions = pipelineActions;
     }
 
+    // Slotted tags, injected at the end of the tag row as plain-name chips.
+    if (sys.tags) {
+      for (const tag of sys.tags) {
+        if (tag.name) data.tags.push({ tag: tag.name, slottedTag: true });
+      }
+    }
+
     // Annotate each target with DC info for DC-gated effect actions.
     const dcActions = pipelineActions.filter(
       (a) => a.type === 'effect' && a.input.dcThreshold != null && a.input.rollTotal != null

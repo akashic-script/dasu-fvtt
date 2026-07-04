@@ -5,6 +5,8 @@ import { DASU, SYSTEM } from '../helpers/config.mjs';
 import { SheetLayoutMixin } from './mixins/sheet-layout-mixin.mjs';
 import { EffectTableRenderer } from '../helpers/tables/effect-table-renderer.mjs';
 import { AdvancementTableRenderer } from '../helpers/tables/advancement-table-renderer.mjs';
+import { SlottedTagTableRenderer } from '../helpers/tables/slotted-tag-table-renderer.mjs';
+import { slotTag } from '../helpers/tag-slotting.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
 
 const BOND_RANK_KEYS = ['rank1', 'rank2', 'rank3'];
@@ -58,13 +60,24 @@ export class DASUItemSheet extends SheetLayoutMixin(
 
   async _onDrop(event) {
     if (!this.isEditable || !this.item.isOwner) return;
+    const data =
+      foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
+
+    // Tag Item drop onto a taggable host item sheet.
+    if (data?.type === 'Item' && data.uuid) {
+      const tagZone = event.target.closest('.tag-drop-zone');
+      if (tagZone) {
+        tagZone.classList.remove('drag-over');
+        await this.#handleTagDrop(data.uuid);
+        return;
+      }
+    }
+
     const zone = event.target.closest(
       '.ability-effect-drop-zone, section[data-tab="effects"]'
     );
     if (!zone) return;
     zone.classList.remove('drag-over');
-    const data =
-      foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
     if (data?.type !== 'ActiveEffect' || !data.uuid) return;
     const src = await fromUuid(data.uuid);
     if (!src || src.parent === this.item) return;
@@ -79,6 +92,12 @@ export class DASUItemSheet extends SheetLayoutMixin(
       };
     }
     await this.item.createEmbeddedDocuments('ActiveEffect', [effectData]);
+  }
+
+  async #handleTagDrop(tagUuid) {
+    const tagItem = await fromUuid(tagUuid);
+    if (!tagItem) return;
+    await slotTag(tagItem, this.item);
   }
 
   /** @override */
@@ -131,6 +150,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
   }
 
   #advancementTable = null;
+  #slottedTagTable = null;
 
   #fieldsets = new FieldsetStateManager([
     {
@@ -201,6 +221,21 @@ export class DASUItemSheet extends SheetLayoutMixin(
         template: 'systems/dasu/templates/item/parts/ability-effects-advanced.hbs',
         scrollable: [''],
       };
+    } else if (this.document.type === 'weapon') {
+      parts.advanced = {
+        template: 'systems/dasu/templates/item/parts/weapon-tags-advanced.hbs',
+        scrollable: [''],
+      };
+    } else if (this.document.type === 'tactic') {
+      parts.advanced = {
+        template: 'systems/dasu/templates/item/parts/tactic-tags-advanced.hbs',
+        scrollable: [''],
+      };
+    } else if (this.document.type === 'tag') {
+      parts.advanced = {
+        template: 'systems/dasu/templates/item/parts/tag-advanced.hbs',
+        scrollable: [''],
+      };
     } else {
       delete parts.advanced;
     }
@@ -250,6 +285,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     context.isSkillAbility = item.type === 'skillAbility';
     context.isScar = item.type === 'scar';
     context.isDejection = item.type === 'dejection';
+    context.isTag = item.type === 'tag';
     context.dejectionLevel = item.actor?.system?.dejection ?? 0;
 
     const localize = (obj) =>
@@ -353,6 +389,46 @@ export class DASUItemSheet extends SheetLayoutMixin(
       context.resourceTypeOptions = localize(DASU.resourceTypes);
       context.damageTypeOptions = localize(DASU.damageTypes);
       context.damageResourceOptions = localize(DASU.damageResources);
+    }
+
+    if (context.isTag) {
+      const selectedTypes = new Set(item.system.applicableTypes ?? []);
+      context.taggableTypeOptions = (DASU.taggableTypes ?? []).map((t) => ({
+        value: t,
+        label: game.i18n.localize(`TYPES.Item.${t}`),
+        selected: selectedTypes.has(t),
+      }));
+      const selectedSubTypes = new Set(item.system.applicableSubType ?? []);
+      const allSubTypeSelected = selectedSubTypes.size === 0;
+      context.tagSubTypeOptions = [
+        { value: 'all', label: game.i18n.localize('DASU.Tag.ApplicableAll'), selected: allSubTypeSelected, type: null },
+        ...Object.entries(DASU.tagSubTypes ?? {}).flatMap(([type, cats]) =>
+          Object.entries(cats).map(([k, v]) => ({
+            value: k,
+            label: game.i18n.localize(v),
+            selected: selectedSubTypes.has(k),
+            type,
+          }))
+        ),
+      ];
+    }
+
+    if (context.isAbility || context.isWeapon || context.isTactic) {
+      if (!this.#slottedTagTable) {
+        this.#slottedTagTable = new SlottedTagTableRenderer({
+          item,
+          editable: context.editable,
+        });
+      } else {
+        this.#slottedTagTable._item = item;
+        this.#slottedTagTable._editable = context.editable;
+      }
+      context.slottedTagTable = await this.#slottedTagTable.renderTable(item);
+      context.tagBudget = item.system.tagBudget ?? 0;
+      context.tagSlotsUsed = item.system.tagSlotsUsed ?? 0;
+      context.tagBudgetFree = item.system.tagBudgetFree ?? 0;
+      context.tagUsesFlatBudget = context.isWeapon || context.isTactic;
+      context.tagMaxSlots = item.system.tagBudget ?? 0;
     }
 
     // Retrieve the roll data for TinyMCE editors.
@@ -516,6 +592,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     this.#passiveEffectsTable.activateListeners(this);
     this.#inactiveEffectsTable.activateListeners(this);
     if (this.#advancementTable) this.#advancementTable.activateListeners(this);
+    if (this.#slottedTagTable) this.#slottedTagTable.activateListeners(this);
   }
 
   /** @override */
@@ -671,6 +748,14 @@ export class DASUItemSheet extends SheetLayoutMixin(
       zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
     }
 
+    for (const zone of this.element.querySelectorAll('.tag-drop-zone')) {
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    }
+
     const abilityEffectZone = this.element.querySelector('.ability-effect-drop-zone');
     if (abilityEffectZone) {
       for (const row of this.element.querySelectorAll('.ability-effect-row')) {
@@ -718,6 +803,70 @@ export class DASUItemSheet extends SheetLayoutMixin(
 
     if (this.#advancementTable) {
       this.#advancementTable.activateAdvancementListeners(this.element);
+    }
+
+    const typeSel = this.element.querySelector('select[name="system.applicableTypes"]');
+    const subTypeSel = this.element.querySelector('select[name="system.applicableSubType"]');
+
+    if (typeSel && subTypeSel) {
+      const syncSubTypeVisibility = (selectedTypes) => {
+        const selected = selectedTypes
+          ?? new Set(Array.from(typeSel.selectedOptions).map((o) => o.value));
+        for (const opt of subTypeSel.options) {
+          if (opt.value === 'all') continue; // always visible
+          const t = opt.dataset.type;
+          const visible = !t || selected.has(t) || selected.size === 0;
+          opt.hidden = !visible;
+          if (!visible) opt.selected = false;
+        }
+        // If nothing is selected after filtering, re-select "All"
+        const anySelected = Array.from(subTypeSel.options).some((o) => !o.hidden && o.value !== 'all' && o.selected);
+        const allOpt = subTypeSel.querySelector('option[value="all"]');
+        if (allOpt) allOpt.selected = !anySelected;
+        const visibleCount = Array.from(subTypeSel.options).filter((o) => !o.hidden).length;
+        subTypeSel.size = Math.max(2, visibleCount);
+      };
+
+      // Seed from item data on first render
+      syncSubTypeVisibility(new Set(this.item.system.applicableTypes ?? []));
+
+      typeSel.addEventListener('change', async (e) => {
+        e.stopPropagation();
+        const values = Array.from(typeSel.selectedOptions).map((o) => o.value);
+        syncSubTypeVisibility(new Set(values));
+        const subValues = Array.from(subTypeSel.selectedOptions).map((o) => o.value);
+        await this.item.update({
+          'system.applicableTypes': values,
+          'system.applicableSubType': subValues,
+        });
+      });
+
+      subTypeSel.addEventListener('change', async (e) => {
+        e.stopPropagation();
+        const selected = Array.from(subTypeSel.selectedOptions).map((o) => o.value);
+        const allOpt = subTypeSel.querySelector('option[value="all"]');
+        const pickedAll = selected.includes('all');
+        if (pickedAll) {
+          // "All" chosen: clear selection and visually deselect everything else
+          for (const opt of subTypeSel.options) opt.selected = opt.value === 'all';
+          await this.item.update({ 'system.applicableSubType': [] });
+        } else {
+          // Real subtypes chosen: deselect the "All" option
+          if (allOpt) allOpt.selected = false;
+          const values = selected.filter((v) => v !== 'all');
+          await this.item.update({ 'system.applicableSubType': values });
+        }
+      });
+    } else {
+      for (const sel of this.element.querySelectorAll(
+        'select[name="system.applicableTypes"], select[name="system.applicableSubType"]'
+      )) {
+        sel.addEventListener('change', async (e) => {
+          e.stopPropagation();
+          const values = Array.from(sel.selectedOptions).map((o) => o.value);
+          await this.item.update({ [sel.name]: values });
+        });
+      }
     }
 
     const activeTab =

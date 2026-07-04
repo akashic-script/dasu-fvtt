@@ -24,6 +24,8 @@ import { BondTableRenderer } from '../helpers/tables/bond-table-renderer.mjs';
 import { SkillAbilityTableRenderer } from '../helpers/tables/skill-ability-table-renderer.mjs';
 import { DejectionTableRenderer } from '../helpers/tables/dejection-table-renderer.mjs';
 import { ScarTableRenderer } from '../helpers/tables/scar-table-renderer.mjs';
+import { TagCatalogRenderer } from '../helpers/tables/tag-catalog-renderer.mjs';
+import { slotTag, unslotTag } from '../helpers/tag-slotting.mjs';
 import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
 import { DASURollDialog } from '../ui/roll-dialog.mjs';
 import { SYSTEM } from '../helpers/config.mjs';
@@ -99,6 +101,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
   #schemaTable = new SchemaTableRenderer();
   #itemTable = new ItemTableRenderer();
   #featureTable = new FeatureTableRenderer();
+  #tagCatalogTable = new TagCatalogRenderer();
   #temporaryEffectsTable = new EffectTableRenderer(
     'temporary',
     'DASU.Effect.Temporary',
@@ -153,6 +156,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
       plannerEditDejection: DASUActorSheet.#onPlannerEditDejection,
       toggleDaemonRole: DASUActorSheet.#onToggleDaemonRole,
       openRolesPopover: DASUActorSheet.#onOpenRolesPopover,
+      removeSlottedTag: DASUActorSheet.#onRemoveSlottedTag,
+      openSlottedTag: DASUActorSheet.#onOpenSlottedTag,
     },
   };
 
@@ -273,6 +278,13 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.itemTable = await this.#itemTable.renderTable(this.document, {
       sectionBadge: {
         type: 'item',
+        tooltip: game.i18n.localize('DASU.Sheet.AddItem'),
+        used: '+',
+      },
+    });
+    context.tagTable = await this.#tagCatalogTable.renderTable(this.document, {
+      sectionBadge: {
+        type: 'tag',
         tooltip: game.i18n.localize('DASU.Sheet.AddItem'),
         used: '+',
       },
@@ -532,6 +544,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
       doc?.sheet?.render(true);
     });
     this.#bindPlannerSlots();
+    this.#bindTagDropHighlight();
     this.#weaponTable.activateListeners(this);
     this.#abilityTable.activateListeners(this);
     this.#tacticTable.activateListeners(this);
@@ -546,6 +559,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
     }
     this.#itemTable.activateListeners(this);
     this.#featureTable.activateListeners(this);
+    this.#tagCatalogTable.activateListeners(this);
     for (const { renderer } of DASUActorSheet.#moduleTableRegistry) {
       renderer.activateListeners(this);
     }
@@ -912,6 +926,21 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   /** @override */
   async _onDropItem(event, item) {
+    // Slot a tag Item onto a specific host item row (ability/weapon/tactic).
+    if (item?.type === 'tag') {
+      const hostRow = event.target.closest('.item[data-item-id]');
+      const hostId = hostRow?.dataset?.itemId;
+      if (hostId) {
+        const hostItem = this.actor.items.get(hostId);
+        if (hostItem && DASU.taggableTypes?.includes(hostItem.type)) {
+          await this.#slotTagOntoItem(item, hostItem);
+          return false;
+        }
+      }
+      // No valid row target; don't add to the actor's item list.
+      return false;
+    }
+
     if (item?.type === 'bond' && this.actor.type !== 'summoner') {
       ui.notifications?.warn(game.i18n.localize('DASU.Bond.SummonerOnly'));
       return false;
@@ -936,6 +965,10 @@ export class DASUActorSheet extends SheetLayoutMixin(
       return false;
     }
     return super._onDropItem(event, item);
+  }
+
+  async #slotTagOntoItem(tagItem, hostItem) {
+    await slotTag(tagItem, hostItem);
   }
 
   /**
@@ -1373,6 +1406,41 @@ export class DASUActorSheet extends SheetLayoutMixin(
     dej?.sheet?.render(true);
   }
 
+  #bindTagDropHighlight() {
+    const taggableTables = new Set(
+      (DASU.taggableTypes ?? []).map((t) => `${t}-table`)
+    );
+    const isTaggableRow = (el) => {
+      const row = el?.closest('.dasu-table__row-container[data-key]');
+      if (!row) return null;
+      const table = row.closest('.dasu-table');
+      if (!table) return null;
+      const inTaggable = [...taggableTables].some((cls) => table.classList.contains(cls));
+      return inTaggable ? row : null;
+    };
+
+    this.element.addEventListener('dragover', (e) => {
+      const row = isTaggableRow(e.target);
+      if (!row) return;
+      e.preventDefault();
+      row.classList.add('tag-drop-target');
+    });
+
+    this.element.addEventListener('dragleave', (e) => {
+      const row = isTaggableRow(e.target);
+      if (!row) return;
+      if (!row.contains(e.relatedTarget)) {
+        row.classList.remove('tag-drop-target');
+      }
+    });
+
+    this.element.addEventListener('drop', () => {
+      for (const el of this.element.querySelectorAll('.tag-drop-target')) {
+        el.classList.remove('tag-drop-target');
+      }
+    });
+  }
+
   #bindPlannerSlots() {
     this.element.addEventListener('dragover', (e) => {
       const slot = e.target.closest('.planner__slot--fillable');
@@ -1797,5 +1865,23 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   static async #onFieldsetSplit(event, target) {
     await this.#fieldsets.onSplit(event, target, this.document);
+  }
+
+  static async #onRemoveSlottedTag(event, target) {
+    const itemId = target.dataset.itemId;
+    const tagId = target.dataset.tagId;
+    const hostItem = this.actor.items.get(itemId);
+    if (hostItem) await unslotTag(hostItem, tagId);
+  }
+
+  static async #onOpenSlottedTag(event, target) {
+    if (this.isEditMode) return;
+    const itemId = target.dataset.itemId;
+    const tagId = target.dataset.tagId;
+    const hostItem = this.actor.items.get(itemId);
+    const tag = hostItem?.system?.tags?.get(tagId);
+    if (!tag?.sourceUuid) return;
+    const sourceItem = await fromUuid(tag.sourceUuid);
+    sourceItem?.sheet?.render(true);
   }
 }

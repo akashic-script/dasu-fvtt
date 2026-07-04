@@ -7,7 +7,7 @@
 
     {{#if tags.length}}
     <div class="check-tags">
-      {{#each tags}}<span class="check-tag">{{localize this.tag}}{{#if this.value}}<span class="check-tag__value">{{localize this.value}}</span>{{/if}}</span>{{/each}}
+      {{#each tags}}<span class="check-tag{{#if this.slottedTag}} check-tag--slotted{{/if}}">{{localize this.tag}}{{#if this.value}}<span class="check-tag__value">{{localize this.value}}</span>{{/if}}</span>{{/each}}
     </div>
     {{/if}}
 

@@ -11,6 +11,7 @@ export class WeaponTableRenderer extends DASUTableRenderer {
     renderDescription: CommonDescriptions.descriptionWithTags(
       WeaponTableRenderer.#getTags
     ),
+    renderRowCaption: CommonDescriptions.slottedTagCaption(),
     columns: {
       name: CommonColumns.itemNameColumn({ columnName: 'TYPES.Item.weapon' }),
       damage: CommonColumns.textColumn({

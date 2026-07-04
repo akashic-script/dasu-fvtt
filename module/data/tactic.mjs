@@ -1,8 +1,9 @@
 import DASUItemBase from "./item-base.mjs";
 import { DamageField, ResourceField } from "./fields/index.mjs";
 import { DASU } from "../helpers/config.mjs";
+import { TaggableMixin } from "./mixins/taggable.mjs";
 
-export default class DASUTactic extends DASUItemBase {
+export default class DASUTactic extends TaggableMixin(DASUItemBase) {
 
   static defineSchema() {
     const fields = foundry.data.fields;

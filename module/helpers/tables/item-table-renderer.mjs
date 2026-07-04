@@ -65,6 +65,12 @@ export class ItemTableRenderer extends DASUTableRenderer {
   static #getTags(item) {
     return [
       {
+        label: 'DASU.Item.Item.Category',
+        value: game.i18n.localize(
+          DASU.itemCategories[item.system.category] ?? ''
+        ),
+      },
+      {
         label: 'DASU.Item.Item.Resource',
         value: game.i18n.localize(
           DASU.itemResources[item.system.effects?.[0]?.resource] ?? ''

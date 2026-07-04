@@ -530,3 +530,12 @@ DASU.stackableStatuses = Object.fromEntries(
     .filter((s) => s.stack)
     .map((s) => [s.id, s.stack.max])
 );
+
+/** Item types that can have tags slotted onto them. */
+DASU.taggableTypes = ['weapon', 'ability', 'tactic'];
+
+/** Sub-type choices keyed by taggable item type. Tactic has no sub-types. */
+DASU.tagSubTypes = {
+  ability: DASU.abilityCategories,
+  weapon: DASU.weaponCategories,
+};

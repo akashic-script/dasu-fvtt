@@ -14,6 +14,10 @@ import { Checks, initializeChecks } from './checks/checks.mjs';
 import { initializePipelines } from './helpers/pipelines/_module.mjs';
 import { initializeStatusEffects } from './helpers/status-effects.mjs';
 import { DASUActiveEffectConfig } from './sheets/active-effect-config.mjs';
+import {
+  resyncCatalogTag,
+  handleCatalogTagDeleted,
+} from './helpers/tag-slotting.mjs';
 import * as models from './data/_module.mjs';
 
 Hooks.once('init', function () {
@@ -31,6 +35,11 @@ Hooks.once('init', function () {
       BaseAdvancement: models.BaseAdvancement,
       ADVANCEMENT_TYPES: models.ADVANCEMENT_TYPES,
       register: (cls) => models.BaseAdvancement.registerType(cls),
+    },
+    tags: {
+      BaseTag: models.BaseTag,
+      TAG_TYPES: models.TAG_TYPES,
+      register: (cls) => models.BaseTag.registerType(cls),
     },
   };
 
@@ -73,6 +82,7 @@ Hooks.once('init', function () {
     skillAbility: models.DASUSkillAbility,
     scar: models.DASUScar,
     dejection: models.DASUDejection,
+    tag: models.DASUTag,
   });
 
   Object.assign(CONFIG.ChatMessage.dataModels, {
@@ -111,6 +121,7 @@ Hooks.once('init', function () {
         'skillAbility',
         'scar',
         'dejection',
+        'tag',
       ],
       makeDefault: true,
       label: 'DASU.SheetLabels.Item',
@@ -141,6 +152,36 @@ function registerHandlebarsHelpers() {
 Hooks.once('ready', async function () {
   Hooks.on('hotbarDrop', (bar, data, slot) => createItemMacro(data, slot));
   for (const actor of game.actors) actor.applySchemaUpgrades?.();
+
+  // When a catalog tag's applicability is edited, reconcile its slotted copies.
+  // Runs once, on the client that owns the actor (or the active GM)
+  Hooks.on('updateItem', (item, changes, options, userId) => {
+    if (item.type !== 'tag') return;
+    if (game.userId !== userId) return;
+    const applChanged =
+      foundry.utils.hasProperty(changes, 'system.applicableTypes') ||
+      foundry.utils.hasProperty(changes, 'system.applicableSubType');
+    if (applChanged) {
+      Promise.resolve(resyncCatalogTag(item)).catch((err) =>
+        Hooks.onError('updateItem#resyncCatalogTag', err, {
+          log: 'error',
+          notify: 'error',
+        })
+      );
+    }
+  });
+
+  // When a catalog tag is deleted, unslot its copies so nothing is orphaned.
+  Hooks.on('deleteItem', (item, options, userId) => {
+    if (item.type !== 'tag') return;
+    if (game.userId !== userId) return;
+    Promise.resolve(handleCatalogTagDeleted(item)).catch((err) =>
+      Hooks.onError('deleteItem#handleCatalogTagDeleted', err, {
+        log: 'error',
+        notify: 'error',
+      })
+    );
+  });
 
   Hooks.callAll('dasu.ready', game.dasu);
 });

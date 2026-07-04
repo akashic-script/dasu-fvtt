@@ -14,6 +14,7 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/dasu/templates/actor/parts/dejection-popover.hbs',
     // Item partials
     'systems/dasu/templates/item/parts/item-effects.hbs',
+    'systems/dasu/templates/item/parts/tag-panel.hbs',
     // Active Effect config
     'systems/dasu/templates/effect/stacks.hbs',
     // Table system

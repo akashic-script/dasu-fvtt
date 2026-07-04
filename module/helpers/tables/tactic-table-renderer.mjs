@@ -11,6 +11,7 @@ export class TacticTableRenderer extends DASUTableRenderer {
     renderDescription: CommonDescriptions.descriptionWithTags(
       TacticTableRenderer.#getTags
     ),
+    renderRowCaption: CommonDescriptions.slottedTagCaption(),
     columns: {
       name: CommonColumns.itemNameColumn({ columnName: 'TYPES.Item.tactic' }),
       damage: CommonColumns.textColumn({

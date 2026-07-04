@@ -19,10 +19,12 @@ export {default as DASUSpecialAbility} from "./special-ability.mjs";
 export {default as DASUSkillAbility} from "./skill-ability.mjs";
 export {default as DASUScar} from "./scar.mjs";
 export {default as DASUDejection} from "./dejection.mjs";
+export {default as DASUTag} from "./item-tag.mjs";
 
 export {default as PipelineMessageModel} from "./pipeline-message.mjs";
 
 export * from "./advancements/_module.mjs";
+export * from "./tags/_module.mjs";
 
 export { PseudoDocument } from "./pseudo/pseudo-document.mjs";
 export { TypedPseudoDocument } from "./pseudo/typed-pseudo-document.mjs";

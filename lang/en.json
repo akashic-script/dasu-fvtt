@@ -506,6 +506,7 @@
       "EditModeToggle": "Toggle edit mode",
       "MoreOptions": "More",
       "EditItem": "Edit",
+      "OpenSheet": "Open sheet",
       "DeleteItem": "Delete",
       "AddItem": "Add new",
       "RollFlavorAbility": "[ability]",
@@ -675,6 +676,27 @@
       "Unslot": "Remove slotted item",
       "SlotWrongType": "That item must be a {type}."
     },
+    "Tag": {
+      "Tags": "Tags",
+      "Base": {
+        "Label": "Tag"
+      },
+      "Rank": "Rank",
+      "SlotsUsed": "Tag slots used / available",
+      "PricePerRank": "Price Per Rank",
+      "Price": "Price",
+      "ApplicableTypes": "Applicable Types",
+      "ApplicableSubType": "Applicable Sub-Type",
+      "Types": "Types",
+      "ApplicableAll": "All",
+      "Properties": "Properties",
+      "Applicability": "Applicability",
+      "DropZone": "Drop a tag here to slot it",
+      "WrongType": "This tag cannot be slotted onto this item type.",
+      "NoSlots": "No free tag slots remaining.",
+      "Pruned": "Removed {count} slotted copy(ies) of \"{name}\" that no longer qualify.",
+      "MaxSlots": "Max Slots"
+    },
     "Advancement": {
       "Type": "Type",
       "ChooseType": "Choose an advancement type to add.",
@@ -829,7 +851,8 @@
       "specialAbility": "Special Ability",
       "skillAbility": "Skill Ability",
       "scar": "Scar",
-      "dejection": "Dejection"
+      "dejection": "Dejection",
+      "tag": "Tag"
     }
   }
 }

@@ -48,7 +48,8 @@
       "specialAbility": {},
       "skillAbility": {},
       "scar": {},
-      "dejection": {}
+      "dejection": {},
+      "tag": {}
     },
     "ChatMessage": {
       "pipeline": {}

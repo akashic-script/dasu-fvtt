@@ -11,6 +11,7 @@ export class AbilityTableRenderer extends DASUTableRenderer {
     renderDescription: CommonDescriptions.descriptionWithTags(
       AbilityTableRenderer.#getTags
     ),
+    renderRowCaption: CommonDescriptions.slottedTagCaption(),
     columns: {
       name: CommonColumns.itemNameColumn({ columnName: 'TYPES.Item.ability' }),
       effect: CommonColumns.textColumn({

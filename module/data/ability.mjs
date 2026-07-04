@@ -1,8 +1,9 @@
 import DASUItemBase from "./item-base.mjs";
 import { AptitudeField, DamageField, HealField, ResourceField } from "./fields/index.mjs";
 import { DASU } from "../helpers/config.mjs";
+import { TaggableMixin } from "./mixins/taggable.mjs";
 
-export default class DASUAbility extends DASUItemBase {
+export default class DASUAbility extends TaggableMixin(DASUItemBase) {
 
   static defineSchema() {
     const fields = foundry.data.fields;
@@ -31,6 +32,11 @@ export default class DASUAbility extends DASUItemBase {
     schema.aptitude = AptitudeField();
 
     return schema;
+  }
+
+  /** Abilities use aptitude level as their tag budget. */
+  _tagBudget() {
+    return this.aptitude?.value ?? 0;
   }
 
   /** @override */
