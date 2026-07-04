@@ -16,7 +16,9 @@ export class SpecialAbilityTableRenderer extends DASUTableRenderer {
       kind: CommonColumns.textColumn({
         columnLabel: 'DASU.SpecialAbility.Kind.Label',
         getText: (item) =>
-          game.i18n.localize(DASU.specialAbilityKinds?.[item.system.kind] ?? '–'),
+          game.i18n.localize(
+            DASU.specialAbilityKinds?.[item.system.kind] ?? '–'
+          ),
       }),
       controls: CommonColumns.itemControlsColumn({
         type: 'specialAbility',

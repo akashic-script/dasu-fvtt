@@ -30,7 +30,8 @@ const onPrepareCheck = (check, actor, item) => {
     const govern = item?.system?.govern ?? 'pow';
     const governValue = actor?.system?.attributes?.[govern]?.value ?? 0;
     const type = itemDamage.type ?? 'physical';
-    const kind = item?.type === 'weapon' ? 'weapon' : (item?.system?.category ?? 'spell');
+    const kind =
+      item?.type === 'weapon' ? 'weapon' : item?.system?.category ?? 'spell';
     const dmgBonus = sumDamageBonus(bonuses?.damage, { kind, type });
     config.setDamage({
       amount: governValue + (itemDamage.value ?? 0) + dmgBonus,

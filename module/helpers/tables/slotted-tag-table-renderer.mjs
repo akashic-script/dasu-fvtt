@@ -46,9 +46,15 @@ export class SlottedTagTableRenderer extends DASUTableRenderer {
       renderCell: (tag) => {
         const uuid = tag.sourceUuid || '';
         const icon = uuid
-          ? `<a class="slotted-tag__icon" data-action="tagOpen" data-tag-id="${tag.id}" data-tooltip="${game.i18n.localize('DASU.Sheet.OpenSheet')}"><i class="fas fa-tag"></i></a>`
+          ? `<a class="slotted-tag__icon" data-action="tagOpen" data-tag-id="${
+              tag.id
+            }" data-tooltip="${game.i18n.localize(
+              'DASU.Sheet.OpenSheet'
+            )}"><i class="fas fa-tag"></i></a>`
           : `<span class="slotted-tag__icon slotted-tag__icon--placeholder"><i class="fas fa-tag"></i></span>`;
-        return `<div class="slotted-tag__name-cell">${icon}<span class="slotted-tag__name">${tag.name ?? ''}</span></div>`;
+        return `<div class="slotted-tag__name-cell">${icon}<span class="slotted-tag__name">${
+          tag.name ?? ''
+        }</span></div>`;
       },
     };
 
@@ -59,9 +65,17 @@ export class SlottedTagTableRenderer extends DASUTableRenderer {
         const canUp = this._editable && free > 0;
         const canDown = this._editable && tag.rank.current > 1;
         return `<div class="slotted-tag__rank-stepper">
-          <a class="slotted-tag__rank-btn ${canDown ? '' : 'slotted-tag__rank-btn--disabled'}" data-action="tagRankDown" data-tag-id="${tag.id}"><i class="fas fa-minus"></i></a>
+          <a class="slotted-tag__rank-btn ${
+            canDown ? '' : 'slotted-tag__rank-btn--disabled'
+          }" data-action="tagRankDown" data-tag-id="${
+          tag.id
+        }"><i class="fas fa-minus"></i></a>
           <span>${tag.rank.current}</span>
-          <a class="slotted-tag__rank-btn ${canUp ? '' : 'slotted-tag__rank-btn--disabled'}" data-action="tagRankUp" data-tag-id="${tag.id}"><i class="fas fa-plus"></i></a>
+          <a class="slotted-tag__rank-btn ${
+            canUp ? '' : 'slotted-tag__rank-btn--disabled'
+          }" data-action="tagRankUp" data-tag-id="${
+          tag.id
+        }"><i class="fas fa-plus"></i></a>
         </div>`;
       },
     };
@@ -70,7 +84,11 @@ export class SlottedTagTableRenderer extends DASUTableRenderer {
       renderHeader: () => '',
       renderCell: (tag) => {
         if (!this._editable) return '';
-        return `<a class="slotted-tag__delete" data-action="tagDelete" data-tag-id="${tag.id}" data-tooltip="${game.i18n.localize('DASU.Sheet.DeleteItem')}"><i class="fas fa-trash"></i></a>`;
+        return `<a class="slotted-tag__delete" data-action="tagDelete" data-tag-id="${
+          tag.id
+        }" data-tooltip="${game.i18n.localize(
+          'DASU.Sheet.DeleteItem'
+        )}"><i class="fas fa-trash"></i></a>`;
       },
     };
   }

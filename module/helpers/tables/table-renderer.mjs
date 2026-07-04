@@ -531,7 +531,11 @@ export class DASUTableRenderer {
     let badge = null;
     if (sectionBadge) {
       const { type, tooltip, used, max } = sectionBadge;
-      badge = { type: type ?? null, text: max != null ? `${used}/${max}` : String(used), tooltip: tooltip ?? null };
+      badge = {
+        type: type ?? null,
+        text: max != null ? `${used}/${max}` : String(used),
+        tooltip: tooltip ?? null,
+      };
     }
 
     return foundry.applications.handlebars.renderTemplate(

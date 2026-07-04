@@ -728,9 +728,13 @@ export function initializeChecks() {
         pipelineActions.push(action);
         data.tags.push({
           tag: 'DASU.Pipeline.ApplyEffect',
-          value: dcThreshold != null
-            ? game.i18n.format('DASU.Pipeline.ApplyEffectDC', { name: effect.name, dc: dcThreshold > 0 ? `+${dcThreshold}` : dcThreshold })
-            : effect.name,
+          value:
+            dcThreshold != null
+              ? game.i18n.format('DASU.Pipeline.ApplyEffectDC', {
+                  name: effect.name,
+                  dc: dcThreshold > 0 ? `+${dcThreshold}` : dcThreshold,
+                })
+              : effect.name,
         });
       }
     }
@@ -770,12 +774,14 @@ export function initializeChecks() {
     const hasDamageAction = pipelineActions.some((a) => a.type === 'damage');
     if (inspectorDamage?.amount > 0 && !hasDamageAction) {
       const dmgBonuses = actor?.system?.bonuses?.damage;
-      const vsArchetypeBonuses = dmgBonuses ? {
-        hero: dmgBonuses.hero ?? 0,
-        sage: dmgBonuses.sage ?? 0,
-        rogue: dmgBonuses.rogue ?? 0,
-        trickster: dmgBonuses.trickster ?? 0,
-      } : undefined;
+      const vsArchetypeBonuses = dmgBonuses
+        ? {
+            hero: dmgBonuses.hero ?? 0,
+            sage: dmgBonuses.sage ?? 0,
+            rogue: dmgBonuses.rogue ?? 0,
+            trickster: dmgBonuses.trickster ?? 0,
+          }
+        : undefined;
       pipelineActions.push({
         type: 'damage',
         label: game.i18n.localize('DASU.Pipeline.ApplyDamage'),
@@ -809,14 +815,19 @@ export function initializeChecks() {
 
     // Annotate each target with DC info for DC-gated effect actions.
     const dcActions = pipelineActions.filter(
-      (a) => a.type === 'effect' && a.input.dcThreshold != null && a.input.rollTotal != null
+      (a) =>
+        a.type === 'effect' &&
+        a.input.dcThreshold != null &&
+        a.input.rollTotal != null
     );
     if (dcActions.length) {
       const rollTotal = result.result;
       for (const target of result.additionalData.targets ?? []) {
         const targetDoc = fromUuidSync(target.uuid);
-        const targetActor = targetDoc?.actor ?? (targetDoc instanceof Actor ? targetDoc : null);
-        const avoid = targetActor?.system?.stats?.avoid?.value ?? target.tn ?? 0;
+        const targetActor =
+          targetDoc?.actor ?? (targetDoc instanceof Actor ? targetDoc : null);
+        const avoid =
+          targetActor?.system?.stats?.avoid?.value ?? target.tn ?? 0;
         target.dcInfo = dcActions.map((a) => ({
           name: a.effectName,
           effectiveDC: avoid + a.input.dcThreshold,
@@ -824,7 +835,8 @@ export function initializeChecks() {
           passed: rollTotal >= avoid + a.input.dcThreshold,
         }));
         target.dcPartial = target.hit && target.dcInfo.some((d) => !d.passed);
-        target.dcAllFailed = target.hit && target.dcInfo.every((d) => !d.passed);
+        target.dcAllFailed =
+          target.hit && target.dcInfo.every((d) => !d.passed);
       }
     }
   });
@@ -848,7 +860,10 @@ export function initializeChecks() {
 
     const itemUuid = message.getFlag(SYSTEM, Flags.ChatMessage.Item);
     const item = itemUuid ? await fromUuid(itemUuid) : null;
-    const src = result.additionalData?.resistanceImg ?? item?.img ?? message.speakerActor?.img;
+    const src =
+      result.additionalData?.resistanceImg ??
+      item?.img ??
+      message.speakerActor?.img;
     if (src) {
       const img = document.createElement('img');
       img.src = src;
@@ -895,7 +910,9 @@ export function initializeChecks() {
         }
         menuBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          document.querySelectorAll('.target-apply-context-menu').forEach((m) => m.remove());
+          document
+            .querySelectorAll('.target-apply-context-menu')
+            .forEach((m) => m.remove());
           const menu = document.createElement('div');
           menu.classList.add('target-apply-context-menu');
           for (const action of targetActions) {
@@ -904,27 +921,36 @@ export function initializeChecks() {
             const entry = document.createElement('button');
             entry.type = 'button';
             // On a miss, relabel as an override per action type.
-            const dcBlocked = action.type === 'effect'
-              && action.input.dcThreshold != null
-              && action.input.rollTotal != null
-              && (() => {
+            const dcBlocked =
+              action.type === 'effect' &&
+              action.input.dcThreshold != null &&
+              action.input.rollTotal != null &&
+              (() => {
                 const doc = fromUuidSync(targetUuid);
-                const targetActor = doc?.actor ?? (doc instanceof Actor ? doc : null);
+                const targetActor =
+                  doc?.actor ?? (doc instanceof Actor ? doc : null);
                 const avoid = targetActor?.system?.stats?.avoid?.value ?? 0;
-                return action.input.rollTotal < avoid + action.input.dcThreshold;
+                return (
+                  action.input.rollTotal < avoid + action.input.dcThreshold
+                );
               })();
-            const label = (isHit && !dcBlocked)
-              ? game.i18n.localize(action.label) || action.label
-              : action.type === 'damage'
+            const label =
+              isHit && !dcBlocked
+                ? game.i18n.localize(action.label) || action.label
+                : action.type === 'damage'
                 ? game.i18n.localize('DASU.Pipeline.ApplyDamageOverride')
                 : game.i18n.format('DASU.Pipeline.ApplyEffectOverride', {
-                    name: action.effectName ?? game.i18n.localize('DASU.Pipeline.ApplyEffect'),
+                    name:
+                      action.effectName ??
+                      game.i18n.localize('DASU.Pipeline.ApplyEffect'),
                   });
             entry.innerHTML = `<i class="${action.icon}"></i> ${label}`;
             entry.addEventListener('click', (ev) => {
               ev.stopPropagation();
               menu.remove();
-              pipeline.applyToTargets(action.input, menuSource, { uuid: targetUuid });
+              pipeline.applyToTargets(action.input, menuSource, {
+                uuid: targetUuid,
+              });
             });
             menu.append(entry);
           }
@@ -940,7 +966,10 @@ export function initializeChecks() {
               document.removeEventListener('click', dismiss, true);
             }
           };
-          setTimeout(() => document.addEventListener('click', dismiss, true), 0);
+          setTimeout(
+            () => document.addEventListener('click', dismiss, true),
+            0
+          );
         });
       }
     } else {
@@ -976,6 +1005,5 @@ export function initializeChecks() {
     footer.append(meta);
 
     html.querySelector('.check-card__fieldset')?.append(footer);
-
   });
 }

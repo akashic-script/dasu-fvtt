@@ -690,11 +690,7 @@
 
       &:hover {
         color: #fff;
-        background: color-mix(
-          in srgb,
-          var(--dasu-hp) 50%,
-          rgb(0 0 0 / 60%)
-        );
+        background: color-mix(in srgb, var(--dasu-hp) 50%, rgb(0 0 0 / 60%));
         box-shadow: inset 0 -2px 4px rgb(0 0 0 / 30%),
           inset 0 1px 0 rgb(255 255 255 / 10%);
       }
@@ -1156,7 +1152,8 @@
         color: inherit;
         white-space: nowrap;
         padding-right: 8px;
-        border-right: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+        border-right: 1px solid
+          color-mix(in srgb, currentColor 25%, transparent);
       }
 
       /* Placeholder chip when a daemon has no archetype/subtype assigned. */
@@ -1597,7 +1594,8 @@
               opacity: 0.6;
             }
 
-            input, select {
+            input,
+            select {
               width: 100%;
             }
           }
@@ -3336,8 +3334,12 @@
         font-size: 0.75em;
         letter-spacing: 0.06em;
         margin-right: 2px;
-        &.stock-expand__resource-label--hp { color: var(--dasu-hp); }
-        &.stock-expand__resource-label--wp { color: var(--dasu-wp); }
+        &.stock-expand__resource-label--hp {
+          color: var(--dasu-hp);
+        }
+        &.stock-expand__resource-label--wp {
+          color: var(--dasu-wp);
+        }
       }
 
       .stock-expand__resource-sep {
@@ -3387,10 +3389,18 @@
         background: var(--dasu-surface-1);
         box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%);
 
-        &.resistance--weak    { background: rgb(224 85 85 / 20%); }
-        &.resistance--resist  { background: rgb(85 153 224 / 20%); }
-        &.resistance--nullify { background: rgb(200 200 200 / 14%); }
-        &.resistance--drain   { background: rgb(85 187 119 / 20%); }
+        &.resistance--weak {
+          background: rgb(224 85 85 / 20%);
+        }
+        &.resistance--resist {
+          background: rgb(85 153 224 / 20%);
+        }
+        &.resistance--nullify {
+          background: rgb(200 200 200 / 14%);
+        }
+        &.resistance--drain {
+          background: rgb(85 187 119 / 20%);
+        }
       }
 
       .stock-expand__resistance-icon {
@@ -3408,10 +3418,18 @@
         letter-spacing: 0.06em;
         color: rgb(255 255 255 / 35%);
 
-        .resistance--weak    & { color: #e05555; }
-        .resistance--resist  & { color: #5599e0; }
-        .resistance--nullify & { color: #cccccc; }
-        .resistance--drain   & { color: #55bb77; }
+        .resistance--weak & {
+          color: #e05555;
+        }
+        .resistance--resist & {
+          color: #5599e0;
+        }
+        .resistance--nullify & {
+          color: #cccccc;
+        }
+        .resistance--drain & {
+          color: #55bb77;
+        }
       }
 
       &.hidden {
@@ -3781,7 +3799,7 @@
       justify-content: center;
     }
 
-    .dasu-table__cell[data-column="name"] {
+    .dasu-table__cell[data-column='name'] {
       align-items: stretch;
       justify-content: flex-start;
       padding: 0;
@@ -4768,8 +4786,16 @@
   text-transform: none;
   letter-spacing: 0.03em;
   font-weight: 600;
-  background: color-mix(in srgb, var(--dasu-accent-feature, #c9922a) 15%, transparent);
-  border-color: color-mix(in srgb, var(--dasu-accent-feature, #c9922a) 30%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--dasu-accent-feature, #c9922a) 15%,
+    transparent
+  );
+  border-color: color-mix(
+    in srgb,
+    var(--dasu-accent-feature, #c9922a) 30%,
+    transparent
+  );
   box-shadow: none;
 }
 
@@ -5053,8 +5079,12 @@
     cursor: pointer;
     text-align: left;
 
-    &:last-child { border-bottom: none; }
-    &:hover { background: rgb(255 255 255 / 8%); }
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover {
+      background: rgb(255 255 255 / 8%);
+    }
   }
 }
 
@@ -5328,10 +5358,18 @@
       width: 100%;
     }
 
-    &--name    { flex: 2; }
-    &--threshold { flex: 0 0 100px; }
-    &--type    { flex: 0 0 120px; }
-    &--effect  { flex: 1; }
+    &--name {
+      flex: 2;
+    }
+    &--threshold {
+      flex: 0 0 100px;
+    }
+    &--type {
+      flex: 0 0 120px;
+    }
+    &--effect {
+      flex: 1;
+    }
   }
 }
 
@@ -5351,9 +5389,7 @@
   &[data-split-direction='column']
     .dasu-fieldset__panel
     + .dasu-fieldset__panel,
-  &[data-split-direction='row']
-    .dasu-fieldset__panel
-    + .dasu-fieldset__panel {
+  &[data-split-direction='row'] .dasu-fieldset__panel + .dasu-fieldset__panel {
     border-top: none;
     border-left: 3px solid rgb(var(--dasu-accent-bond-rgb, 212 160 200) / 55%);
   }
@@ -5402,7 +5438,9 @@
     text-overflow: ellipsis;
     cursor: pointer;
     color: var(--dasu-accent-bond);
-    &:hover { text-decoration: underline; }
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   &__hint {
@@ -5417,7 +5455,9 @@
     color: var(--dasu-muted);
     cursor: pointer;
     font-size: 0.8em;
-    &:hover { color: var(--color-level-error); }
+    &:hover {
+      color: var(--color-level-error);
+    }
   }
 }
 
@@ -5464,7 +5504,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--dasu-accent-bond);
-    &:hover { text-decoration: underline; }
+    &:hover {
+      text-decoration: underline;
+    }
 
     &--missing {
       color: var(--color-level-error);
@@ -5484,7 +5526,9 @@
     color: var(--dasu-muted);
     cursor: pointer;
     font-size: 0.8em;
-    &:hover { color: var(--color-level-error); }
+    &:hover {
+      color: var(--color-level-error);
+    }
   }
 }
 
@@ -5536,8 +5580,7 @@
     border-style: solid;
     background: rgb(var(--dasu-panel) / 85%);
     outline: 2px solid var(--dasu-accent-transformation);
-    box-shadow: 0 0 8px
-      rgb(from var(--dasu-accent-transformation) r g b / 45%);
+    box-shadow: 0 0 8px rgb(from var(--dasu-accent-transformation) r g b / 45%);
   }
 
   &.drag-over .transformation-drop-zone__hint {
@@ -5589,8 +5632,12 @@
     border: var(--dasu-border);
     color: var(--dasu-on-panel);
 
-    p { margin: 0; }
-    p + p { margin-top: 0.4em; }
+    p {
+      margin: 0;
+    }
+    p + p {
+      margin-top: 0.4em;
+    }
   }
 
   &__empty {
@@ -6115,7 +6162,6 @@ section[data-tab='effects'].drag-over {
     color: rgb(130 214 160);
   }
 
-
   &__effect-label {
     display: block;
     font-weight: 600;
@@ -6179,7 +6225,6 @@ section[data-tab='effects'].drag-over {
     filter: brightness(1.15);
   }
 }
-
 
 /* Relentless Curse penalty editor grid (advancement expand) */
 .adv-expand__curse-grid {
@@ -6442,8 +6487,13 @@ section[data-tab='effects'].drag-over {
   gap: 4px;
   padding: 3px 8px 3px 9px;
   border-radius: 0;
-  background: color-mix(in srgb, var(--dasu-accent-feature, #c9922a) 15%, transparent);
-  border: 1px solid color-mix(in srgb, var(--dasu-accent-feature, #c9922a) 30%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--dasu-accent-feature, #c9922a) 15%,
+    transparent
+  );
+  border: 1px solid
+    color-mix(in srgb, var(--dasu-accent-feature, #c9922a) 30%, transparent);
   font-size: 0.78em;
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -6451,7 +6501,11 @@ section[data-tab='effects'].drag-over {
   cursor: pointer;
 
   &:hover {
-    background: color-mix(in srgb, var(--dasu-accent-feature, #c9922a) 25%, transparent);
+    background: color-mix(
+      in srgb,
+      var(--dasu-accent-feature, #c9922a) 25%,
+      transparent
+    );
     border-color: var(--dasu-accent-feature, #c9922a);
   }
 
@@ -6464,8 +6518,16 @@ section[data-tab='effects'].drag-over {
   cursor: default;
 
   &:hover {
-    background: color-mix(in srgb, var(--dasu-accent-feature, #c9922a) 15%, transparent);
-    border-color: color-mix(in srgb, var(--dasu-accent-feature, #c9922a) 30%, transparent);
+    background: color-mix(
+      in srgb,
+      var(--dasu-accent-feature, #c9922a) 15%,
+      transparent
+    );
+    border-color: color-mix(
+      in srgb,
+      var(--dasu-accent-feature, #c9922a) 30%,
+      transparent
+    );
   }
 
   .item-tag-chip__remove {
@@ -6588,4 +6650,3 @@ section[data-tab='effects'].drag-over {
     }
   }
 }
-

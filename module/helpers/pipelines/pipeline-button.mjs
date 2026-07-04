@@ -34,10 +34,14 @@ function inject(message, html) {
     btn.type = 'button';
     btn.classList.add('pipeline-actions__btn');
     const label = game.i18n.localize(action.label) || action.label;
-    btn.innerHTML = `${action.icon ? `<i class="${action.icon}"></i> ` : ''}${label}`;
+    btn.innerHTML = `${
+      action.icon ? `<i class="${action.icon}"></i> ` : ''
+    }${label}`;
     btn.addEventListener('click', async (event) => {
       event.preventDefault();
-      await pipeline.applyToTargets(action.input, source, { uuid: action.uuid });
+      await pipeline.applyToTargets(action.input, source, {
+        uuid: action.uuid,
+      });
     });
     row.append(btn);
   }
@@ -46,7 +50,11 @@ function inject(message, html) {
   const targetActions = actions.filter(
     (a) => !a.uuid && (a.type === 'damage' || a.type === 'effect')
   );
-  const hitUuids = [...html.querySelectorAll('.check-target.target-hit .target-name[data-uuid]')]
+  const hitUuids = [
+    ...html.querySelectorAll(
+      '.check-target.target-hit .target-name[data-uuid]'
+    ),
+  ]
     .map((el) => el.dataset.uuid)
     .filter(Boolean);
 
@@ -59,16 +67,23 @@ function inject(message, html) {
     btn.classList.add('pipeline-actions__btn');
     const actionLabel = game.i18n.localize(action.label) || action.label;
     const allHitsLabel = game.i18n.localize('DASU.Pipeline.ApplyToAllHits');
-    btn.innerHTML = `${action.icon ? `<i class="${action.icon}"></i> ` : ''}${actionLabel} ${allHitsLabel}`;
+    btn.innerHTML = `${
+      action.icon ? `<i class="${action.icon}"></i> ` : ''
+    }${actionLabel} ${allHitsLabel}`;
     btn.addEventListener('click', async (event) => {
       event.preventDefault();
       for (const uuid of hitUuids) {
         // For DC-gated effects, skip targets that didn't pass the DC threshold.
-        if (action.type === 'effect' && action.input.dcThreshold != null && action.input.rollTotal != null) {
+        if (
+          action.type === 'effect' &&
+          action.input.dcThreshold != null &&
+          action.input.rollTotal != null
+        ) {
           const doc = fromUuidSync(uuid);
           const targetActor = doc?.actor ?? (doc instanceof Actor ? doc : null);
           const avoid = targetActor?.system?.stats?.avoid?.value ?? 0;
-          if (action.input.rollTotal < avoid + action.input.dcThreshold) continue;
+          if (action.input.rollTotal < avoid + action.input.dcThreshold)
+            continue;
         }
         await pipeline.applyToTargets(action.input, source, { uuid });
       }

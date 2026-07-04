@@ -54,9 +54,7 @@ export class Pipeline {
   async applyToTargets(input, source, { uuid } = {}) {
     const targets = await TargetResolver.resolveTargets({ uuid });
     if (!targets.length) {
-      ui.notifications?.warn(
-        game.i18n.localize('DASU.Pipeline.NoTargets')
-      );
+      ui.notifications?.warn(game.i18n.localize('DASU.Pipeline.NoTargets'));
       return [];
     }
 
@@ -116,9 +114,7 @@ export class Pipeline {
       return true;
     } catch (err) {
       console.error(`${this.constructor.name} toggle failed`, err);
-      ui.notifications?.error(
-        game.i18n.localize('DASU.Pipeline.ToggleFailed')
-      );
+      ui.notifications?.error(game.i18n.localize('DASU.Pipeline.ToggleFailed'));
       return false;
     } finally {
       this.#toggling.delete(message.id);

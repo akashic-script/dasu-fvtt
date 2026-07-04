@@ -15,7 +15,9 @@ export class BondTableRenderer extends DASUTableRenderer {
       }),
       rank: CommonColumns.textColumn({
         columnLabel: 'DASU.Bond.CurrentRank',
-        getText: (item) => item.system.currentRank?.name ?? game.i18n.localize('DASU.Bond.NoRank'),
+        getText: (item) =>
+          item.system.currentRank?.name ??
+          game.i18n.localize('DASU.Bond.NoRank'),
       }),
       controls: CommonColumns.itemControlsColumn({
         type: 'bond',
@@ -57,10 +59,18 @@ export class BondTableRenderer extends DASUTableRenderer {
         affinity: sys.affinity,
         targetName: sys.resolvedTargetName,
         negative: sys.negative,
-        description: await TextEditor.enrichHTML(item.system.description ?? '', {
-          relativeTo: item,
-          secrets: false,
-        }).then((r) => r.trim().replace(/^<p>(.*)<\/p>$/s, '$1').trim()),
+        description: await TextEditor.enrichHTML(
+          item.system.description ?? '',
+          {
+            relativeTo: item,
+            secrets: false,
+          }
+        ).then((r) =>
+          r
+            .trim()
+            .replace(/^<p>(.*)<\/p>$/s, '$1')
+            .trim()
+        ),
       }
     );
   }

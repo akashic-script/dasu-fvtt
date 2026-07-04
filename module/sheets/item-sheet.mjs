@@ -174,17 +174,20 @@ export class DASUItemSheet extends SheetLayoutMixin(
   #temporaryEffectsTable = new EffectTableRenderer(
     'temporary',
     'DASU.Effect.Temporary',
-    (doc) => prepareActiveEffectCategories(this.#ownEffects(doc)).temporary.effects
+    (doc) =>
+      prepareActiveEffectCategories(this.#ownEffects(doc)).temporary.effects
   );
   #passiveEffectsTable = new EffectTableRenderer(
     'passive',
     'DASU.Effect.Passive',
-    (doc) => prepareActiveEffectCategories(this.#ownEffects(doc)).passive.effects
+    (doc) =>
+      prepareActiveEffectCategories(this.#ownEffects(doc)).passive.effects
   );
   #inactiveEffectsTable = new EffectTableRenderer(
     'inactive',
     'DASU.Effect.Inactive',
-    (doc) => prepareActiveEffectCategories(this.#ownEffects(doc)).inactive.effects
+    (doc) =>
+      prepareActiveEffectCategories(this.#ownEffects(doc)).inactive.effects
   );
 
   /** @override */
@@ -218,7 +221,8 @@ export class DASUItemSheet extends SheetLayoutMixin(
     } else if (this.document.type === 'ability') {
       // Every ability sub-category gets the "Apply Effects" advanced tab.
       parts.advanced = {
-        template: 'systems/dasu/templates/item/parts/ability-effects-advanced.hbs',
+        template:
+          'systems/dasu/templates/item/parts/ability-effects-advanced.hbs',
         scrollable: [''],
       };
     } else if (this.document.type === 'weapon') {
@@ -420,7 +424,12 @@ export class DASUItemSheet extends SheetLayoutMixin(
       const selectedSubTypes = new Set(item.system.applicableSubType ?? []);
       const allSubTypeSelected = selectedSubTypes.size === 0;
       context.tagSubTypeOptions = [
-        { value: 'all', label: game.i18n.localize('DASU.Tag.ApplicableAll'), selected: allSubTypeSelected, type: null },
+        {
+          value: 'all',
+          label: game.i18n.localize('DASU.Tag.ApplicableAll'),
+          selected: allSubTypeSelected,
+          type: null,
+        },
         ...Object.entries(DASU.tagSubTypes ?? {}).flatMap(([type, cats]) =>
           Object.entries(cats).map(([k, v]) => ({
             value: k,
@@ -478,7 +487,12 @@ export class DASUItemSheet extends SheetLayoutMixin(
         this.#advancementTable = new AdvancementTableRenderer({
           editable: context.editable,
           item,
-          allowedTypes: ['aptitude', 'schemaSlot', 'schemaUpgrade', 'itemGrant'],
+          allowedTypes: [
+            'aptitude',
+            'schemaSlot',
+            'schemaUpgrade',
+            'itemGrant',
+          ],
         });
       }
       context.advancementTable = await this.#advancementTable.renderTable(item);
@@ -563,13 +577,28 @@ export class DASUItemSheet extends SheetLayoutMixin(
           if (rank.effectUuid) {
             const doc = await fromUuid(rank.effectUuid);
             if (doc) {
-              const description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-                doc.description ?? '',
-                { relativeTo: doc, secrets: false, rollData: context.rollData }
-              );
-              effect = { uuid: rank.effectUuid, name: doc.name, img: doc.img, description };
+              const description =
+                await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+                  doc.description ?? '',
+                  {
+                    relativeTo: doc,
+                    secrets: false,
+                    rollData: context.rollData,
+                  }
+                );
+              effect = {
+                uuid: rank.effectUuid,
+                name: doc.name,
+                img: doc.img,
+                description,
+              };
             } else {
-              effect = { uuid: rank.effectUuid, name: rank.effectUuid, img: null, description: '' };
+              effect = {
+                uuid: rank.effectUuid,
+                name: rank.effectUuid,
+                img: null,
+                description: '',
+              };
             }
           }
           return {
@@ -623,7 +652,10 @@ export class DASUItemSheet extends SheetLayoutMixin(
     dejectionInput?.addEventListener('change', async (event) => {
       event.preventDefault();
       event.stopPropagation();
-      const value = Math.min(15, Math.max(0, parseInt(dejectionInput.value) || 0));
+      const value = Math.min(
+        15,
+        Math.max(0, parseInt(dejectionInput.value) || 0)
+      );
       dejectionInput.value = value;
       await this.item.actor?.update({ 'system.dejection': value });
     });
@@ -665,12 +697,16 @@ export class DASUItemSheet extends SheetLayoutMixin(
       });
     }
 
-    for (const zone of this.element.querySelectorAll('.bond-rank-effect-drop-zone')) {
+    for (const zone of this.element.querySelectorAll(
+      '.bond-rank-effect-drop-zone'
+    )) {
       zone.addEventListener('dragover', (e) => {
         e.preventDefault();
         zone.classList.add('drag-over');
       });
-      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('dragleave', () =>
+        zone.classList.remove('drag-over')
+      );
       zone.addEventListener('drop', async (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -678,7 +714,9 @@ export class DASUItemSheet extends SheetLayoutMixin(
         let data;
         try {
           data =
-            foundry.applications.ux.TextEditor.implementation.getDragEventData(e);
+            foundry.applications.ux.TextEditor.implementation.getDragEventData(
+              e
+            );
         } catch {
           try {
             data = JSON.parse(e.dataTransfer.getData('text/plain'));
@@ -689,7 +727,9 @@ export class DASUItemSheet extends SheetLayoutMixin(
         const key = zone.dataset.rankKey;
         if (!BOND_RANK_KEYS.includes(key)) return;
         if (data?.type !== 'ActiveEffect' || !data.uuid) {
-          ui.notifications?.warn(game.i18n.localize('DASU.Bond.EffectDropInvalid'));
+          ui.notifications?.warn(
+            game.i18n.localize('DASU.Bond.EffectDropInvalid')
+          );
           return;
         }
         await this.item.update({ [`system.${key}.effectUuid`]: data.uuid });
@@ -701,7 +741,9 @@ export class DASUItemSheet extends SheetLayoutMixin(
         if (!BOND_RANK_KEYS.includes(key)) return;
         await this.item.update({ [`system.${key}.effectUuid`]: '' });
       });
-      const nameEl = zone.querySelector('.bond-rank-effect-drop-zone__name[data-uuid]');
+      const nameEl = zone.querySelector(
+        '.bond-rank-effect-drop-zone__name[data-uuid]'
+      );
       if (nameEl) {
         zone.addEventListener('click', async () => {
           const doc = await fromUuid(nameEl.dataset.uuid);
@@ -710,12 +752,16 @@ export class DASUItemSheet extends SheetLayoutMixin(
       }
     }
 
-    for (const zone of this.element.querySelectorAll('.bond-target-drop-zone')) {
+    for (const zone of this.element.querySelectorAll(
+      '.bond-target-drop-zone'
+    )) {
       zone.addEventListener('dragover', (e) => {
         e.preventDefault();
         zone.classList.add('drag-over');
       });
-      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('dragleave', () =>
+        zone.classList.remove('drag-over')
+      );
       zone.addEventListener('drop', async (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -723,7 +769,9 @@ export class DASUItemSheet extends SheetLayoutMixin(
         let data;
         try {
           data =
-            foundry.applications.ux.TextEditor.implementation.getDragEventData(e);
+            foundry.applications.ux.TextEditor.implementation.getDragEventData(
+              e
+            );
         } catch {
           try {
             data = JSON.parse(e.dataTransfer.getData('text/plain'));
@@ -748,7 +796,9 @@ export class DASUItemSheet extends SheetLayoutMixin(
         e.stopPropagation();
         await this.item.update({ 'system.targetUuid': '' });
       });
-      const nameEl = zone.querySelector('.bond-target-drop-zone__name[data-uuid]');
+      const nameEl = zone.querySelector(
+        '.bond-target-drop-zone__name[data-uuid]'
+      );
       if (nameEl) {
         zone.addEventListener('click', async () => {
           const doc = await fromUuid(nameEl.dataset.uuid);
@@ -764,7 +814,9 @@ export class DASUItemSheet extends SheetLayoutMixin(
         e.preventDefault();
         zone.classList.add('drag-over');
       });
-      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('dragleave', () =>
+        zone.classList.remove('drag-over')
+      );
     }
 
     for (const zone of this.element.querySelectorAll('.tag-drop-zone')) {
@@ -772,51 +824,77 @@ export class DASUItemSheet extends SheetLayoutMixin(
         e.preventDefault();
         zone.classList.add('drag-over');
       });
-      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('dragleave', () =>
+        zone.classList.remove('drag-over')
+      );
     }
 
-    const abilityEffectZone = this.element.querySelector('.ability-effect-drop-zone');
+    const abilityEffectZone = this.element.querySelector(
+      '.ability-effect-drop-zone'
+    );
     if (abilityEffectZone) {
       for (const row of this.element.querySelectorAll('.ability-effect-row')) {
         const effectId = row.dataset.effectId;
-        const details = this.element.querySelector(`.ability-effect-details[data-effect-id="${effectId}"]`);
+        const details = this.element.querySelector(
+          `.ability-effect-details[data-effect-id="${effectId}"]`
+        );
 
-        row.querySelector('.ability-effect__expand')?.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const expanded = !details?.hidden;
-          if (details) details.hidden = expanded;
-          row.querySelector('.ability-effect__expand i')?.classList.toggle('fa-chevron-down', expanded);
-          row.querySelector('.ability-effect__expand i')?.classList.toggle('fa-chevron-up', !expanded);
-        });
+        row
+          .querySelector('.ability-effect__expand')
+          ?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const expanded = !details?.hidden;
+            if (details) details.hidden = expanded;
+            row
+              .querySelector('.ability-effect__expand i')
+              ?.classList.toggle('fa-chevron-down', expanded);
+            row
+              .querySelector('.ability-effect__expand i')
+              ?.classList.toggle('fa-chevron-up', !expanded);
+          });
 
-        row.querySelector('.ability-effect__name')?.addEventListener('click', async () => {
-          const effect = this.item.effects.get(effectId);
-          effect?.sheet?.render(true);
-        });
+        row
+          .querySelector('.ability-effect__name')
+          ?.addEventListener('click', async () => {
+            const effect = this.item.effects.get(effectId);
+            effect?.sheet?.render(true);
+          });
 
         const valInput = row.querySelector('.ability-effect__duration-value');
-        const unitsSelect = row.querySelector('.ability-effect__duration-units');
+        const unitsSelect = row.querySelector(
+          '.ability-effect__duration-units'
+        );
         const targetSelect = row.querySelector('.ability-effect__apply-target');
         const updateDuration = async () => {
           const value = parseInt(valInput?.value) || null;
           const units = unitsSelect?.value ?? 'turns';
-          await this.item.effects.get(effectId)?.update({ 'duration.value': value, 'duration.units': units });
+          await this.item.effects
+            .get(effectId)
+            ?.update({ 'duration.value': value, 'duration.units': units });
         };
         valInput?.addEventListener('change', updateDuration);
         unitsSelect?.addEventListener('change', updateDuration);
         targetSelect?.addEventListener('change', async () => {
-          await this.item.effects.get(effectId)?.update({ 'flags.dasu.applyTarget': targetSelect.value });
+          await this.item.effects
+            .get(effectId)
+            ?.update({ 'flags.dasu.applyTarget': targetSelect.value });
         });
 
-        details?.querySelector('.ability-effect__dc-threshold')?.addEventListener('change', async (e) => {
-          const value = parseInt(e.target.value) || null;
-          await this.item.effects.get(effectId)?.update({ 'flags.dasu.dcThreshold': value });
-        });
+        details
+          ?.querySelector('.ability-effect__dc-threshold')
+          ?.addEventListener('change', async (e) => {
+            const value = parseInt(e.target.value) || null;
+            await this.item.effects
+              .get(effectId)
+              ?.update({ 'flags.dasu.dcThreshold': value });
+          });
 
-        details?.querySelector('.ability-effect__delete')?.addEventListener('click', async (e) => {
-          e.stopPropagation();
-          await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
-        });
+        details
+          ?.querySelector('.ability-effect__delete')
+          ?.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
+          });
       }
     }
 
@@ -824,13 +902,18 @@ export class DASUItemSheet extends SheetLayoutMixin(
       this.#advancementTable.activateAdvancementListeners(this.element);
     }
 
-    const typeSel = this.element.querySelector('select[name="system.applicableTypes"]');
-    const subTypeSel = this.element.querySelector('select[name="system.applicableSubType"]');
+    const typeSel = this.element.querySelector(
+      'select[name="system.applicableTypes"]'
+    );
+    const subTypeSel = this.element.querySelector(
+      'select[name="system.applicableSubType"]'
+    );
 
     if (typeSel && subTypeSel) {
       const syncSubTypeVisibility = (selectedTypes) => {
-        const selected = selectedTypes
-          ?? new Set(Array.from(typeSel.selectedOptions).map((o) => o.value));
+        const selected =
+          selectedTypes ??
+          new Set(Array.from(typeSel.selectedOptions).map((o) => o.value));
         for (const opt of subTypeSel.options) {
           if (opt.value === 'all') continue; // always visible
           const t = opt.dataset.type;
@@ -839,10 +922,14 @@ export class DASUItemSheet extends SheetLayoutMixin(
           if (!visible) opt.selected = false;
         }
         // If nothing is selected after filtering, re-select "All"
-        const anySelected = Array.from(subTypeSel.options).some((o) => !o.hidden && o.value !== 'all' && o.selected);
+        const anySelected = Array.from(subTypeSel.options).some(
+          (o) => !o.hidden && o.value !== 'all' && o.selected
+        );
         const allOpt = subTypeSel.querySelector('option[value="all"]');
         if (allOpt) allOpt.selected = !anySelected;
-        const visibleCount = Array.from(subTypeSel.options).filter((o) => !o.hidden).length;
+        const visibleCount = Array.from(subTypeSel.options).filter(
+          (o) => !o.hidden
+        ).length;
         subTypeSel.size = Math.max(2, visibleCount);
       };
 
@@ -866,12 +953,15 @@ export class DASUItemSheet extends SheetLayoutMixin(
 
       subTypeSel.addEventListener('change', async (e) => {
         e.stopPropagation();
-        const selected = Array.from(subTypeSel.selectedOptions).map((o) => o.value);
+        const selected = Array.from(subTypeSel.selectedOptions).map(
+          (o) => o.value
+        );
         const allOpt = subTypeSel.querySelector('option[value="all"]');
         const pickedAll = selected.includes('all');
         if (pickedAll) {
           // "All" chosen: clear selection and visually deselect everything else
-          for (const opt of subTypeSel.options) opt.selected = opt.value === 'all';
+          for (const opt of subTypeSel.options)
+            opt.selected = opt.value === 'all';
           await this.item.update({ 'system.applicableSubType': [] });
         } else {
           // Real subtypes chosen: deselect the "All" option
@@ -911,7 +1001,10 @@ export class DASUItemSheet extends SheetLayoutMixin(
 
   static async #onRegenerateDsid() {
     const name = this.item.name ?? '';
-    const dsid = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const dsid = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
     await this.item.update({ 'system.dsid': dsid });
   }
 

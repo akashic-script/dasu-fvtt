@@ -439,7 +439,11 @@ DASU.statusEffects = [
     description: 'DASU.Status.Infected.description',
     stack: { max: 'sta' },
     flags: {
-      dasu: { behavior: 'perTurnDamage', damageAttr: 'pow', halvePowerTick: true },
+      dasu: {
+        behavior: 'perTurnDamage',
+        damageAttr: 'pow',
+        halvePowerTick: true,
+      },
     },
   },
   {
@@ -526,9 +530,7 @@ DASU.statusEffects = [
  * @type {Object<string, number|string>}
  */
 DASU.stackableStatuses = Object.fromEntries(
-  DASU.statusEffects
-    .filter((s) => s.stack)
-    .map((s) => [s.id, s.stack.max])
+  DASU.statusEffects.filter((s) => s.stack).map((s) => [s.id, s.stack.max])
 );
 
 /** Item types that can have tags slotted onto them. */

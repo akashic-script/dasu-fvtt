@@ -12,7 +12,9 @@ export class DejectionTableRenderer extends DASUTableRenderer {
       return [{ label: 'DASU.Dejection.Track', value: `${dej} / 15` }];
     }),
     columns: {
-      name: CommonColumns.itemNameColumn({ columnName: 'TYPES.Item.dejection' }),
+      name: CommonColumns.itemNameColumn({
+        columnName: 'TYPES.Item.dejection',
+      }),
       controls: CommonColumns.itemControlsColumn({
         type: 'dejection',
         label: 'TYPES.Item.dejection',

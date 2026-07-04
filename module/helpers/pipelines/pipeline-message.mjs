@@ -59,7 +59,9 @@ async function activate(message, html) {
   html.classList.add('pipeline-message', `pipeline-message--${state.type}`);
 
   const deleteBtn = html.querySelector('.message-delete');
-  const cardHeader = html.querySelector('.pipeline-card__fieldset .dasu-fieldset__header');
+  const cardHeader = html.querySelector(
+    '.pipeline-card__fieldset .dasu-fieldset__header'
+  );
   if (deleteBtn && cardHeader) cardHeader.append(deleteBtn);
 
   // Clicking the target avatar opens its sheet, if the user can view it.

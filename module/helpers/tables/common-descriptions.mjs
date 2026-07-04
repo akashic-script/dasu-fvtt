@@ -69,13 +69,26 @@ function slottedTagCaption() {
     if (!tags.length) return '';
     const used = item.system?.tagSlotsUsed ?? 0;
     const max = item.system?.tagBudget ?? 0;
-    const budget = `<span class="item-tag-caption__budget" data-tooltip="${game.i18n.localize('DASU.Tag.SlotsUsed')}">${used}/${max}</span>`;
-    const chips = tags.map((tag) => {
-      const rank = tag.rank?.current ?? 1;
-      const rankChip = rank > 1 ? `<span class="item-tag-chip__tier">×${rank}</span>` : '';
-      const removeBtn = `<a class="item-tag-chip__remove" data-action="removeSlottedTag" data-item-id="${item.id}" data-tag-id="${tag.id}" data-tooltip="${game.i18n.localize('DASU.Sheet.DeleteItem')}"><i class="fas fa-times"></i></a>`;
-      return `<span class="item-tag-chip" data-action="openSlottedTag" data-item-id="${item.id}" data-tag-id="${tag.id}"><span class="item-tag-chip__name">${tag.name ?? ''}</span>${rankChip}${removeBtn}</span>`;
-    }).join('');
+    const budget = `<span class="item-tag-caption__budget" data-tooltip="${game.i18n.localize(
+      'DASU.Tag.SlotsUsed'
+    )}">${used}/${max}</span>`;
+    const chips = tags
+      .map((tag) => {
+        const rank = tag.rank?.current ?? 1;
+        const rankChip =
+          rank > 1 ? `<span class="item-tag-chip__tier">×${rank}</span>` : '';
+        const removeBtn = `<a class="item-tag-chip__remove" data-action="removeSlottedTag" data-item-id="${
+          item.id
+        }" data-tag-id="${tag.id}" data-tooltip="${game.i18n.localize(
+          'DASU.Sheet.DeleteItem'
+        )}"><i class="fas fa-times"></i></a>`;
+        return `<span class="item-tag-chip" data-action="openSlottedTag" data-item-id="${
+          item.id
+        }" data-tag-id="${tag.id}"><span class="item-tag-chip__name">${
+          tag.name ?? ''
+        }</span>${rankChip}${removeBtn}</span>`;
+      })
+      .join('');
     return `<div class="item-tag-caption">${budget}${chips}</div>`;
   };
 }

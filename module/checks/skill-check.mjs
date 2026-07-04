@@ -26,7 +26,10 @@ const onRenderCheck = (data, result, actor, item) => {
     if (sa.name) data.tags.unshift({ tag: sa.name });
     const thresholdTag =
       sa.thresholdType === 'fixed'
-        ? { tag: 'DASU.SkillAbility.Threshold.Label', value: `TN ${sa.fixedTN}` }
+        ? {
+            tag: 'DASU.SkillAbility.Threshold.Label',
+            value: `TN ${sa.fixedTN}`,
+          }
         : {
             tag: 'DASU.SkillAbility.Threshold.Label',
             value:

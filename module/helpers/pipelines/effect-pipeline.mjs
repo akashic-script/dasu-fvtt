@@ -21,16 +21,17 @@ export class EffectPipeline extends Pipeline {
     if (input.effectUuid) {
       src = fromUuidSync(input.effectUuid);
       if (src) {
-        effectData = typeof src.toObject === 'function'
-          ? src.toObject()
-          : foundry.utils.deepClone(src._source ?? src);
+        effectData =
+          typeof src.toObject === 'function'
+            ? src.toObject()
+            : foundry.utils.deepClone(src._source ?? src);
       }
     }
     const description =
-      src?.system?.description
-      ?? effectData?.system?.description
-      ?? effectData?.description
-      ?? '';
+      src?.system?.description ??
+      effectData?.system?.description ??
+      effectData?.description ??
+      '';
 
     // Strip the source _id so repeated applies don't collide on one embedded id.
     if (effectData) delete effectData._id;
@@ -39,7 +40,9 @@ export class EffectPipeline extends Pipeline {
 
     const statusId =
       effectData?.flags?.dasu?.statusId ?? effectData?.statuses?.[0] ?? null;
-    const isKnownStatus = !!(statusId && CONFIG.DASU.statusEffectIndex?.[statusId]);
+    const isKnownStatus = !!(
+      statusId && CONFIG.DASU.statusEffectIndex?.[statusId]
+    );
 
     // Snapshot the caster's attributes for caster-scaled statuses (Bleeding/
     // Infected, stack caps) so later turns don't depend on the caster existing.
@@ -88,7 +91,8 @@ export class EffectPipeline extends Pipeline {
 
   async applyToTarget(outcome, target) {
     if (outcome.dcSkipped) return { dcSkipped: true };
-    if (!outcome.effectData) throw new Error('EffectPipeline: no effect data to apply');
+    if (!outcome.effectData)
+      throw new Error('EffectPipeline: no effect data to apply');
 
     // Statuses route through applyStatus for stacking; capture prior for revert.
     if (outcome.statusId) {
@@ -122,7 +126,9 @@ export class EffectPipeline extends Pipeline {
     if (revertData.statusId && isStackable(revertData.statusId)) {
       const effect = target.effects.get(id);
       if (revertData.existedBefore && revertData.priorStacks > 0) {
-        await effect.update({ [`flags.${SYSTEM}.stacks`]: revertData.priorStacks });
+        await effect.update({
+          [`flags.${SYSTEM}.stacks`]: revertData.priorStacks,
+        });
         await resyncStacks(effect);
         return;
       }
@@ -173,7 +179,9 @@ function _formatDuration(dur) {
   if (!dur) return null;
   const rounds = dur.rounds ?? (dur.units === 'rounds' ? dur.value : null);
   const turns = dur.turns ?? (dur.units === 'turns' ? dur.value : null);
-  if (rounds) return game.i18n.format('DASU.Pipeline.DurationRounds', { n: rounds });
-  if (turns) return game.i18n.format('DASU.Pipeline.DurationTurns', { n: turns });
+  if (rounds)
+    return game.i18n.format('DASU.Pipeline.DurationRounds', { n: rounds });
+  if (turns)
+    return game.i18n.format('DASU.Pipeline.DurationTurns', { n: turns });
   return null;
 }

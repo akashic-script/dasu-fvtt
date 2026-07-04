@@ -26,7 +26,8 @@ export class TagCatalogRenderer extends DASUTableRenderer {
         columnLabel: 'DASU.Tag.Types',
         getText: (item) => {
           const types = item.system.applicableTypes ?? [];
-          if (!types.length || types.includes('all')) return game.i18n.localize('DASU.Tag.ApplicableAll');
+          if (!types.length || types.includes('all'))
+            return game.i18n.localize('DASU.Tag.ApplicableAll');
           return types
             .map((t) => game.i18n.localize(`TYPES.Item.${t}`) || t)
             .join(', ');

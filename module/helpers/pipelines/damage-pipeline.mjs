@@ -45,7 +45,9 @@ export class DamagePipeline extends Pipeline {
       type: damageType,
     });
     const vsArchetype = target.itemTypes?.archetype?.[0]?.system?.dsid;
-    const vsBonus = vsArchetype ? (input.vsArchetypeBonuses?.[vsArchetype] ?? 0) : 0;
+    const vsBonus = vsArchetype
+      ? input.vsArchetypeBonuses?.[vsArchetype] ?? 0
+      : 0;
     const raw = Math.max(0, (input.value ?? 0) + incoming + vsBonus);
     const finalAmount = Math.floor(raw * Math.abs(multiplier));
     const drain = multiplier < 0;

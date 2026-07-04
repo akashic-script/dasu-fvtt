@@ -124,7 +124,9 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
           this.#actor?.system?.attributes?.[govern]?.value ?? 0;
         const baseAmount = governValue + (sys.damage?.value ?? 0);
         const value =
-          this.#damageDir === 'minus' ? baseAmount - amount : baseAmount + amount;
+          this.#damageDir === 'minus'
+            ? baseAmount - amount
+            : baseAmount + amount;
         overrides.damageValue = Math.max(0, value);
       }
     }
@@ -196,7 +198,8 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
       name: s.name,
       active: this.#specialty === i,
     }));
-    const specialtyMod = this.#specialty >= 0 && this.#specialty < specialties.length ? 1 : 0;
+    const specialtyMod =
+      this.#specialty >= 0 && this.#specialty < specialties.length ? 1 : 0;
 
     return {
       mode,
@@ -239,8 +242,7 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     );
 
     const dmg = sys.damage;
-    const showDamageType =
-      !isDisplay && dmg != null && dmg.type !== 'untyped';
+    const showDamageType = !isDisplay && dmg != null && dmg.type !== 'untyped';
     // Rolled damage is the governing attribute + the item's base value; the
     // field shows and edits that final amount.
     const govern = sys.govern ?? 'pow';
@@ -340,17 +342,19 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
       if (previewEl) previewEl.textContent = `${dicePart} + ${total}`;
     };
 
-    htmlElement.querySelector('[name="key"]')?.addEventListener('change', (e) => {
-      // In skill mode the specialty list depends on the skill, so re-render to
-      // refresh it (and reset the chosen specialty); otherwise just preview.
-      if (this.#mode === 'skill') {
-        this.#key = e.target.value;
-        this.#specialty = -1;
-        this.render();
-      } else {
-        updatePreview();
-      }
-    });
+    htmlElement
+      .querySelector('[name="key"]')
+      ?.addEventListener('change', (e) => {
+        // In skill mode the specialty list depends on the skill, so re-render to
+        // refresh it (and reset the chosen specialty); otherwise just preview.
+        if (this.#mode === 'skill') {
+          this.#key = e.target.value;
+          this.#specialty = -1;
+          this.render();
+        } else {
+          updatePreview();
+        }
+      });
     htmlElement
       .querySelector('[name="mod"]')
       ?.addEventListener('input', updatePreview);
@@ -414,7 +418,8 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     // Resolve the chosen specialty (skill mode) to a +1 named modifier.
     const specialtyName =
       this.#mode === 'skill' && this.#specialty >= 0
-        ? this.#actor.system?.skills?.[key]?.specialties?.[this.#specialty]?.name
+        ? this.#actor.system?.skills?.[key]?.specialties?.[this.#specialty]
+            ?.name
         : null;
 
     const configCallback = (check) => {
@@ -426,7 +431,9 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         });
       if (specialtyName)
         check.modifiers.push({
-          label: game.i18n.format('DASU.Dialog.Roll.SpecialtyMod', { name: specialtyName }),
+          label: game.i18n.format('DASU.Dialog.Roll.SpecialtyMod', {
+            name: specialtyName,
+          }),
           value: 1,
           source: 'specialty',
         });

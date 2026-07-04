@@ -6,7 +6,11 @@ import { CommonDescriptions } from './common-descriptions.mjs';
 function thresholdText(item) {
   const sys = item.system;
   if (sys.thresholdType === 'fixed') return `TN ${sys.fixedTN}`;
-  return game.i18n.localize(`DASU.SkillAbility.Threshold.${sys.thresholdType === 'defense' ? 'Defense' : 'Avoid'}`);
+  return game.i18n.localize(
+    `DASU.SkillAbility.Threshold.${
+      sys.thresholdType === 'defense' ? 'Defense' : 'Avoid'
+    }`
+  );
 }
 
 export class SkillAbilityTableRenderer extends DASUTableRenderer {
@@ -16,13 +20,23 @@ export class SkillAbilityTableRenderer extends DASUTableRenderer {
     getItems: (document) => document.itemTypes.skillAbility ?? [],
     renderDescription: CommonDescriptions.descriptionWithTags((item) => {
       const tags = [];
-      if (item.system.skillLabel) tags.push({ label: 'DASU.SkillAbility.Skill', value: item.system.skillLabel });
-      tags.push({ label: 'DASU.SkillAbility.Threshold.Label', value: thresholdText(item) });
-      if (item.system.costsMainAction) tags.push({ label: 'DASU.SkillAbility.CostsMainAction', value: '✓' });
+      if (item.system.skillLabel)
+        tags.push({
+          label: 'DASU.SkillAbility.Skill',
+          value: item.system.skillLabel,
+        });
+      tags.push({
+        label: 'DASU.SkillAbility.Threshold.Label',
+        value: thresholdText(item),
+      });
+      if (item.system.costsMainAction)
+        tags.push({ label: 'DASU.SkillAbility.CostsMainAction', value: '✓' });
       return tags;
     }),
     columns: {
-      name: CommonColumns.itemNameColumn({ columnName: 'TYPES.Item.skillAbility' }),
+      name: CommonColumns.itemNameColumn({
+        columnName: 'TYPES.Item.skillAbility',
+      }),
       skill: CommonColumns.textColumn({
         columnLabel: 'DASU.SkillAbility.Skill',
         getText: (item) => item.system.skillLabel || '–',

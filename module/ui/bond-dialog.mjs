@@ -47,7 +47,9 @@ export class DASUBondDialog extends HandlebarsApplicationMixin(ApplicationV2) {
   static #defaultRankKey(item) {
     const sys = item.system ?? {};
     const affinity = sys.affinity ?? 0;
-    const unlocked = RANK_KEYS.filter((k) => affinity >= (sys[k]?.threshold ?? 0));
+    const unlocked = RANK_KEYS.filter(
+      (k) => affinity >= (sys[k]?.threshold ?? 0)
+    );
     return unlocked.at(-1) ?? RANK_KEYS[0];
   }
 
@@ -58,7 +60,8 @@ export class DASUBondDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     const ranks = RANK_KEYS.map((key, i) => ({
       key,
       label:
-        sys[key]?.name || game.i18n.format('DASU.Dialog.Bond.RankN', { n: i + 1 }),
+        sys[key]?.name ||
+        game.i18n.format('DASU.Dialog.Bond.RankN', { n: i + 1 }),
       selected: key === this.#rankKey,
       unlocked: affinity >= (sys[key]?.threshold ?? 0),
     })).filter((r) => r.unlocked);

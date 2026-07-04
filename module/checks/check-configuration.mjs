@@ -115,7 +115,8 @@ class CheckConfigurer {
 
   /** Override the final damage amount while keeping the current type. @param {number} amount @returns {CheckConfigurer} */
   setDamageValue(amount) {
-    if (amount != null && this.#data[DAMAGE]) this.#data[DAMAGE].amount = amount;
+    if (amount != null && this.#data[DAMAGE])
+      this.#data[DAMAGE].amount = amount;
     return this;
   }
 

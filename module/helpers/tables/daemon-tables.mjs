@@ -82,7 +82,14 @@ export class DaemonTables {
       this.ability.renderTable(daemon),
       this.tactic.renderTable(daemon),
     ]);
-    return { uuid: this.#uuid, name: daemon.name, img: daemon.img, weapon, ability, tactic };
+    return {
+      uuid: this.#uuid,
+      name: daemon.name,
+      img: daemon.img,
+      weapon,
+      ability,
+      tactic,
+    };
   }
 
   async renderAck() {

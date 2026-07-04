@@ -31,7 +31,15 @@ export class ResourcePipeline extends Pipeline {
     const delta = input.op === 'cost' ? -base : base;
     const newValue = Math.max(0, Math.min(max, priorValue + delta));
 
-    return { resource, op: input.op, amount: base, delta, priorValue, newValue, max };
+    return {
+      resource,
+      op: input.op,
+      amount: base,
+      delta,
+      priorValue,
+      newValue,
+      max,
+    };
   }
 
   async applyToTarget(outcome, target) {

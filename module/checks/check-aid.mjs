@@ -54,7 +54,9 @@ async function aid(message) {
     return;
   }
 
-  const roll = await new Roll(`${DASU.check.baseDice}d${DASU.check.faces}`).evaluate();
+  const roll = await new Roll(
+    `${DASU.check.baseDice}d${DASU.check.faces}`
+  ).evaluate();
   const faces = roll.dice[0]?.results?.map((r) => r.result) ?? [];
   const { mod, key } = aidOutcome(faces[0] ?? 0, faces[1] ?? 0);
 
@@ -75,7 +77,9 @@ async function aid(message) {
 
   await roll.toMessage({
     speaker: ChatMessage.getSpeaker({ actor: helper }),
-    flavor: `${flavor} - ${game.i18n.localize(`DASU.Check.Aid.${key}`)}: ${outcomeText}`,
+    flavor: `${flavor} - ${game.i18n.localize(
+      `DASU.Check.Aid.${key}`
+    )}: ${outcomeText}`,
     flags: { [SYSTEM]: { aidOf: message.id, aidMod: mod } },
   });
 }

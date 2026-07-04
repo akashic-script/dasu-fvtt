@@ -51,7 +51,9 @@ export async function slotTag(tagItem, hostItem) {
     (t) => t.sourceUuid === tagItem.uuid
   );
   if (existing) {
-    await existing.update({ 'rank.current': (existing.rank?.current ?? 1) + 1 });
+    await existing.update({
+      'rank.current': (existing.rank?.current ?? 1) + 1,
+    });
     return existing;
   }
 

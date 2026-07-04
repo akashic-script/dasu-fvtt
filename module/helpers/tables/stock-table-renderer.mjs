@@ -84,7 +84,14 @@ export class StockTableRenderer extends DASUTableRenderer {
     const img = actor?.img ?? 'icons/svg/mystery-man.svg';
     return foundry.applications.handlebars.renderTemplate(
       'systems/dasu/templates/table/cell/cell-item-name.hbs',
-      { name, img, uuid: entry.uuid, rollable: false, caption: null, cssClass: null }
+      {
+        name,
+        img,
+        uuid: entry.uuid,
+        rollable: false,
+        caption: null,
+        cssClass: null,
+      }
     );
   }
 
@@ -96,17 +103,23 @@ export class StockTableRenderer extends DASUTableRenderer {
     // Channelers get a bolt toggle first in the row, separate from the active layer.
     let channelBtn = '';
     if (entry.isChanneler) {
-      const channelIcon = entry.channeled ? 'fa-solid fa-bolt' : 'fa-regular fa-bolt';
+      const channelIcon = entry.channeled
+        ? 'fa-solid fa-bolt'
+        : 'fa-regular fa-bolt';
       const channelLabel = entry.channeled
         ? game.i18n.localize('DASU.Stock.StopChannel')
         : game.i18n.localize('DASU.Stock.Channel');
-      const channelCls = entry.channeled ? ' cell-item-controls__control--active' : '';
+      const channelCls = entry.channeled
+        ? ' cell-item-controls__control--active'
+        : '';
       channelBtn = `<a class="cell-item-controls__control${channelCls}" data-action="stockChannel" data-tooltip="${channelLabel}"><i class="${channelIcon}"></i></a>`;
     }
     return `<div class="cell-item-controls">
       ${channelBtn}
       <a class="cell-item-controls__control" data-action="stockToggle" data-tooltip="${toggleLabel}"><i class="fa-regular ${toggleIcon}"></i></a>
-      <a class="cell-item-controls__control" data-action="stockMenu" data-tooltip="${game.i18n.localize('DASU.Sheet.MoreOptions')}"><i class="fas fa-bars"></i></a>
+      <a class="cell-item-controls__control" data-action="stockMenu" data-tooltip="${game.i18n.localize(
+        'DASU.Sheet.MoreOptions'
+      )}"><i class="fas fa-bars"></i></a>
     </div>`;
   }
 
@@ -128,7 +141,10 @@ export class StockTableRenderer extends DASUTableRenderer {
       const cap = actor.system.willStrain?.cap ?? 0;
       const used = stock
         .filter((e) => e.active)
-        .reduce((sum, e) => sum + (fromUuidSync(e.uuid)?.system?.strain?.value ?? 0), 0);
+        .reduce(
+          (sum, e) => sum + (fromUuidSync(e.uuid)?.system?.strain?.value ?? 0),
+          0
+        );
       if (used > cap) {
         ui.notifications?.warn(
           game.i18n.format('DASU.Stock.OverStrain', { used, cap })
@@ -163,7 +179,13 @@ export class StockTableRenderer extends DASUTableRenderer {
     const resistances = Object.fromEntries(
       DASU.resistanceTypes.map((key) => {
         const base = sys.resistances?.[key]?.base ?? 0;
-        return [key, { abbr: RESISTANCE_ABBR[String(base)] ?? '–', cssClass: RESISTANCE_CLASS[String(base)] ?? '' }];
+        return [
+          key,
+          {
+            abbr: RESISTANCE_ABBR[String(base)] ?? '–',
+            cssClass: RESISTANCE_CLASS[String(base)] ?? '',
+          },
+        ];
       })
     );
     const meritsTooltip = game.i18n.format('DASU.Actor.Merit.ToTransform', {
@@ -190,11 +212,15 @@ export class StockTableRenderer extends DASUTableRenderer {
     if (!entry) return;
     const resolved = fromUuidSync(entry.uuid);
     const items = [
-      ...(resolved ? [{
-        label: game.i18n.localize('DASU.Sheet.EditItem'),
-        icon: 'fas fa-edit',
-        onClick: () => resolved.sheet?.render(true),
-      }] : []),
+      ...(resolved
+        ? [
+            {
+              label: game.i18n.localize('DASU.Sheet.EditItem'),
+              icon: 'fas fa-edit',
+              onClick: () => resolved.sheet?.render(true),
+            },
+          ]
+        : []),
       {
         label: game.i18n.localize('DASU.Sheet.DeleteItem'),
         icon: 'fas fa-trash',
@@ -206,11 +232,16 @@ export class StockTableRenderer extends DASUTableRenderer {
       },
     ];
     ui.context?.close();
-    const menu = new foundry.applications.ux.ContextMenu(document.body, null, items, {
-      jQuery: false,
-      fixed: true,
-      relative: 'target',
-    });
+    const menu = new foundry.applications.ux.ContextMenu(
+      document.body,
+      null,
+      items,
+      {
+        jQuery: false,
+        fixed: true,
+        relative: 'target',
+      }
+    );
     setTimeout(() => {
       ui.context = menu;
       menu.render(target, { event });

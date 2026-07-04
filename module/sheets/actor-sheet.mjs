@@ -239,28 +239,32 @@ export class DASUActorSheet extends SheetLayoutMixin(
     });
     const slots = actorData.slots;
     context.abilityTable = await this.#abilityTable.renderTable(this.document, {
-      sectionBadge: slots?.ability ? {
-        type: 'ability',
-        tooltip: game.i18n.localize('DASU.Actor.Slots.AbilityLong'),
-        used: slots.ability.used,
-        max: slots.ability.max,
-      } : {
-        type: 'ability',
-        tooltip: game.i18n.localize('DASU.Sheet.AddItem'),
-        used: '+',
-      },
+      sectionBadge: slots?.ability
+        ? {
+            type: 'ability',
+            tooltip: game.i18n.localize('DASU.Actor.Slots.AbilityLong'),
+            used: slots.ability.used,
+            max: slots.ability.max,
+          }
+        : {
+            type: 'ability',
+            tooltip: game.i18n.localize('DASU.Sheet.AddItem'),
+            used: '+',
+          },
     });
     context.tacticTable = await this.#tacticTable.renderTable(this.document, {
-      sectionBadge: slots?.tactic ? {
-        type: 'tactic',
-        tooltip: game.i18n.localize('DASU.Actor.Slots.TacticLong'),
-        used: slots.tactic.used,
-        max: slots.tactic.max,
-      } : {
-        type: 'tactic',
-        tooltip: game.i18n.localize('DASU.Sheet.AddItem'),
-        used: '+',
-      },
+      sectionBadge: slots?.tactic
+        ? {
+            type: 'tactic',
+            tooltip: game.i18n.localize('DASU.Actor.Slots.TacticLong'),
+            used: slots.tactic.used,
+            max: slots.tactic.max,
+          }
+        : {
+            type: 'tactic',
+            tooltip: game.i18n.localize('DASU.Sheet.AddItem'),
+            used: '+',
+          },
     });
     context.schemaTable = await this.#schemaTable.renderTable(this.document);
     context.classTable = await this.#classTable.renderTable(this.document);
@@ -292,8 +296,12 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.featureTable = await this.#featureTable.renderTable(this.document);
     if (actor.type === 'summoner') {
       context.bondTable = await this.#bondTable.renderTable(this.document);
-      context.skillAbilityTable = await this.#skillAbilityTable.renderTable(this.document);
-      context.dejectionTable = await this.#dejectionTable.renderTable(this.document);
+      context.skillAbilityTable = await this.#skillAbilityTable.renderTable(
+        this.document
+      );
+      context.dejectionTable = await this.#dejectionTable.renderTable(
+        this.document
+      );
       context.scarTable = await this.#scarTable.renderTable(this.document);
     }
 
@@ -304,10 +312,12 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
     // Daemon-only Ack content
     if (actor.type === 'daemon') {
-      context.specialAbilityTable =
-        await this.#specialAbilityTable.renderTable(this.document);
-      context.transformationTable =
-        await this.#transformationTable.renderTable(this.document);
+      context.specialAbilityTable = await this.#specialAbilityTable.renderTable(
+        this.document
+      );
+      context.transformationTable = await this.#transformationTable.renderTable(
+        this.document
+      );
       const activeSet = new Set(actorData.roles ?? []);
       context.daemonRoles = Object.keys(DASU.daemonRoles)
         .filter((key) => activeSet.has(key))
@@ -322,39 +332,61 @@ export class DASUActorSheet extends SheetLayoutMixin(
     context.fieldsets = this.#fieldsets.prepareContext(actor);
 
     if (actor.type === 'summoner') {
-      context.activeStockTable = await this.#activeStockTable.renderTable(this.document, {
-        sectionBadge: { tooltip: game.i18n.localize('DASU.Stock.Active'), used: game.i18n.localize('DASU.Stock.Active') },
-      });
-      context.inactiveStockTable = await this.#inactiveStockTable.renderTable(this.document, {
-        sectionBadge: { tooltip: game.i18n.localize('DASU.Stock.Inactive'), used: game.i18n.localize('DASU.Stock.Inactive') },
-      });
+      context.activeStockTable = await this.#activeStockTable.renderTable(
+        this.document,
+        {
+          sectionBadge: {
+            tooltip: game.i18n.localize('DASU.Stock.Active'),
+            used: game.i18n.localize('DASU.Stock.Active'),
+          },
+        }
+      );
+      context.inactiveStockTable = await this.#inactiveStockTable.renderTable(
+        this.document,
+        {
+          sectionBadge: {
+            tooltip: game.i18n.localize('DASU.Stock.Inactive'),
+            used: game.i18n.localize('DASU.Stock.Inactive'),
+          },
+        }
+      );
 
       const activeStock = (actor.system.stock ?? [])
-        .filter(e => e.active)
-        .map(e => fromUuidSync(e.uuid))
-        .filter(d => d?.type === 'daemon');
+        .filter((e) => e.active)
+        .map((e) => fromUuidSync(e.uuid))
+        .filter((d) => d?.type === 'daemon');
 
       // Current Will Strain = sum of fielded daemons' WSC, vs the summoner's cap.
       const cap = actor.system.willStrain?.cap ?? 0;
-      const used = activeStock.reduce((sum, d) => sum + (d.system.strain?.value ?? 0), 0);
+      const used = activeStock.reduce(
+        (sum, d) => sum + (d.system.strain?.value ?? 0),
+        0
+      );
       context.willStrain = { used, cap, over: used > cap };
 
-      const activeUuids = new Set(activeStock.map(d => d.uuid));
+      const activeUuids = new Set(activeStock.map((d) => d.uuid));
       for (const uuid of this.#daemonTableCache.keys())
         if (!activeUuids.has(uuid)) this.#daemonTableCache.delete(uuid);
 
       for (const daemon of activeStock) {
         if (!this.#daemonTableCache.has(daemon.uuid)) {
-          this.#daemonTableCache.set(daemon.uuid, new DaemonTables(daemon.uuid));
+          this.#daemonTableCache.set(
+            daemon.uuid,
+            new DaemonTables(daemon.uuid)
+          );
         }
       }
 
-      context.daemonTabs = (await Promise.all(
-        [...this.#daemonTableCache.values()].map(t => t.render())
-      )).filter(Boolean);
-      context.daemonAckTabs = (await Promise.all(
-        [...this.#daemonTableCache.values()].map(t => t.renderAck())
-      )).filter(Boolean);
+      context.daemonTabs = (
+        await Promise.all(
+          [...this.#daemonTableCache.values()].map((t) => t.render())
+        )
+      ).filter(Boolean);
+      context.daemonAckTabs = (
+        await Promise.all(
+          [...this.#daemonTableCache.values()].map((t) => t.renderAck())
+        )
+      ).filter(Boolean);
       context.useDaemonItemTabs = true;
     }
 
@@ -591,11 +623,15 @@ export class DASUActorSheet extends SheetLayoutMixin(
         actor.sheet?.render(true);
       });
 
-      bar.addEventListener('wheel', (e) => {
-        if (e.deltaY === 0) return;
-        e.preventDefault();
-        bar.scrollLeft += e.deltaY;
-      }, { passive: false });
+      bar.addEventListener(
+        'wheel',
+        (e) => {
+          if (e.deltaY === 0) return;
+          e.preventDefault();
+          bar.scrollLeft += e.deltaY;
+        },
+        { passive: false }
+      );
 
       bar.addEventListener('mousedown', (e) => {
         if (e.button !== 0) return;
@@ -633,9 +669,12 @@ export class DASUActorSheet extends SheetLayoutMixin(
     await super._onRender(context, options);
 
     for (const { tab, html } of context.moduleItemTables ?? []) {
-      const container = tab === 'items'
-        ? this.element.querySelector('[data-application-part="items"] [data-panel="innate"]')
-        : this.element.querySelector(`[data-application-part="${tab}"]`);
+      const container =
+        tab === 'items'
+          ? this.element.querySelector(
+              '[data-application-part="items"] [data-panel="innate"]'
+            )
+          : this.element.querySelector(`[data-application-part="${tab}"]`);
       if (!container) continue;
       const wrapper = document.createElement('div');
       wrapper.innerHTML = html;
@@ -872,7 +911,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
       const li = input.closest('[data-transformation-index]');
       const index = Number(li?.dataset?.transformationIndex);
       if (Number.isNaN(index)) return;
-      const list = foundry.utils.deepClone(this.actor.system.transformations ?? []);
+      const list = foundry.utils.deepClone(
+        this.actor.system.transformations ?? []
+      );
       if (!list[index]) return;
       list[index].meritThreshold = Math.max(0, parseInt(input.value) || 0);
       await this.actor.update({ 'system.transformations': list });
@@ -888,7 +929,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
     ) {
       return this.#addTransformation(actorData.uuid);
     }
-    if (this.actor.type !== 'summoner') return super._onDropActor(event, actorData);
+    if (this.actor.type !== 'summoner')
+      return super._onDropActor(event, actorData);
     const dropped = await fromUuid(actorData.uuid);
     if (!dropped || dropped.type !== 'daemon') return false;
     const stock = foundry.utils.deepClone(this.actor.system.stock ?? []);
@@ -912,7 +954,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
       return false;
     }
     if (dropped.uuid === this.actor.uuid) return false; // can't become itself
-    const list = foundry.utils.deepClone(this.actor.system.transformations ?? []);
+    const list = foundry.utils.deepClone(
+      this.actor.system.transformations ?? []
+    );
     if (list.some((entry) => entry.uuid === uuid)) {
       ui.notifications?.warn(
         game.i18n.localize('DASU.Transformation.AlreadyAdded')
@@ -1133,7 +1177,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
     // pointerdown fires before blur, so commit the field here.
     const onPointerDown = (e) => {
-      if (!pop.contains(e.target) && e.target !== target) cleanup({ commit: true });
+      if (!pop.contains(e.target) && e.target !== target)
+        cleanup({ commit: true });
     };
     setTimeout(() => doc.addEventListener('pointerdown', onPointerDown), 0);
   }
@@ -1161,7 +1206,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
       sync: (pop, anchor, v) => {
         const valEl = anchor.querySelector('.actor-sidebar__resource-val');
         if (valEl) valEl.textContent = v;
-        const m = parseInt(pop.querySelector('.resource-popover__max')?.value) || 0;
+        const m =
+          parseInt(pop.querySelector('.resource-popover__max')?.value) || 0;
         const fill = anchor.querySelector('.actor-sidebar__resource-fill');
         if (fill)
           fill.style.width = `${m > 0 ? Math.min(100, (v / m) * 100) : 0}%`;
@@ -1173,7 +1219,10 @@ export class DASUActorSheet extends SheetLayoutMixin(
     const merit = this.actor.system.meritProgress;
     const isTransform = merit?.mode === 'transform';
     if (merit?.atMax) return game.i18n.localize('DASU.Actor.Merit.AtMax');
-    if (isTransform) return game.i18n.format('DASU.Actor.Merit.ToTransform', { count: merit?.toNext ?? 0 });
+    if (isTransform)
+      return game.i18n.format('DASU.Actor.Merit.ToTransform', {
+        count: merit?.toNext ?? 0,
+      });
     return game.i18n.format('DASU.Actor.Merit.ToNext', {
       count: merit?.toNext ?? 0,
       level: merit?.nextLevel ?? (this.actor.system.level ?? 1) + 1,
@@ -1350,7 +1399,12 @@ export class DASUActorSheet extends SheetLayoutMixin(
         if (adv.constructor.TYPE !== 'relentlessCurse') continue;
         for (const badge of adv.getBadges()) {
           if (badge.type === 'scar') {
-            scarSlots.push(adv._slotPlannerEntry(actor, { level: threshold, currentLevel: currentDejection }));
+            scarSlots.push(
+              adv._slotPlannerEntry(actor, {
+                level: threshold,
+                currentLevel: currentDejection,
+              })
+            );
           } else {
             penalties.push(badge.label);
           }
@@ -1416,7 +1470,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
       if (!row) return null;
       const table = row.closest('.dasu-table');
       if (!table) return null;
-      const inTaggable = [...taggableTables].some((cls) => table.classList.contains(cls));
+      const inTaggable = [...taggableTables].some((cls) =>
+        table.classList.contains(cls)
+      );
       return inTaggable ? row : null;
     };
 
@@ -1735,7 +1791,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
         'systems/dasu/templates/actor/parts/specialties-popover.hbs',
         {
           label: skill?.label ?? key,
-          specialties: (skill?.specialties ?? []).map((s) => ({ name: s.name })),
+          specialties: (skill?.specialties ?? []).map((s) => ({
+            name: s.name,
+          })),
           used: spec.used,
           max: spec.max,
           over: spec.used > spec.max,
@@ -1773,17 +1831,19 @@ export class DASUActorSheet extends SheetLayoutMixin(
       );
 
     // Add/remove mutate the actor immediately so the popover re-renders fresh.
-    pop.querySelector('.specialties-popover__add')?.addEventListener('click', async () => {
-      const next = [...collect(), { name: '' }];
-      await this.actor.update(
-        { [`system.skills.${key}.specialties`]: next },
-        { render: false }
-      );
-      skill.specialties = next;
-      pop.innerHTML = await render();
-      bindRowActions();
-      pop.querySelector('.specialties-popover__input:last-of-type')?.focus();
-    });
+    pop
+      .querySelector('.specialties-popover__add')
+      ?.addEventListener('click', async () => {
+        const next = [...collect(), { name: '' }];
+        await this.actor.update(
+          { [`system.skills.${key}.specialties`]: next },
+          { render: false }
+        );
+        skill.specialties = next;
+        pop.innerHTML = await render();
+        bindRowActions();
+        pop.querySelector('.specialties-popover__input:last-of-type')?.focus();
+      });
 
     const bindRowActions = () => {
       pop.querySelectorAll('[data-action="removeSpecialty"]').forEach((btn) =>
@@ -1821,7 +1881,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.#specialtiesPopoverCleanup = () => cleanup();
 
     const onPointerDown = (e) => {
-      if (!pop.contains(e.target) && e.target !== target) cleanup({ commitOnClose: true });
+      if (!pop.contains(e.target) && e.target !== target)
+        cleanup({ commitOnClose: true });
     };
     setTimeout(() => doc.addEventListener('pointerdown', onPointerDown), 0);
   }
@@ -1834,7 +1895,13 @@ export class DASUActorSheet extends SheetLayoutMixin(
     const ABBR = { '-1': 'WK', 0: '–', 1: 'RS', 2: 'NU', 3: 'DR' };
     const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
     const typeLabel = game.i18n.localize(`DASU.DamageType.${capitalize(key)}`);
-    const levelKey = { '-1': 'Weak', 0: 'Normal', 1: 'Resist', 2: 'Nullify', 3: 'Drain' }[String(base)];
+    const levelKey = {
+      '-1': 'Weak',
+      0: 'Normal',
+      1: 'Resist',
+      2: 'Nullify',
+      3: 'Drain',
+    }[String(base)];
     const levelLabel = game.i18n.localize(`DASU.Resistance.${levelKey}`);
     const abbr = ABBR[String(base)] ?? '–';
     const resistImg = `systems/dasu/assets/resistances/${key}.png`;
@@ -1846,7 +1913,13 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
     const content = await foundry.applications.handlebars.renderTemplate(
       `systems/${SYSTEM}/templates/chat/chat-check.hbs`,
-      { checkTitle: typeLabel, checkLabel: null, checkType: 'display', sections: [sectionHtml], tags: [] }
+      {
+        checkTitle: typeLabel,
+        checkLabel: null,
+        checkType: 'display',
+        sections: [sectionHtml],
+        tags: [],
+      }
     );
 
     ChatMessage.create({
@@ -1854,7 +1927,10 @@ export class DASUActorSheet extends SheetLayoutMixin(
       content,
       flags: {
         [SYSTEM]: {
-          [Flags.ChatMessage.Check]: { type: 'display', additionalData: { resistanceImg: resistImg } },
+          [Flags.ChatMessage.Check]: {
+            type: 'display',
+            additionalData: { resistanceImg: resistImg },
+          },
         },
       },
     });

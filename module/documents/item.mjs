@@ -15,7 +15,10 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
     if (allowed === false) return false;
 
     // Archetypes and subtypes are daemon-exclusive item types.
-    const DAEMON_ONLY = { archetype: 'DASU.Archetype.DaemonOnly', subtype: 'DASU.Subtype.DaemonOnly' };
+    const DAEMON_ONLY = {
+      archetype: 'DASU.Archetype.DaemonOnly',
+      subtype: 'DASU.Subtype.DaemonOnly',
+    };
     if (DAEMON_ONLY[data.type] && this.actor && this.actor.type !== 'daemon') {
       ui.notifications.warn(game.i18n.localize(DAEMON_ONLY[data.type]));
       return false;
@@ -24,7 +27,9 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
     // Dejection is summoner-exclusive and limited to one per actor.
     if (data.type === 'dejection') {
       if (this.actor && this.actor.type !== 'summoner') {
-        ui.notifications.warn(game.i18n.localize('DASU.Dejection.SummonerOnly'));
+        ui.notifications.warn(
+          game.i18n.localize('DASU.Dejection.SummonerOnly')
+        );
         return false;
       }
       if (this.actor?.itemTypes?.dejection?.length) {

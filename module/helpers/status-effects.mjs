@@ -67,7 +67,9 @@ function capFromSource(statusId, source) {
 
 /** The status id an ActiveEffect represents, if any. */
 export function statusIdOf(effect) {
-  return effect.statuses?.first?.() ?? effect.getFlag?.(SYSTEM, 'statusId') ?? null;
+  return (
+    effect.statuses?.first?.() ?? effect.getFlag?.(SYSTEM, 'statusId') ?? null
+  );
 }
 
 /** Find an existing status effect on an actor by status id. */
@@ -105,7 +107,9 @@ export function maxStacksOf(effect) {
   if (attrKey) {
     const live = originActorOf(effect)?.system?.attributes?.[attrKey]?.value;
     if (live != null) return Math.max(1, live);
-    const snap = effect?.getFlag?.(SYSTEM, 'statusSource')?.attributes?.[attrKey];
+    const snap = effect?.getFlag?.(SYSTEM, 'statusSource')?.attributes?.[
+      attrKey
+    ];
     if (snap != null) return Math.max(1, snap);
   }
 
@@ -133,7 +137,11 @@ export function maxStacksOf(effect) {
  * @param {number} [opts.bumpBy]  stacks to add on reapplication (default 1)
  * @returns {Promise<ActiveEffect|null>}
  */
-export async function applyStatus(actor, statusId, { source, bumpBy = 1 } = {}) {
+export async function applyStatus(
+  actor,
+  statusId,
+  { source, bumpBy = 1 } = {}
+) {
   const def = CONFIG.DASU.statusEffectIndex[statusId];
   if (!actor || !def) return null;
 
@@ -147,8 +155,8 @@ export async function applyStatus(actor, statusId, { source, bumpBy = 1 } = {}) 
     );
     if (existing) {
       const current =
-        CONFIG.DASU.statusEffectIndex[statusIdOf(existing)]?.flags?.dasu?.tier ??
-        0;
+        CONFIG.DASU.statusEffectIndex[statusIdOf(existing)]?.flags?.dasu
+          ?.tier ?? 0;
       if (incoming <= current) return existing; // keep the stronger/equal tier
       await existing.delete();
     }
@@ -171,16 +179,12 @@ export async function applyStatus(actor, statusId, { source, bumpBy = 1 } = {}) 
       Number.isFinite(override) && override > 0
         ? override
         : source
-          ? capFromSource(statusId, source)
-          : maxStacksOf(existing);
+        ? capFromSource(statusId, source)
+        : maxStacksOf(existing);
     const next = Math.min(cap, stacksOf(existing) + bumpBy);
     update[`flags.${SYSTEM}.stacks`] = next;
     update.name = stackedName(baseNameOf(existing), next);
-    update.changes = scaledChanges(
-      statusId,
-      next,
-      scaleWithStacksOf(existing)
-    );
+    update.changes = scaledChanges(statusId, next, scaleWithStacksOf(existing));
     await existing.update(update);
     return existing;
   }
@@ -234,7 +238,9 @@ function baseNameOf(effect) {
   return (
     effect?.getFlag?.(SYSTEM, 'baseName') ??
     game.i18n.localize(
-      CONFIG.DASU.statusEffectIndex[statusIdOf(effect)]?.name ?? effect?.name ?? ''
+      CONFIG.DASU.statusEffectIndex[statusIdOf(effect)]?.name ??
+        effect?.name ??
+        ''
     )
   );
 }
@@ -291,13 +297,18 @@ async function onCombatTurn(combat, _prior, current) {
 
   for (const effect of actor.effects) {
     const statusId = statusIdOf(effect);
-    const behavior = CONFIG.DASU.statusEffectIndex[statusId]?.flags?.dasu?.behavior;
+    const behavior =
+      CONFIG.DASU.statusEffectIndex[statusId]?.flags?.dasu?.behavior;
     if (behavior !== 'perTurnDamage') continue;
 
     const stacks = effect.getFlag(SYSTEM, 'stacks') ?? 1;
     const src = effect.getFlag(SYSTEM, 'statusSource');
-    const attrKey = CONFIG.DASU.statusEffectIndex[statusId].flags.dasu.damageAttr;
-    const tick = src?.attributes?.[attrKey] ?? actor.system?.attributes?.[attrKey]?.value ?? 0;
+    const attrKey =
+      CONFIG.DASU.statusEffectIndex[statusId].flags.dasu.damageAttr;
+    const tick =
+      src?.attributes?.[attrKey] ??
+      actor.system?.attributes?.[attrKey]?.value ??
+      0;
     const amount = tick * stacks;
     if (amount <= 0) continue;
 
@@ -338,7 +349,9 @@ async function reapDurations(actor) {
 async function postTurnSummary(actor, { active, expired }) {
   if (!active.length && !expired.length) return;
   const unitLabel = (units) =>
-    game.i18n.localize(units === 'turns' ? 'DASU.Duration.Turns' : 'DASU.Duration.Rounds');
+    game.i18n.localize(
+      units === 'turns' ? 'DASU.Duration.Turns' : 'DASU.Duration.Rounds'
+    );
   const content = await foundry.applications.handlebars.renderTemplate(
     `systems/${SYSTEM}/templates/chat/turn-summary.hbs`,
     {
@@ -361,7 +374,9 @@ async function postTurnSummary(actor, { active, expired }) {
 
 /** Post a brief chat message for status-tick damage. */
 async function announceStatusDamage(actor, statusId, amount, stacks) {
-  const label = game.i18n.localize(CONFIG.DASU.statusEffectIndex[statusId].name);
+  const label = game.i18n.localize(
+    CONFIG.DASU.statusEffectIndex[statusId].name
+  );
   const content = game.i18n.format('DASU.Status.TickDamage', {
     name: actor.name,
     status: label,
@@ -393,7 +408,8 @@ export async function wakeIfSleeping(actor) {
  */
 export function getActionBlockingStatus(actor) {
   const blocker = actor?.effects?.find((e) => {
-    const b = CONFIG.DASU.statusEffectIndex[statusIdOf(e)]?.flags?.dasu?.behavior;
+    const b =
+      CONFIG.DASU.statusEffectIndex[statusIdOf(e)]?.flags?.dasu?.behavior;
     return b === 'cannotAct';
   });
   return blocker ? statusIdOf(blocker) : null;
@@ -407,7 +423,9 @@ export function isUnraveled(actor) {
 /** True if Silenced (cannot use abilities). */
 export function isSilenced(actor) {
   return !!actor?.effects?.some(
-    (e) => CONFIG.DASU.statusEffectIndex[statusIdOf(e)]?.flags?.dasu?.behavior === 'silenced'
+    (e) =>
+      CONFIG.DASU.statusEffectIndex[statusIdOf(e)]?.flags?.dasu?.behavior ===
+      'silenced'
   );
 }
 
