@@ -1,0 +1,22 @@
+<div class="dasu-fieldset dasu-fieldset--active-legend tag-panel">
+  <div class="dasu-fieldset__header">
+    <div class="dasu-fieldset__legend">{{localize "DASU.Tag.Tags"}}</div>
+    {{#if tagUsesFlatBudget}}
+    <label class="tag-panel__max-slots" data-tooltip="{{localize 'DASU.Tag.MaxSlots'}}">
+      <input type="number" name="system.maxTagSlots" value="{{tagMaxSlots}}" min="0" step="1" />
+    </label>
+    {{/if}}
+    <div class="tag-panel__budget">
+      <span class="tag-panel__budget-used">{{tagSlotsUsed}}</span>
+      <span class="tag-panel__budget-sep">/</span>
+      <span class="tag-panel__budget-max">{{tagBudget}}</span>
+    </div>
+  </div>
+
+  {{{slottedTagTable}}}
+
+  <div class="tag-drop-zone">
+    <i class="fas fa-tag"></i>
+    <span>{{localize "DASU.Tag.DropZone"}}</span>
+  </div>
+</div>

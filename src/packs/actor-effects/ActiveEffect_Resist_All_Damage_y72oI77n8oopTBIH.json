@@ -1,0 +1,36 @@
+{
+  "name": "All Ward",
+  "type": "base",
+  "_id": "y72oI77n8oopTBIH",
+  "img": "icons/equipment/chest/breastplate-banded-steel-grey.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.incomingDamage.all",
+      "mode": 2,
+      "value": "-2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>Reduce all incoming damage by 2.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "fWE164PM75o1be96",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!y72oI77n8oopTBIH"
+}

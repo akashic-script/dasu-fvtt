@@ -1,0 +1,36 @@
+{
+  "name": "Untyped Ward",
+  "type": "base",
+  "_id": "cESZ5vAQFfJAVKrL",
+  "img": "icons/magic/control/silhouette-hold-beam-blue.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.incomingDamage.untyped",
+      "mode": 2,
+      "value": "-3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>Reduce incoming untyped damage by 3.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "fWE164PM75o1be96",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!cESZ5vAQFfJAVKrL"
+}

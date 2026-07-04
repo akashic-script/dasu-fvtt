@@ -1,0 +1,8 @@
+{{#each options as |role|}}
+<button type="button"
+  class="dasu-roles-popover__option{{#if role.active}} dasu-roles-popover__option--active{{/if}}"
+  data-role="{{role.key}}" aria-pressed="{{role.active}}">
+  <span class="dasu-roles-popover__check">{{#if role.active}}<i class="fas fa-check"></i>{{/if}}</span>
+  <span class="dasu-roles-popover__label">{{role.label}}</span>
+</button>
+{{/each}}

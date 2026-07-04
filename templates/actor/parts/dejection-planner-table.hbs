@@ -1,0 +1,42 @@
+<table class="planner__table dejection-planner__table">
+  <thead>
+    <tr>
+      <th class="dejection-planner__col-threshold">{{localize "DASU.Dejection.Track"}}</th>
+      <th class="dejection-planner__col-effects">
+        {{localize "DASU.Planner.Effects"}}
+        <button class="planner__class-edit dejection-planner__edit-btn" data-action="plannerEditDejection" type="button" data-tooltip="{{localize 'DASU.Sheet.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each rows as |row|}}
+    <tr class="planner__row dejection-planner__row {{#if row.isActive}}planner__row--reached{{/if}} {{#if row.isCurrent}}dejection-planner__row--current{{/if}}">
+      <td class="dejection-planner__col-threshold">
+        {{row.threshold}}
+      </td>
+      <td class="dejection-planner__col-effects">
+        {{#if row.empty}}
+        <span class="planner__effect planner__effect--none">–</span>
+        {{else}}
+          {{#each row.penalties as |pen|}}
+          <span class="planner__effect planner__effect--dejection">{{pen}}</span>
+          {{/each}}
+          {{#each row.scarSlots as |slot|}}
+          <span class="planner__slot {{#if slot.filled}}planner__slot--filled{{/if}} planner__slot--fillable planner__slot--typed"
+                data-advancement-id="{{slot.advancementId}}" data-grant-type="scar"
+                {{#if slot.filled}}data-action="plannerOpenItem" data-tooltip="{{slot.filledName}}"{{else}}data-tooltip="{{localize 'DASU.Planner.SlotHint'}}"{{/if}}>
+            <span class="planner__slot-type">{{localize "TYPES.Item.scar"}}</span>
+            {{#if slot.filled}}
+              <span class="planner__slot-name">{{slot.filledName}}</span>
+              <a class="planner__slot-clear" data-action="plannerUnslot" data-advancement-id="{{slot.advancementId}}" data-tooltip="{{localize 'DASU.Planner.Unslot'}}"><i class="fa-solid fa-xmark"></i></a>
+            {{else}}
+              <span class="planner__slot-drop"><i class="fas fa-plus"></i> {{localize "DASU.Planner.EmptySlot"}}</span>
+            {{/if}}
+          </span>
+          {{/each}}
+        {{/if}}
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

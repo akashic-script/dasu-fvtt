@@ -1,0 +1,36 @@
+{
+  "name": "Tremor",
+  "type": "base",
+  "_id": "Ec4PlC6zNzvvCPJJ",
+  "img": "icons/magic/earth/projectile-boulder-debris.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.earth",
+      "mode": 2,
+      "value": "3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+3 to earth damage.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "agrBME97EKt2yEjB",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!Ec4PlC6zNzvvCPJJ"
+}

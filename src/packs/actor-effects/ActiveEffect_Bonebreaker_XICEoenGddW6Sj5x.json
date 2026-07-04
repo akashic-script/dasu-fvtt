@@ -1,0 +1,36 @@
+{
+  "name": "Bonebreaker",
+  "type": "base",
+  "_id": "XICEoenGddW6Sj5x",
+  "img": "icons/skills/melee/strike-hammer-destructive-orange.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.physical",
+      "mode": 2,
+      "value": "3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+3 to physical damage.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "agrBME97EKt2yEjB",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!XICEoenGddW6Sj5x"
+}

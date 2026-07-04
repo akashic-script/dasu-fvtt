@@ -1,0 +1,29 @@
+<div class="check-targets">
+  {{#unless hideLabel}}
+  <div class="check-targets-header">
+    <span class="check-targets-label">
+      {{#if (eq defense "defense")}}{{localize "DASU.Actor.Stat.Defense.long"}}{{else}}{{localize "DASU.Actor.Stat.Avoid.long"}}{{/if}}
+    </span>
+  </div>
+  {{/unless}}
+  {{#each targets}}
+  <div class="check-target{{#if this.hit}} target-hit{{else}} target-miss{{/if}}{{#if this.dcPartial}} target-partial{{/if}}">
+    <span class="target-name" data-uuid="{{this.uuid}}">{{this.name}}</span>
+    {{#unless ../hideTn}}{{#if this.tn}}<span class="target-tn">{{this.tn}}</span>{{/if}}{{/unless}}
+    {{#if this.dcPartial}}
+    <div class="target-outcome-group" data-tooltip="{{#each this.dcInfo}}{{this.name}}: {{this.rollTotal}} / {{this.effectiveDC}}{{#unless @last}} | {{/unless}}{{/each}}">
+      <span class="target-outcome">{{localize "DASU.Check.Partial"}}</span>
+      <span class="target-dc-info"><i class="fas fa-circle-exclamation"></i></span>
+    </div>
+    {{else}}
+    <span class="target-outcome">{{#if this.hit}}{{localize "DASU.Check.Hit"}}{{else}}{{localize "DASU.Check.Miss"}}{{/if}}</span>
+    {{/if}}
+    {{#if ../hasTargetActions}}
+    <button type="button" class="target-apply-menu" data-target-uuid="{{this.uuid}}"
+            data-target-hit="{{#if this.hit}}1{{else}}0{{/if}}">
+      <i class="fas fa-ellipsis-v"></i>
+    </button>
+    {{/if}}
+  </div>
+  {{/each}}
+</div>

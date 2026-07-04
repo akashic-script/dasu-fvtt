@@ -1,0 +1,47 @@
+<header class="sheet-header">
+  <div class="actor-header__name-row">
+    <h1><input class="actor-header__name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize 'DASU.Actor.DaemonNamePlaceholder'}}" /></h1>
+    <div class="actor-header__level">
+      <span class="actor-header__level-label">{{localize "DASU.Actor.Level.long"}}</span>
+      <input class="dasu-pill" type="text" name="system.level" value="{{system.level}}" data-dtype="Number" />
+    </div>
+  </div>
+  <div class="actor-header__identity-row">
+    {{#if archetypeName}}<span class="actor-header__class-name">{{archetypeName}}</span>{{else}}<span class="actor-header__class-name actor-header__class-name--empty">{{localize "DASU.Archetype.Placeholder"}}</span>{{/if}}
+    {{#if subtypeName}}<span class="actor-header__class-name">{{subtypeName}}</span>{{else}}<span class="actor-header__class-name actor-header__class-name--empty">{{localize "DASU.Subtype.Placeholder"}}</span>{{/if}}
+    <span class="actor-header__roles">
+      {{#each daemonRoles as |role|}}
+      <span class="actor-header__role" data-role="{{role.key}}">
+        {{role.label}}
+        <button type="button" class="actor-header__role-remove" data-action="toggleDaemonRole" data-role="{{role.key}}" data-tooltip="{{localize 'DASU.Daemon.Role.Remove'}}"><i class="fas fa-times"></i></button>
+      </span>
+      {{/each}}
+      {{#if hasAddableRoles}}
+      <button type="button" class="actor-header__role-add" data-action="openRolesPopover" data-tooltip="{{localize 'DASU.Daemon.Role.Add'}}"><i class="fas fa-plus"></i></button>
+      {{/if}}
+    </span>
+    <input class="actor-header__identity" type="text" placeholder="{{localize 'DASU.Actor.ClassPlaceholder'}}" />
+    {{#if canAdvance}}
+    <button type="button" class="actor-header__levelup" data-action="advance" data-tooltip="{{advanceTooltip}}">
+      <i class="fa-solid fa-angles-up"></i>
+    </button>
+    {{/if}}
+    <div class="actor-header__level actor-header__level--merit" data-tooltip="{{meritTooltip}}">
+      <span class="actor-header__level-label">{{localize "DASU.Actor.Merit.long"}}</span>
+      <input class="dasu-pill" type="text" name="system.merit" value="{{system.merit}}" data-dtype="Number" />
+    </div>
+  </div>
+  <div class="actor-header__resistances">
+    {{#each resistances as |resistance key|}}
+    <div class="actor-header__resistance {{resistance.cssClass}}" data-tooltip="{{localize (concat 'DASU.DamageType.' (capitalize key))}}">
+      <div class="actor-header__resistance-top">
+        <img class="actor-header__resistance-icon" src="systems/dasu/assets/resistances/{{key}}.png" alt="{{key}}" />
+        <span class="actor-header__resistance-value">{{resistance.abbr}}</span>
+      </div>
+      <select class="actor-header__resistance-select" name="system.resistances.{{key}}.base" data-dtype="Number">
+        {{selectOptions @root.resistanceLevelOptions selected=resistance.base localize=true}}
+      </select>
+    </div>
+    {{/each}}
+  </div>
+</header>

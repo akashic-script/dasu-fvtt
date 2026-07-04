@@ -1,0 +1,15 @@
+<div class="check-roll{{#if critical}} is-critical{{/if}}{{#if snakeEyes}} is-snake-eyes{{/if}}">
+  <div class="check-roll__main">
+    <div class="check-dice">
+      {{#each droppedDice}}<span class="check-die die-dropped">{{this}}</span>{{/each}}
+      {{#each dice}}<span class="check-die{{#if (gte this ../critThreshold)}} die-high{{/if}}">{{this}}</span>{{/each}}
+      {{#if tick}}<span class="check-die check-tick" data-tooltip="DASU.Check.Tick">+{{tick}}</span>{{/if}}
+      {{#each modifiers}}<span class="check-die check-mod" data-tooltip="{{localize this.label}}">{{numberFormat this.value sign=true}}</span>{{/each}}
+    </div>
+    <div class="check-total">
+      <span class="check-total-value">{{total}}</span>
+      {{#if critical}}<span class="check-flag crit">{{localize "DASU.Check.Critical"}}</span>{{/if}}
+      {{#if snakeEyes}}<span class="check-flag snake-eyes">{{localize "DASU.Check.SnakeEyes"}}</span>{{/if}}
+    </div>
+  </div>
+</div>

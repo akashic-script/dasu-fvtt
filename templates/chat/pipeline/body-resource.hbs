@@ -1,0 +1,6 @@
+<div class="pipeline-body pipeline-body--resource">
+  <span class="pipeline-body__amount {{#if isCost}}pipeline-body__amount--cost{{else}}pipeline-body__amount--heal{{/if}}">
+    {{#if isCost}}-{{else}}+{{/if}}{{amount}} {{resourceLabel}}
+  </span>
+  <span class="pipeline-body__detail">{{priorValue}} &rarr; {{newValue}}</span>
+</div>

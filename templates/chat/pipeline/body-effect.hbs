@@ -1,0 +1,8 @@
+<div class="pipeline-body pipeline-body--effect{{#if dcSkipped}} pipeline-body--dc-skipped{{/if}}">
+  <div class="pipeline-body__effect-label">{{name}}{{#if duration}} {{localize "DASU.Pipeline.EffectFor"}} {{duration}}{{/if}}</div>
+  {{#if dcSkipped}}
+  <div class="pipeline-body__dc-skipped">{{localize "DASU.Pipeline.DCNotMet"}} ({{rollTotal}} / {{effectiveDC}})</div>
+  {{else if description}}
+  <div class="pipeline-body__description">{{{description}}}</div>
+  {{/if}}
+</div>

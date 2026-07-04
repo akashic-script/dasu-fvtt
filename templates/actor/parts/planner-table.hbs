@@ -1,0 +1,52 @@
+<table class="planner__table">
+  <thead>
+    <tr>
+      <th class="planner__col-level">{{localize "DASU.Actor.Level.abbr"}}</th>
+      <th class="planner__col-merit">{{localize "DASU.Actor.Merit.abbr"}}</th>
+      <th class="planner__col-sp">{{localize "DASU.Actor.SP.abbr"}}</th>
+      <th class="planner__col-ap">{{localize "DASU.Actor.AP.abbr"}}</th>
+      <th class="planner__col-effects">{{localize "DASU.Planner.Effects"}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each rows as |row|}}
+    <tr class="planner__row {{#if row.isReached}}planner__row--reached{{/if}} {{#if row.isCurrent}}planner__row--current{{/if}}">
+      <td class="planner__col-level">
+        {{row.level}}
+      </td>
+      <td class="planner__col-merit">{{row.meritText}}</td>
+      <td class="planner__col-sp">{{row.spText}}</td>
+      <td class="planner__col-ap">{{row.apText}}</td>
+      <td class="planner__col-effects">
+        {{#if row.empty}}
+        <span class="planner__effect planner__effect--none">–</span>
+        {{else}}
+          {{#if row.aptitudeUp}}
+          <span class="planner__effect planner__effect--apt">{{localize "DASU.Item.Class.AptitudeUp"}} +{{row.aptitudeUp}}</span>
+          {{/if}}
+          {{#each row.schema as |s|}}
+          <span class="planner__effect planner__effect--schema">{{s}}</span>
+          {{/each}}
+          {{#each row.itemGrants as |g|}}
+            {{#if g.fixed}}
+            <span class="planner__effect planner__effect--item">{{g.fixedName}}</span>
+            {{else}}
+            <span class="planner__slot {{#if g.filled}}planner__slot--filled{{/if}} planner__slot--fillable {{#if g.itemType}}planner__slot--typed{{/if}}"
+                  data-advancement-id="{{g.advancementId}}" data-grant-type="{{g.type}}"
+                  {{#if g.filled}}data-action="plannerOpenItem" data-tooltip="{{g.filledName}}"{{else}}data-tooltip="{{localize 'DASU.Planner.SlotHint'}}"{{/if}}>
+              <span class="planner__slot-type">{{g.typeLabel}}</span>
+              {{#if g.filled}}
+                <span class="planner__slot-name">{{g.filledName}}</span>
+                <a class="planner__slot-clear" data-action="plannerUnslot" data-advancement-id="{{g.advancementId}}" data-tooltip="{{localize 'DASU.Planner.Unslot'}}"><i class="fa-solid fa-xmark"></i></a>
+              {{else}}
+                <span class="planner__slot-drop"><i class="fas fa-plus"></i> {{localize "DASU.Planner.EmptySlot"}}</span>
+              {{/if}}
+            </span>
+            {{/if}}
+          {{/each}}
+        {{/if}}
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

@@ -1,0 +1,36 @@
+{
+  "name": "WP Cost Reduction",
+  "type": "base",
+  "_id": "ZSpe60ZOI4sSVyae",
+  "img": "icons/magic/control/buff-flight-wings-runes-blue-white.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.incomingLoss.wp",
+      "mode": 2,
+      "value": "-2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>Reduce WP spent on costs by 2 (clamped at 0).</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "bU5MqJvrLuP8EVY2",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!ZSpe60ZOI4sSVyae"
+}

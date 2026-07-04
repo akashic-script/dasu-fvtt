@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" aria-hidden="true" focusable="false">
+  <polygon
+    points="90 32.842 24 147.158 156 147.158"
+    fill="#ffffff"
+    fill-opacity="0.04"
+    stroke="#b5b3a4"
+    stroke-width="4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M90 109.052 L90 32.842 M90 109.052 L24 147.158 M90 109.052 L156 147.158"
+    fill="none"
+    opacity="0.78"
+    stroke="#b5b3a4"
+    stroke-width="2.25"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <polygon
+    points="90 98.052 99.526 114.552 80.474 114.552"
+    fill="#ffffff"
+    fill-opacity="0.08"
+    stroke="#b5b3a4"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

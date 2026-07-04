@@ -1,0 +1,43 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="advanced" style="padding: 12px 14px;">
+
+  <div class="dasu-fieldset dasu-fieldset--active-legend">
+    <div class="dasu-fieldset__header">
+      <div class="dasu-fieldset__legend">{{localize "DASU.Tag.Properties"}}</div>
+    </div>
+
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Tag.PricePerRank"}}</label>
+        <input type="number" name="system.pricePerRank" value="{{system.pricePerRank}}" min="0" />
+      </div>
+    </div>
+  </div>
+
+  <div class="dasu-fieldset dasu-fieldset--active-legend">
+    <div class="dasu-fieldset__header">
+      <div class="dasu-fieldset__legend">{{localize "DASU.Tag.Applicability"}}</div>
+    </div>
+
+    <div class="dasu-fieldset__row tag-applicability-row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Tag.ApplicableTypes"}}</label>
+        <select name="system.applicableTypes" multiple size="4">
+          {{#each taggableTypeOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Tag.ApplicableSubType"}}</label>
+        <select name="system.applicableSubType" multiple size="6">
+          {{#each tagSubTypeOptions}}
+          <option value="{{this.value}}" {{#if this.type}}data-type="{{this.type}}"{{/if}} {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  {{> "systems/dasu/templates/item/parts/apply-effects-panel.hbs"}}
+
+</section>

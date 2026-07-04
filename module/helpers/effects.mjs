@@ -7,10 +7,13 @@
 export function onManageActiveEffect(event, owner, element) {
   event.preventDefault();
   const a = element ?? event.currentTarget;
-  const li = a.closest('li');
-  const effect = li.dataset.effectId
-    ? owner.effects.get(li.dataset.effectId)
-    : null;
+  const row = a.closest('[data-effect-id], [data-key], li');
+  const effectUuid = row?.dataset.key;
+  const effectId = row?.dataset.effectId;
+  const effect =
+    (effectUuid ? fromUuidSync(effectUuid) : null) ??
+    (effectId ? owner.effects.get(effectId) : null);
+  const effectType = row?.dataset.effectType ?? a.dataset.effectType;
   switch (a.dataset.action) {
     case 'create':
       return owner.createEmbeddedDocuments('ActiveEffect', [
@@ -18,19 +21,58 @@ export function onManageActiveEffect(event, owner, element) {
           name: game.i18n.format('DOCUMENT.New', {
             type: game.i18n.localize('DOCUMENT.ActiveEffect'),
           }),
-          icon: 'icons/svg/aura.svg',
+          img: 'icons/svg/aura.svg',
           origin: owner.uuid,
-          'duration.rounds':
-            li.dataset.effectType === 'temporary' ? 1 : undefined,
-          disabled: li.dataset.effectType === 'inactive',
+          'duration.rounds': effectType === 'temporary' ? 1 : undefined,
+          disabled: effectType === 'inactive',
         },
       ]);
     case 'edit':
+      if (!effect) return;
       return effect.sheet.render(true);
     case 'delete':
+      if (!effect) return;
       return effect.delete();
     case 'toggle':
+      if (!effect) return;
       return effect.update({ disabled: !effect.disabled });
+    case 'menu': {
+      if (!effect) return;
+      const items = [
+        {
+          label: 'Edit',
+          icon: 'fas fa-edit',
+          onClick: () => effect.sheet.render(true),
+        },
+        {
+          label: effect.disabled
+            ? game.i18n.localize('DASU.Effect.Enable')
+            : game.i18n.localize('DASU.Effect.Toggle'),
+          icon: effect.disabled ? 'fas fa-check' : 'fas fa-times',
+          onClick: () => effect.update({ disabled: !effect.disabled }),
+        },
+        {
+          label: 'Delete',
+          icon: 'fas fa-trash',
+          onClick: () => effect.delete(),
+        },
+      ];
+      const menu = new foundry.applications.ux.ContextMenu(
+        document.body,
+        null,
+        items,
+        {
+          jQuery: false,
+          fixed: true,
+          relative: 'target',
+        }
+      );
+      setTimeout(() => {
+        ui.context = menu;
+        menu.render(a);
+      }, 0);
+      return;
+    }
   }
 }
 

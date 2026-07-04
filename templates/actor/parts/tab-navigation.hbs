@@ -1,0 +1,10 @@
+<nav class="tabs sheet-tabs" data-group="primary" role="tablist">
+  {{#each tabs}}
+  <a class="item {{#if active}}active{{/if}}" role="tab"
+     data-action="tab" data-group="primary" data-tab="{{id}}"
+     aria-label="{{localize label}}" aria-selected="{{active}}">
+    <i class="{{icon}}" inert></i>
+    {{#unless iconOnly}}<span class="tab-label">{{localize label}}</span>{{/unless}}
+  </a>
+  {{/each}}
+</nav>

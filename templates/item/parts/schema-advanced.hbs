@@ -1,0 +1,35 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="advanced" style="padding: 12px 14px;">
+
+  {{#with (lookup fieldsets "schema-levels")}}
+  <div
+    class="dasu-fieldset dasu-fieldset--tabbed dasu-fieldset--editor {{splitClass}}"
+    data-fieldset="schema-levels"
+    data-split-direction="{{splitDirection}}"
+  >
+    <div class="dasu-fieldset__tabs">
+      <button class="dasu-fieldset__tab {{lookup panels.level1 "activeClass"}}" data-action="fieldsetTab" data-panel="level1" type="button">{{localize "DASU.Item.Schema.Level1"}}</button>
+      <button class="dasu-fieldset__tab {{lookup panels.level2 "activeClass"}}" data-action="fieldsetTab" data-panel="level2" type="button">{{localize "DASU.Item.Schema.Level2"}}</button>
+      <button class="dasu-fieldset__tab {{lookup panels.level3 "activeClass"}}" data-action="fieldsetTab" data-panel="level3" type="button">{{localize "DASU.Item.Schema.Level3"}}</button>
+      <div class="dasu-fieldset__split-btns">
+        <button class="dasu-fieldset__split-btn {{splitBtnActiveClass}}" data-action="fieldsetSplit" data-direction="column" type="button" data-tooltip="Split horizontally"><i class="fa-solid fa-table-cells-large"></i></button>
+      </div>
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="level1" {{lookup panels.level1 "hidden"}}>
+      <prose-mirror name="system.level1.description" toggled value="{{@root.item.system.level1.description}}" data-document-uuid="{{@root.item.uuid}}" {{#unless @root.editable}}disabled{{/unless}}>
+        {{{@root.level1DescriptionHTML}}}
+      </prose-mirror>
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="level2" {{lookup panels.level2 "hidden"}}>
+      <prose-mirror name="system.level2.description" toggled value="{{@root.item.system.level2.description}}" data-document-uuid="{{@root.item.uuid}}" {{#unless @root.editable}}disabled{{/unless}}>
+        {{{@root.level2DescriptionHTML}}}
+      </prose-mirror>
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="level3" {{lookup panels.level3 "hidden"}}>
+      <prose-mirror name="system.level3.description" toggled value="{{@root.item.system.level3.description}}" data-document-uuid="{{@root.item.uuid}}" {{#unless @root.editable}}disabled{{/unless}}>
+        {{{@root.level3DescriptionHTML}}}
+      </prose-mirror>
+    </div>
+  </div>
+  {{/with}}
+
+</section>

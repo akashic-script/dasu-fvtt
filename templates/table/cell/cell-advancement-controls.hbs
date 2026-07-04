@@ -1,0 +1,9 @@
+<div class="cell-adv-controls">
+  {{#if editable}}
+  <button type="button" class="cell-adv-controls__btn cell-adv-controls__btn--danger"
+    data-action="advancementDelete" data-advancement-id="{{adv.id}}"
+    data-tooltip="{{localize 'DASU.Item.Class.DeleteAdvancement'}}">
+    <i class="fas fa-trash"></i>
+  </button>
+  {{/if}}
+</div>

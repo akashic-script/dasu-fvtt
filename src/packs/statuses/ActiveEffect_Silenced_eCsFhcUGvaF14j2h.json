@@ -1,0 +1,35 @@
+{
+  "name": "Silenced",
+  "type": "base",
+  "_id": "eCsFhcUGvaF14j2h",
+  "img": "icons/svg/silenced.svg",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "value": 3,
+    "units": "turns",
+    "expiry": "turnStart",
+    "expired": false
+  },
+  "description": "<p>Cannot use abilities. (The Negotiation version locks Tactics instead.)</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "silenced"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "silenced",
+      "behavior": "silenced"
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!eCsFhcUGvaF14j2h"
+}

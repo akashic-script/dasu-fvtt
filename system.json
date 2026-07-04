@@ -31,16 +31,36 @@
   "esmodules": ["module/dasu.mjs"],
   "documentTypes": {
     "Actor": {
-      "character": {},
-      "npc": {}
+      "summoner": {},
+      "daemon": {}
     },
     "Item": {
       "item": {},
       "feature": {},
-      "spell": {}
+      "class": {},
+      "ability": {},
+      "weapon": {},
+      "tactic": {},
+      "schema": {},
+      "archetype": {},
+      "subtype": {},
+      "bond": {},
+      "specialAbility": {},
+      "skillAbility": {},
+      "scar": {},
+      "dejection": {},
+      "tag": {}
+    },
+    "ChatMessage": {
+      "pipeline": {}
     }
   },
-  "styles": [{ "src": "css/dasu.css", "layer": "system" }],
+  "styles": [
+    {
+      "src": "css/dasu.css",
+      "layer": "system"
+    }
+  ],
   "languages": [
     {
       "lang": "en",
@@ -48,8 +68,65 @@
       "path": "lang/en.json"
     }
   ],
-  "packs": [],
-  "packFolders": [],
+  "packs": [
+    {
+      "name": "statuses",
+      "label": "Status Effects",
+      "path": "packs/statuses",
+      "type": "ActiveEffect",
+      "system": "dasu",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "name": "actor-effects",
+      "label": "Actor Effects",
+      "path": "packs/actor-effects",
+      "type": "ActiveEffect",
+      "system": "dasu",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "name": "archetypes",
+      "label": "Archetypes",
+      "path": "packs/archetypes",
+      "type": "Item",
+      "system": "dasu",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "name": "subtypes",
+      "label": "Subtypes",
+      "path": "packs/subtypes",
+      "type": "Item",
+      "system": "dasu",
+      "private": false,
+      "flags": {}
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "path": "packs/tags",
+      "type": "Item",
+      "system": "dasu",
+      "private": false,
+      "flags": {}
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "Daemon Building",
+      "sorting": "m",
+      "packs": ["archetypes", "subtypes"]
+    },
+    {
+      "name": "Effects",
+      "sorting": "m",
+      "packs": ["tags", "statuses", "actor-effects"]
+    }
+  ],
   "socket": true,
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
@@ -60,6 +137,6 @@
     "units": "ft",
     "diagonals": 0
   },
-  "primaryTokenAttribute": "health",
-  "secondaryTokenAttribute": "power"
+  "primaryTokenAttribute": "resources.hp",
+  "secondaryTokenAttribute": "resources.wp"
 }

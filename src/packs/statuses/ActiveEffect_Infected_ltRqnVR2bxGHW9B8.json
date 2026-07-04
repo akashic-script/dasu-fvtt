@@ -1,0 +1,40 @@
+{
+  "name": "Infected",
+  "type": "base",
+  "_id": "ltRqnVR2bxGHW9B8",
+  "img": "icons/svg/acid.svg",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "value": 3,
+    "units": "turns",
+    "expiry": "turnStart",
+    "expired": false
+  },
+  "description": "<p>Take [Caster's POW Tick \u00d7 Rank] damage each turn and halve Power Tick. Stacks up to the caster's STA Tick; Power halving does not stack.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "infected"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "infected",
+      "stacks": 1,
+      "maxStacksAttr": "sta",
+      "maxStacks": 1,
+      "behavior": "perTurnDamage",
+      "damageAttr": "pow",
+      "halvePowerTick": true
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!ltRqnVR2bxGHW9B8"
+}

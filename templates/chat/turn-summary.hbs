@@ -1,0 +1,35 @@
+<div class="dasu theme-dark pipeline-card pipeline-card--turn">
+  <div class="pipeline-card__header">
+    <img class="pipeline-card__avatar" src="{{actorImg}}" alt="" />
+    <span class="pipeline-card__name">{{actorName}}</span>
+    <span class="pipeline-card__source">{{localize "DASU.Status.TurnSummary"}}</span>
+  </div>
+
+  <div class="pipeline-card__body turn-summary">
+    {{#if active.length}}
+    <ul class="turn-summary__list">
+      {{#each active}}
+      <li class="turn-summary__row">
+        <img class="turn-summary__icon" src="{{this.img}}" alt="" />
+        <span class="turn-summary__name">{{this.name}}</span>
+        <span class="turn-summary__remaining">{{this.remainingLabel}}</span>
+      </li>
+      {{/each}}
+    </ul>
+    {{else}}
+    <div class="turn-summary__none">{{localize "DASU.Status.TurnSummaryNone"}}</div>
+    {{/if}}
+
+    {{#if expired.length}}
+    <div class="turn-summary__expired-label">{{localize "DASU.Status.TurnSummaryExpired"}}</div>
+    <ul class="turn-summary__list turn-summary__list--expired">
+      {{#each expired}}
+      <li class="turn-summary__row">
+        <img class="turn-summary__icon" src="{{this.img}}" alt="" />
+        <span class="turn-summary__name">{{this.name}}</span>
+      </li>
+      {{/each}}
+    </ul>
+    {{/if}}
+  </div>
+</div>

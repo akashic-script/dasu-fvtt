@@ -1,0 +1,36 @@
+{
+  "name": "HP Recovered",
+  "type": "base",
+  "_id": "HM6V4UP7zfrL10Ob",
+  "img": "icons/magic/life/heart-cross-strong-green.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.incomingRecovery.hp",
+      "mode": 2,
+      "value": "5",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+5 to HP you recover from heals.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "bU5MqJvrLuP8EVY2",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!HM6V4UP7zfrL10Ob"
+}

@@ -1,41 +1,862 @@
 {
   "DASU": {
+    "Archetype": {
+      "Bonuses": "Bonuses",
+      "BonusHint": "Each bonus adds the result of its formula to a stat. Formulas may use roll data such as @lvl and @attributes.pow.value.",
+      "BonusTarget": "Target",
+      "BonusFormula": "Formula",
+      "AddBonus": "Add Bonus",
+      "Identifier": "Identifier",
+      "OnlyOne": "A Daemon can only have one Archetype.",
+      "DaemonOnly": "Archetypes can only be added to Daemons.",
+      "Placeholder": "No Archetype",
+      "Target": {
+        "HpMax": "Max HP",
+        "WpMax": "Max WP",
+        "Avoid": "Avoid",
+        "Defense": "Defense",
+        "Hit": "To Hit",
+        "Land": "To Land"
+      }
+    },
+    "Stock": {
+      "SetActive": "Set Active",
+      "SetInactive": "Set Inactive",
+      "AlreadyAdded": "This daemon is already in stock.",
+      "Active": "Active",
+      "Inactive": "Inactive",
+      "Channel": "Channel",
+      "StopChannel": "Stop Channeling",
+      "OverStrain": "Fielded daemons ({used}) exceed your Will Strain Cap ({cap}). They risk breaking free of your will."
+    },
+    "SpecialAbility": {
+      "Title": "Special Ability",
+      "Kind": {
+        "Label": "Ability Type",
+        "Passive": "Passive",
+        "Active": "Active",
+        "Reactive": "Reactive"
+      }
+    },
+    "SkillAbility": {
+      "Title": "Skill Ability",
+      "Skill": "Skill",
+      "SkillAny": "Any / chosen at roll",
+      "CostsMainAction": "Costs Main Action",
+      "FixedTN": "Fixed TN",
+      "Threshold": {
+        "Label": "Difficulty Threshold",
+        "Avoid": "Target's Avoid",
+        "Defense": "Target's Defense",
+        "Fixed": "Fixed TN"
+      }
+    },
+    "Scar": {
+      "Title": "Scar"
+    },
+    "Dejection": {
+      "Title": "Dejection",
+      "Track": "Dejection",
+      "abbr": "DEJ",
+      "TrackTooltip": "Adjust Dejection (0-15). <br> 15 = Perish.",
+      "Level": "Dejection Level",
+      "NoItem": "No Dejection item found. Add one in the SYN tab.",
+      "OnlyOne": "A Summoner can only have one Dejection item.",
+      "SummonerOnly": "Dejection items can only be added to Summoners.",
+      "Perished": "Your will is extinguished, your life is gone.",
+      "Curse": {
+        "Label": "Relentless Curse",
+        "Add": "Add Relentless Curse",
+        "Count": "Curses",
+        "WpMaxPct": "Max WP %",
+        "WpMaxFlat": "Max WP",
+        "GrantsScar": "Grants a Scar slot",
+        "ScarSlotHint": "Drop a Scar item here from the actor's planner to fill this slot."
+      }
+    },
+    "Daemon": {
+      "Role": {
+        "Title": "Roles",
+        "Add": "Add role",
+        "Remove": "Remove role",
+        "Fighter": "Fighter",
+        "Magus": "Magus",
+        "Assist": "Assist",
+        "Healer": "Healer",
+        "Debuffer": "Debuffer",
+        "Mediator": "Mediator"
+      }
+    },
+    "Transformation": {
+      "Title": "Transformations",
+      "MeritThreshold": "Merits",
+      "MeritThresholdShort": "Merit",
+      "Reached": "Ready to Transform",
+      "NotReached": "Not enough Merits",
+      "DropHint": "Drop a daemon to add a form",
+      "AlreadyAdded": "That daemon is already a transformation form.",
+      "DaemonOnly": "Only daemons can be transformation forms.",
+      "Remove": "Remove form"
+    },
+    "Table": {
+      "BrowseCompendium": "Browse"
+    },
+    "Pipeline": {
+      "Undo": "Undo",
+      "Redo": "Redo",
+      "NoTargets": "No targets selected or targeted.",
+      "TargetMissing": "The target could not be found.",
+      "ApplyFailed": "Failed to apply to {name}.",
+      "ToggleFailed": "Could not update the result. Try again.",
+      "ApplyDamage": "Apply Damage",
+      "ApplyDamageAll": "Apply to All Hits",
+      "ApplyDamageOverride": "Apply Damage (override)",
+      "ApplyEffectOverride": "Apply {name} (override)",
+      "ApplyToAllHits": "to All Hits",
+      "ApplyResource": "Apply Cost",
+      "ApplyHeal": "Apply Heal",
+      "ApplyEffect": "Apply Effect",
+      "ApplyEffectNamed": "Apply {name}",
+      "EffectFor": "for",
+      "DurationRounds": "{n} rounds",
+      "DurationTurns": "{n} turns",
+      "DCNotMet": "DC not met",
+      "ApplyEffectDC": "{name} (DC{dc})"
+    },
+    "Duration": {
+      "Rounds": "Rounds",
+      "Turns": "Turns"
+    },
+    "Bond": {
+      "Target": "Bond Target",
+      "TargetNone": "Drop an actor here",
+      "TargetDropInvalid": "Only Actors can be dropped here.",
+      "TargetName": "Bond Target Name",
+      "TargetNameHint": "Name of the bond",
+      "Affinity": "Affinity",
+      "Negative": "Negative Bond",
+      "RankName": "Rank",
+      "RankThreshold": "Affinity Required",
+      "AbilityType": "Ability Type",
+      "Effect": "Effect (drop active effect)",
+      "EffectNone": "Drop active effect here",
+      "EffectDescription": "Effect Description",
+      "EffectNoDescription": "This effect has no description.",
+      "EffectDropInvalid": "Only Active Effects can be dropped here.",
+      "CurrentRank": "Current Rank",
+      "NoRank": "No rank yet",
+      "SummonerOnly": "Bonds can only be added to Summoners.",
+      "Ability": {
+        "Active": "Active",
+        "Passive": "Passive",
+        "Reactive": "Reactive"
+      }
+    },
+    "Subtype": {
+      "Identifier": "Identifier",
+      "StatAllocationBonus": "Stat Allocation Bonus",
+      "MaxAbilitySlots": "Max Ability Slots",
+      "MaxTacticSlots": "Max Tactic Slots",
+      "StatShort": "Stat",
+      "AbilityShort": "Abil",
+      "TacticShort": "Tac",
+      "OnlyOne": "A Daemon can only have one Subtype.",
+      "SlotsFull": "Slot limit reached: this Daemon's subtype allows at most {max} {type} items.",
+      "DaemonOnly": "Subtypes can only be added to Daemons.",
+      "Placeholder": "No Subtype"
+    },
     "Ability": {
-      "Str": { "long": "Strength", "abbr": "str" },
-      "Con": { "long": "Constitution", "abbr": "con" },
-      "Dex": { "long": "Dexterity", "abbr": "dex" },
-      "Int": { "long": "Intelligence", "abbr": "int" },
-      "Wis": { "long": "Wisdom", "abbr": "wis" },
-      "Cha": { "long": "Charisma", "abbr": "cha" }
+      "Pow": {
+        "long": "Power",
+        "abbr": "Pow"
+      },
+      "Dex": {
+        "long": "Dexterity",
+        "abbr": "Dex"
+      },
+      "Wil": {
+        "long": "Willpower",
+        "abbr": "Will"
+      },
+      "Sta": {
+        "long": "Stamina",
+        "abbr": "Sta"
+      }
     },
     "SheetLabels": {
       "Actor": "DASU Actor Sheet",
-      "Item": "DASU Item Sheet"
-    },
-    "Item": {
-      "Spell": {
-        "SpellLVL": "Level {level} Spells",
-        "AddLVL": "Add LVL {level}"
-      }
+      "Item": "DASU Item Sheet",
+      "Effect": "DASU Effect Config"
     },
     "Effect": {
       "Source": "Source",
-      "Toggle": "Toggle Effect",
+      "Toggle": "Disable Effect",
+      "Enable": "Enable Effect",
       "Temporary": "Temporary Effects",
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects"
+    },
+    "Status": {
+      "TickDamage": "{name} takes {amount} damage from {status} ({stacks} stack(s)).",
+      "CannotAct": "{name} is {status} and cannot act.",
+      "SilencedWarn": "{name} is Silenced and cannot use abilities.",
+      "TurnSummary": "Active Effects",
+      "TurnSummaryNone": "No temporary effects.",
+      "TurnSummaryExpired": "Expired",
+      "StacksTab": "Stacks",
+      "StacksLabel": "Current Stacks",
+      "StacksHint": "Current stack count (max {cap}). Per-stack effects scale automatically.",
+      "StacksCurrentHint": "How many stacks are active (capped at {cap}).",
+      "MaxOverrideLabel": "Max Stacks Override",
+      "MaxOverrideHint": "Force a maximum stack count. Leave blank to use the caster-derived or default cap (shown as the placeholder).",
+      "StackAttrLabel": "Cap From Attribute",
+      "StackAttrHint": "Derive the max stacks from the caster's tick in this attribute. Choose None to use a fixed cap.",
+      "StackAttrNone": "None (fixed cap)",
+      "ScaleLabel": "Scale With Stacks",
+      "ScaleHint": "When enabled, this effect's changes multiply by the current stack count.",
+      "Bleeding": {
+        "name": "Bleeding",
+        "description": "<p>Take [Caster's POW Tick × Rank] damage each turn. Stacks up to the caster's POW Tick; Rank equals the current stacks.</p>"
+      },
+      "Charmed": {
+        "name": "Charmed",
+        "description": "<p>Cannot attack the caster.</p>"
+      },
+      "Cursed": {
+        "name": "Cursed",
+        "description": "<p>Status effects applied after this point have their duration doubled. Lasts until the end of the conflict; applies only to future statuses.</p>"
+      },
+      "Dazed": {
+        "name": "Dazed",
+        "description": "<p>-1 To Hit per stack. Stacks up to 2.</p>"
+      },
+      "Despair": {
+        "name": "Despair",
+        "description": "<p>Halve WILL Tick and lose half of current WP.</p>"
+      },
+      "Empowered": {
+        "name": "Empowered",
+        "description": "<p>Add +2 to weapon, spell, and tactic damage.</p>"
+      },
+      "Focused": {
+        "name": "Focused",
+        "description": "<p>+1 To Hit per stack. Stacks up to 2.</p>"
+      },
+      "Infected": {
+        "name": "Infected",
+        "description": "<p>Take [Caster's POW Tick × Rank] damage each turn and halve Power Tick. Stacks up to the caster's STA Tick; Power halving does not stack.</p>"
+      },
+      "Invisible1": {
+        "name": "Invisible 1",
+        "description": "<p>Gain +1 Avoid. Removed if you perform an Attack action.</p>"
+      },
+      "Invisible2": {
+        "name": "Invisible 2",
+        "description": "<p>Gain +2 Avoid.</p>"
+      },
+      "Invisible3": {
+        "name": "Invisible 3",
+        "description": "<p>Gain +2 Avoid. Cannot be directly targeted by single-target Abilities; can be applied to allies.</p>"
+      },
+      "Rage": {
+        "name": "Rage",
+        "description": "<p>Double attribute damage and WP costs. Normal attacks cost WP equal to [Level].</p>"
+      },
+      "Restrained": {
+        "name": "Restrained",
+        "description": "<p>Take a -2 penalty to To Hit and Avoid.</p>"
+      },
+      "Silenced": {
+        "name": "Silenced",
+        "description": "<p>Cannot use abilities. (The Negotiation version locks Tactics instead.)</p>"
+      },
+      "Sleep": {
+        "name": "Sleep",
+        "description": "<p>Cannot act until attacked. Ends when attacked.</p>"
+      },
+      "Stunned": {
+        "name": "Stunned",
+        "description": "<p>Cannot act. Lasts 1 turn unless otherwise stated.</p>"
+      },
+      "Unraveled": {
+        "name": "Unraveled",
+        "description": "<p>Weak to all damage types.</p>"
+      }
+    },
+    "Resource": {
+      "HP": "HP",
+      "WP": "WP",
+      "Riches": "Riches",
+      "RichesAbbr": "\u00a4",
+      "CostLabelResource": "Cost",
+      "CostLabelRiches": "Price"
+    },
+    "DamageType": {
+      "Fire": "Fire",
+      "Ice": "Ice",
+      "Electric": "Electric",
+      "Wind": "Wind",
+      "Earth": "Earth",
+      "Light": "Light",
+      "Dark": "Dark",
+      "Physical": "Physical",
+      "Untyped": "Untyped"
+    },
+    "Resistance": {
+      "Weak": "Weak",
+      "Normal": "Normal",
+      "Resist": "Resist",
+      "Nullify": "Nullify",
+      "Drain": "Drain"
+    },
+    "Aptitude": {
+      "Fire": {
+        "long": "Fire",
+        "abbr": "f"
+      },
+      "Ice": {
+        "long": "Ice",
+        "abbr": "i"
+      },
+      "Electric": {
+        "long": "Electric",
+        "abbr": "el"
+      },
+      "Wind": {
+        "long": "Wind",
+        "abbr": "w"
+      },
+      "Earth": {
+        "long": "Earth",
+        "abbr": "ea"
+      },
+      "Light": {
+        "long": "Light",
+        "abbr": "l"
+      },
+      "Dark": {
+        "long": "Dark",
+        "abbr": "d"
+      },
+      "DebuffPhysical": {
+        "long": "Debuff (Physical)",
+        "abbr": "dp"
+      },
+      "DebuffMental": {
+        "long": "Debuff (Mental)",
+        "abbr": "dm"
+      },
+      "DebuffAlmighty": {
+        "long": "Debuff (Almighty)",
+        "abbr": "da"
+      },
+      "Heal": {
+        "long": "Heal",
+        "abbr": "h"
+      },
+      "TechniqueBrutal": {
+        "long": "Technique (Brutal)",
+        "abbr": "tb"
+      },
+      "TechniqueTechnical": {
+        "long": "Technique (Technical)",
+        "abbr": "tt"
+      },
+      "TechniqueGeneral": {
+        "long": "Technique (General)",
+        "abbr": "tg"
+      },
+      "TechniqueAlmighty": {
+        "long": "Technique (Almighty)",
+        "abbr": "ta"
+      },
+      "Assist": {
+        "long": "Assist",
+        "abbr": "a"
+      },
+      "PrereqWarning": "Reaching Lvl {tier} requires two aptitudes at Lvl {requiredTier} or higher."
+    },
+    "Actor": {
+      "SummonerNamePlaceholder": "Summoner Name",
+      "DaemonNamePlaceholder": "Daemon Name",
+      "ClassPlaceholder": "Class / Identity",
+      "Level": {
+        "long": "Level",
+        "abbr": "LVL"
+      },
+      "Merit": {
+        "long": "Merits",
+        "abbr": "MER",
+        "ToNext": "{count} merits to level {level}",
+        "ToTransform": "{count} merits to Transform",
+        "AtMax": "Max level reached",
+        "LevelUp": "Level up",
+        "Transform": "Transform",
+        "TransformReady": "This daemon has enough Merits to Transform."
+      },
+      "Section": {
+        "Attributes": "Attributes",
+        "Stats": "Stats",
+        "Skills": "Skills",
+        "Aptitudes": "Aptitudes"
+      },
+      "HP": {
+        "long": "Hit Points",
+        "abbr": "HP",
+        "bonusAbbr": "HP+",
+        "bonusLong": "Hit Points Bonus"
+      },
+      "WP": {
+        "long": "Will Points",
+        "abbr": "WP",
+        "bonusAbbr": "WP+",
+        "bonusLong": "Will Points Bonus"
+      },
+      "AP": {
+        "long": "Attribute Points",
+        "abbr": "AP",
+        "bonusAbbr": "AP+",
+        "bonusLong": "Attribute Points Bonus"
+      },
+      "Attributes": {
+        "TickMaxHint": "Maximum tick any single attribute can be raised to at this level."
+      },
+      "SP": {
+        "long": "Skill Points",
+        "abbr": "SP",
+        "bonusAbbr": "SP+",
+        "bonusLong": "Skill Points Bonus"
+      },
+      "APT": {
+        "long": "Aptitude Points",
+        "abbr": "APT"
+      },
+      "Slots": {
+        "AbilityLong": "Ability Slots",
+        "TacticLong": "Tactic Slots"
+      },
+      "Stat": {
+        "Avoid": {
+          "long": "Avoid",
+          "abbr": "AVO",
+          "bonusAbbr": "AVO+",
+          "bonusLong": "Avoid Bonus"
+        },
+        "Defense": {
+          "long": "Defense",
+          "abbr": "DEF",
+          "bonusAbbr": "DEF+",
+          "bonusLong": "Defense Bonus"
+        },
+        "Hit": {
+          "long": "To Hit",
+          "abbr": "HIT",
+          "bonusAbbr": "HIT+",
+          "bonusLong": "To Hit Bonus"
+        },
+        "Land": {
+          "long": "To Land",
+          "abbr": "LAN",
+          "bonusAbbr": "LAN+",
+          "bonusLong": "To Land Bonus"
+        },
+        "Critical": {
+          "long": "Critical Threshold",
+          "abbr": "CRIT",
+          "bonusAbbr": "CRIT+",
+          "bonusLong": "Critical Threshold Bonus"
+        },
+        "Strain": {
+          "long": "Will Strain Cost",
+          "abbr": "WSC",
+          "bonusAbbr": "WSC+",
+          "bonusLong": "Will Strain Cost Bonus"
+        }
+      },
+      "Triad": {
+        "Virtue": "Virtue",
+        "VirtuePlaceholder": "What drives you?",
+        "VirtueSuggestions": "Ambition,Cunning,Passion,Competition,Yearning,Indulgence,Certainty,Comfort,Devotion,Discernment,Conviction,Aspiration",
+        "Sin": "Sin",
+        "SinPlaceholder": "What tempts you?",
+        "SinSuggestions": "Pride,Greed,Wrath,Envy,Lust,Gluttony,Sloth,Ignorance,Attachment,Aversion,Delusion,Obsession",
+        "Anathema": "Anathema",
+        "AnathemaPlaceholder": "What do you despise?",
+        "AnathemaSuggestions": "Dishonor,Disgrace,Poverty,Helplessness,Insignificance,Sterility,Starvation,Paralysis,Confusion,Subjugation,Blindness,Emptiness"
+      },
+      "Skill": {
+        "Athletics": "Athletics",
+        "Academia": "Academia",
+        "Craftsmanship": "Craftsmanship",
+        "Intuition": "Intuition",
+        "Medicine": "Medicine",
+        "Perceiving": "Perceiving",
+        "Stealth": "Stealth",
+        "Outdoorsmanship": "Outdoorsmanship"
+      },
+      "Specialty": {
+        "Manage": "Manage specialties",
+        "Add": "Add specialty",
+        "Remove": "Remove specialty",
+        "Budget": "Specialties used / available",
+        "Placeholder": "e.g. Long Jumping"
+      }
+    },
+    "Sheet": {
+      "EditModeToggle": "Toggle edit mode",
+      "MoreOptions": "More",
+      "EditItem": "Edit",
+      "OpenSheet": "Open sheet",
+      "DeleteItem": "Delete",
+      "AddItem": "Add new",
+      "RollFlavorAbility": "[ability]",
+      "Tab": {
+        "Identity": "Identity",
+        "Syn": "SYN",
+        "Ack": "ACK",
+        "Items": "Items",
+        "Effects": "Effects",
+        "Description": "Description",
+        "Advanced": "Advanced",
+        "Planner": "Level Planner"
+      },
+      "Syn": {
+        "Innate": "Innate",
+        "Stock": "Stock",
+        "Bonds": "Bonds"
+      },
+      "Items": {
+        "Innate": "Innate"
+      },
+      "Section": {
+        "MoralTriad": "Moral Triad",
+        "Description": "Description",
+        "FieldNotes": "Field Notes"
+      },
+      "Warn": {
+        "NoAP": "Not enough Attribute Points.",
+        "TickCapped": "Attribute is capped at {value} for this level.",
+        "AttrCapped": "Attribute is already at maximum (6).",
+        "NoSP": "Not enough Skill Points.",
+        "SkillCapped": "Skill is already at maximum (6)."
+      }
+    },
+    "Item": {
+      "NamePlaceholder": "Item Name",
+      "Dsid": "ID",
+      "DsidRegenerate": "Regenerate from name",
+      "Govern": "Governs",
+      "DamageResource": "Target Resource",
+      "Item": {
+        "Category": "Category",
+        "CategoryRestorative": "Restorative",
+        "CategoryElement": "Element Piece",
+        "CategoryHoard": "Hoard",
+        "CategoryFoodOfGods": "Food of the Gods",
+        "Effect": "Effect",
+        "Resource": "Resource",
+        "ResourceHP": "HP",
+        "ResourceWP": "WP",
+        "ResourceStatus": "Status",
+        "ResourceDamage": "Damage",
+        "DamageType": "Element",
+        "Value": "Value",
+        "Mode": "Mode",
+        "ModeTick": "Tick",
+        "ModeFlat": "Flat",
+        "ModePercent": "Percent",
+        "StatusMode": "Status Mode",
+        "StatusClear": "Clear",
+        "StatusGrant": "Grant",
+        "ClearMode": "Clear Mode",
+        "ClearChoose": "Choose",
+        "ClearAll": "All",
+        "GrantEffect": "Effect",
+        "GrantEffectHint": "Drop an Active Effect here",
+        "Price": "Price",
+        "Quantity": "QTY",
+        "ResourceType": "Cost Type",
+        "Attribute": "Attribute",
+        "AddEffect": "Add Effect",
+        "DeleteEffect": "Remove Effect"
+      },
+      "Weapon": {
+        "Category": "Category",
+        "CategorySmall": "Small",
+        "CategoryLarge": "Large",
+        "CategoryRanged": "Ranged",
+        "CategoryFirearm": "Firearm",
+        "Range": "Range",
+        "RangeMelee": "Melee",
+        "RangeRanged": "Ranged",
+        "Damage": "DMG",
+        "DamageType": "Type",
+        "ToHit": "To Hit",
+        "ResourceType": "Cost Type",
+        "Price": "Price"
+      },
+      "Ability": {
+        "Category": "Category",
+        "CategorySpell": "Spell",
+        "CategoryAffliction": "Affliction",
+        "CategoryRestorative": "Restorative",
+        "CategoryTechnique": "Technique",
+        "Effect": "Effect",
+        "ResourceType": "Cost Type",
+        "Cost": "Cost",
+        "ToHit": "To Hit",
+        "IsInfinity": "Auto-pass",
+        "Aptitude": "Aptitude",
+        "AptitudeType": "Aptitude",
+        "AptitudeValue": "Rank",
+        "Damage": "DMG",
+        "DamageType": "Type",
+        "Heal": "Heal",
+        "HealResource": "Resource",
+        "HealMode": "Mode",
+        "Attribute": "Attribute",
+        "ApplyEffects": "Apply Effects",
+        "EffectDrop": "Drop an Active Effect here to add",
+        "EffectDropInvalid": "Only Active Effects can be dropped here.",
+        "EffectSettings": "Effect settings",
+        "DCThreshold": "DC Threshold",
+        "ApplyTarget": {
+          "Target": "Target",
+          "Self": "Self"
+        }
+      },
+      "Tactic": {
+        "Govern": "Governs",
+        "GovernNone": "None",
+        "ResourceType": "Cost Type",
+        "Cost": "Cost",
+        "ToLand": "To Land",
+        "IsInfinity": "Auto-pass",
+        "Damage": "DMG",
+        "DamageType": "Type"
+      },
+      "Schema": {
+        "Level": "Level",
+        "Level1": "Level 1",
+        "Level2": "Level 2",
+        "Level3": "Level 3",
+        "Level1Cost": "Level 1 Cost",
+        "Level2Cost": "Level 2 Cost",
+        "Level3Cost": "Level 3 Cost"
+      },
+      "Class": {
+        "Identifier": "Identifier",
+        "SpBase": "SP Base",
+        "SpPerLevel": "SP / Level",
+        "ApBase": "AP Base",
+        "ApPerStep": "AP / Step",
+        "ApStepEvery": "AP Step Every",
+        "Advancement": "Advancement",
+        "AddAdvancement": "Add Advancement",
+        "DeleteAdvancement": "Remove Advancement",
+        "Level": "Level",
+        "AptitudeUp": "Aptitude Up",
+        "ItemGrants": "Item Grant",
+        "GrantTypeAny": "Any Type",
+        "OpenSlotHint": "Player chooses on actor",
+        "SchemaUpgrade": "Schema Up",
+        "OnlyOne": "An actor can only have one class."
+      }
+    },
+    "Planner": {
+      "Effects": "Effects",
+      "Reached": "Reached",
+      "Future": "Future",
+      "NoClass": "No class equipped. Add a class item to plan advancement.",
+      "SchemaGrant": "Schema Slot {slot}",
+      "AptitudeBadge": "Apt +{n}",
+      "SchemaUpgrade": "{slot} > Tier {to}",
+      "EmptySlot": "Empty",
+      "SlotHint": "Drag an item here to slot it",
+      "Unslot": "Remove slotted item",
+      "SlotWrongType": "That item must be a {type}."
+    },
+    "Tag": {
+      "Tags": "Tags",
+      "Base": {
+        "Label": "Tag"
+      },
+      "Rank": "Rank",
+      "SlotsUsed": "Tag slots used / available",
+      "PricePerRank": "Price Per Rank",
+      "Price": "Price",
+      "ApplicableTypes": "Applicable Types",
+      "ApplicableSubType": "Applicable Sub-Type",
+      "Types": "Types",
+      "ApplicableAll": "All",
+      "Properties": "Properties",
+      "Applicability": "Applicability",
+      "DropZone": "Drop a tag here to slot it",
+      "WrongType": "This tag cannot be slotted onto this item type.",
+      "NoSlots": "No free tag slots remaining.",
+      "Pruned": "Removed {count} slotted copy(ies) of \"{name}\" that no longer qualify.",
+      "RefreshSlotted": "Update Slotted Copies",
+      "RefreshedSlotted": "Updated {count} slotted copy(ies) of \"{name}\".",
+      "FromTag": "Applied by a slotted tag; managed from the tag.",
+      "FromTagNamed": "Applied by the \"{name}\" tag; managed from the tag.",
+      "MaxSlots": "Max Slots"
+    },
+    "Advancement": {
+      "Type": "Type",
+      "ChooseType": "Choose an advancement type to add.",
+      "Base": {
+        "Label": "Advancement"
+      },
+      "Aptitude": {
+        "Amount": "Aptitude-Ups"
+      },
+      "SchemaSlot": {
+        "Label": "Schema Slot",
+        "ItemType": "Slot Type"
+      },
+      "SchemaUpgrade": {
+        "Slot": "Schema Slot",
+        "Tier": "Tier",
+        "ChooseSlot": "Choose Slot",
+        "NoTarget": "?"
+      },
+      "ItemGrant": {
+        "ItemType": "Item Type",
+        "SlotHint": "The player fills this slot on their sheet."
+      }
+    },
+    "Check": {
+      "Tick": "Tick",
+      "ToLand": "To Land",
+      "TN": "TN",
+      "Success": "Success",
+      "Failure": "Failure",
+      "Critical": "Critical",
+      "SnakeEyes": "Snake Eyes",
+      "Hit": "Hit",
+      "Miss": "Miss",
+      "Partial": "Partial",
+      "Reroll": "Reroll",
+      "Retarget": "Retarget",
+      "Aid": {
+        "Action": "Aid Skill Check",
+        "Flavor": "{helper} aids {target}'s {skill} check",
+        "Effect": "{mod} to the target's result",
+        "NoEffect": "no effect",
+        "Success": "Success",
+        "Crit": "Critical",
+        "SnakeEyes": "Snake Eyes",
+        "Fail": "No Aid",
+        "NoActor": "Select a token or assign a character to aid with.",
+        "SelfAid": "An actor cannot aid their own check.",
+        "NeedsTick": "Your actor needs at least +1 tick in that skill to aid."
+      },
+      "Type": {
+        "Attribute": "Attribute Check",
+        "Skill": "Skill Check",
+        "Accuracy": "Attack",
+        "Tactic": "Tactic",
+        "Initiative": "Initiative",
+        "Open": "Open Check",
+        "Display": "Display"
+      },
+      "Rerolled": "Rerolled",
+      "Retargeted": "Retargeted",
+      "Advantage": "Advantage",
+      "Disadvantage": "Disadvantage",
+      "Cost": "Cost",
+      "Heal": "Heal",
+      "IgnoreResist": "Ignore Resist",
+      "IgnoreNullify": "Ignore Nullify",
+      "IgnoreDrain": "Ignore Drain",
+      "IgnoreWeak": "Ignore Weak",
+      "DeductCost": "Deduct"
+    },
+    "Damage": {
+      "physical": "Physical",
+      "fire": "Fire",
+      "ice": "Ice",
+      "electric": "Electric",
+      "wind": "Wind",
+      "earth": "Earth",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "Difficulty": {
+      "Routine": "Routine",
+      "Standard": "Standard",
+      "Hard": "Hard",
+      "Extreme": "Extreme"
+    },
+    "Dialog": {
+      "Roll": {
+        "Title": "Roll Check",
+        "Attribute": "Attribute",
+        "Skill": "Skill",
+        "Item": "Item",
+        "Modifier": "Modifier",
+        "Formula": "Formula",
+        "Roll": "Roll",
+        "Use": "Use",
+        "Cancel": "Cancel",
+        "Advantage": "Advantage",
+        "Disadvantage": "Disadvantage",
+        "Normal": "Normal",
+        "Difficulty": "Difficulty",
+        "DifficultyNone": "No TN",
+        "Specialty": "Specialty",
+        "SpecialtyNone": "None",
+        "SpecialtyMod": "{name} (specialty)",
+        "Range": "Range",
+        "DamageType": "Damage Type",
+        "Damage": "Damage",
+        "Cost": "Cost",
+        "Reduce": "Reduce",
+        "Increase": "Increase",
+        "HealAmount": "Heal Amount",
+        "SchemaLevel": "Level {level}",
+        "SchemaLevelLabel": "Schema Level",
+        "ForceReaction": "Force Reaction",
+        "IgnoreResist": "Ignore Resist",
+        "IgnoreNullify": "Ignore Nullify",
+        "IgnoreDrain": "Ignore Drain",
+        "IgnoreWeak": "Ignore Weak"
+      },
+      "Schema": {
+        "Title": "Use Schema",
+        "Description": "Schema Description"
+      },
+      "Bond": {
+        "Title": "Use Bond",
+        "RankLabel": "Bond Rank",
+        "RankN": "Rank {n}",
+        "Ability": "Ability",
+        "Description": "Effect",
+        "NoUnlocked": "No bond ranks unlocked yet."
+      }
     }
   },
-
   "TYPES": {
     "Actor": {
-      "character": "Character",
-      "npc": "NPC"
+      "summoner": "Summoner",
+      "daemon": "Daemon"
     },
     "Item": {
       "item": "Item",
+      "weapon": "Weapon",
       "feature": "Feature",
-      "spell": "Spell"
+      "class": "Class",
+      "ability": "Ability",
+      "tactic": "Tactic",
+      "schema": "Schema",
+      "archetype": "Archetype",
+      "subtype": "Subtype",
+      "bond": "Bond",
+      "specialAbility": "Special Ability",
+      "skillAbility": "Skill Ability",
+      "scar": "Scar",
+      "dejection": "Dejection",
+      "tag": "Tag"
     }
   }
 }

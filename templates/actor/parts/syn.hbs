@@ -1,0 +1,59 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="syn">
+  {{> "systems/dasu/templates/actor/parts/aptitudes.hbs"}}
+
+  <div class="dasu-fieldset dasu-fieldset--tabbed">
+    <div class="dasu-fieldset__tabs">
+      <button class="dasu-fieldset__tab active" data-action="fieldsetTab" data-panel="innate" type="button">
+        <span class="dasu-fieldset__tab-label">{{localize "DASU.Sheet.Syn.Innate"}}</span>
+      </button>
+      {{#each @root.daemonAckTabs}}
+      <button class="dasu-fieldset__tab" data-action="fieldsetTab" data-panel="ack-{{uuid}}" type="button">
+        <img src="{{img}}" class="items-fieldset__daemon-img" /><span class="dasu-fieldset__tab-label">{{name}}</span>
+      </button>
+      {{/each}}
+    </div>
+
+    <div class="dasu-fieldset__panel" data-panel="innate">
+      <div class="syn-identity-grid">
+        {{{@root.classTable}}}
+        {{{@root.dejectionTable}}}
+      </div>
+      {{{@root.schemaTable}}}
+      {{{@root.featureTable}}}
+      {{{@root.bondTable}}}
+      {{{@root.skillAbilityTable}}}
+      {{{@root.scarTable}}}
+    </div>
+
+    {{#each @root.daemonAckTabs}}
+    <div class="dasu-fieldset__panel" data-panel="ack-{{uuid}}" data-uuid="{{uuid}}" hidden>
+      {{{archetype}}}
+      {{{subtype}}}
+      {{{specialAbility}}}
+      {{{transformation}}}
+    </div>
+    {{/each}}
+  </div>
+
+  {{#if @root.activeStockTable}}
+  {{#with (lookup fieldsets "syn-stock")}}
+  <div class="dasu-fieldset dasu-fieldset--tabbed" data-fieldset="syn-stock">
+    <div class="dasu-fieldset__tabs">
+      <button class="dasu-fieldset__tab {{lookup panels.stock "activeClass"}}" data-action="fieldsetTab" data-panel="stock" type="button">
+        <span class="dasu-fieldset__tab-label">{{localize "DASU.Sheet.Syn.Stock"}}</span>
+      </button>
+      <span class="dasu-fieldset__counter syn-stock__strain{{#if @root.willStrain.over}} syn-stock__strain--over{{/if}}" data-tooltip="{{localize 'DASU.Actor.Stat.Strain.long'}}">
+        <span class="syn-stock__strain-label">{{localize "DASU.Actor.Stat.Strain.abbr"}}</span>
+        <span class="syn-stock__strain-val">{{@root.willStrain.used}}</span>
+        <span class="syn-stock__strain-sep">/</span>
+        <span class="syn-stock__strain-max">{{@root.willStrain.cap}}</span>
+      </span>
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="stock" {{lookup panels.stock "hidden"}}>
+      {{{@root.activeStockTable}}}
+      {{{@root.inactiveStockTable}}}
+    </div>
+  </div>
+  {{/with}}
+  {{/if}}
+</section>

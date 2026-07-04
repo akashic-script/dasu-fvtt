@@ -1,0 +1,18 @@
+<div class="dasu theme-dark check-card check-card--{{checkType}}">
+  <div class="dasu-fieldset dasu-fieldset--active-legend check-card__fieldset">
+    <div class="dasu-fieldset__header">
+      <div class="dasu-fieldset__legend">{{checkTitle}}</div>
+      {{#if checkLabel}}<span class="check-label">{{checkLabel}}</span>{{/if}}
+    </div>
+
+    {{#if tags.length}}
+    <div class="check-tags">
+      {{#each tags}}<span class="check-tag{{#if this.slottedTag}} check-tag--slotted{{/if}}">{{localize this.tag}}{{#if this.value}}<span class="check-tag__value">{{localize this.value}}</span>{{/if}}</span>{{/each}}
+    </div>
+    {{/if}}
+
+    <div class="check-sections">
+      {{#each sections}}{{{this}}}{{/each}}
+    </div>
+  </div>
+</div>
