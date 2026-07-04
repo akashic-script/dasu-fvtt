@@ -1,0 +1,36 @@
+{
+  "name": "Pyrokinetic",
+  "type": "base",
+  "_id": "vNlxivgykLs4FHju",
+  "img": "icons/magic/fire/flame-burning-hand-orange.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.fire",
+      "mode": 2,
+      "value": "3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+3 to fire damage.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "agrBME97EKt2yEjB",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!vNlxivgykLs4FHju"
+}

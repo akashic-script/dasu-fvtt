@@ -1,0 +1,195 @@
+<form class="dasu theme-dark roll-dialog">
+  <div class="dasu-fieldset dasu-fieldset--active-legend roll-dialog__fieldset">
+    <div class="dasu-fieldset__header">
+      <div class="dasu-fieldset__legend">
+        {{#if isItem}}{{#if (eq itemCheckType "tactic")}}{{localize "DASU.Check.Type.Tactic"}}{{else}}{{localize "DASU.Check.Type.Accuracy"}}{{/if}}{{else if (eq mode "skill")}}{{localize "DASU.Check.Type.Skill"}}{{else}}{{localize "DASU.Check.Type.Attribute"}}{{/if}}
+      </div>
+      <span class="roll-dialog__actor">{{actorName}}</span>
+    </div>
+
+    {{#if isItem}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.Item"}}</label>
+        <div class="roll-dialog__item-name">{{itemName}}</div>
+      </div>
+    </div>
+    {{else}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{#if (eq mode "skill")}}{{localize "DASU.Dialog.Roll.Skill"}}{{else}}{{localize "DASU.Dialog.Roll.Attribute"}}{{/if}}</label>
+        <select name="key">
+          {{#if (eq mode "skill")}}
+            {{#each skills}}
+              <option value="{{key}}" {{#if (eq key ../selectedKey)}}selected{{/if}}>{{label}} ({{value}})</option>
+            {{/each}}
+          {{else}}
+            {{#each attributes}}
+              <option value="{{key}}" {{#if (eq key ../selectedKey)}}selected{{/if}}>{{label}} ({{value}})</option>
+            {{/each}}
+          {{/if}}
+        </select>
+      </div>
+    </div>
+    {{/if}}
+
+    {{#unless isDisplay}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field flex-none" style="width:80px;">
+        <label>{{localize "DASU.Dialog.Roll.Modifier"}}</label>
+        <input type="number" name="mod" value="{{mod}}" placeholder="0" />
+      </div>
+      <div class="roll-dialog__preview">
+        <span class="roll-dialog__formula-label">{{localize "DASU.Dialog.Roll.Formula"}}</span>
+        <span class="roll-dialog__formula">{{formula}}</span>
+      </div>
+    </div>
+    {{/unless}}
+
+    {{#if isItem}}
+    {{#if showRange}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.Range"}}</label>
+        <select name="range">
+          {{#each ranges}}
+          <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+    {{/if}}
+
+    {{#if showDamageType}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.Damage"}} &middot; {{localize "DASU.Dialog.Roll.Formula"}} {{baseDamage}}</label>
+        <div class="roll-dialog__damage">
+          <select name="damageType" class="roll-dialog__damage-type">
+            {{#each damageTypes}}
+            <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+            {{/each}}
+          </select>
+          <div class="roll-dialog__damage-dir">
+            <button type="button" class="roll-dialog__damage-btn {{#if (eq damageDir 'minus')}}is-active{{/if}}" data-action="setDamageDir" data-value="minus" title="{{localize 'DASU.Dialog.Roll.Reduce'}}">
+              <i class="fas fa-minus"></i>
+            </button>
+            <button type="button" class="roll-dialog__damage-btn {{#if (eq damageDir 'plus')}}is-active{{/if}}" data-action="setDamageDir" data-value="plus" title="{{localize 'DASU.Dialog.Roll.Increase'}}">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+          <input type="number" name="damageAmount" value="0" min="0" step="1" />
+        </div>
+      </div>
+    </div>
+    {{/if}}
+
+    {{#if showCost}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.Cost"}} &middot; {{localize "DASU.Dialog.Roll.Formula"}} {{baseCost}}</label>
+        <div class="roll-dialog__cost">
+          <select name="costType" class="roll-dialog__cost-type">
+            {{#each resourceTypes}}
+            <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+            {{/each}}
+          </select>
+          <div class="roll-dialog__cost-dir">
+            <button type="button" class="roll-dialog__cost-btn {{#if (eq costDir 'minus')}}is-active{{/if}}" data-action="setCostDir" data-value="minus" title="{{localize 'DASU.Dialog.Roll.Reduce'}}">
+              <i class="fas fa-minus"></i>
+            </button>
+            <button type="button" class="roll-dialog__cost-btn {{#if (eq costDir 'plus')}}is-active{{/if}}" data-action="setCostDir" data-value="plus" title="{{localize 'DASU.Dialog.Roll.Increase'}}">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+          <input type="number" name="costAmount" value="0" min="0" step="1" />
+        </div>
+      </div>
+    </div>
+    {{/if}}
+
+    {{#if showHeal}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.HealAmount"}} ({{healResource}}) &middot; {{localize "DASU.Dialog.Roll.Formula"}} {{healPrefix}}{{baseHeal}}{{healSuffix}}</label>
+        <div class="roll-dialog__heal">
+          {{#if healPrefix}}<span class="roll-dialog__heal-affix">{{healPrefix}}</span>{{/if}}
+          <input type="number" name="healAmount" value="{{baseHeal}}" min="0" step="1" />
+          {{#if healSuffix}}<span class="roll-dialog__heal-affix">{{healSuffix}}</span>{{/if}}
+        </div>
+      </div>
+    </div>
+    {{/if}}
+
+    {{#if showResistOverrides}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.ForceReaction"}}</label>
+        <div class="roll-dialog__resist-grid">
+          {{#each ignoreModes}}
+          <div class="roll-dialog__resist-chip">
+            <input type="checkbox" name="resistMode" value="{{mode}}" id="resistMode-{{mode}}" />
+            <label for="resistMode-{{mode}}">{{label}}</label>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+    {{/if}}
+    {{/if}}
+
+    {{#unless isItem}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.Difficulty"}}</label>
+        <select name="difficulty">
+          <option value="">{{localize "DASU.Dialog.Roll.DifficultyNone"}}</option>
+          {{#each difficulties}}
+          <option value="{{key}}" {{#if (eq key ../difficulty)}}selected{{/if}}>{{label}} (TN {{tn}})</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+    {{/unless}}
+
+    {{#if hasSpecialties}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.Specialty"}}</label>
+        <div class="roll-dialog__specialties">
+          <button type="button" class="roll-dialog__spec-btn {{#if specialtyNone}}is-active{{/if}}" data-action="setSpecialty" data-index="-1">{{localize "DASU.Dialog.Roll.SpecialtyNone"}}</button>
+          {{#each specialties}}
+          <button type="button" class="roll-dialog__spec-btn {{#if active}}is-active{{/if}}" data-action="setSpecialty" data-index="{{index}}">{{name}} <span class="roll-dialog__spec-bonus">+1</span></button>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+    {{/if}}
+
+    {{#unless isDisplay}}
+    <div class="roll-dialog__adv-row">
+      <label class="roll-dialog__adv-btn {{#if (eq advantage 'advantage')}}is-active{{/if}}" data-action="setAdvantage" data-value="advantage">
+        <input type="radio" name="advantage" value="advantage" {{#if (eq advantage 'advantage')}}checked{{/if}} hidden />
+        <i class="fas fa-angles-up"></i> {{localize "DASU.Dialog.Roll.Advantage"}}
+      </label>
+      <label class="roll-dialog__adv-btn roll-dialog__adv-btn--normal {{#if (eq advantage 'normal')}}is-active{{/if}}" data-action="setAdvantage" data-value="normal">
+        <input type="radio" name="advantage" value="normal" {{#if (eq advantage 'normal')}}checked{{/if}} hidden />
+        {{localize "DASU.Dialog.Roll.Normal"}}
+      </label>
+      <label class="roll-dialog__adv-btn roll-dialog__adv-btn--dis {{#if (eq advantage 'disadvantage')}}is-active{{/if}}" data-action="setAdvantage" data-value="disadvantage">
+        <input type="radio" name="advantage" value="disadvantage" {{#if (eq advantage 'disadvantage')}}checked{{/if}} hidden />
+        <i class="fas fa-angles-down"></i> {{localize "DASU.Dialog.Roll.Disadvantage"}}
+      </label>
+    </div>
+    {{/unless}}
+
+    <div class="roll-dialog__actions">
+      <button type="button" data-action="roll" class="roll-dialog__btn roll-dialog__btn--roll">
+        {{#if isDisplay}}<i class="fas fa-hand-sparkles"></i> {{localize "DASU.Dialog.Roll.Use"}}{{else}}<i class="fas fa-dice"></i> {{localize "DASU.Dialog.Roll.Roll"}}{{/if}}
+      </button>
+      <button type="button" data-action="cancel" class="roll-dialog__btn roll-dialog__btn--cancel">
+        {{localize "DASU.Dialog.Roll.Cancel"}}
+      </button>
+    </div>
+  </div>
+</form>

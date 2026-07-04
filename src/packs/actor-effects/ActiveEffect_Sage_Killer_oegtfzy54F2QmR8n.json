@@ -1,0 +1,36 @@
+{
+  "name": "Sage Killer",
+  "type": "base",
+  "_id": "oegtfzy54F2QmR8n",
+  "img": "icons/environment/people/commoner.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.sage",
+      "mode": 2,
+      "value": "5",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>Gains +5 bonus damage against Sages.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "nqyrlWbtmnQ8ZVR9",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!oegtfzy54F2QmR8n"
+}

@@ -1,0 +1,24 @@
+{
+  "name": "Attacks all",
+  "type": "tag",
+  "_id": "9c7cgJ9nWdXOvcfm",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "description": "<p>The attack strikes every valid target rather than a single one.</p>",
+    "applicableTypes": ["all"],
+    "applicableSubType": [],
+    "pricePerRank": 0,
+    "rank": {
+      "current": 1
+    },
+    "sourceUuid": ""
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!9c7cgJ9nWdXOvcfm"
+}

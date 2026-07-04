@@ -1,0 +1,36 @@
+{
+  "name": "Rogue Killer",
+  "type": "base",
+  "_id": "4SLCzT6EdfpKtjW5",
+  "img": "icons/equipment/head/hood-purple-mask.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.rogue",
+      "mode": 2,
+      "value": "5",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>Gains +5 bonus damage against Rogues.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "nqyrlWbtmnQ8ZVR9",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!4SLCzT6EdfpKtjW5"
+}

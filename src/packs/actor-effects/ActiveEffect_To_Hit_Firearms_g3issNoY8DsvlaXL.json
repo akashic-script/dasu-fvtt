@@ -1,0 +1,36 @@
+{
+  "name": "To Hit: Firearms",
+  "type": "base",
+  "_id": "g3issNoY8DsvlaXL",
+  "img": "icons/weapons/guns/gun-pistol-flintlock-metal.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.toHit.firearm",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+2 To Hit with firearms.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "iqrOlv9MnuBSf2Zv",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!g3issNoY8DsvlaXL"
+}

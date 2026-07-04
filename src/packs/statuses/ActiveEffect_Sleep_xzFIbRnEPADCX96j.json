@@ -1,0 +1,36 @@
+{
+  "name": "Sleep",
+  "type": "base",
+  "_id": "xzFIbRnEPADCX96j",
+  "img": "icons/svg/sleep.svg",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "value": 1,
+    "units": "turns",
+    "expiry": "turnStart",
+    "expired": false
+  },
+  "description": "<p>Cannot act until attacked. Ends when attacked.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "sleep"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "sleep",
+      "behavior": "cannotAct",
+      "wakeOnAttacked": true
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!xzFIbRnEPADCX96j"
+}

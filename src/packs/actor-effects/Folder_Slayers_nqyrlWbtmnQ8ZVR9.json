@@ -1,0 +1,17 @@
+{
+  "name": "Slayers",
+  "type": "ActiveEffect",
+  "_id": "nqyrlWbtmnQ8ZVR9",
+  "description": "",
+  "color": "#652a8d",
+  "sort": 400,
+  "folder": null,
+  "sorting": "a",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!folders!nqyrlWbtmnQ8ZVR9"
+}

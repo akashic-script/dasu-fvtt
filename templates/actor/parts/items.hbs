@@ -1,4 +1,37 @@
 <section class="tab {{tab.cssClass}}" data-group="primary" data-tab="items">
-  {{> "systems/dasu/templates/actor/parts/actor-items.hbs"}}
-</section>
+  <div class="actor-items__riches" data-action="openRichesPopover" data-tooltip="{{localize 'DASU.Resource.Riches'}}">
+    <span class="actor-items__riches-label">{{localize "DASU.Resource.RichesAbbr"}} {{localize "DASU.Resource.Riches"}}</span>
+    <input class="dasu-pill" type="text" name="system.riches" value="{{system.riches}}" data-dtype="Number" readonly />
+  </div>
 
+  {{> "systems/dasu/templates/actor/parts/aptitudes.hbs"}}
+
+  {{#if useDaemonItemTabs}}
+  <div class="dasu-fieldset dasu-fieldset--tabbed">
+    <div class="dasu-fieldset__tabs">
+      <button class="dasu-fieldset__tab active" data-action="fieldsetTab" data-panel="innate" type="button">
+        <span class="dasu-fieldset__tab-label">{{localize "DASU.Sheet.Items.Innate"}}</span>
+      </button>
+      {{#each daemonTabs}}
+      <button class="dasu-fieldset__tab" data-action="fieldsetTab" data-panel="{{uuid}}" type="button">
+        <img src="{{img}}" class="items-fieldset__daemon-img" /><span class="dasu-fieldset__tab-label">{{name}}</span>
+      </button>
+      {{/each}}
+    </div>
+
+    <div class="dasu-fieldset__panel" data-panel="innate">
+      {{> "systems/dasu/templates/actor/parts/actor-items.hbs"}}
+    </div>
+
+    {{#each daemonTabs}}
+    <div class="dasu-fieldset__panel" data-panel="{{uuid}}" hidden>
+      {{{weapon}}}
+      {{{ability}}}
+      {{{tactic}}}
+    </div>
+    {{/each}}
+  </div>
+  {{else}}
+  {{> "systems/dasu/templates/actor/parts/actor-items.hbs"}}
+  {{/if}}
+</section>

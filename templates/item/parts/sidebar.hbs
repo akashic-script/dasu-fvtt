@@ -1,0 +1,497 @@
+<div class="sheet-sidebar">
+  <div class="sidebar-portrait">
+    <img class="profile-img" src="{{item.img}}" data-action="editImage" data-edit="img" title="{{item.name}}" />
+  </div>
+
+  <div class="item-sidebar__type">Core Stats</div>
+
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--dsid">
+      <label>{{localize "DASU.Item.Dsid"}}</label>
+      <div class="item-sidebar__input-adornment">
+        <input type="text" name="system.dsid" value="{{system.dsid}}" />
+        <button type="button" class="item-sidebar__regenerate-dsid" data-action="regenerateDsid" title="{{localize "DASU.Item.DsidRegenerate"}}"><i class="fa-solid fa-rotate"></i></button>
+      </div>
+    </div>
+  </div>
+
+  {{#if isItem}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Item.Category"}}</label>
+      <select name="system.category">
+        {{selectOptions itemCategoryOptions selected=system.category}}
+      </select>
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Item.ResourceType"}}</label>
+      <select name="system.resource.type">
+        {{selectOptions resourceTypeOptions selected=system.resource.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{#if (eq system.resource.type "riches")}}{{localize "DASU.Resource.CostLabelRiches"}}{{else}}{{localize "DASU.Resource.CostLabelResource"}}{{/if}}</label>
+      <input type="text" name="system.resource.cost" value="{{system.resource.cost}}" />
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Item.Quantity"}}</label>
+      <input type="number" name="system.quantity" value="{{system.quantity}}" min="1" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    {{#each itemEffects}}
+    {{#unless @first}}<div class="item-sidebar__divider"></div>{{/unless}}
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Item.Resource"}}</label>
+      <div class="item-sidebar__row">
+        <select name="system.effects.{{index}}.resource">
+          {{selectOptions ../resourceOptions selected=resource}}
+        </select>
+        <a data-action="deleteItemEffect" data-index="{{index}}" title="{{localize "DASU.Item.Item.DeleteEffect"}}"><i class="fas fa-trash"></i></a>
+      </div>
+    </div>
+    {{#if showMode}}
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Item.Value"}}</label>
+      <input type="number" name="system.effects.{{index}}.value" value="{{value}}" min="0" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Item.Mode"}}</label>
+      <select name="system.effects.{{index}}.mode">
+        {{selectOptions ../modeOptions selected=mode}}
+      </select>
+    </div>
+    {{#if showAttribute}}
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Item.Attribute"}}</label>
+      <select name="system.effects.{{index}}.attribute">
+        {{selectOptions ../attributeOptions selected=attribute}}
+      </select>
+    </div>
+    {{/if}}
+    {{/if}}
+    {{#if showStatusMode}}
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Item.StatusMode"}}</label>
+      <select name="system.effects.{{index}}.statusMode">
+        {{selectOptions ../statusModeOptions selected=statusMode}}
+      </select>
+    </div>
+    {{/if}}
+    {{#if showClearMode}}
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Item.ClearMode"}}</label>
+      <select name="system.effects.{{index}}.clearMode">
+        {{selectOptions ../clearModeOptions selected=clearMode}}
+      </select>
+    </div>
+    {{/if}}
+    {{#if showStatusCount}}
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Item.Value"}}</label>
+      <input type="number" name="system.effects.{{index}}.value" value="{{value}}" min="1" />
+    </div>
+    {{/if}}
+    {{#if showDamage}}
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Item.Value"}}</label>
+      <input type="number" name="system.effects.{{index}}.value" value="{{value}}" min="0" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Item.DamageType"}}</label>
+      <select name="system.effects.{{index}}.damageType">
+        {{selectOptions ../damageTypeOptions selected=damageType}}
+      </select>
+    </div>
+    {{/if}}
+    {{#if showGrantUuid}}
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Item.GrantEffect"}}</label>
+      <div class="effect-drop-zone" data-effect-index="{{index}}">
+        {{#if grantUuid}}
+          <span class="effect-drop-zone__name" data-grant-uuid="{{grantUuid}}">{{grantUuidName}}</span>
+          <a class="effect-drop-zone__clear" data-action="clearGrantUuid" data-index="{{index}}"><i class="fas fa-times"></i></a>
+        {{else}}
+          <span class="effect-drop-zone__hint">{{localize "DASU.Item.Item.GrantEffectHint"}}</span>
+        {{/if}}
+      </div>
+    </div>
+    {{/if}}
+    {{/each}}
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <a data-action="addItemEffect" class="item-sidebar__add-effect">
+        <i class="fas fa-plus"></i> {{localize "DASU.Item.Item.AddEffect"}}
+      </a>
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if isWeapon}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Weapon.Category"}}</label>
+      <select name="system.category">
+        {{selectOptions categoryOptions selected=system.category}}
+      </select>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Weapon.Range"}}</label>
+      <select name="system.range">
+        {{selectOptions rangeOptions selected=system.range}}
+      </select>
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Govern"}}</label>
+      <select name="system.govern">
+        {{selectOptions governOptions selected=system.govern}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Weapon.Damage"}}</label>
+      <input type="number" name="system.damage.value" value="{{system.damage.value}}" min="0" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Weapon.DamageType"}}</label>
+      <select name="system.damage.type">
+        {{selectOptions damageTypeOptions selected=system.damage.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.DamageResource"}}</label>
+      <select name="system.damage.resource">
+        {{selectOptions damageResourceOptions selected=system.damage.resource}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Weapon.ToHit"}}</label>
+      <input type="number" name="system.toHit" value="{{system.toHit}}" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Weapon.ResourceType"}}</label>
+      <select name="system.resource.type">
+        {{selectOptions resourceTypeOptions selected=system.resource.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{#if (eq system.resource.type "riches")}}{{localize "DASU.Resource.CostLabelRiches"}}{{else}}{{localize "DASU.Resource.CostLabelResource"}}{{/if}}</label>
+      <input type="text" name="system.resource.cost" value="{{system.resource.cost}}" />
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if isTactic}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Tactic.Govern"}}</label>
+      <select name="system.govern">
+        {{selectOptions governOptions selected=system.govern}}
+      </select>
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Tactic.ResourceType"}}</label>
+      <select name="system.resource.type">
+        {{selectOptions resourceTypeOptions selected=system.resource.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{#if (eq system.resource.type "riches")}}{{localize "DASU.Resource.CostLabelRiches"}}{{else}}{{localize "DASU.Resource.CostLabelResource"}}{{/if}}</label>
+      <input type="text" name="system.resource.cost" value="{{system.resource.cost}}" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Tactic.ToLand"}}</label>
+      <input type="number" name="system.toLand" value="{{system.toLand}}" {{#if system.isInfinity}}disabled{{/if}} />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Tactic.IsInfinity"}}</label>
+      <input type="checkbox" name="system.isInfinity" {{checked system.isInfinity}} />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Tactic.Damage"}}</label>
+      <input type="number" name="system.damage.value" value="{{system.damage.value}}" min="0" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Tactic.DamageType"}}</label>
+      <select name="system.damage.type" disabled>
+        {{selectOptions damageTypeOptions selected="untyped"}}
+      </select>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.DamageResource"}}</label>
+      <select name="system.damage.resource" disabled>
+        {{selectOptions damageResourceOptions selected="wp"}}
+      </select>
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if isSchema}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Schema.Level"}}</label>
+      <input type="number" name="system.level" value="{{system.level}}" min="1" max="3" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Schema.Level1Cost"}}</label>
+      <select name="system.level1.resource.type">
+        {{selectOptions resourceTypeOptions selected=system.level1.resource.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Resource.CostLabelResource"}}</label>
+      <input type="text" name="system.level1.resource.cost" value="{{system.level1.resource.cost}}" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Schema.Level2Cost"}}</label>
+      <select name="system.level2.resource.type">
+        {{selectOptions resourceTypeOptions selected=system.level2.resource.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Resource.CostLabelResource"}}</label>
+      <input type="text" name="system.level2.resource.cost" value="{{system.level2.resource.cost}}" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Schema.Level3Cost"}}</label>
+      <select name="system.level3.resource.type">
+        {{selectOptions resourceTypeOptions selected=system.level3.resource.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Resource.CostLabelResource"}}</label>
+      <input type="text" name="system.level3.resource.cost" value="{{system.level3.resource.cost}}" />
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if isClass}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Class.SpBase"}}</label>
+      <input type="number" name="system.sp.base" value="{{system.sp.base}}" min="0" />
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Class.SpPerLevel"}}</label>
+      <input type="number" name="system.sp.perLevel" value="{{system.sp.perLevel}}" min="0" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Class.ApBase"}}</label>
+      <input type="number" name="system.ap.base" value="{{system.ap.base}}" min="0" />
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Class.ApPerStep"}}</label>
+      <input type="number" name="system.ap.perStep" value="{{system.ap.perStep}}" min="0" />
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Class.ApStepEvery"}}</label>
+      <input type="number" name="system.ap.stepEvery" value="{{system.ap.stepEvery}}" min="1" />
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if isDejection}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Dejection.Level"}}</label>
+      <input class="dejection-level-input" type="number" value="{{dejectionLevel}}" min="0" max="15" />
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if isSubtype}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Subtype.StatAllocationBonus"}}</label>
+      <input type="number" name="system.statAllocationBonus" value="{{system.statAllocationBonus}}" min="0" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Subtype.MaxAbilitySlots"}}</label>
+      <input type="number" name="system.maxAbilitySlots" value="{{system.maxAbilitySlots}}" min="0" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Subtype.MaxTacticSlots"}}</label>
+      <input type="number" name="system.maxTacticSlots" value="{{system.maxTacticSlots}}" min="0" />
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if isBond}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Bond.Target"}}</label>
+      <div class="bond-target-drop-zone {{#if bondTarget}}bond-target-drop-zone--filled{{/if}}">
+        {{#if bondTarget}}
+          {{#if bondTarget.img}}<img class="bond-target-drop-zone__img" src="{{bondTarget.img}}" alt="" />{{/if}}
+          <span class="bond-target-drop-zone__name {{#if bondTarget.missing}}bond-target-drop-zone__name--missing{{/if}}" data-uuid="{{bondTarget.uuid}}">{{bondTarget.name}}</span>
+          <a class="bond-target-drop-zone__clear" data-tooltip="{{localize 'DASU.Sheet.DeleteItem'}}"><i class="fas fa-times"></i></a>
+        {{else}}
+          <span class="bond-target-drop-zone__hint">{{localize "DASU.Bond.TargetNone"}}</span>
+        {{/if}}
+      </div>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Bond.TargetName"}}</label>
+      <input type="text" name="system.targetName" value="{{system.targetName}}" placeholder="{{localize 'DASU.Bond.TargetNameHint'}}" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Bond.Affinity"}}</label>
+      <input type="number" name="system.affinity" value="{{system.affinity}}" min="0" />
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--full">
+      <label>{{localize "DASU.Bond.Negative"}}</label>
+      <input type="checkbox" name="system.negative" {{checked system.negative}} />
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if isAbility}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Ability.Category"}}</label>
+      <select name="system.category">
+        {{selectOptions abilityCategoryOptions selected=system.category}}
+      </select>
+    </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Ability.ResourceType"}}</label>
+      <select name="system.resource.type">
+        {{selectOptions resourceTypeOptions selected=system.resource.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{#if (eq system.resource.type "riches")}}{{localize "DASU.Resource.CostLabelRiches"}}{{else}}{{localize "DASU.Resource.CostLabelResource"}}{{/if}}</label>
+      <input type="text" name="system.resource.cost" value="{{system.resource.cost}}" />
+    </div>
+    {{#if showAbilityToHit}}
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Ability.ToHit"}}</label>
+      <input type="number" name="system.toHit" value="{{system.toHit}}" {{#if system.isInfinity}}disabled{{/if}} />
+    </div>
+    {{/if}}
+
+    {{#if showAbilityDamage}}
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Govern"}}</label>
+      <select name="system.govern">
+        {{selectOptions governOptions selected=system.govern}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Ability.Damage"}}</label>
+      <input type="number" name="system.damage.value" value="{{system.damage.value}}" min="0" />
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Ability.DamageType"}}</label>
+      <select name="system.damage.type">
+        {{selectOptions damageTypeOptions selected=system.damage.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.DamageResource"}}</label>
+      <select name="system.damage.resource">
+        {{selectOptions damageResourceOptions selected=system.damage.resource}}
+      </select>
+    </div>
+    {{/if}}
+
+    {{#if isAfflictionAbility}}
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Ability.IsInfinity"}}</label>
+      <input type="checkbox" name="system.isInfinity" {{checked system.isInfinity}} />
+    </div>
+    {{/if}}
+
+    {{#if isRestorativeAbility}}
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Ability.HealResource"}}</label>
+      <select name="system.heal.resource">
+        {{selectOptions resourceOptions selected=system.heal.resource}}
+      </select>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Ability.HealMode"}}</label>
+      <select name="system.heal.mode">
+        {{selectOptions modeOptions selected=system.heal.mode}}
+      </select>
+    </div>
+    {{#if (eq system.heal.mode "tick")}}
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Ability.Attribute"}}</label>
+      <select name="system.heal.attribute">
+        {{selectOptions attributeOptions selected=system.heal.attribute}}
+      </select>
+    </div>
+    {{/if}}
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Ability.Heal"}}</label>
+      <input type="number" name="system.heal.value" value="{{system.heal.value}}" min="0" />
+    </div>
+    {{/if}}
+
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Ability.AptitudeType"}}</label>
+      <select name="system.aptitude.type">
+        {{selectOptions aptitudeOptions selected=system.aptitude.type}}
+      </select>
+    </div>
+    {{#unless (eq system.aptitude.type "assist")}}
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.Item.Ability.AptitudeValue"}}</label>
+      <input type="number" name="system.aptitude.value" value="{{system.aptitude.value}}" min="1" max="4" />
+    </div>
+    {{/unless}}
+  </div>
+  {{/if}}
+
+  {{#if isSpecialAbility}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.SpecialAbility.Kind.Label"}}</label>
+      <select name="system.kind">
+        {{selectOptions kindOptions selected=system.kind}}
+      </select>
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if isSkillAbility}}
+  <div class="item-sidebar__fields">
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.SkillAbility.Skill"}}</label>
+      <select name="system.skill">
+        {{selectOptions skillOptions selected=system.skill}}
+      </select>
+    </div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.SkillAbility.Threshold.Label"}}</label>
+      <select name="system.thresholdType">
+        {{selectOptions thresholdTypeOptions selected=system.thresholdType}}
+      </select>
+    </div>
+    {{#if (eq system.thresholdType "fixed")}}
+    <div class="item-sidebar__field">
+      <label>{{localize "DASU.SkillAbility.FixedTN"}}</label>
+      <input type="number" name="system.fixedTN" value="{{system.fixedTN}}" min="0" step="1" />
+    </div>
+    {{/if}}
+    <label class="item-sidebar__field item-sidebar__checkbox">
+      <input type="checkbox" name="system.costsMainAction" {{checked system.costsMainAction}} />
+      <span>{{localize "DASU.SkillAbility.CostsMainAction"}}</span>
+    </label>
+  </div>
+  {{/if}}
+</div>

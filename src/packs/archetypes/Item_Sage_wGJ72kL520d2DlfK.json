@@ -1,0 +1,21 @@
+{
+  "name": "Sage",
+  "type": "archetype",
+  "_id": "wGJ72kL520d2DlfK",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "<p>A knowledgeable individual. They are known to be great reservoirs of information and wisdom. Often, they become known by aiding others along their Journey with their expansive knowledge. The Sage is a studious person, seeking out the secrets of the universe, although there has been known to be those born with this knowledge inherently.</p><ul><li><p>Daemons of the Sage Archetype add their Lvl to WP</p></li></ul>",
+    "dsid": "sage",
+    "bonuses": [
+      { "target": "resources.wp.max", "formula": "@lvl" }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!wGJ72kL520d2DlfK"
+}

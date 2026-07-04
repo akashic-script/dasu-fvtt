@@ -1,0 +1,67 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="advanced" style="padding: 12px 14px;">
+
+  {{#with (lookup fieldsets "bond-ranks")}}
+  <div class="dasu-fieldset dasu-fieldset--tabbed bond-ranks {{splitClass}}" data-fieldset="bond-ranks" data-split-direction="{{splitDirection}}">
+    <div class="dasu-fieldset__tabs">
+      {{#each @root.bondRanks as |r|}}
+      <button class="dasu-fieldset__tab {{r.activeClass}}" data-action="fieldsetTab" data-panel="{{r.key}}" type="button">
+        <span class="dasu-fieldset__tab-label">{{r.tabLabel}}</span>
+      </button>
+      {{/each}}
+      <div class="dasu-fieldset__split-btns">
+        <button class="dasu-fieldset__split-btn {{splitBtnActiveClass}}" data-action="fieldsetSplit" data-direction="column" type="button" data-tooltip="Split horizontally"><i class="fa-solid fa-table-cells-large"></i></button>
+      </div>
+    </div>
+
+    {{#each @root.bondRanks as |r|}}
+    <div class="dasu-fieldset__panel bond-rank" data-panel="{{r.key}}" {{r.hidden}}>
+
+      <div class="bond-rank__row">
+        <div class="bond-rank__field bond-rank__field--name">
+          <label>{{localize "DASU.Bond.RankName"}}</label>
+          <input type="text" name="system.{{r.key}}.name" value="{{r.rank.name}}" />
+        </div>
+        <div class="bond-rank__field bond-rank__field--threshold">
+          <label>{{localize "DASU.Bond.RankThreshold"}}</label>
+          <input type="number" name="system.{{r.key}}.threshold" value="{{r.rank.threshold}}" min="0" />
+        </div>
+        <div class="bond-rank__field bond-rank__field--type">
+          <label>{{localize "DASU.Bond.AbilityType"}}</label>
+          <select name="system.{{r.key}}.abilityType">
+            {{selectOptions @root.bondAbilityTypeOptions selected=r.rank.abilityType}}
+          </select>
+        </div>
+      </div>
+
+      <div class="bond-rank__row">
+        <div class="bond-rank__field bond-rank__field--effect">
+          <label>{{localize "DASU.Bond.Effect"}}</label>
+          <div class="bond-rank-effect-drop-zone {{#if r.effect}}bond-rank-effect-drop-zone--filled{{/if}}" data-rank-key="{{r.key}}">
+            {{#if r.effect}}
+              {{#if r.effect.img}}<img class="bond-rank-effect-drop-zone__img" src="{{r.effect.img}}" alt="" />{{/if}}
+              <span class="bond-rank-effect-drop-zone__name" data-uuid="{{r.effect.uuid}}">{{r.effect.name}}</span>
+              <a class="bond-rank-effect-drop-zone__clear" data-tooltip="{{localize 'DASU.Sheet.DeleteItem'}}"><i class="fas fa-times"></i></a>
+            {{else}}
+              <span class="bond-rank-effect-drop-zone__hint">{{localize "DASU.Bond.EffectNone"}}</span>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      {{#if r.effect}}
+      <div class="bond-rank__row">
+        <div class="bond-rank__field bond-rank-effect-description">
+          <label>{{localize "DASU.Bond.EffectDescription"}}</label>
+          <div class="bond-rank-effect-description__body">
+            {{#if r.effect.description}}{{{r.effect.description}}}{{else}}<span class="bond-rank-effect-description__empty">{{localize "DASU.Bond.EffectNoDescription"}}</span>{{/if}}
+          </div>
+        </div>
+      </div>
+      {{/if}}
+
+    </div>
+    {{/each}}
+  </div>
+  {{/with}}
+
+</section>

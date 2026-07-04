@@ -1,0 +1,15 @@
+<div class="specialties-popover__header">
+  <span class="specialties-popover__title">{{label}}</span>
+  <span class="specialties-popover__budget {{#if over}}specialties-popover__budget--over{{/if}}" data-tooltip="{{localize 'DASU.Actor.Specialty.Budget'}}">{{used}}/{{max}}</span>
+</div>
+
+<ul class="specialties-popover__list">
+  {{#each specialties}}
+  <li class="specialties-popover__row" data-index="{{@index}}">
+    <input class="specialties-popover__input dasu-pill" type="text" value="{{this.name}}" placeholder="{{localize 'DASU.Actor.Specialty.Placeholder'}}" />
+    <button type="button" class="specialties-popover__remove" data-action="removeSpecialty" data-index="{{@index}}" data-tooltip="{{localize 'DASU.Actor.Specialty.Remove'}}"><i class="fas fa-trash"></i></button>
+  </li>
+  {{/each}}
+</ul>
+
+<button type="button" class="specialties-popover__add" data-action="addSpecialty"><i class="fas fa-plus"></i> {{localize "DASU.Actor.Specialty.Add"}}</button>

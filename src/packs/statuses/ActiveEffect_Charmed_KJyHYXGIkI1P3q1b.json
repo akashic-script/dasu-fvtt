@@ -1,0 +1,35 @@
+{
+  "name": "Charmed",
+  "type": "base",
+  "_id": "KJyHYXGIkI1P3q1b",
+  "img": "icons/svg/heal.svg",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "value": 3,
+    "units": "turns",
+    "expiry": "turnStart",
+    "expired": false
+  },
+  "description": "<p>Cannot attack the caster.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "charmed"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "charmed",
+      "behavior": "cannotTargetCaster"
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!KJyHYXGIkI1P3q1b"
+}

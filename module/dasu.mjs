@@ -1,68 +1,189 @@
 import { DASUActor } from './documents/actor.mjs';
 import { DASUItem } from './documents/item.mjs';
-import { DASUActorSheet } from './sheets/actor-sheet.mjs';
+import { DASUSummonerActorSheet } from './sheets/summoner-actor-sheet.mjs';
+import { DASUDaemonActorSheet } from './sheets/daemon-actor-sheet.mjs';
 import { DASUItemSheet } from './sheets/item-sheet.mjs';
 import { preloadHandlebarsTemplates } from './helpers/templates.mjs';
 import { DASU } from './helpers/config.mjs';
+import { FieldsetStateManager } from './helpers/fieldset-state.mjs';
+import { DASUActorSheet } from './sheets/actor-sheet.mjs';
+import { DASUTableRenderer } from './helpers/tables/table-renderer.mjs';
+import { CommonColumns } from './helpers/tables/common-columns.mjs';
+import { CommonDescriptions } from './helpers/tables/common-descriptions.mjs';
+import { Checks, initializeChecks } from './checks/checks.mjs';
+import { initializePipelines } from './helpers/pipelines/_module.mjs';
+import { initializeStatusEffects } from './helpers/status-effects.mjs';
+import { DASUActiveEffectConfig } from './sheets/active-effect-config.mjs';
+import {
+  resyncCatalogTag,
+  handleCatalogTagDeleted,
+} from './helpers/tag-slotting.mjs';
 import * as models from './data/_module.mjs';
 
 Hooks.once('init', function () {
   game.dasu = {
     DASUActor,
     DASUItem,
+    Checks,
     rollItemMacro,
+    FieldsetStateManager,
+    DASUTableRenderer,
+    CommonColumns,
+    CommonDescriptions,
+    registerItemTable: DASUActorSheet.registerItemTable.bind(DASUActorSheet),
+    advancements: {
+      BaseAdvancement: models.BaseAdvancement,
+      ADVANCEMENT_TYPES: models.ADVANCEMENT_TYPES,
+      register: (cls) => models.BaseAdvancement.registerType(cls),
+    },
+    tags: {
+      BaseTag: models.BaseTag,
+      TAG_TYPES: models.TAG_TYPES,
+      register: (cls) => models.BaseTag.registerType(cls),
+    },
   };
 
   CONFIG.DASU = DASU;
 
+  registerHandlebarsHelpers();
+  initializeChecks();
+  initializePipelines();
+  initializeStatusEffects();
+
   CONFIG.Combat.initiative = {
-    formula: '1d20 + @abilities.dex.mod',
+    formula: '1d20 + @attributes.dex.value',
     decimals: 2,
   };
 
   CONFIG.Actor.documentClass = DASUActor;
   Object.assign(CONFIG.Actor.dataModels, {
-    character: models.DASUCharacter,
-    npc: models.DASUNPC,
+    summoner: models.DASUSummoner,
+    daemon: models.DASUDaemon,
   });
+
+  CONFIG.Actor.trackableAttributes = {
+    summoner: { bar: ['resources.hp', 'resources.wp'], value: [] },
+    daemon: { bar: ['resources.hp', 'resources.wp'], value: [] },
+  };
 
   CONFIG.Item.documentClass = DASUItem;
   Object.assign(CONFIG.Item.dataModels, {
     item: models.DASUItem,
+    weapon: models.DASUWeapon,
     feature: models.DASUFeature,
-    spell: models.DASUSpell,
+    class: models.DASUClass,
+    ability: models.DASUAbility,
+    tactic: models.DASUTactic,
+    schema: models.DASUSchema,
+    archetype: models.DASUArchetype,
+    subtype: models.DASUSubtype,
+    bond: models.DASUBond,
+    specialAbility: models.DASUSpecialAbility,
+    skillAbility: models.DASUSkillAbility,
+    scar: models.DASUScar,
+    dejection: models.DASUDejection,
+    tag: models.DASUTag,
+  });
+
+  Object.assign(CONFIG.ChatMessage.dataModels, {
+    pipeline: models.PipelineMessageModel,
   });
 
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
     Actor,
     'dasu',
-    DASUActorSheet,
-    {
-      types: ['character', 'npc'],
-      makeDefault: true,
-      label: 'DASU.SheetLabels.Actor',
-    }
+    DASUSummonerActorSheet,
+    { types: ['summoner'], makeDefault: true, label: 'DASU.SheetLabels.Actor' }
+  );
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(
+    Actor,
+    'dasu',
+    DASUDaemonActorSheet,
+    { types: ['daemon'], makeDefault: true, label: 'DASU.SheetLabels.Actor' }
   );
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
     Item,
     'dasu',
     DASUItemSheet,
     {
-      types: ['item', 'feature', 'spell'],
+      types: [
+        'item',
+        'weapon',
+        'feature',
+        'class',
+        'ability',
+        'tactic',
+        'schema',
+        'archetype',
+        'subtype',
+        'bond',
+        'specialAbility',
+        'skillAbility',
+        'scar',
+        'dejection',
+        'tag',
+      ],
       makeDefault: true,
       label: 'DASU.SheetLabels.Item',
     }
   );
 
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(
+    ActiveEffect,
+    'dasu',
+    DASUActiveEffectConfig,
+    { makeDefault: true, label: 'DASU.SheetLabels.Effect' }
+  );
+
   return preloadHandlebarsTemplates();
 });
 
-foundry.applications.handlebars.registerHelper('toLowerCase', (str) =>
-  str.toLowerCase()
-);
+function registerHandlebarsHelpers() {
+  Handlebars.registerHelper('toLowerCase', (str) => str.toLowerCase());
+  Handlebars.registerHelper('capitalize', (str) =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
+  );
+  Handlebars.registerHelper('gte', (a, b) => a >= b);
+  Handlebars.registerHelper('eq', (a, b) => a === b);
+  Handlebars.registerHelper('add', (a, b) => Number(a) + Number(b));
+  Handlebars.registerHelper('concat', (...args) => args.slice(0, -1).join(''));
+}
 
-Hooks.once('ready', function () {
+Hooks.once('ready', async function () {
   Hooks.on('hotbarDrop', (bar, data, slot) => createItemMacro(data, slot));
+  for (const actor of game.actors) actor.applySchemaUpgrades?.();
+
+  // When a catalog tag's applicability is edited, reconcile its slotted copies.
+  // Runs once, on the client that owns the actor (or the active GM)
+  Hooks.on('updateItem', (item, changes, options, userId) => {
+    if (item.type !== 'tag') return;
+    if (game.userId !== userId) return;
+    const applChanged =
+      foundry.utils.hasProperty(changes, 'system.applicableTypes') ||
+      foundry.utils.hasProperty(changes, 'system.applicableSubType');
+    if (applChanged) {
+      Promise.resolve(resyncCatalogTag(item)).catch((err) =>
+        Hooks.onError('updateItem#resyncCatalogTag', err, {
+          log: 'error',
+          notify: 'error',
+        })
+      );
+    }
+  });
+
+  // When a catalog tag is deleted, unslot its copies so nothing is orphaned.
+  Hooks.on('deleteItem', (item, options, userId) => {
+    if (item.type !== 'tag') return;
+    if (game.userId !== userId) return;
+    Promise.resolve(handleCatalogTagDeleted(item)).catch((err) =>
+      Hooks.onError('deleteItem#handleCatalogTagDeleted', err, {
+        log: 'error',
+        notify: 'error',
+      })
+    );
+  });
+
+  Hooks.callAll('dasu.ready', game.dasu);
 });
 
 async function createItemMacro(data, slot) {

@@ -1,0 +1,40 @@
+<ol id="{{tableId}}" class="dasu-table {{config.tableClass}} {{cssClass}}" data-table-id="{{tableId}}">
+  <li class="dasu-table__header">
+    {{#each columns}}
+      {{#unless hideHeader}}
+        <div class="dasu-table__header-cell {{#if headerAlignment}}dasu-table__header-cell--{{headerAlignment}}{{/if}}"
+             data-column="{{@key}}"
+             {{#if headerSpan}}style="--dasu-table-column-span: {{headerSpan}}"{{/if}}>
+          {{{header}}}
+        </div>
+      {{/unless}}
+    {{/each}}
+    {{#if @root.badge}}
+      <a class="dasu-table__badge"
+         {{#if @root.badge.type}}data-action="createItem" data-type="{{@root.badge.type}}"{{/if}}
+         {{#if @root.badge.tooltip}} data-tooltip="{{@root.badge.tooltip}}"{{/if}}>{{@root.badge.text}}</a>
+    {{/if}}
+  </li>
+  {{#each items as |row|}}
+    <li class="dasu-table__row-container {{@root.config.rowClass}} {{#if @root.config.draggable}}draggable{{/if}} {{lookup @root.rowCssClasses key}} {{#unless visible}}hidden{{/unless}}"
+        data-key="{{key}}"
+        {{#each additionalAttributes}}{{@key}}="{{this}}"{{/each}}
+        {{#with (lookup @root.rowTooltips key)}}data-tooltip="{{this}}"{{/with}}>
+      <div class="dasu-table__row">
+        {{#each ../columns}}
+          <div class="dasu-table__cell" data-column="{{@key}}">
+            {{{lookup cells row.key}}}
+          </div>
+        {{/each}}
+      </div>
+      {{#with (lookup @root.rowCaptions key)}}
+        <div class="dasu-table__row-caption">
+          {{{this}}}
+        </div>
+      {{/with}}
+      <div class="dasu-table__row-expand {{#if (lookup @root.expandedItems key)}}dasu-table__row-expand--visible{{/if}}">
+        <div class="dasu-table__row-expand-content">{{{lookup @root.descriptions key}}}</div>
+      </div>
+    </li>
+  {{/each}}
+</ol>

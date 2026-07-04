@@ -1,0 +1,42 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="planner">
+
+  {{#unless planner.hasClass}}
+  <p class="planner__empty">{{localize "DASU.Planner.NoClass"}}</p>
+  {{/unless}}
+
+  {{#with (lookup fieldsets "planner")}}
+  <div
+    class="dasu-fieldset dasu-fieldset--tabbed dasu-fieldset--planner {{splitClass}}"
+    data-fieldset="planner"
+    data-split-direction="{{splitDirection}}"
+  >
+    <div class="dasu-fieldset__tabs">
+      <button class="dasu-fieldset__tab {{lookup panels.reached "activeClass"}}" data-action="fieldsetTab" data-panel="reached" type="button">{{localize "DASU.Planner.Reached"}}</button>
+      <button class="dasu-fieldset__tab {{lookup panels.future "activeClass"}}" data-action="fieldsetTab" data-panel="future" type="button">{{localize "DASU.Planner.Future"}}</button>
+      <button class="dasu-fieldset__tab {{lookup panels.dejection "activeClass"}}" data-action="fieldsetTab" data-panel="dejection" type="button">{{localize "DASU.Dejection.Track"}}</button>
+      {{#if @root.planner.className}}
+      <span class="planner__class-name">{{@root.planner.className}}</span>
+      <button class="planner__class-edit" data-action="plannerEditClass" type="button" data-tooltip="{{localize 'DASU.Sheet.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
+      {{/if}}
+      <div class="dasu-fieldset__split-btns">
+        <button class="dasu-fieldset__split-btn {{splitBtnActiveClass}}" data-action="fieldsetSplit" data-direction="column" type="button" data-tooltip="Split horizontally"><i class="fa-solid fa-table-cells-large"></i></button>
+      </div>
+    </div>
+
+    <div class="dasu-fieldset__panel" data-panel="reached" {{lookup panels.reached "hidden"}}>
+      {{> "systems/dasu/templates/actor/parts/planner-table.hbs" rows=@root.planner.reachedRows}}
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="future" {{lookup panels.future "hidden"}}>
+      {{> "systems/dasu/templates/actor/parts/planner-table.hbs" rows=@root.planner.futureRows}}
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="dejection" {{lookup panels.dejection "hidden"}}>
+      {{#if @root.planner.dejection.hasDejection}}
+      {{> "systems/dasu/templates/actor/parts/dejection-planner-table.hbs" rows=@root.planner.dejection.rows}}
+      {{else}}
+      <p class="planner__empty">{{localize "DASU.Dejection.NoItem"}}</p>
+      {{/if}}
+    </div>
+  </div>
+  {{/with}}
+
+</section>

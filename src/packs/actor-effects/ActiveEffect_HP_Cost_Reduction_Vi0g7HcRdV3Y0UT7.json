@@ -1,0 +1,36 @@
+{
+  "name": "HP Cost Reduction",
+  "type": "base",
+  "_id": "Vi0g7HcRdV3Y0UT7",
+  "img": "icons/magic/life/heart-shadow-red.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.incomingLoss.hp",
+      "mode": 2,
+      "value": "-2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>Reduce HP spent on costs by 2 (clamped at 0).</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "bU5MqJvrLuP8EVY2",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!Vi0g7HcRdV3Y0UT7"
+}

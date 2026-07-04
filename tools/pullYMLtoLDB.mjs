@@ -8,6 +8,7 @@ const packs = await fs.readdir('./src/packs');
 for (const pack of packs) {
   if (pack === '.gitattributes') continue;
   console.log('Packing ' + pack);
+  await fs.rm(`${MODULE_ID}/packs/${pack}`, { recursive: true, force: true });
   await compilePack(
     `${MODULE_ID}/src/packs/${pack}`,
     `${MODULE_ID}/packs/${pack}`,

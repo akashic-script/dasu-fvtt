@@ -1,0 +1,39 @@
+{
+  "name": "Bleeding",
+  "type": "base",
+  "_id": "fgePMscFdSr8o9HY",
+  "img": "icons/svg/blood.svg",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "value": 3,
+    "units": "turns",
+    "expiry": "turnStart",
+    "expired": false
+  },
+  "description": "<p>Take [Caster's POW Tick \u00d7 Rank] damage each turn. Stacks up to the caster's POW Tick; Rank equals the current stacks.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "bleeding"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "bleeding",
+      "stacks": 1,
+      "maxStacksAttr": "pow",
+      "maxStacks": 1,
+      "behavior": "perTurnDamage",
+      "damageAttr": "pow"
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!fgePMscFdSr8o9HY"
+}

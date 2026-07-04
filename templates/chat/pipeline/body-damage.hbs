@@ -1,0 +1,11 @@
+<div class="pipeline-body pipeline-body--damage{{#if drain}} pipeline-body--drain{{/if}}">
+  <span class="pipeline-body__amount">
+    {{#if drain}}+{{else}}-{{/if}}{{finalAmount}} {{resourceLabel}}
+  </span>
+  <span class="pipeline-body__type">
+    {{#unless (eq damageType "untyped")}}<img class="pipeline-body__icon" src="systems/dasu/assets/resistances/{{damageType}}.png" alt="{{damageType}}" />{{/unless}}
+    {{damageTypeLabel}}
+  </span>
+  {{#unless (eq mode "normal")}}<span class="pipeline-body__verdict pipeline-body__verdict--{{mode}}">{{modeLabel}}</span>{{/unless}}
+  <span class="pipeline-body__detail">{{priorValue}} &rarr; {{newValue}}</span>
+</div>

@@ -1,0 +1,36 @@
+{
+  "name": "To Hit: Restoratives",
+  "type": "base",
+  "_id": "4vwLHF2Hnat4SVeA",
+  "img": "icons/magic/life/cross-beam-green.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.toHit.restorative",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+2 To Hit with restorative abilities.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "iqrOlv9MnuBSf2Zv",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!4vwLHF2Hnat4SVeA"
+}

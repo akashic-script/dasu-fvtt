@@ -10,6 +10,7 @@ const foundryGlobals = {
   CONFIG: 'readonly',
   Hooks: 'readonly',
   foundry: 'readonly',
+  canvas: 'readonly',
   globalThis: 'readonly',
 
   // Documents
@@ -140,6 +141,7 @@ const foundryGlobals = {
   Color: 'readonly',
   DuplicateError: 'readonly',
   fromUuid: 'readonly',
+  fromUuidSync: 'readonly',
   getDocumentClass: 'readonly',
   renderDialog: 'readonly',
   renderTemplate: 'readonly',

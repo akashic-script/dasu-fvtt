@@ -1,0 +1,19 @@
+<div class="check-outcome">
+  {{#unless (eq success null)}}
+  {{#unless hideVerdict}}
+  <div class="check-result-line{{#if success}} success{{else}} failure{{/if}}">
+    {{#if tn}}<span class="check-vs">{{localize "DASU.Check.TN"}} {{tn}}</span>{{/if}}
+    <span class="check-verdict">
+      {{#if snakeEyes}}{{localize "DASU.Check.SnakeEyes"}}{{else if success}}{{localize "DASU.Check.Success"}}{{else}}{{localize "DASU.Check.Failure"}}{{/if}}
+    </span>
+  </div>
+  {{/unless}}
+  {{/unless}}
+  {{#if damage}}
+  <div class="check-damage">
+    <span class="damage-amount">{{damage.amount}}</span>
+    {{#unless (eq damage.type "untyped")}}<img class="damage-icon" src="systems/dasu/assets/resistances/{{damage.type}}.png" alt="{{damage.type}}" />{{/unless}}
+    <span class="damage-type">{{localize (concat "DASU.Damage." damage.type)}}</span>
+  </div>
+  {{/if}}
+</div>

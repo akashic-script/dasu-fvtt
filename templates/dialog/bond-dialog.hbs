@@ -1,0 +1,61 @@
+<form class="dasu theme-dark roll-dialog">
+  <div class="dasu-fieldset dasu-fieldset--active-legend roll-dialog__fieldset">
+    <div class="dasu-fieldset__header">
+      <div class="dasu-fieldset__legend">{{localize "TYPES.Item.bond"}}</div>
+    </div>
+
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Roll.Item"}}</label>
+        <div class="roll-dialog__item-name">{{itemName}}</div>
+      </div>
+    </div>
+
+    {{#if showRanks}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Bond.RankLabel"}}</label>
+        <select name="rank">
+          {{#each ranks}}
+          <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+
+    {{#if hasSelection}}
+    {{#if abilityName}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <label>{{localize "DASU.Dialog.Bond.Ability"}}</label>
+        <div class="roll-dialog__item-name">{{abilityName}} <span class="roll-dialog__ability-type">[{{abilityTypeLabel}}]</span></div>
+      </div>
+    </div>
+    {{/if}}
+    {{#if effectDescription}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field roll-dialog__level-description">
+        <label>{{localize "DASU.Dialog.Bond.Description"}}</label>
+        <div class="roll-dialog__level-description-body">{{{effectDescription}}}</div>
+      </div>
+    </div>
+    {{/if}}
+    {{/if}}
+    {{else}}
+    <div class="dasu-fieldset__row">
+      <div class="dasu-fieldset__field">
+        <div class="roll-dialog__empty">{{localize "DASU.Dialog.Bond.NoUnlocked"}}</div>
+      </div>
+    </div>
+    {{/if}}
+
+    <div class="roll-dialog__actions">
+      <button type="button" data-action="use" class="roll-dialog__btn roll-dialog__btn--roll" {{#unless showRanks}}disabled{{/unless}}>
+        <i class="fas fa-hand-sparkles"></i> {{localize "DASU.Dialog.Roll.Use"}}
+      </button>
+      <button type="button" data-action="cancel" class="roll-dialog__btn roll-dialog__btn--cancel">
+        {{localize "DASU.Dialog.Roll.Cancel"}}
+      </button>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,21 @@
+{
+  "name": "Rogue",
+  "type": "archetype",
+  "_id": "pyypUMMX243yF3kg",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "<p>A skilled individual. Generally, a Rogue is born of a bad situation, but they aren't explicitly bound to that fate. Their most lauded traits are their versatility and determination. The methodology of a Rogue is rarely direct but always deliberate. Commonly, Rogues are remembered for that one big heist or some crazy stunt they did. Rogues are one of the rarer daemons but still appear frequently enough.</p><ul><li><p>Daemons of the Rogue Archetype add +2 to all damage that targets HP.</p></li></ul>",
+    "dsid": "rogue",
+    "bonuses": [
+      { "target": "bonuses.damage.combat", "formula": "2" }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!pyypUMMX243yF3kg"
+}

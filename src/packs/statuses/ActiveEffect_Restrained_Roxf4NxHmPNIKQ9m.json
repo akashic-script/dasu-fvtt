@@ -1,0 +1,47 @@
+{
+  "name": "Restrained",
+  "type": "base",
+  "_id": "Roxf4NxHmPNIKQ9m",
+  "img": "icons/svg/net.svg",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.toHit.all",
+      "mode": 2,
+      "value": "-2",
+      "priority": 20
+    },
+    {
+      "key": "system.stats.avoid.bonus",
+      "mode": 2,
+      "value": "-2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": 3,
+    "units": "turns",
+    "expiry": "turnStart",
+    "expired": false
+  },
+  "description": "<p>Take a -2 penalty to To Hit and Avoid.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "restrained"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "restrained"
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!Roxf4NxHmPNIKQ9m"
+}

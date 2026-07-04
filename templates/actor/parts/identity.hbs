@@ -1,0 +1,50 @@
+<section class="tab identity-tab {{tab.cssClass}}" data-group="primary" data-tab="{{tab.id}}">
+
+  <div class="dasu-fieldset dasu-fieldset--active-legend">
+    <div class="dasu-fieldset__header">
+      <div class="dasu-fieldset__legend">{{localize "DASU.Sheet.Section.MoralTriad"}}</div>
+    </div>
+    <div class="triad-fields" style="margin-bottom: 0;">
+      <img class="triad-bg-triangle" src="systems/dasu/assets/moral-triad.svg" alt="" aria-hidden="true" />
+      <div class="triad-field">
+        <label class="triad-label">{{localize "DASU.Actor.Triad.Virtue"}}</label>
+        <input class="dasu-triad__input" type="text" name="system.triad.virtue" value="{{system.triad.virtue}}" data-suggestions="dasu-virtues" placeholder="{{localize 'DASU.Actor.Triad.VirtuePlaceholder'}}" />
+      </div>
+      <div class="triad-field">
+        <label class="triad-label">{{localize "DASU.Actor.Triad.Sin"}}</label>
+        <input class="dasu-triad__input" type="text" name="system.triad.sin" value="{{system.triad.sin}}" data-suggestions="dasu-sins" placeholder="{{localize 'DASU.Actor.Triad.SinPlaceholder'}}" />
+      </div>
+      <div class="triad-field">
+        <label class="triad-label">{{localize "DASU.Actor.Triad.Anathema"}}</label>
+        <input class="dasu-triad__input" type="text" name="system.triad.anathema" value="{{system.triad.anathema}}" data-suggestions="dasu-anathemas" placeholder="{{localize 'DASU.Actor.Triad.AnathemaPlaceholder'}}" />
+      </div>
+    </div>
+  </div>
+
+  {{#with (lookup fieldsets "identity-editor")}}
+  <div
+    class="dasu-fieldset dasu-fieldset--tabbed dasu-fieldset--editor {{splitClass}}"
+    data-fieldset="identity-editor"
+    data-split-direction="{{splitDirection}}"
+  >
+    <div class="dasu-fieldset__tabs">
+      <button class="dasu-fieldset__tab {{lookup panels.biography "activeClass"}}" data-action="fieldsetTab" data-panel="biography" type="button">{{localize "DASU.Sheet.Section.Description"}}</button>
+      <button class="dasu-fieldset__tab {{lookup panels.notes "activeClass"}}" data-action="fieldsetTab" data-panel="notes" type="button">{{localize "DASU.Sheet.Section.FieldNotes"}}</button>
+      <div class="dasu-fieldset__split-btns">
+        <button class="dasu-fieldset__split-btn {{splitBtnActiveClass}}" data-action="fieldsetSplit" data-direction="column" type="button" data-tooltip="Split horizontally"><i class="fa-solid fa-table-cells-large"></i></button>
+      </div>
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="biography" {{lookup panels.biography "hidden"}}>
+      <prose-mirror name="system.biography" toggled value="{{@root.actor.system.biography}}" data-document-uuid="{{@root.actor.uuid}}" {{#unless @root.editable}}disabled{{/unless}}>
+        {{{@root.biographyHTML}}}
+      </prose-mirror>
+    </div>
+    <div class="dasu-fieldset__panel" data-panel="notes" {{lookup panels.notes "hidden"}}>
+      <prose-mirror name="system.notes" toggled value="{{@root.actor.system.notes}}" data-document-uuid="{{@root.actor.uuid}}" {{#unless @root.editable}}disabled{{/unless}}>
+        {{{@root.notesHTML}}}
+      </prose-mirror>
+    </div>
+  </div>
+  {{/with}}
+
+</section>

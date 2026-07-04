@@ -1,0 +1,36 @@
+{
+  "name": "To Hit: Techniques",
+  "type": "base",
+  "_id": "AOspgxcS7WdCrm3j",
+  "img": "icons/skills/melee/strike-flail-spiked-pink.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.toHit.technique",
+      "mode": 2,
+      "value": "2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+2 To Hit with technique abilities.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "iqrOlv9MnuBSf2Zv",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!AOspgxcS7WdCrm3j"
+}

@@ -1,0 +1,36 @@
+{
+  "name": "HP Healing Dealt",
+  "type": "base",
+  "_id": "TKvm2YEye41rLDUT",
+  "img": "icons/magic/life/cross-area-circle-green-white.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.outgoingRecovery.hp",
+      "mode": 2,
+      "value": "3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+3 to HP healing you grant others (flat heals).</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "bU5MqJvrLuP8EVY2",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!TKvm2YEye41rLDUT"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Accuracy",
+  "type": "ActiveEffect",
+  "_id": "iqrOlv9MnuBSf2Zv",
+  "description": "",
+  "color": "#2a435a",
+  "sort": 100,
+  "folder": null,
+  "sorting": "a",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!folders!iqrOlv9MnuBSf2Zv"
+}

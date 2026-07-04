@@ -1,0 +1,43 @@
+{
+  "name": "Dazed",
+  "type": "base",
+  "_id": "aewRPLXeltucDP05",
+  "img": "icons/svg/daze.svg",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.toHit.all",
+      "mode": 2,
+      "value": "-1",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": 3,
+    "units": "turns",
+    "expiry": "turnStart",
+    "expired": false
+  },
+  "description": "<p>-1 To Hit per stack. Stacks up to 2.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [
+    "dazed"
+  ],
+  "sort": 0,
+  "flags": {
+    "dasu": {
+      "statusId": "dazed",
+      "stacks": 1,
+      "maxStacks": 2
+    }
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!aewRPLXeltucDP05"
+}

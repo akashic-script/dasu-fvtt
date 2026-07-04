@@ -1,37 +1,35 @@
-{{!-- Sheet Header --}}
 <header class="sheet-header">
-  <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100" />
-  <div class="header-fields">
-    <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Name" /></h1>
-
-    <div class="resources grid grid-3col">
-      <div class="resource flex-group-center">
-        <label for="system.health.value" class="resource-label">Health</label>
-        <div class="resource-content flexrow flex-center flex-between">
-          <input type="text" name="system.health.value" value="{{system.health.value}}" data-dtype="Number" />
-          <span> / </span>
-          <input type="text" name="system.health.max" value="{{system.health.max}}" data-dtype="Number" />
-        </div>
-      </div>
-
-      <div class="resource flex-group-center">
-        <label for="system.power.value" class="resource-label">Power</label>
-        <div class="resource-content flexrow flex-center flex-between">
-          <input type="text" name="system.power.value" value="{{system.power.value}}" data-dtype="Number" />
-          <span> / </span>
-          <input type="text" name="system.power.max" value="{{system.power.max}}" data-dtype="Number" />
-        </div>
-      </div>
-
-      <div class="resource flex-group-center">
-        <label for="system.attributes.level.value" class="resource-label">Level</label>
-        <div class="resource-content flexrow flex-center flex-between">
-          <input type="text" name="system.attributes.level.value" value="{{system.attributes.level.value}}"
-            data-dtype="Number" />
-        </div>
-      </div>
-
+  <div class="actor-header__name-row">
+    <h1><input class="actor-header__name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize 'DASU.Actor.SummonerNamePlaceholder'}}" /></h1>
+    <div class="actor-header__level">
+      <span class="actor-header__level-label">{{localize "DASU.Actor.Level.long"}}</span>
+      <input class="dasu-pill" type="text" name="system.level" value="{{system.level}}" data-dtype="Number" {{#unless editable}}readonly{{/unless}} />
     </div>
   </div>
+  <div class="actor-header__identity-row">
+    {{#if className}}<span class="actor-header__class-name">{{className}}</span>{{/if}}
+    <input class="actor-header__identity" type="text" placeholder="{{localize 'DASU.Actor.ClassPlaceholder'}}" />
+    {{#if canAdvance}}
+    <button type="button" class="actor-header__levelup" data-action="advance" data-tooltip="{{advanceTooltip}}">
+      <i class="fa-solid fa-angles-up"></i>
+    </button>
+    {{/if}}
+    <div class="actor-header__level actor-header__level--merit" data-action="openMeritPopover">
+      <span class="actor-header__level-label">{{localize "DASU.Actor.Merit.long"}}</span>
+      <input class="dasu-pill" type="text" name="system.merit" value="{{system.merit}}" data-dtype="Number" {{#unless editable}}readonly{{/unless}} />
+    </div>
+  </div>
+  <div class="actor-header__resistances">
+    {{#each resistances as |resistance key|}}
+    <div class="actor-header__resistance {{resistance.cssClass}}" data-resistance="{{key}}" data-tooltip="{{localize (concat 'DASU.DamageType.' (capitalize key))}}">
+      <div class="actor-header__resistance-top" data-action="showResistance" data-resistance="{{key}}">
+        <img class="actor-header__resistance-icon" src="systems/dasu/assets/resistances/{{key}}.png" alt="{{key}}" />
+        <span class="actor-header__resistance-value">{{resistance.abbr}}</span>
+      </div>
+      <select class="actor-header__resistance-select" name="system.resistances.{{key}}.base" data-dtype="Number">
+        {{selectOptions @root.resistanceLevelOptions selected=resistance.base localize=true}}
+      </select>
+    </div>
+    {{/each}}
+  </div>
 </header>
-

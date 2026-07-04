@@ -1,0 +1,36 @@
+{
+  "name": "Radiance",
+  "type": "base",
+  "_id": "AsOMsJtvzewSKxR5",
+  "img": "icons/magic/light/beam-rays-yellow-blue.webp",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.bonuses.damage.light",
+      "mode": 2,
+      "value": "3",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "value": null,
+    "units": "turns",
+    "expiry": null,
+    "expired": false
+  },
+  "description": "<p>+3 to light damage.</p>",
+  "origin": null,
+  "tint": "#ffffff",
+  "transfer": true,
+  "statuses": [],
+  "sort": 0,
+  "folder": "agrBME97EKt2yEjB",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!effects!AsOMsJtvzewSKxR5"
+}

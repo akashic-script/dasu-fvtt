@@ -1,0 +1,17 @@
+{
+  "name": "Resources",
+  "type": "ActiveEffect",
+  "_id": "bU5MqJvrLuP8EVY2",
+  "description": "",
+  "color": "#71598d",
+  "sort": 600,
+  "folder": null,
+  "sorting": "a",
+  "flags": {},
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!folders!bU5MqJvrLuP8EVY2"
+}
