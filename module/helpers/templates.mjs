@@ -15,6 +15,7 @@ export const preloadHandlebarsTemplates = async function () {
     // Item partials
     'systems/dasu/templates/item/parts/item-effects.hbs',
     'systems/dasu/templates/item/parts/tag-panel.hbs',
+    'systems/dasu/templates/item/parts/apply-effects-panel.hbs',
     // Active Effect config
     'systems/dasu/templates/effect/stacks.hbs',
     // Table system

@@ -41,7 +41,7 @@ export default class BaseTag extends TypedPseudoDocument {
     const types = tagData.applicableTypes ?? [];
     if (types.length && !types.includes('all') && !types.includes(hostItem.type)) return false;
     const subTypes = tagData.applicableSubType ?? [];
-    if (subTypes.length && hostItem.system?.category) {
+    if (subTypes.length && !subTypes.includes('all') && hostItem.system?.category) {
       if (!subTypes.includes(hostItem.system.category)) return false;
     }
     return true;

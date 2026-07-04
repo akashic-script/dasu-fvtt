@@ -711,9 +711,10 @@ export function initializeChecks() {
       }
     }
 
-    // Abilities apply their "Apply Effects" entries (flagged dasu.applied) to
-    // hit targets; an effect flagged apply-target=self goes to the caster.
-    if (item.type === 'ability') {
+    // Abilities, weapons, and tactics apply their "Apply Effects" entries
+    // (flagged dasu.applied) to hit targets; an effect flagged
+    // apply-target=self goes to the caster.
+    if (DASU.taggableTypes?.includes(item.type)) {
       for (const effect of item.effects ?? []) {
         if (!effect.flags?.dasu?.applied) continue;
         const isSelf = effect.flags?.dasu?.applyTarget === 'self';

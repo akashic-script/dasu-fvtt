@@ -54,6 +54,8 @@
  * @property {(item: T) => boolean} [isVisible]
  */
 
+import { refreshSlottedTags } from '../tag-slotting.mjs';
+
 export class DASUTableRenderer {
   /** @type {TableConfig} */
   static TABLE_CONFIG = {
@@ -357,6 +359,25 @@ export class DASUTableRenderer {
         icon: 'fas fa-edit',
         onClick: () => item.sheet.render(true),
       },
+      // A catalog tag can push its current state onto its slotted copies,
+      // which are otherwise one-time snapshots.
+      ...(item.type === 'tag' && item.parent instanceof Actor
+        ? [
+            {
+              label: game.i18n.localize('DASU.Tag.RefreshSlotted'),
+              icon: 'fas fa-rotate',
+              onClick: async () => {
+                const count = await refreshSlottedTags(item);
+                ui.notifications?.info(
+                  game.i18n.format('DASU.Tag.RefreshedSlotted', {
+                    name: item.name,
+                    count,
+                  })
+                );
+              },
+            },
+          ]
+        : []),
       // Delete is suppressed for pseudo-items, managed via the class advancement slot.
       ...(!isGrant
         ? [

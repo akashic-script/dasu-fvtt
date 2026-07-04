@@ -104,6 +104,15 @@
       "system": "dasu",
       "private": false,
       "flags": {}
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "path": "packs/tags",
+      "type": "Item",
+      "system": "dasu",
+      "private": false,
+      "flags": {}
     }
   ],
   "packFolders": [
@@ -115,7 +124,7 @@
     {
       "name": "Effects",
       "sorting": "m",
-      "packs": ["statuses", "actor-effects"]
+      "packs": ["tags", "statuses", "actor-effects"]
     }
   ],
   "socket": true,

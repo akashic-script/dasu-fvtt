@@ -695,6 +695,10 @@
       "WrongType": "This tag cannot be slotted onto this item type.",
       "NoSlots": "No free tag slots remaining.",
       "Pruned": "Removed {count} slotted copy(ies) of \"{name}\" that no longer qualify.",
+      "RefreshSlotted": "Update Slotted Copies",
+      "RefreshedSlotted": "Updated {count} slotted copy(ies) of \"{name}\".",
+      "FromTag": "Applied by a slotted tag; managed from the tag.",
+      "FromTagNamed": "Applied by the \"{name}\" tag; managed from the tag.",
       "MaxSlots": "Max Slots"
     },
     "Advancement": {

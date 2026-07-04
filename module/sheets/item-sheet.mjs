@@ -359,18 +359,37 @@ export class DASUItemSheet extends SheetLayoutMixin(
         context.isSpellAbility ||
         context.isAfflictionAbility ||
         context.isTechniqueAbility;
+    }
+
+    // The "Apply Effects" advanced panel is shared by ability, weapon, tactic,
+    // and tag.
+    if (
+      context.isAbility ||
+      context.isWeapon ||
+      context.isTactic ||
+      context.isTag
+    ) {
       context.abilityEffects = item.effects
         .filter((e) => e.getFlag(SYSTEM, 'applied'))
-        .map((e) => ({
-          id: e.id,
-          uuid: e.uuid,
-          name: e.name,
-          img: e.img,
-          durationValue: e.duration?.value ?? null,
-          durationUnits: e.duration?.units ?? 'turns',
-          applyTarget: e.flags?.dasu?.applyTarget ?? 'target',
-          dcThreshold: e.flags?.dasu?.dcThreshold ?? null,
-        }));
+        .map((e) => {
+          // Effects transferred from a slotted tag carry a sourceTagId; surface
+          // the source tag's name so the row can be badged as tag-sourced.
+          const sourceTagId = e.flags?.dasu?.sourceTagId ?? null;
+          const sourceTagName = sourceTagId
+            ? item.system?.tags?.get(sourceTagId)?.name ?? null
+            : null;
+          return {
+            id: e.id,
+            uuid: e.uuid,
+            name: e.name,
+            img: e.img,
+            durationValue: e.duration?.value ?? null,
+            durationUnits: e.duration?.units ?? 'turns',
+            applyTarget: e.flags?.dasu?.applyTarget ?? 'target',
+            dcThreshold: e.flags?.dasu?.dcThreshold ?? null,
+            sourceTagName,
+          };
+        });
       context.durationUnitsOptions = {
         turns: game.i18n.localize('DASU.Duration.Turns'),
         rounds: game.i18n.localize('DASU.Duration.Rounds'),
@@ -834,7 +853,11 @@ export class DASUItemSheet extends SheetLayoutMixin(
         e.stopPropagation();
         const values = Array.from(typeSel.selectedOptions).map((o) => o.value);
         syncSubTypeVisibility(new Set(values));
-        const subValues = Array.from(subTypeSel.selectedOptions).map((o) => o.value);
+        // 'all' is a UI sentinel for "no restriction"; persist it as [] so it
+        // matches the subtype-select handler and validation stays consistent.
+        const subValues = Array.from(subTypeSel.selectedOptions)
+          .map((o) => o.value)
+          .filter((v) => v !== 'all');
         await this.item.update({
           'system.applicableTypes': values,
           'system.applicableSubType': subValues,

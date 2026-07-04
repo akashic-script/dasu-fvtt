@@ -2,36 +2,6 @@
 
   {{> "systems/dasu/templates/item/parts/tag-panel.hbs"}}
 
-  <div class="dasu-fieldset dasu-fieldset--active-legend">
-    <div class="dasu-fieldset__header">
-      <div class="dasu-fieldset__legend">{{localize "DASU.Item.Ability.ApplyEffects"}}</div>
-    </div>
-
-    <div class="ability-effects-list">
-      {{#each abilityEffects as |e|}}
-      <div class="ability-effect-row" data-effect-id="{{e.id}}">
-        <span class="ability-effect__name">{{e.name}}</span>
-        <input class="ability-effect__duration-value" type="number" value="{{e.durationValue}}" min="1" placeholder="--" />
-        <select class="ability-effect__duration-units">
-          {{selectOptions @root.durationUnitsOptions selected=e.durationUnits}}
-        </select>
-        <select class="ability-effect__apply-target">
-          {{selectOptions @root.applyTargetOptions selected=e.applyTarget}}
-        </select>
-        <a class="ability-effect__expand" data-tooltip="{{localize 'DASU.Item.Ability.EffectSettings'}}"><i class="fas fa-chevron-down"></i></a>
-      </div>
-      <div class="ability-effect-details" data-effect-id="{{e.id}}" hidden>
-        <label class="ability-effect-details__label">{{localize "DASU.Item.Ability.DCThreshold"}}</label>
-        <input class="ability-effect__dc-threshold" type="number" value="{{e.dcThreshold}}" min="0" placeholder="--" />
-        <a class="ability-effect__delete" data-tooltip="{{localize 'DASU.Sheet.DeleteItem'}}"><i class="fas fa-trash"></i></a>
-      </div>
-      {{/each}}
-
-      <div class="ability-effect-drop-zone">
-        <i class="fas fa-hand-sparkles"></i>
-        <span>{{localize "DASU.Item.Ability.EffectDrop"}}</span>
-      </div>
-    </div>
-  </div>
+  {{> "systems/dasu/templates/item/parts/apply-effects-panel.hbs"}}
 
 </section>

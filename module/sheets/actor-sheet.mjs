@@ -926,7 +926,9 @@ export class DASUActorSheet extends SheetLayoutMixin(
 
   /** @override */
   async _onDropItem(event, item) {
-    // Slot a tag Item onto a specific host item row (ability/weapon/tactic).
+    // A tag dropped on a host item row (ability/weapon/tactic) is slotted onto
+    // it; dropped anywhere else on the sheet it's added to the actor's tag
+    // catalog.
     if (item?.type === 'tag') {
       const hostRow = event.target.closest('.item[data-item-id]');
       const hostId = hostRow?.dataset?.itemId;
@@ -937,8 +939,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
           return false;
         }
       }
-      // No valid row target; don't add to the actor's item list.
-      return false;
+      return super._onDropItem(event, item);
     }
 
     if (item?.type === 'bond' && this.actor.type !== 'summoner') {

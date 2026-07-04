@@ -158,6 +158,42 @@ export async function resyncCatalogTag(catalogTag) {
 }
 
 /**
+ * Push the catalog tag's current state onto its slotted copies: re-sync the
+ * snapshotted fields (name/description/applicability/price) and replace each
+ * copy's transferred effects with fresh copies from the catalog tag. Rank is
+ * per-slot state and is preserved.
+ * @returns {Promise<number>} the number of slotted copies refreshed
+ */
+export async function refreshSlottedTags(catalogTag) {
+  const actor = catalogTag?.parent;
+  if (!(actor instanceof Actor)) return 0;
+  if (reconcilingTags.has(catalogTag.id)) return 0;
+  reconcilingTags.add(catalogTag.id);
+  let refreshed = 0;
+  try {
+    const snapshot = buildSlottedTagData(catalogTag);
+    // Rank and identity stay with the slot; only the authored fields refresh.
+    delete snapshot.rank;
+    for (const hostItem of actor.items) {
+      if (!DASU.taggableTypes?.includes(hostItem.type)) continue;
+      const slotted = [...(hostItem.system?.tags ?? [])].filter(
+        (t) => t.sourceUuid === catalogTag.uuid
+      );
+      for (const tag of slotted) {
+        await tag.update(snapshot);
+        // Replace the transferred effects with a fresh snapshot.
+        await removeTagEffects(hostItem, tag.id);
+        await transferTagEffects(catalogTag, hostItem, tag.id);
+        refreshed++;
+      }
+    }
+  } finally {
+    reconcilingTags.delete(catalogTag.id);
+  }
+  return refreshed;
+}
+
+/**
  * Unslot every copy of a catalog tag from its owning actor's items. Called when
  * the catalog tag Item itself is deleted so no orphaned copies or effects remain.
  */

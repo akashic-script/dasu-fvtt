@@ -5634,12 +5634,34 @@
 }
 
 .ability-effect__name {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 60px;
   font-size: 0.85em;
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &:hover {
     text-decoration: underline;
+  }
+}
+
+.ability-effect__source-tag {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+  border: 1px solid rgb(255 255 255 / 20%);
+  color: rgb(255 255 255 / 60%);
+  cursor: default;
+
+  &:hover {
+    text-decoration: none;
+    color: rgb(255 255 255 / 85%);
   }
 }
 
@@ -5657,6 +5679,9 @@
 .ability-effect__apply-target {
   border-radius: 0;
   font-size: 0.85em;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 80px;
 }
 
 .ability-effect__expand {
