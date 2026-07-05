@@ -136,6 +136,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
       roll: DASUActorSheet.#onRoll,
       rollAttribute: DASUActorSheet.#onRollAttribute,
       rollSkill: DASUActorSheet.#onRollSkill,
+      rollInit: DASUActorSheet.#onRollInit,
       resourceStep: DASUActorSheet.#onResourceStep,
       openResourcePopover: DASUActorSheet.#onOpenResourcePopover,
       openMeritPopover: DASUActorSheet.#onOpenMeritPopover,
@@ -446,6 +447,10 @@ export class DASUActorSheet extends SheetLayoutMixin(
     );
     context.meritTooltip = this.#getMeritTooltip();
 
+    // The INIT header button is enabled only while this actor is a combatant in
+    // the active encounter; it opens the initiative dialog.
+    context.inCombat = !!this.#activeCombatant();
+
     return context;
   }
 
@@ -525,8 +530,13 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.#closeStepperPopover();
     this.#specialtiesPopoverCleanup?.();
     this.#rolesPopoverCleanup?.();
+    for (const [hook, id] of this.#combatHookIds ?? []) Hooks.off(hook, id);
+    this.#combatHookIds = null;
     return super._onClose(options);
   }
+
+  /** Registered [hookName, id] pairs for combat-state refresh; see _onFirstRender. */
+  #combatHookIds = null;
 
   _renderModeToggle() {
     const header = this.element.querySelector('.window-header');
@@ -575,6 +585,18 @@ export class DASUActorSheet extends SheetLayoutMixin(
       const doc = fromUuidSync(uuid);
       doc?.sheet?.render(true);
     });
+
+    // The INIT header button's enabled/awaiting state depends on this actor's
+    // combatant, which lives outside the actor document.
+    const refreshIfMine = (combatant) => {
+      if (combatant?.actor?.id === this.actor.id) this.render();
+    };
+    this.#combatHookIds = [
+      ['createCombatant', refreshIfMine],
+      ['deleteCombatant', refreshIfMine],
+      ['updateCombatant', refreshIfMine],
+    ].map(([hook, fn]) => [hook, Hooks.on(hook, fn)]);
+
     this.#bindPlannerSlots();
     this.#bindTagDropHighlight();
     this.#weaponTable.activateListeners(this);
@@ -1126,6 +1148,23 @@ export class DASUActorSheet extends SheetLayoutMixin(
     if (this.isEditMode) return;
     const key = target.dataset.skill;
     if (key) DASURollDialog.openSkill(this.actor, key);
+  }
+
+  /** Open the initiative dialog (DEX or skill + modifier). Header button. */
+  static #onRollInit(event, target) {
+    if (!this.#activeCombatant()) return;
+    DASURollDialog.openInitiative(this.actor);
+  }
+
+  /**
+   * This actor's combatant in the active encounter (started or staging), or
+   * null. Initiative can be rolled during staging, so `started` is not required.
+   * @returns {Combatant|null}
+   */
+  #activeCombatant() {
+    const combat = game.combat;
+    if (!combat) return null;
+    return combat.combatants.find((c) => c.actor?.id === this.actor.id) ?? null;
   }
 
   #closeStepperPopover() {

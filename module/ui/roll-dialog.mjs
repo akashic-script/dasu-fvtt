@@ -11,7 +11,7 @@ const systemTpl = (path) => `systems/${SYSTEM}/templates/${path}.hbs`;
 export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
   /** @type {FUActor} */
   #actor;
-  /** @type {'attribute'|'skill'|'item'} */
+  /** @type {'attribute'|'skill'|'item'|'initiative'} */
   #mode;
   /** @type {string} preselected attribute or skill key */
   #key;
@@ -83,6 +83,12 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     }
     if (this.#mode === 'skill') {
       return system.skills?.[key]?.value ?? 0;
+    }
+    if (this.#mode === 'initiative') {
+      // `dex` reads the attribute; any other key is a skill.
+      return key === 'dex'
+        ? system.attributes?.dex?.value ?? 0
+        : system.skills?.[key]?.value ?? 0;
     }
     const item = this.#item;
     if (this.#itemCheckType === 'tactic') {
@@ -177,6 +183,19 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     const selectedKey = this.#key;
     const mode = this.#mode;
     const isItem = mode === 'item';
+    const isInitiative = mode === 'initiative';
+
+    // Initiative source: DEX plus every skill, chosen from one dropdown.
+    const initiativeSources = isInitiative
+      ? [
+          {
+            key: 'dex',
+            label: game.i18n.localize(CONFIG.DASU.attributes.dex),
+            value: system.attributes?.dex?.value ?? 0,
+          },
+          ...skills,
+        ]
+      : [];
 
     const tick = this.#computeTick(selectedKey);
 
@@ -204,6 +223,8 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     return {
       mode,
       isItem,
+      isInitiative,
+      initiativeSources,
       isDisplay: this.#itemCheckType === 'display',
       itemName: this.#item?.name ?? null,
       itemCheckType: this.#itemCheckType,
@@ -452,7 +473,19 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
       }
     };
 
-    if (this.#mode === 'item') {
+    if (this.#mode === 'initiative') {
+      const combat = game.combat;
+      const combatant = combat?.combatants.find(
+        (c) => c.actor?.id === this.#actor.id
+      );
+      if (combatant) {
+        // `dex` uses the default primary; any other key rolls with that skill.
+        await combat.rollInitiative([combatant.id], {
+          skill: key === 'dex' ? null : key,
+          configure: configCallback,
+        });
+      }
+    } else if (this.#mode === 'item') {
       if (this.#itemCheckType === 'tactic') {
         await checks.tacticCheck(this.#actor, this.#item, configCallback);
       } else if (this.#itemCheckType === 'display') {
@@ -480,6 +513,16 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static openAttribute(actor, attributeKey) {
     return new DASURollDialog(actor, 'attribute', attributeKey).render(true);
+  }
+
+  /**
+   * Initiative dialog: choose DEX or a skill as the source, plus a situational
+   * modifier. Rolls through the actor's combatant.
+   * @param {FUActor} actor
+   * @param {string} [sourceKey='dex']  'dex' or a skill key.
+   */
+  static openInitiative(actor, sourceKey = 'dex') {
+    return new DASURollDialog(actor, 'initiative', sourceKey).render(true);
   }
 
   static openSkill(actor, skillKey, options = {}) {

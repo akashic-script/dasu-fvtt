@@ -29,11 +29,13 @@
       "SetActive": "Set Active",
       "SetInactive": "Set Inactive",
       "AlreadyAdded": "This daemon is already in stock.",
+      "OwnedByOther": "This daemon is already in {name}'s stock.",
       "Active": "Active",
       "Inactive": "Inactive",
       "Channel": "Channel",
       "StopChannel": "Stop Channeling",
-      "OverStrain": "Fielded daemons ({used}) exceed your Will Strain Cap ({cap}). They risk breaking free of your will."
+      "OverStrain": "Fielded daemons ({used}) exceed your Will Strain Cap ({cap}). They risk breaking free of your will.",
+      "Channeled": "Channeled"
     },
     "SpecialAbility": {
       "Title": "Special Ability",
@@ -293,7 +295,7 @@
       "HP": "HP",
       "WP": "WP",
       "Riches": "Riches",
-      "RichesAbbr": "\u00a4",
+      "RichesAbbr": "¤",
       "CostLabelResource": "Cost",
       "CostLabelRiches": "Price"
     },
@@ -800,6 +802,7 @@
         "Attribute": "Attribute",
         "Skill": "Skill",
         "Item": "Item",
+        "Source": "Source",
         "Modifier": "Modifier",
         "Formula": "Formula",
         "Roll": "Roll",
@@ -840,6 +843,48 @@
         "Description": "Effect",
         "NoUnlocked": "No bond ranks unlocked yet."
       }
+    },
+    "Combat": {
+      "StagingPhase": "Staging Phase",
+      "Kind": {
+        "Label": "Encounter Type",
+        "Combat": "Combat",
+        "Negotiation": "Negotiation"
+      },
+      "Initiative": {
+        "Init": "Initiative",
+        "Tooltip": "Initiative"
+      },
+      "Role": {
+        "Summoner": "Summoner",
+        "Daemon": "Daemon",
+        "NPC": "NPC"
+      },
+      "Actions": {
+        "Label": "Actions",
+        "Major": "Major Action",
+        "Minor": "Minor Action",
+        "Free": "Free Action",
+        "NoneLeft": "{name} has no {action} remaining this turn."
+      },
+      "Strain": {
+        "Tooltip": "Will Strain: fielded daemons vs. this summoner’s cap.",
+        "Cost": "Will Strain cost"
+      },
+      "Field": {
+        "Add": "Field this daemon",
+        "Remove": "Bench this daemon",
+        "Empty": "No daemons in stock.",
+        "Bench": "Bench",
+        "Team": "Team",
+        "Stale": "This daemon is rostered to a different summoner. Re-field it to reclaim ownership."
+      }
+    },
+    "Settings": {
+      "AutoRollInitiative": {
+        "Name": "Auto-roll Initiative",
+        "Hint": "Automatically roll initiative for combatants when combat begins."
+      }
     }
   },
   "TYPES": {
@@ -863,6 +908,12 @@
       "scar": "Scar",
       "dejection": "Dejection",
       "tag": "Tag"
+    },
+    "Combat": {
+      "base": "Encounter"
+    },
+    "Combatant": {
+      "base": "Combatant"
     }
   }
 }

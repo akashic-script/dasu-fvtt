@@ -41,6 +41,10 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/dasu/templates/chat/pipeline/body-resource.hbs',
     'systems/dasu/templates/chat/pipeline/body-effect.hbs',
     'systems/dasu/templates/chat/turn-summary.hbs',
+    // Combat tracker
+    'systems/dasu/templates/combat/tracker.hbs',
+    'systems/dasu/templates/combat/parts/daemon-row.hbs',
+    'systems/dasu/templates/combat/parts/actions.hbs',
     // Check chat partials
     'systems/dasu/templates/chat/chat-check.hbs',
     'systems/dasu/templates/chat/chat-resistance.hbs',

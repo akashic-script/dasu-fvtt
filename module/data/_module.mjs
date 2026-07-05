@@ -24,6 +24,9 @@ export {default as DASUTag} from "./item-tag.mjs";
 
 export {default as PipelineMessageModel} from "./pipeline-message.mjs";
 
+export {default as DASUCombatData} from "./combat/combat.mjs";
+export {default as DASUCombatantData} from "./combat/combatant.mjs";
+
 export * from "./advancements/_module.mjs";
 export * from "./tags/_module.mjs";
 

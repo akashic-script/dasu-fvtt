@@ -14,6 +14,7 @@ import { DisplayCheck } from './display-check.mjs';
 import { CheckReroll } from './check-reroll.mjs';
 import { CheckAid } from './check-aid.mjs';
 import { CheckRetarget } from './check-retarget.mjs';
+import { CombatActionHooks } from './combat-action-hooks.mjs';
 import {
   getActionBlockingStatus,
   isSilenced,
@@ -495,6 +496,7 @@ export function initializeChecks() {
   CheckReroll.initialize();
   CheckRetarget.initialize();
   CheckAid.initialize();
+  CombatActionHooks.initialize();
 
   Hooks.on(CheckHooks.renderCheck, (data, result) => {
     const adv = result.advantage && !result.disadvantage;
