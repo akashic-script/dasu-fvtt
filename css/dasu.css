@@ -2939,6 +2939,9 @@
 
       &.weapon-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-weapon);
+        &[data-equipped="true"] {
+          --item-accent: var(--dasu-accent-stock-active);
+        }
       }
       &.ability-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-ability);
@@ -3152,6 +3155,26 @@
       }
 
       /* Controls cell */
+      .cell-equip-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9em;
+        color: var(--dasu-tab-icon);
+        line-height: 1;
+        width: 100%;
+        &.cell-equip-toggle--active {
+          color: var(--dasu-accent-stock-active);
+        }
+        &.cell-equip-toggle--disabled {
+          opacity: 0.3;
+          pointer-events: none;
+        }
+        .dasu-table__row:hover & {
+          color: inherit;
+        }
+      }
+
       .cell-item-controls {
         display: flex;
         align-items: center;
@@ -3439,7 +3462,7 @@
 
     /* Per-table column definitions */
     .weapon-table {
-      grid-template-columns: [name] auto [damage] 48px [toHit] 54px [controls] 54px;
+      grid-template-columns: [name] auto [damage] 48px [toHit] 54px [equip] 36px [controls] 54px;
     }
     .ability-table {
       grid-template-columns: [name] auto [effect] 80px [cost] 48px [toHit] 48px [aptitude] 48px [controls] 54px;

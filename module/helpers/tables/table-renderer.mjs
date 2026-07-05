@@ -340,7 +340,7 @@ export class DASUTableRenderer {
       li?.dataset?.itemId
     );
     if (!item || isGrant) return;
-    await item.delete();
+    await item.delete({ dasuForce: true });
   }
 
   static #onMenuItem(event, target) {
@@ -384,7 +384,7 @@ export class DASUTableRenderer {
             {
               label: game.i18n.localize('DASU.Sheet.DeleteItem'),
               icon: 'fas fa-trash',
-              onClick: () => item.delete(),
+              onClick: () => item.delete({ dasuForce: true }),
             },
           ]
         : []),

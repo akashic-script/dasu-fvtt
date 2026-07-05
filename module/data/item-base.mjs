@@ -74,6 +74,10 @@ export default class DASUItemBase extends foundry.abstract.TypeDataModel {
     return null;
   }
 
+  transferEffects() {
+    return true;
+  }
+
   get parentFoundryDocument() {
     let current = this.parent;
     while (current !== null) {

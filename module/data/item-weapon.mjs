@@ -37,4 +37,13 @@ export default class DASUWeapon extends TaggableMixin(DASUItemBase) {
 
     return schema;
   }
+
+  get isEquipped() {
+    const item = this.parent;
+    return item?.actor?.system?.equipped?.isEquipped(item) ?? false;
+  }
+
+  transferEffects() {
+    return this.isEquipped;
+  }
 }

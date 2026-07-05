@@ -14,6 +14,18 @@ export class DASUActor extends Actor {
     return { ...super.getRollData(), ...(this.system.getRollData?.() ?? {}) };
   }
 
+  /** @override */
+  *allApplicableEffects() {
+    for (const effect of this.effects) {
+      yield effect;
+    }
+    for (const item of this.items) {
+      for (const effect of item.transferredEffects) {
+        yield effect;
+      }
+    }
+  }
+
   /**
    * @override
    * Route stackable statuses through {@link applyStatus} so a HUD "toggle on"
@@ -26,6 +38,16 @@ export class DASUActor extends Actor {
       return super.toggleStatusEffect(statusId, options);
     }
     return applyStatus(this, statusId);
+  }
+
+  /** @override */
+  async _onDeleteDescendantDocuments(parent, collection, documents, ids, options, userId) {
+    await super._onDeleteDescendantDocuments(parent, collection, documents, ids, options, userId);
+    if (collection === 'items' && this.system.equipped?.weapon) {
+      if (ids.includes(this.system.equipped.weapon)) {
+        await this.update({ 'system.equipped.weapon': null });
+      }
+    }
   }
 
   /** @override */

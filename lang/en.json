@@ -19,6 +19,12 @@
         "Land": "To Land"
       }
     },
+    "Equip": {
+      "ColumnHeader": "EQ",
+      "Equip": "Equip weapon",
+      "Unequip": "Unequip weapon",
+      "InnateUndeletable": "This weapon is innate and cannot be deleted while the Innate tag is slotted."
+    },
     "Stock": {
       "SetActive": "Set Active",
       "SetInactive": "Set Inactive",

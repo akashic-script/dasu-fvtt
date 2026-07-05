@@ -1,5 +1,6 @@
 export {default as DASUActorBase} from "./actor-base.mjs";
 export {default as BonusesDataModel, sumDamageBonus} from "./bonuses.mjs";
+export {default as EquippedDataModel} from "./equipped-data-model.mjs";
 export * from "./fields/index.mjs";
 export {default as DASUSummoner} from "./summoner.mjs";
 export {default as DASUDaemon} from "./daemon.mjs";
