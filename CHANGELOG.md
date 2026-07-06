@@ -1,5 +1,15 @@
 # Changelog
 
+# [14.1.0](https://github.com/spyrella/dasu/compare/v14.0.0...v14.1.0) (2026-07-06)
+
+### Features
+
+- combat encounter tracker with team-based fielding ([1e42fd8](https://github.com/spyrella/dasu/commit/1e42fd85d8f38cc347678cd0d06b8254be0a30ef))
+- implement socket handling for inline actions and auto-apply settings ([06b9dc2](https://github.com/spyrella/dasu/commit/06b9dc2374dc50f8ff4972acb5d031eaf37e3779))
+- inline enrichers, AE expression values, and roll-data expansion ([885fbbf](https://github.com/spyrella/dasu/commit/885fbbf289101df29577e1cae628e88aad0d93cb))
+- single-owner daemon stock via system.summonerId ([0a34cfe](https://github.com/spyrella/dasu/commit/0a34cfecad08edc77990138aabe946fa6e748a39))
+- weapon equip slotting system ([27fa73a](https://github.com/spyrella/dasu/commit/27fa73a98c9ef4d56947d52cedf1b5e34b470a5d))
+
 # 14.0.0 (2026-07-04)
 
 ### Bug Fixes
