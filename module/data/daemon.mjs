@@ -23,6 +23,15 @@ export default class DASUDaemon extends DASUActorBase {
       bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }),
     });
 
+    // The summoner whose stock rosters this daemon; null when unrostered. A
+    // denormalized back-reference (single-owner, synced by DASUActor).
+    schema.summonerId = new fields.StringField({
+      required: true,
+      nullable: true,
+      blank: false,
+      initial: null,
+    });
+
     // Descriptive combat Roles (fighter, magus, ...). No mechanical effect;
     // a daemon may have several. Validated against CONFIG.DASU.daemonRoles.
     schema.roles = new fields.ArrayField(new fields.StringField(), {

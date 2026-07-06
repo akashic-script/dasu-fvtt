@@ -23,11 +23,28 @@ export class DamagePipeline extends Pipeline {
 
   computeOutcome(input, target) {
     const resource = input.resource === 'wp' ? 'wp' : 'hp';
-    const damageType = input.damageType ?? 'physical';
     const pool = target.system?.resources?.[resource] ?? {};
     const max = pool.max ?? 0;
     const priorValue = pool.value ?? 0;
 
+    // WP damage bypasses resistances/drain/tuning; apply flat.
+    if (resource === 'wp') {
+      const finalAmount = Math.max(0, Math.floor(input.value ?? 0));
+      return {
+        resource,
+        damageType: 'untyped',
+        raw: finalAmount,
+        level: 0,
+        mode: 'normal',
+        drain: false,
+        finalAmount,
+        priorValue,
+        newValue: Math.max(0, priorValue - finalAmount),
+        max,
+      };
+    }
+
+    const damageType = input.damageType ?? 'physical';
     let level = target.system?.resistances?.[damageType]?.base ?? 0;
     // Unraveled: weak to all damage types. Only worsens resistance, never
     // overriding an even weaker (already negative) value.
@@ -39,8 +56,6 @@ export class DamagePipeline extends Pipeline {
       multiplier = 1;
     }
 
-    // Incoming-damage tuning (blanket + per-type) adjusts the raw amount before
-    // the resistance multiplier. Positive = takes more; clamped at 0.
     const incoming = sumDamageBonus(target.system?.bonuses?.incomingDamage, {
       type: damageType,
     });
@@ -103,6 +118,8 @@ export class DamagePipeline extends Pipeline {
       modeLabel: game.i18n.localize(
         CONFIG.DASU.resistanceLevels[String(c.level)] ?? ''
       ),
+      // WP damage is typeless; suppress the type row entirely.
+      isWp: c.resource === 'wp',
       drain: c.drain,
       isNullify: c.mode === 'nullify',
       priorValue: c.priorValue,

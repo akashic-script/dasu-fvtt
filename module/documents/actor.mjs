@@ -14,6 +14,18 @@ export class DASUActor extends Actor {
     return { ...super.getRollData(), ...(this.system.getRollData?.() ?? {}) };
   }
 
+  /** @override */
+  *allApplicableEffects() {
+    for (const effect of this.effects) {
+      yield effect;
+    }
+    for (const item of this.items) {
+      for (const effect of item.transferredEffects) {
+        yield effect;
+      }
+    }
+  }
+
   /**
    * @override
    * Route stackable statuses through {@link applyStatus} so a HUD "toggle on"
@@ -29,10 +41,69 @@ export class DASUActor extends Actor {
   }
 
   /** @override */
+  async _onDeleteDescendantDocuments(parent, collection, documents, ids, options, userId) {
+    await super._onDeleteDescendantDocuments(parent, collection, documents, ids, options, userId);
+    if (collection === 'items' && this.system.equipped?.weapon) {
+      if (ids.includes(this.system.equipped.weapon)) {
+        await this.update({ 'system.equipped.weapon': null });
+      }
+    }
+  }
+
+  /** @override */
+  async _preUpdate(changed, options, user) {
+    await super._preUpdate(changed, options, user);
+    // Snapshot prior stock so _onUpdate can tell which daemons left.
+    if (
+      this.type === 'summoner' &&
+      foundry.utils.hasProperty(changed, 'system.stock')
+    ) {
+      options.dasuPriorStock = (this.system?.stock ?? []).map((e) => e.uuid);
+    }
+  }
+
+  /** @override */
   async _onUpdate(changed, options, userId) {
     await super._onUpdate(changed, options, userId);
     if (foundry.utils.hasProperty(changed, 'system.level')) {
       await this.applySchemaUpgrades();
+    }
+    if (
+      game.userId === userId &&
+      this.type === 'summoner' &&
+      foundry.utils.hasProperty(changed, 'system.stock')
+    ) {
+      await this.#syncStockOwnership(options.dasuPriorStock ?? []);
+    }
+  }
+
+  /**
+   * Sync daemons' `system.summonerId` with this summoner's stock (claim on add,
+   * release on remove). The single enforcement point for the single-owner
+   * invariant, covering every stock write path. Set/clear-only, so no cascade.
+   * @param {string[]} priorUuids  Stock daemon UUIDs before this update.
+   */
+  async #syncStockOwnership(priorUuids) {
+    const nowUuids = (this.system?.stock ?? []).map((e) => e.uuid);
+    const nowSet = new Set(nowUuids);
+    const priorSet = new Set(priorUuids);
+
+    for (const uuid of nowUuids) {
+      if (priorSet.has(uuid)) continue;
+      const daemon = await fromUuid(uuid);
+      if (!daemon?.isOwner || daemon.type !== 'daemon') continue;
+      if (daemon.system?.summonerId !== this.id) {
+        await daemon.update({ 'system.summonerId': this.id });
+      }
+    }
+
+    for (const uuid of priorUuids) {
+      if (nowSet.has(uuid)) continue;
+      const daemon = await fromUuid(uuid);
+      if (!daemon?.isOwner || daemon.type !== 'daemon') continue;
+      if (daemon.system?.summonerId === this.id) {
+        await daemon.update({ 'system.summonerId': null });
+      }
     }
   }
 

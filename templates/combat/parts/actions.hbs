@@ -1,0 +1,10 @@
+<span class="dasu-actions" aria-label="{{ localize "DASU.Combat.Actions.Label" }}">
+    <span class="dasu-actions__group" data-tooltip="{{ localize "DASU.Combat.Actions.Major" }}">
+        <i class="fa-solid fa-angles-right"></i>
+        <span class="dasu-actions__pip {{#if major.remaining}}dasu-actions__pip--available{{else}}dasu-actions__pip--spent{{/if}}"></span>
+    </span>
+    <span class="dasu-actions__group" data-tooltip="{{ localize "DASU.Combat.Actions.Minor" }}">
+        <i class="fa-solid fa-angle-right"></i>
+        <span class="dasu-actions__pip {{#if minor.remaining}}dasu-actions__pip--available{{else}}dasu-actions__pip--spent{{/if}}"></span>
+    </span>
+</span>

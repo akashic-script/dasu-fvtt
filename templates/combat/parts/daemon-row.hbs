@@ -1,0 +1,25 @@
+<li class="dasu-daemon {{#if fielded}}dasu-daemon--fielded{{/if}} {{#if stale}}dasu-daemon--stale{{/if}}" data-daemon-uuid="{{ uuid }}">
+    {{#if staging}}
+    <button type="button" class="dasu-daemon__toggle" data-action="dasuToggleFielded" data-uuid="{{ uuid }}"
+            data-tooltip="{{#if fielded}}{{ localize "DASU.Combat.Field.Remove" }}{{else}}{{ localize "DASU.Combat.Field.Add" }}{{/if}}">
+        <i class="fa-{{#if fielded}}solid fa-square-check{{else}}regular fa-square{{/if}}"></i>
+    </button>
+    {{else}}
+    <span class="dasu-daemon__bullet"><i class="fa-solid fa-angle-right"></i></span>
+    {{/if}}
+    <img class="dasu-daemon__img" src="{{ img }}" alt="{{ name }}" loading="lazy">
+    <span class="dasu-daemon__name">{{ name }}</span>
+    {{#if stale}}<i class="dasu-daemon__stale fa-solid fa-triangle-exclamation" data-tooltip="{{ localize "DASU.Combat.Field.Stale" }}"></i>{{/if}}
+    {{#if isChanneler}}
+    <button type="button" class="dasu-daemon__channel-btn {{#if channeled}}active{{/if}}" data-action="dasuToggleChanneled" data-uuid="{{ uuid }}"
+            data-tooltip="{{#if channeled}}{{ localize "DASU.Stock.StopChannel" }}{{else}}{{ localize "DASU.Stock.Channel" }}{{/if}}"
+            aria-pressed="{{#if channeled}}true{{else}}false{{/if}}" tabindex="-1">
+        <i class="dasu-daemon__channel fa-solid fa-hand-sparkles"></i>
+    </button>
+    {{else}}
+    {{#if channeled}}<i class="dasu-daemon__channel fa-solid fa-hand-sparkles" data-tooltip="{{ localize "DASU.Stock.Channeled" }}"></i>{{/if}}
+    {{/if}}
+    {{#if hp}}<span class="dasu-daemon__res dasu-daemon__res--hp" data-tooltip="{{ localize "DASU.Resource.HP" }}">{{ hp }}</span>{{/if}}
+    {{#if wp}}<span class="dasu-daemon__res dasu-daemon__res--wp" data-tooltip="{{ localize "DASU.Resource.WP" }}">{{ wp }}</span>{{/if}}
+    <span class="dasu-daemon__strain" data-tooltip="{{ localize "DASU.Combat.Strain.Cost" }}">{{ strain }}</span>
+</li>

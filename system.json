@@ -53,6 +53,12 @@
     },
     "ChatMessage": {
       "pipeline": {}
+    },
+    "Combat": {
+      "base": {}
+    },
+    "Combatant": {
+      "base": {}
     }
   },
   "styles": [

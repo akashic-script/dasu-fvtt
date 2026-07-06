@@ -1266,6 +1266,36 @@
         }
       }
 
+      .actor-header__init {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        border: 1px solid var(--dasu-accent-spell);
+        border-radius: 0;
+        background: var(--dasu-surface-1);
+        color: var(--dasu-accent-spell);
+        font-size: 0.9em;
+        line-height: 1;
+        cursor: pointer;
+        i {
+          margin: 0;
+        }
+        &:hover:not(:disabled) {
+          background: var(--dasu-accent-spell);
+          color: var(--dasu-paper);
+        }
+        &:disabled {
+          opacity: 0.35;
+          cursor: default;
+          border-color: var(--dasu-muted, #9a9a9a);
+          color: var(--dasu-muted, #9a9a9a);
+        }
+      }
+
       .actor-header__levelup {
         flex: 0 0 auto;
         display: flex;
@@ -2939,6 +2969,9 @@
 
       &.weapon-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-weapon);
+        &[data-equipped='true'] {
+          --item-accent: var(--dasu-accent-stock-active);
+        }
       }
       &.ability-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-ability);
@@ -3152,6 +3185,26 @@
       }
 
       /* Controls cell */
+      .cell-equip-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9em;
+        color: var(--dasu-tab-icon);
+        line-height: 1;
+        width: 100%;
+        &.cell-equip-toggle--active {
+          color: var(--dasu-accent-stock-active);
+        }
+        &.cell-equip-toggle--disabled {
+          opacity: 0.3;
+          pointer-events: none;
+        }
+        .dasu-table__row:hover & {
+          color: inherit;
+        }
+      }
+
       .cell-item-controls {
         display: flex;
         align-items: center;
@@ -3439,7 +3492,7 @@
 
     /* Per-table column definitions */
     .weapon-table {
-      grid-template-columns: [name] auto [damage] 48px [toHit] 54px [controls] 54px;
+      grid-template-columns: [name] auto [damage] 48px [toHit] 54px [equip] 36px [controls] 54px;
     }
     .ability-table {
       grid-template-columns: [name] auto [effect] 80px [cost] 48px [toHit] 48px [aptitude] 48px [controls] 54px;
@@ -6226,6 +6279,96 @@ section[data-tab='effects'].drag-over {
   }
 }
 
+/* Inline references (@DMG / @RESOURCE / @EFFECT / @STATUS in descriptions). */
+a.inline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 0 3px;
+  border: 1px solid var(--dasu-border, #3a3a3a);
+  border-radius: 0;
+  background: var(--dasu-surface-1, #1e1a24);
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+}
+a.inline:hover {
+  filter: brightness(1.2);
+}
+a.inline-damage {
+  color: var(--dasu-hp, #d9a800);
+  border-color: var(--dasu-hp, #d9a800);
+}
+a.inline-resource--cost {
+  color: var(--dasu-wp, #6ab4d8);
+  border-color: var(--dasu-wp, #6ab4d8);
+}
+a.inline-resource--heal {
+  color: var(--dasu-accent-heal, #5fbf7f);
+  border-color: var(--dasu-accent-heal, #5fbf7f);
+}
+a.inline-effect,
+a.inline-status {
+  color: var(--dasu-accent-spell);
+  border-color: var(--dasu-accent-spell);
+}
+a.inline-broken {
+  color: var(--dasu-muted, #9a9a9a);
+  border-color: var(--dasu-muted, #9a9a9a);
+  cursor: default;
+}
+
+/* Inline apply-request chat card (unowned targets, GM-gated). Rendered inside
+   the shared chat-check wrapper as a display-kind card. */
+.inline-request-card__body {
+  padding: 6px 8px;
+  font-size: 0.85em;
+}
+.inline-request-card--resolved {
+  opacity: 0.6;
+}
+.inline-request-card__apply {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 0;
+  background: var(--dasu-accent-spell);
+  color: #1a1520;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.inline-request-card__apply:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+.inline-request-card__apply:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Inline command builder dialog. */
+.dasu-inline-builder {
+  min-height: 320px;
+}
+.dasu-inline-builder .form-group {
+  margin-bottom: 6px;
+}
+.dasu-inline-builder__preview code {
+  display: block;
+  padding: 4px 6px;
+  border: 1px solid var(--dasu-border, #3a3a3a);
+  border-radius: 0;
+  background: var(--dasu-surface-1, #1e1a24);
+  color: var(--dasu-accent-spell);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
 /* Relentless Curse penalty editor grid (advancement expand) */
 .adv-expand__curse-grid {
   display: grid;
@@ -6649,4 +6792,375 @@ section[data-tab='effects'].drag-over {
       color: var(--color-level-error, #e05252);
     }
   }
+}
+
+/* Combat Tracker - team staging tree + action pips */
+.dasu-combat-tracker .dasu-combatant {
+  flex-wrap: wrap;
+  gap: 0;
+  padding: 0.35rem 0.35rem;
+}
+
+.dasu-combat-tracker .dasu-combatant__main {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.dasu-combat-tracker .dasu-combatant__main .token-image {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+}
+
+.dasu-combat-tracker .dasu-combatant__main .token-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35rem;
+}
+.dasu-combat-tracker .dasu-combatant__main .token-name .name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dasu-combat-tracker .dasu-combatant__main .combatant-controls {
+  margin-left: auto;
+}
+
+.dasu-combat-tracker
+  .dasu-combatant__main
+  .token-initiative
+  .combatant-control.roll {
+  opacity: 0.65;
+}
+.dasu-combat-tracker
+  .dasu-combatant__main
+  .token-initiative
+  .combatant-control.roll:hover {
+  opacity: 1;
+}
+.dasu-combat-tracker .dasu-combatant__main .initiative-input {
+  border-radius: 0;
+}
+
+.dasu-strain {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: auto;
+  padding: 0 0.5rem 0 0.6rem;
+  height: 1.1rem;
+  font-size: 0.68em;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  color: var(--dasu-paper, #191813);
+  background: var(--dasu-accent-stock-active, #4a8fc4);
+  clip-path: polygon(5px 0, 100% 0, 100% 100%, 0 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%);
+  white-space: nowrap;
+}
+.dasu-strain i {
+  color: inherit;
+  opacity: 0.85;
+}
+.dasu-strain--over {
+  background: var(--dasu-accent-tactic, #c45a5a);
+}
+
+/* Team fielding tree. */
+.dasu-team {
+  width: 100%;
+  margin: 0.15rem 0 0.1rem;
+}
+
+/* Encounter-kind selector (staging, GM only): sharp-edged segmented toggle.
+   Rendered as the first <li> of the tracker <ol>, so reset list styling. */
+.dasu-encounter-kind {
+  list-style: none;
+  display: flex;
+  gap: 0;
+  margin: 0.25rem;
+  border: 1px solid var(--dasu-border, #3a3a3a);
+}
+.dasu-encounter-kind__option {
+  flex: 1;
+  padding: 0.3rem 0.5rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--dasu-muted, #9a9a9a);
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+.dasu-encounter-kind__option:not(:last-child) {
+  border-right: 1px solid var(--dasu-border, #3a3a3a);
+}
+.dasu-encounter-kind__option--active {
+  background: var(--dasu-accent-spell);
+  color: var(--color-text-light-highlight, #fff);
+}
+
+.dasu-team--framed {
+  --_tab-w: 62px;
+  --_tab-h: 15px;
+  position: relative;
+  padding: calc(0.15rem + var(--_tab-h)) 0.35rem 0.25rem;
+}
+
+.dasu-team--framed::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgb(255 255 255 / 12%);
+  clip-path: polygon(
+    0% var(--_tab-h),
+    0% 0%,
+    var(--_tab-w) 0%,
+    var(--_tab-w) var(--_tab-h),
+    100% var(--_tab-h),
+    100% 100%,
+    0% 100%
+  );
+}
+
+.dasu-team--framed::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  pointer-events: none;
+  background: rgb(var(--dasu-panel, 0 0 0) / 30%);
+  clip-path: polygon(
+    0% var(--_tab-h),
+    0% 0%,
+    calc(var(--_tab-w) - 1px) 0%,
+    calc(var(--_tab-w) - 1px) var(--_tab-h),
+    100% var(--_tab-h),
+    100% 100%,
+    0% 100%
+  );
+}
+.dasu-team__legend {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: var(--_tab-h);
+  width: var(--_tab-w);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 0.4rem;
+  font-size: 0.6em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dasu-tab-icon, #b5b3a4);
+  white-space: nowrap;
+  overflow: hidden;
+  z-index: 1;
+}
+.dasu-team__legend::before {
+  content: '◆';
+  font-size: 0.9em;
+  opacity: 0.6;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.dasu-team--framed > .dasu-team__header,
+.dasu-team--framed > .dasu-team__tree,
+.dasu-team--framed > .dasu-team__bench-toggle,
+.dasu-team--framed > .dasu-team__empty {
+  position: relative;
+  z-index: 1;
+}
+
+.dasu-team__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  line-height: 1.2;
+  margin-bottom: 0.15rem;
+}
+.dasu-team__empty {
+  font-size: var(--font-size-11, 11px);
+  color: var(--dasu-muted, #9a9a9a);
+  padding: 0.1rem 0;
+}
+
+.dasu-team__tree {
+  list-style: none;
+  margin: 0.05rem 0 0;
+  padding: 0;
+}
+.dasu-team__tree--bench {
+  opacity: 0.85;
+}
+/* Bench */
+.dasu-team__bench-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  padding: 0.05rem 0;
+  margin: 0;
+  cursor: pointer;
+  font-size: var(--font-size-11, 11px);
+  color: var(--dasu-muted, #9a9a9a);
+  text-align: left;
+}
+.dasu-team__bench-toggle:hover {
+  color: var(--dasu-ink, #eee);
+}
+.dasu-team__bench-toggle i {
+  width: 0.7em;
+}
+.dasu-daemon {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.15rem;
+  line-height: 1.2;
+  font-size: var(--font-size-12, 12px);
+  border-radius: 3px;
+}
+.dasu-daemon + .dasu-daemon {
+  margin-top: 0.1rem;
+}
+.dasu-daemon:hover {
+  background: rgb(from var(--dasu-ink, #eee) r g b / 6%);
+}
+.dasu-team__tree--bench .dasu-daemon {
+  opacity: 0.6;
+}
+.dasu-team__tree--bench .dasu-daemon--fielded {
+  opacity: 1;
+}
+.dasu-daemon__toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--dasu-muted, #9a9a9a);
+}
+.dasu-daemon--fielded .dasu-daemon__toggle {
+  color: var(--dasu-accent-stock-active, #4a8fc4);
+}
+.dasu-daemon__bullet {
+  color: var(--dasu-accent-stock-active, #4a8fc4);
+  font-size: 0.75em;
+}
+.dasu-daemon__img {
+  width: 16px;
+  height: 16px;
+  object-fit: cover;
+  border: none;
+  border-radius: 0;
+}
+.dasu-daemon__name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dasu-daemon__channel {
+  color: var(--dasu-accent-spell);
+  font-size: 0.85em;
+}
+.dasu-daemon__channel-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--dasu-muted, #9a9a9a);
+  opacity: 0.4;
+  outline: none;
+  box-shadow: none;
+}
+.dasu-daemon__channel-btn:hover,
+.dasu-daemon__channel-btn.active {
+  opacity: 1;
+  outline: none;
+  box-shadow: none;
+}
+.dasu-daemon__stale {
+  color: var(--dasu-warn, #d9a800);
+  font-size: 0.85em;
+}
+.dasu-daemon--stale .dasu-daemon__name {
+  opacity: 0.7;
+}
+.dasu-daemon__res {
+  flex: 0 0 auto;
+  min-width: 2.6rem;
+  text-align: right;
+  font-size: var(--font-size-10, 10px);
+  font-variant-numeric: tabular-nums;
+  color: var(--dasu-muted, #9a9a9a);
+}
+.dasu-daemon__res--hp {
+  color: var(--dasu-hp, #d9a800);
+}
+.dasu-daemon__res--wp {
+  color: var(--dasu-wp, #6ab4d8);
+}
+.dasu-daemon__strain {
+  flex: 0 0 auto;
+  min-width: 1.1rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--dasu-wp, #6ab4d8);
+}
+
+/* Meta row: strain badge + action pips share one line */
+.dasu-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+/* Standalone meta row (non-summoner combatants) */
+.dasu-combatant > .dasu-meta {
+  width: 100%;
+  padding: 0.05rem 0.15rem 0.1rem;
+}
+
+/* Action pips (in-combat) */
+.dasu-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.dasu-actions__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--font-size-11, 11px);
+  color: var(--dasu-muted, #9a9a9a);
+}
+.dasu-actions__pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+  display: inline-block;
+  border: 1px solid var(--dasu-border, rgba(255, 255, 255, 0.2));
+}
+.dasu-actions__pip--available {
+  background: var(--dasu-accent-feature, #c9922a);
+}
+.dasu-actions__pip--spent {
+  background: transparent;
+  opacity: 0.4;
+}
+
+/* Sharp-edged inputs */
+.dasu-combat-tracker .initiative-input {
+  border-radius: 0;
 }
