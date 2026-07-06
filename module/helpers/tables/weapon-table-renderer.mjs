@@ -57,13 +57,19 @@ export class WeaponTableRenderer extends DASUTableRenderer {
 
   static async #renderEquipCell(item) {
     const equipped = item.system?.isEquipped ?? false;
-    const icon = equipped ? 'fa-solid fa-shield-halved' : 'fa-regular fa-shield';
+    const icon = equipped
+      ? 'fa-solid fa-shield-halved'
+      : 'fa-regular fa-shield';
     const activeCls = equipped ? ' cell-equip-toggle--active' : '';
     const label = equipped
       ? game.i18n.localize('DASU.Equip.Unequip')
       : game.i18n.localize('DASU.Equip.Equip');
-    const disabled = !(item.parent instanceof Actor) ? ' cell-equip-toggle--disabled' : '';
-    return `<a class="cell-equip-toggle${activeCls}${disabled}" data-action="equipToggle" data-tooltip="${foundry.utils.escapeHTML(label)}">
+    const disabled = !(item.parent instanceof Actor)
+      ? ' cell-equip-toggle--disabled'
+      : '';
+    return `<a class="cell-equip-toggle${activeCls}${disabled}" data-action="equipToggle" data-tooltip="${foundry.utils.escapeHTML(
+      label
+    )}">
       <i class="${icon}"></i>
     </a>`;
   }

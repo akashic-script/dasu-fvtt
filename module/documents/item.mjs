@@ -13,7 +13,9 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
   async _preDelete(options, user) {
     const blocked = this.effects.some((e) => e.getFlag('dasu', 'undeletable'));
     if (blocked && !options.dasuForce) {
-      ui.notifications?.warn(game.i18n.localize('DASU.Equip.InnateUndeletable'));
+      ui.notifications?.warn(
+        game.i18n.localize('DASU.Equip.InnateUndeletable')
+      );
       return false;
     }
     return super._preDelete(options, user);
@@ -68,9 +70,10 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
 
   /** @override */
   get transferredEffects() {
-    const gate = this.system?.transferEffects instanceof Function
-      ? this.system.transferEffects()
-      : true;
+    const gate =
+      this.system?.transferEffects instanceof Function
+        ? this.system.transferEffects()
+        : true;
     return gate ? super.transferredEffects : [];
   }
 
