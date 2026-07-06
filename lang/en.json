@@ -109,6 +109,60 @@
     "Table": {
       "BrowseCompendium": "Browse"
     },
+    "Inline": {
+      "Variable": "(varies)",
+      "Unknown": "Someone",
+      "Damage": {
+        "Tooltip": "Apply {amount} {type} damage to the target.",
+        "Summary": "{amount} {type} damage"
+      },
+      "Resource": {
+        "CostTooltip": "Spend {amount} {resource}.",
+        "HealTooltip": "Restore {amount} {resource}.",
+        "CostSummary": "spend {amount} {resource}",
+        "HealSummary": "restore {amount} {resource}"
+      },
+      "Effect": {
+        "Tooltip": "Apply {name} to the target.",
+        "Summary": "apply {name}",
+        "Invalid": "Invalid effect",
+        "Broken": "Broken effect reference"
+      },
+      "Status": {
+        "Tooltip": "Apply the {name} status to the target.",
+        "Summary": "apply {name}"
+      },
+      "Request": {
+        "Title": "Apply Request",
+        "Body": "{source} wants to {summary} to {target}.",
+        "Apply": "Apply",
+        "Applied": "Applied",
+        "Deny": "Deny"
+      },
+      "Builder": {
+        "Menu": "Inline Command",
+        "Title": "Insert Inline Command",
+        "Command": "Command",
+        "Amount": "Amount",
+        "DamageType": "Damage Type",
+        "TargetWp": "Target WP",
+        "Resource": "Resource",
+        "Operation": "Operation",
+        "Cost": "Cost (spend)",
+        "Heal": "Heal (restore)",
+        "EffectKind": "Source",
+        "KindStatus": "Status",
+        "KindUuid": "By UUID",
+        "EffectUuid": "Effect UUID",
+        "Status": "Status",
+        "Duration": "Duration",
+        "NoDuration": "None",
+        "Label": "Label (optional)",
+        "LabelHint": "Custom display text",
+        "Preview": "Preview",
+        "Insert": "Insert"
+      }
+    },
     "Pipeline": {
       "Undo": "Undo",
       "Redo": "Redo",

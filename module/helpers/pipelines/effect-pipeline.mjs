@@ -36,6 +36,7 @@ export class EffectPipeline extends Pipeline {
     // Strip the source _id so repeated applies don't collide on one embedded id.
     if (effectData) delete effectData._id;
 
+    if (effectData && input.duration) effectData.duration = input.duration;
     if (effectData) normalizeDuration(effectData);
 
     const statusId =
@@ -94,7 +95,8 @@ export class EffectPipeline extends Pipeline {
     if (!outcome.effectData)
       throw new Error('EffectPipeline: no effect data to apply');
 
-    // Statuses route through applyStatus for stacking; capture prior for revert.
+    const duration = outcome.effectData.duration ?? null;
+
     if (outcome.statusId) {
       const prior = target.effects.find(
         (e) => statusIdOf(e) === outcome.statusId
@@ -102,6 +104,7 @@ export class EffectPipeline extends Pipeline {
       const priorStacks = prior ? stacksOf(prior) : 0;
       const effect = await applyStatus(target, outcome.statusId, {
         source: outcome.statusSource ?? undefined,
+        ...(duration ? { duration } : {}),
       });
       return {
         effectId: effect?.id ?? null,
@@ -111,20 +114,75 @@ export class EffectPipeline extends Pipeline {
       };
     }
 
-    const [created] = await target.createEmbeddedDocuments('ActiveEffect', [
-      outcome.effectData,
-    ]);
-    return { effectId: created?.id ?? null };
+    return this.#applyPlainEffect(outcome, target, duration);
+  }
+
+  /**
+   * Apply a non-status effect. A duplicate (matched by source UUID) either stacks
+   * (if the effect declares `flags.dasu.maxStacks > 1`) with its duration reset,
+   * or overwrites the previous instance. A first apply just creates it.
+   */
+  async #applyPlainEffect(outcome, target, duration) {
+    const sourceUuid = outcome.sourceUuid;
+    const existing = sourceUuid
+      ? target.effects.find(
+          (e) => e.getFlag(SYSTEM, 'inlineSourceUuid') === sourceUuid
+        )
+      : null;
+
+    const data = foundry.utils.deepClone(outcome.effectData);
+    if (sourceUuid) {
+      data.flags = data.flags ?? {};
+      data.flags[SYSTEM] = {
+        ...data.flags[SYSTEM],
+        inlineSourceUuid: sourceUuid,
+        baseName: data.name,
+      };
+    }
+
+    if (!existing) {
+      const [created] = await target.createEmbeddedDocuments('ActiveEffect', [
+        data,
+      ]);
+      return { effectId: created?.id ?? null };
+    }
+
+    const maxStacks = existing.getFlag(SYSTEM, 'maxStacks') ?? 1;
+    const stackable = Number.isFinite(maxStacks) && maxStacks > 1;
+    const priorStacks = stacksOf(existing);
+
+    if (stackable) {
+      const next = Math.min(maxStacks, priorStacks + 1);
+      const base = existing.getFlag(SYSTEM, 'baseName') ?? existing.name;
+      const update = {
+        [`flags.${SYSTEM}.stacks`]: next,
+        name: next > 1 ? `${base} (${next})` : base,
+      };
+      if (duration) update.duration = duration;
+      await existing.update(update);
+      return {
+        effectId: existing.id,
+        plainStack: true,
+        existedBefore: true,
+        priorStacks,
+      };
+    }
+
+    delete data._id;
+    data.flags = data.flags ?? {};
+    data.flags[SYSTEM] = { ...data.flags[SYSTEM], stacks: 1 };
+    await existing.update(data);
+    return { effectId: existing.id, plainOverwrite: true };
   }
 
   async revert(revertData, target) {
     if (revertData?.dcSkipped) return;
     const id = revertData?.effectId;
     if (!id || !target.effects?.get(id)) return;
+    const effect = target.effects.get(id);
 
     // If a stackable status pre-existed, restore its prior stacks; else delete.
     if (revertData.statusId && isStackable(revertData.statusId)) {
-      const effect = target.effects.get(id);
       if (revertData.existedBefore && revertData.priorStacks > 0) {
         await effect.update({
           [`flags.${SYSTEM}.stacks`]: revertData.priorStacks,
@@ -133,6 +191,17 @@ export class EffectPipeline extends Pipeline {
         return;
       }
     }
+
+    if (revertData.plainStack && revertData.priorStacks > 0) {
+      const base = effect.getFlag(SYSTEM, 'baseName') ?? effect.name;
+      const prior = revertData.priorStacks;
+      await effect.update({
+        [`flags.${SYSTEM}.stacks`]: prior,
+        name: prior > 1 ? `${base} (${prior})` : base,
+      });
+      return;
+    }
+
     await target.deleteEmbeddedDocuments('ActiveEffect', [id]);
   }
 

@@ -1266,6 +1266,36 @@
         }
       }
 
+      .actor-header__init {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        border: 1px solid var(--dasu-accent-spell);
+        border-radius: 0;
+        background: var(--dasu-surface-1);
+        color: var(--dasu-accent-spell);
+        font-size: 0.9em;
+        line-height: 1;
+        cursor: pointer;
+        i {
+          margin: 0;
+        }
+        &:hover:not(:disabled) {
+          background: var(--dasu-accent-spell);
+          color: var(--dasu-paper);
+        }
+        &:disabled {
+          opacity: 0.35;
+          cursor: default;
+          border-color: var(--dasu-muted, #9a9a9a);
+          color: var(--dasu-muted, #9a9a9a);
+        }
+      }
+
       .actor-header__levelup {
         flex: 0 0 auto;
         display: flex;
@@ -2939,7 +2969,7 @@
 
       &.weapon-table .dasu-table__row-container.item {
         --item-accent: var(--dasu-accent-weapon);
-        &[data-equipped="true"] {
+        &[data-equipped='true'] {
           --item-accent: var(--dasu-accent-stock-active);
         }
       }
@@ -6247,6 +6277,96 @@ section[data-tab='effects'].drag-over {
   &:hover {
     filter: brightness(1.15);
   }
+}
+
+/* Inline references (@DMG / @RESOURCE / @EFFECT / @STATUS in descriptions). */
+a.inline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 0 3px;
+  border: 1px solid var(--dasu-border, #3a3a3a);
+  border-radius: 0;
+  background: var(--dasu-surface-1, #1e1a24);
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+}
+a.inline:hover {
+  filter: brightness(1.2);
+}
+a.inline-damage {
+  color: var(--dasu-hp, #d9a800);
+  border-color: var(--dasu-hp, #d9a800);
+}
+a.inline-resource--cost {
+  color: var(--dasu-wp, #6ab4d8);
+  border-color: var(--dasu-wp, #6ab4d8);
+}
+a.inline-resource--heal {
+  color: var(--dasu-accent-heal, #5fbf7f);
+  border-color: var(--dasu-accent-heal, #5fbf7f);
+}
+a.inline-effect,
+a.inline-status {
+  color: var(--dasu-accent-spell);
+  border-color: var(--dasu-accent-spell);
+}
+a.inline-broken {
+  color: var(--dasu-muted, #9a9a9a);
+  border-color: var(--dasu-muted, #9a9a9a);
+  cursor: default;
+}
+
+/* Inline apply-request chat card (unowned targets, GM-gated). Rendered inside
+   the shared chat-check wrapper as a display-kind card. */
+.inline-request-card__body {
+  padding: 6px 8px;
+  font-size: 0.85em;
+}
+.inline-request-card--resolved {
+  opacity: 0.6;
+}
+.inline-request-card__apply {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 0;
+  background: var(--dasu-accent-spell);
+  color: #1a1520;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.inline-request-card__apply:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+.inline-request-card__apply:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Inline command builder dialog. */
+.dasu-inline-builder {
+  min-height: 320px;
+}
+.dasu-inline-builder .form-group {
+  margin-bottom: 6px;
+}
+.dasu-inline-builder__preview code {
+  display: block;
+  padding: 4px 6px;
+  border: 1px solid var(--dasu-border, #3a3a3a);
+  border-radius: 0;
+  background: var(--dasu-surface-1, #1e1a24);
+  color: var(--dasu-accent-spell);
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 /* Relentless Curse penalty editor grid (advancement expand) */

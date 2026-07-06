@@ -157,6 +157,7 @@ export default class DASUSummoner extends DASUActorBase {
         data.skills[k] = foundry.utils.deepClone(v);
     }
     data.lvl = this.level;
+    data.dejection = this.dejection ?? 0;
     data.ap = foundry.utils.deepClone(this.ap);
     data.sp = foundry.utils.deepClone(this.sp);
     data.stats = foundry.utils.deepClone(this.stats);

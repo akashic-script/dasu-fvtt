@@ -1,4 +1,5 @@
 import { DASUActor } from './documents/actor.mjs';
+import { DASUActiveEffect } from './documents/active-effect.mjs';
 import { DASUItem } from './documents/item.mjs';
 import { DASUSummonerActorSheet } from './sheets/summoner-actor-sheet.mjs';
 import { DASUDaemonActorSheet } from './sheets/daemon-actor-sheet.mjs';
@@ -16,6 +17,7 @@ import { DASUCombatant } from './documents/combatant.mjs';
 import { DASUCombatTracker } from './sheets/combat-tracker.mjs';
 import { registerCombatSettings } from './helpers/combat-settings.mjs';
 import { initializePipelines } from './helpers/pipelines/_module.mjs';
+import { initializeInlineEnrichers } from './enrichers/_module.mjs';
 import { initializeStatusEffects } from './helpers/status-effects.mjs';
 import { DASUActiveEffectConfig } from './sheets/active-effect-config.mjs';
 import {
@@ -54,11 +56,7 @@ Hooks.once('init', function () {
   initializeChecks();
   initializePipelines();
   initializeStatusEffects();
-
-  CONFIG.Combat.initiative = {
-    formula: '1d20 + @attributes.dex.value',
-    decimals: 2,
-  };
+  initializeInlineEnrichers();
   initializeCombat();
 
   // Initiative is rolled through the DASU check pipeline (2d10 + DEX / skill),
@@ -74,6 +72,7 @@ Hooks.once('init', function () {
   });
   CONFIG.ui.combat = DASUCombatTracker;
 
+  CONFIG.ActiveEffect.documentClass = DASUActiveEffect;
   CONFIG.Actor.documentClass = DASUActor;
   Object.assign(CONFIG.Actor.dataModels, {
     summoner: models.DASUSummoner,

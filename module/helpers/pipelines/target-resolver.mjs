@@ -1,10 +1,6 @@
 /**
- * Resolves the actors a pipeline action applies to.
- *
- * Three sources, in priority order:
- *  - explicit: an actor/token uuid passed on a chat button's dataset
- *  - targeted: the user's current Foundry targets (game.user.targets)
- *  - selected: the user's controlled tokens (canvas selection)
+ * Resolves the actors a pipeline action applies to, in priority order:
+ * explicit uuid -> targeted tokens -> (optional) the user's own character.
  */
 
 /** Resolve a single actor from an actor or token uuid. */
@@ -31,16 +27,22 @@ function getSelected() {
 
 /**
  * Resolve the targets for an action.
- * @param {string} [options.uuid]  explicit actor/token uuid (wins if present)
+ * @param {string} [options.uuid]   explicit actor/token uuid (wins if present)
+ * @param {boolean} [options.allowSelf]  final fallback to the user's own
+ *   character. Off by default so pipeline callers keep explicit targeting.
  */
-async function resolveTargets({ uuid } = {}) {
+async function resolveTargets({
+  uuid,
+  allowSelf = false,
+} = {}) {
   if (uuid) {
     const actor = await resolveActor(uuid);
     return actor ? [actor] : [];
   }
   const targeted = getTargeted();
   if (targeted.length) return targeted;
-  return getSelected();
+  if (allowSelf && game.user?.character) return [game.user.character];
+  return [];
 }
 
 export const TargetResolver = Object.freeze({
