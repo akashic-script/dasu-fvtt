@@ -17,6 +17,7 @@ import { DASUCombatant } from './documents/combatant.mjs';
 import { DASUCombatTracker } from './sheets/combat-tracker.mjs';
 import { registerCombatSettings } from './helpers/combat-settings.mjs';
 import { initializePipelines } from './helpers/pipelines/_module.mjs';
+import { DASUSocketHandler } from './helpers/socket.mjs';
 import { initializeInlineEnrichers } from './enrichers/_module.mjs';
 import { initializeStatusEffects } from './helpers/status-effects.mjs';
 import { DASUActiveEffectConfig } from './sheets/active-effect-config.mjs';
@@ -47,6 +48,7 @@ Hooks.once('init', function () {
       TAG_TYPES: models.TAG_TYPES,
       register: (cls) => models.BaseTag.registerType(cls),
     },
+    socket: new DASUSocketHandler(),
   };
 
   CONFIG.DASU = DASU;

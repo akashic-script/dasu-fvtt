@@ -185,6 +185,10 @@
       "DCNotMet": "DC not met",
       "ApplyEffectDC": "{name} (DC{dc})"
     },
+    "Socket": {
+      "NoActiveGM": "No active GM is connected to apply this action.",
+      "AlreadyRegistered": "A socket handler named '{name}' is already registered."
+    },
     "Duration": {
       "Rounds": "Rounds",
       "Turns": "Turns"
@@ -938,6 +942,10 @@
       "AutoRollInitiative": {
         "Name": "Auto-roll Initiative",
         "Hint": "Automatically roll initiative for combatants when combat begins."
+      },
+      "AutoApplyViaSocket": {
+        "Name": "Auto-Apply to Unowned Targets",
+        "Hint": "When enabled, inline actions targeting tokens you don't own are automatically applied by the GM client over the socket. When disabled, a request card is posted to chat for manual approval instead."
       }
     }
   },

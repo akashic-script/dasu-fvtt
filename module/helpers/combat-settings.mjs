@@ -10,4 +10,13 @@ export function registerCombatSettings() {
     type: Boolean,
     default: false,
   });
+
+  game.settings.register(SYSTEM, 'autoApplyViaSocket', {
+    name: 'DASU.Settings.AutoApplyViaSocket.Name',
+    hint: 'DASU.Settings.AutoApplyViaSocket.Hint',
+    scope: 'world',
+    config: true,
+    type: Boolean,
+    default: true,
+  });
 }

@@ -6,7 +6,8 @@ import { InlineSourceInfo } from './inline-source.mjs';
 
 /**
  * Turns an inline click or token drop into pipeline actions. Owned targets apply
- * now; unowned post a request card whose Apply button only a GM or owner can use.
+ * now; unowned are applied silently by the active GM over the socket, falling
+ * back to a manual request card only when no GM is connected.
  */
 
 const REQUEST_FLAG = 'inlineRequest';
@@ -27,15 +28,30 @@ async function dispatch(action, sourceInfo) {
   for (const target of targets) await applyToTarget(action, source, target);
 }
 
-/** Apply to one actor: owned applies now, unowned posts a request card. */
+/**
+ * Apply to one actor. Owned targets apply locally; unowned targets are applied
+ * by the active GM over the socket, falling back to a manual request card when
+ * no GM is connected.
+ */
 async function applyToTarget(action, source, target) {
   const pipeline = getPipeline(action.type);
   if (!pipeline || !target) return;
+
   if (target.isOwner) {
     await pipeline.applyToTargets(action.input, source, { uuid: target.uuid });
-  } else {
-    await postRequest(action, source, target);
+    return;
   }
+  // Not ours: let the active GM apply it silently over the socket.
+  if (game.users.activeGM && game.settings.get(SYSTEM, 'autoApplyViaSocket')) {
+    await game.dasu.socket.requestPipeline(action.type, {
+      input: action.input,
+      source, // already a plain object from toPipelineSource
+      targetUuid: target.uuid,
+    });
+    return;
+  }
+  // No GM connected - fall back to the manual request card.
+  await postRequest(action, source, target);
 }
 
 /** Post a request card for a target the clicking user does not own. */
