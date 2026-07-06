@@ -41,8 +41,22 @@ export class DASUActor extends Actor {
   }
 
   /** @override */
-  async _onDeleteDescendantDocuments(parent, collection, documents, ids, options, userId) {
-    await super._onDeleteDescendantDocuments(parent, collection, documents, ids, options, userId);
+  async _onDeleteDescendantDocuments(
+    parent,
+    collection,
+    documents,
+    ids,
+    options,
+    userId
+  ) {
+    await super._onDeleteDescendantDocuments(
+      parent,
+      collection,
+      documents,
+      ids,
+      options,
+      userId
+    );
     if (collection === 'items' && this.system.equipped?.weapon) {
       if (ids.includes(this.system.equipped.weapon)) {
         await this.update({ 'system.equipped.weapon': null });

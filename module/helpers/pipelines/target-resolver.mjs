@@ -31,10 +31,7 @@ function getSelected() {
  * @param {boolean} [options.allowSelf]  final fallback to the user's own
  *   character. Off by default so pipeline callers keep explicit targeting.
  */
-async function resolveTargets({
-  uuid,
-  allowSelf = false,
-} = {}) {
+async function resolveTargets({ uuid, allowSelf = false } = {}) {
   if (uuid) {
     const actor = await resolveActor(uuid);
     return actor ? [actor] : [];

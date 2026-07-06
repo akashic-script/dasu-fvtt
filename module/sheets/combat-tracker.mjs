@@ -74,7 +74,8 @@ export class DASUCombatTracker extends CombatTracker {
     await super._onRender(context, options);
     if (this.viewed?.round === 0) {
       const title = this.element.querySelector('.encounter-title');
-      if (title) title.textContent = game.i18n.localize('DASU.Combat.StagingPhase');
+      if (title)
+        title.textContent = game.i18n.localize('DASU.Combat.StagingPhase');
     }
   }
 
@@ -236,7 +237,8 @@ export class DASUCombatTracker extends CombatTracker {
   static async #onToggleChanneled(event, target) {
     event.stopPropagation();
     target.blur();
-    const combatantId = target.closest('[data-combatant-id]')?.dataset.combatantId;
+    const combatantId = target.closest('[data-combatant-id]')?.dataset
+      .combatantId;
     const daemonUuid = target.dataset.uuid;
     const combat = this.viewed;
     const actor = combat?.combatants.get(combatantId)?.actor;

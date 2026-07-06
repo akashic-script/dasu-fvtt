@@ -51,7 +51,9 @@ function compose(form) {
       const dur = val('effectDuration');
       // The reference is either a chosen status id or a pasted effect UUID.
       const ref =
-        val('effectKind') === 'status' ? val('effectStatus') : val('effectUuid');
+        val('effectKind') === 'status'
+          ? val('effectStatus')
+          : val('effectUuid');
       return `@EFFECT[${ref}${dur ? ` ${dur}` : ''}]${suffix}`;
     }
     default:
@@ -62,7 +64,12 @@ function compose(form) {
 /** A duration `<select>` (blank / turns 1-5 / rounds 1-5) for a named field. */
 function durationField(name) {
   const opts = ['', '1t', '2t', '3t', '4t', '5t', '1r', '2r', '3r', '4r', '5r']
-    .map((v) => `<option value="${v}">${v || game.i18n.localize('DASU.Inline.Builder.NoDuration')}</option>`)
+    .map(
+      (v) =>
+        `<option value="${v}">${
+          v || game.i18n.localize('DASU.Inline.Builder.NoDuration')
+        }</option>`
+    )
     .join('');
   return `
     <div class="form-group">
@@ -78,12 +85,16 @@ function formHtml(initialType) {
     list
       .map(
         (o) =>
-          `<option value="${o.key}"${o.key === sel ? ' selected' : ''}>${o.label}</option>`
+          `<option value="${o.key}"${o.key === sel ? ' selected' : ''}>${
+            o.label
+          }</option>`
       )
       .join('');
   const typeOpts = TYPES.map(
     (t) =>
-      `<option value="${t}"${t === initialType ? ' selected' : ''}>@${t}</option>`
+      `<option value="${t}"${
+        t === initialType ? ' selected' : ''
+      }>@${t}</option>`
   ).join('');
 
   return `
@@ -120,7 +131,11 @@ function formHtml(initialType) {
         </div>
         <div class="form-group">
           <label>${game.i18n.localize('DASU.Inline.Builder.Operation')}</label>
-          <select name="resOp"><option value="cost">${game.i18n.localize('DASU.Inline.Builder.Cost')}</option><option value="heal">${game.i18n.localize('DASU.Inline.Builder.Heal')}</option></select>
+          <select name="resOp"><option value="cost">${game.i18n.localize(
+            'DASU.Inline.Builder.Cost'
+          )}</option><option value="heal">${game.i18n.localize(
+    'DASU.Inline.Builder.Heal'
+  )}</option></select>
         </div>
       </fieldset>
 
@@ -128,13 +143,20 @@ function formHtml(initialType) {
         <div class="form-group">
           <label>${game.i18n.localize('DASU.Inline.Builder.EffectKind')}</label>
           <select name="effectKind">
-            <option value="status">${game.i18n.localize('DASU.Inline.Builder.KindStatus')}</option>
-            <option value="uuid">${game.i18n.localize('DASU.Inline.Builder.KindUuid')}</option>
+            <option value="status">${game.i18n.localize(
+              'DASU.Inline.Builder.KindStatus'
+            )}</option>
+            <option value="uuid">${game.i18n.localize(
+              'DASU.Inline.Builder.KindUuid'
+            )}</option>
           </select>
         </div>
         <div class="form-group" data-effect-kind="status">
           <label>${game.i18n.localize('DASU.Inline.Builder.Status')}</label>
-          <select name="effectStatus">${opt(statuses, statuses[0]?.key)}</select>
+          <select name="effectStatus">${opt(
+            statuses,
+            statuses[0]?.key
+          )}</select>
         </div>
         <div class="form-group" data-effect-kind="uuid" hidden>
           <label>${game.i18n.localize('DASU.Inline.Builder.EffectUuid')}</label>
@@ -145,7 +167,9 @@ function formHtml(initialType) {
 
       <div class="form-group">
         <label>${game.i18n.localize('DASU.Inline.Builder.Label')}</label>
-        <input type="text" name="label" placeholder="${game.i18n.localize('DASU.Inline.Builder.LabelHint')}" />
+        <input type="text" name="label" placeholder="${game.i18n.localize(
+          'DASU.Inline.Builder.LabelHint'
+        )}" />
       </div>
 
       <div class="form-group dasu-inline-builder__preview">
