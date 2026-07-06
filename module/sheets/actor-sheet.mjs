@@ -136,6 +136,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
       roll: DASUActorSheet.#onRoll,
       rollAttribute: DASUActorSheet.#onRollAttribute,
       rollSkill: DASUActorSheet.#onRollSkill,
+      rollInit: DASUActorSheet.#onRollInit,
       resourceStep: DASUActorSheet.#onResourceStep,
       openResourcePopover: DASUActorSheet.#onOpenResourcePopover,
       openMeritPopover: DASUActorSheet.#onOpenMeritPopover,
@@ -446,6 +447,10 @@ export class DASUActorSheet extends SheetLayoutMixin(
     );
     context.meritTooltip = this.#getMeritTooltip();
 
+    // The INIT header button is enabled only while this actor is a combatant in
+    // the active encounter; it opens the initiative dialog.
+    context.inCombat = !!this.#activeCombatant();
+
     return context;
   }
 
@@ -525,8 +530,13 @@ export class DASUActorSheet extends SheetLayoutMixin(
     this.#closeStepperPopover();
     this.#specialtiesPopoverCleanup?.();
     this.#rolesPopoverCleanup?.();
+    for (const [hook, id] of this.#combatHookIds ?? []) Hooks.off(hook, id);
+    this.#combatHookIds = null;
     return super._onClose(options);
   }
+
+  /** Registered [hookName, id] pairs for combat-state refresh; see _onFirstRender. */
+  #combatHookIds = null;
 
   _renderModeToggle() {
     const header = this.element.querySelector('.window-header');
@@ -575,6 +585,18 @@ export class DASUActorSheet extends SheetLayoutMixin(
       const doc = fromUuidSync(uuid);
       doc?.sheet?.render(true);
     });
+
+    // The INIT header button's enabled/awaiting state depends on this actor's
+    // combatant, which lives outside the actor document.
+    const refreshIfMine = (combatant) => {
+      if (combatant?.actor?.id === this.actor.id) this.render();
+    };
+    this.#combatHookIds = [
+      ['createCombatant', refreshIfMine],
+      ['deleteCombatant', refreshIfMine],
+      ['updateCombatant', refreshIfMine],
+    ].map(([hook, fn]) => [hook, Hooks.on(hook, fn)]);
+
     this.#bindPlannerSlots();
     this.#bindTagDropHighlight();
     this.#weaponTable.activateListeners(this);
@@ -931,16 +953,71 @@ export class DASUActorSheet extends SheetLayoutMixin(
     }
     if (this.actor.type !== 'summoner')
       return super._onDropActor(event, actorData);
-    const dropped = await fromUuid(actorData.uuid);
+    let dropped = await fromUuid(actorData.uuid);
     if (!dropped || dropped.type !== 'daemon') return false;
+
+    // Compendium daemon = template: import a fresh world copy per drop, so each
+    // is uniquely owned and the single-owner invariant holds by construction.
+    if (dropped.pack) {
+      dropped = await this.#importDaemon(dropped);
+      if (!dropped) return false;
+    } else {
+      // A world daemon belongs to at most one summoner: reject if already
+      // rostered by a different live summoner. A stale ref falls through and is
+      // reclaimed. `system.summonerId` is synced by DASUActor.
+      const ownerId = dropped.system?.summonerId;
+      if (ownerId && ownerId !== this.actor.id) {
+        const owner = game.actors.get(ownerId);
+        const stillOwned = owner?.system?.stock?.some(
+          (e) => e.uuid === dropped.uuid
+        );
+        if (owner && stillOwned) {
+          const key = 'DASU.Stock.OwnedByOther';
+          ui.notifications?.warn(
+            game.i18n.has(key)
+              ? game.i18n.format(key, { name: owner.name })
+              : `This daemon is already in ${owner.name}'s stock.`
+          );
+          return false;
+        }
+      }
+    }
+
     const stock = foundry.utils.deepClone(this.actor.system.stock ?? []);
-    if (stock.some((e) => e.uuid === actorData.uuid)) {
+    if (stock.some((e) => e.uuid === dropped.uuid)) {
       ui.notifications?.warn(game.i18n.localize('DASU.Stock.AlreadyAdded'));
       return false;
     }
-    stock.push({ uuid: actorData.uuid, active: false });
+    stock.push({ uuid: dropped.uuid, active: false });
     await this.actor.update({ 'system.stock': stock });
     return true;
+  }
+
+  /**
+   * Import a compendium daemon into the world as a fresh actor, in the "Summoned
+   * Daemons" folder (created on first use). Returns the new Actor, or null.
+   * @param {Actor} packActor  The compendium daemon document.
+   * @returns {Promise<Actor|null>}
+   */
+  async #importDaemon(packActor) {
+    const folderName = 'Summoned Daemons';
+    let folder = game.folders.find(
+      (f) => f.type === 'Actor' && f.name === folderName
+    );
+    if (!folder) {
+      folder = await Folder.create({ name: folderName, type: 'Actor' });
+    }
+    const data = packActor.toObject();
+    delete data._id;
+    data.folder = folder?.id ?? null;
+    const created = await getDocumentClass('Actor').create(data);
+    if (!created) {
+      ui.notifications?.warn(
+        `Failed to import ${packActor.name} into the world.`
+      );
+      return null;
+    }
+    return created;
   }
 
   /** Append a daemon form to this daemon's transformations array. */
@@ -1071,6 +1148,23 @@ export class DASUActorSheet extends SheetLayoutMixin(
     if (this.isEditMode) return;
     const key = target.dataset.skill;
     if (key) DASURollDialog.openSkill(this.actor, key);
+  }
+
+  /** Open the initiative dialog (DEX or skill + modifier). Header button. */
+  static #onRollInit(event, target) {
+    if (!this.#activeCombatant()) return;
+    DASURollDialog.openInitiative(this.actor);
+  }
+
+  /**
+   * This actor's combatant in the active encounter (started or staging), or
+   * null. Initiative can be rolled during staging, so `started` is not required.
+   * @returns {Combatant|null}
+   */
+  #activeCombatant() {
+    const combat = game.combat;
+    if (!combat) return null;
+    return combat.combatants.find((c) => c.actor?.id === this.actor.id) ?? null;
   }
 
   #closeStepperPopover() {

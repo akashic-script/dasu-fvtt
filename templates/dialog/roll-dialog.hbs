@@ -2,7 +2,7 @@
   <div class="dasu-fieldset dasu-fieldset--active-legend roll-dialog__fieldset">
     <div class="dasu-fieldset__header">
       <div class="dasu-fieldset__legend">
-        {{#if isItem}}{{#if (eq itemCheckType "tactic")}}{{localize "DASU.Check.Type.Tactic"}}{{else}}{{localize "DASU.Check.Type.Accuracy"}}{{/if}}{{else if (eq mode "skill")}}{{localize "DASU.Check.Type.Skill"}}{{else}}{{localize "DASU.Check.Type.Attribute"}}{{/if}}
+        {{#if isItem}}{{#if (eq itemCheckType "tactic")}}{{localize "DASU.Check.Type.Tactic"}}{{else}}{{localize "DASU.Check.Type.Accuracy"}}{{/if}}{{else if isInitiative}}{{localize "DASU.Combat.Initiative.Init"}}{{else if (eq mode "skill")}}{{localize "DASU.Check.Type.Skill"}}{{else}}{{localize "DASU.Check.Type.Attribute"}}{{/if}}
       </div>
       <span class="roll-dialog__actor">{{actorName}}</span>
     </div>
@@ -17,9 +17,13 @@
     {{else}}
     <div class="dasu-fieldset__row">
       <div class="dasu-fieldset__field">
-        <label>{{#if (eq mode "skill")}}{{localize "DASU.Dialog.Roll.Skill"}}{{else}}{{localize "DASU.Dialog.Roll.Attribute"}}{{/if}}</label>
+        <label>{{#if isInitiative}}{{localize "DASU.Dialog.Roll.Source"}}{{else if (eq mode "skill")}}{{localize "DASU.Dialog.Roll.Skill"}}{{else}}{{localize "DASU.Dialog.Roll.Attribute"}}{{/if}}</label>
         <select name="key">
-          {{#if (eq mode "skill")}}
+          {{#if isInitiative}}
+            {{#each initiativeSources}}
+              <option value="{{key}}" {{#if (eq key ../selectedKey)}}selected{{/if}}>{{label}} ({{value}})</option>
+            {{/each}}
+          {{else if (eq mode "skill")}}
             {{#each skills}}
               <option value="{{key}}" {{#if (eq key ../selectedKey)}}selected{{/if}}>{{label}} ({{value}})</option>
             {{/each}}
@@ -139,6 +143,7 @@
     {{/if}}
 
     {{#unless isItem}}
+    {{#unless isInitiative}}
     <div class="dasu-fieldset__row">
       <div class="dasu-fieldset__field">
         <label>{{localize "DASU.Dialog.Roll.Difficulty"}}</label>
@@ -150,6 +155,7 @@
         </select>
       </div>
     </div>
+    {{/unless}}
     {{/unless}}
 
     {{#if hasSpecialties}}

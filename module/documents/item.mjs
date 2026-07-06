@@ -10,6 +10,18 @@ import { DASUBondDialog } from '../ui/bond-dialog.mjs';
  */
 export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
   /** @override */
+  async _preDelete(options, user) {
+    const blocked = this.effects.some((e) => e.getFlag('dasu', 'undeletable'));
+    if (blocked && !options.dasuForce) {
+      ui.notifications?.warn(
+        game.i18n.localize('DASU.Equip.InnateUndeletable')
+      );
+      return false;
+    }
+    return super._preDelete(options, user);
+  }
+
+  /** @override */
   async _preCreate(data, options, user) {
     const allowed = await super._preCreate(data, options, user);
     if (allowed === false) return false;
@@ -54,6 +66,15 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
         return false;
       }
     }
+  }
+
+  /** @override */
+  get transferredEffects() {
+    const gate =
+      this.system?.transferEffects instanceof Function
+        ? this.system.transferEffects()
+        : true;
+    return gate ? super.transferredEffects : [];
   }
 
   /** @override */

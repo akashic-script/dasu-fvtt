@@ -100,19 +100,18 @@ export class StockTableRenderer extends DASUTableRenderer {
     const toggleLabel = entry.active
       ? game.i18n.localize('DASU.Stock.SetInactive')
       : game.i18n.localize('DASU.Stock.SetActive');
-    // Channelers get a bolt toggle first in the row, separate from the active layer.
+    // Channelers get a channel toggle first in the row, separate from the active
+    // layer. On/off is shown via the --active highlight (the icon has no regular
+    // variant); matches the combat tracker's channeled indicator.
     let channelBtn = '';
     if (entry.isChanneler) {
-      const channelIcon = entry.channeled
-        ? 'fa-solid fa-bolt'
-        : 'fa-regular fa-bolt';
       const channelLabel = entry.channeled
         ? game.i18n.localize('DASU.Stock.StopChannel')
         : game.i18n.localize('DASU.Stock.Channel');
       const channelCls = entry.channeled
         ? ' cell-item-controls__control--active'
         : '';
-      channelBtn = `<a class="cell-item-controls__control${channelCls}" data-action="stockChannel" data-tooltip="${channelLabel}"><i class="${channelIcon}"></i></a>`;
+      channelBtn = `<a class="cell-item-controls__control${channelCls}" data-action="stockChannel" data-tooltip="${channelLabel}"><i class="fa-solid fa-hand-sparkles"></i></a>`;
     }
     return `<div class="cell-item-controls">
       ${channelBtn}

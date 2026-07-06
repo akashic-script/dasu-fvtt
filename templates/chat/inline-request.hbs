@@ -1,0 +1,10 @@
+<div class="inline-request-card__body{{#if resolved}} inline-request-card--resolved{{/if}}">
+  {{localize "DASU.Inline.Request.Body" source=sourceName summary=summary target=targetName}}
+</div>
+<button type="button" class="inline-request-card__apply" data-action="inlineApply" {{#if resolved}}disabled{{/if}}>
+  {{#if resolved}}
+  <i class="fa-solid fa-check"></i> {{localize "DASU.Inline.Request.Applied"}}
+  {{else}}
+  <i class="fa-solid fa-circle-check"></i> {{localize "DASU.Inline.Request.Apply"}}
+  {{/if}}
+</button>

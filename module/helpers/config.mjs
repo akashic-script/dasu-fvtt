@@ -541,3 +541,30 @@ DASU.tagSubTypes = {
   ability: DASU.abilityCategories,
   weapon: DASU.weaponCategories,
 };
+
+/** Roll-data variable suggestions for inline command amount fields. */
+DASU.inlineAmountVars = [
+  '@attributes.pow.value',
+  '@attributes.dex.value',
+  '@attributes.wil.value',
+  '@attributes.sta.value',
+  '@skills.athletics.value',
+  '@skills.academia.value',
+  '@skills.craftsmanship.value',
+  '@skills.intuition.value',
+  '@skills.medicine.value',
+  '@skills.perceiving.value',
+  '@skills.stealth.value',
+  '@skills.outdoorsmanship.value',
+  '@lvl',
+  '@dejection',
+  '@ap.value',
+  '@ap.max',
+  '@sp.value',
+  '@sp.max',
+  '@stats.avoid.value',
+  '@stats.defense.value',
+  '@stats.hit.value',
+  '@stats.land.value',
+  '@stats.critical.value',
+];

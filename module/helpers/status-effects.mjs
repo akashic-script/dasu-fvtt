@@ -135,12 +135,13 @@ export function maxStacksOf(effect) {
  * @param {object} [opts]
  * @param {object} [opts.source]  { uuid, attributes } caster snapshot
  * @param {number} [opts.bumpBy]  stacks to add on reapplication (default 1)
+ * @param {object} [opts.duration]  Foundry duration to (re)set on apply/reapply
  * @returns {Promise<ActiveEffect|null>}
  */
 export async function applyStatus(
   actor,
   statusId,
-  { source, bumpBy = 1 } = {}
+  { source, bumpBy = 1, duration } = {}
 ) {
   const def = CONFIG.DASU.statusEffectIndex[statusId];
   if (!actor || !def) return null;
@@ -160,20 +161,19 @@ export async function applyStatus(
       if (incoming <= current) return existing; // keep the stronger/equal tier
       await existing.delete();
     }
-    return createStatus(actor, statusId, { source });
+    return createStatus(actor, statusId, { source, duration });
   }
 
   const existing = findStatus(actor, statusId);
-  if (!existing) return createStatus(actor, statusId, { source });
+  if (!existing) return createStatus(actor, statusId, { source, duration });
 
-  // Stackable: bump toward the cap and rescale. A fresh source re-resolves the
-  // cap against the new caster.
   if (isStackable(statusId)) {
     const update = {};
     if (source?.uuid) {
       update.origin = source.uuid;
       update[`flags.${SYSTEM}.statusSource`] = source;
     }
+    if (duration) update.duration = duration;
     const override = existing.getFlag(SYSTEM, 'maxStacksOverride');
     const cap =
       Number.isFinite(override) && override > 0
@@ -189,13 +189,12 @@ export async function applyStatus(
     return existing;
   }
 
-  // Non-stackable: reapplying replaces the previous instance.
   await existing.delete();
-  return createStatus(actor, statusId, { source });
+  return createStatus(actor, statusId, { source, duration });
 }
 
 /** Create a fresh status AE from its CONFIG definition (stack = 1). */
-async function createStatus(actor, statusId, { source } = {}) {
+async function createStatus(actor, statusId, { source, duration } = {}) {
   const def = CONFIG.DASU.statusEffectIndex[statusId];
   // Store the cap (and its attribute key, if any) so the effect is self-contained.
   const rawCap = DASU.stackableStatuses[statusId];
@@ -214,6 +213,7 @@ async function createStatus(actor, statusId, { source } = {}) {
     statuses: [statusId],
     changes: scaledChanges(statusId, 1),
     description: def.description ? game.i18n.localize(def.description) : '',
+    ...(duration ? { duration } : {}),
     // Origin = caster, so attribute-keyed caps resolve live from its tick.
     ...(source?.uuid ? { origin: source.uuid } : {}),
     flags: {

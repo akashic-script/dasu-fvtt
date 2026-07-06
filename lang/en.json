@@ -19,15 +19,23 @@
         "Land": "To Land"
       }
     },
+    "Equip": {
+      "ColumnHeader": "EQ",
+      "Equip": "Equip weapon",
+      "Unequip": "Unequip weapon",
+      "InnateUndeletable": "This weapon is innate and cannot be deleted while the Innate tag is slotted."
+    },
     "Stock": {
       "SetActive": "Set Active",
       "SetInactive": "Set Inactive",
       "AlreadyAdded": "This daemon is already in stock.",
+      "OwnedByOther": "This daemon is already in {name}'s stock.",
       "Active": "Active",
       "Inactive": "Inactive",
       "Channel": "Channel",
       "StopChannel": "Stop Channeling",
-      "OverStrain": "Fielded daemons ({used}) exceed your Will Strain Cap ({cap}). They risk breaking free of your will."
+      "OverStrain": "Fielded daemons ({used}) exceed your Will Strain Cap ({cap}). They risk breaking free of your will.",
+      "Channeled": "Channeled"
     },
     "SpecialAbility": {
       "Title": "Special Ability",
@@ -101,6 +109,60 @@
     "Table": {
       "BrowseCompendium": "Browse"
     },
+    "Inline": {
+      "Variable": "(varies)",
+      "Unknown": "Someone",
+      "Damage": {
+        "Tooltip": "Apply {amount} {type} damage to the target.",
+        "Summary": "{amount} {type} damage"
+      },
+      "Resource": {
+        "CostTooltip": "Spend {amount} {resource}.",
+        "HealTooltip": "Restore {amount} {resource}.",
+        "CostSummary": "spend {amount} {resource}",
+        "HealSummary": "restore {amount} {resource}"
+      },
+      "Effect": {
+        "Tooltip": "Apply {name} to the target.",
+        "Summary": "apply {name}",
+        "Invalid": "Invalid effect",
+        "Broken": "Broken effect reference"
+      },
+      "Status": {
+        "Tooltip": "Apply the {name} status to the target.",
+        "Summary": "apply {name}"
+      },
+      "Request": {
+        "Title": "Apply Request",
+        "Body": "{source} wants to {summary} to {target}.",
+        "Apply": "Apply",
+        "Applied": "Applied",
+        "Deny": "Deny"
+      },
+      "Builder": {
+        "Menu": "Inline Command",
+        "Title": "Insert Inline Command",
+        "Command": "Command",
+        "Amount": "Amount",
+        "DamageType": "Damage Type",
+        "TargetWp": "Target WP",
+        "Resource": "Resource",
+        "Operation": "Operation",
+        "Cost": "Cost (spend)",
+        "Heal": "Heal (restore)",
+        "EffectKind": "Source",
+        "KindStatus": "Status",
+        "KindUuid": "By UUID",
+        "EffectUuid": "Effect UUID",
+        "Status": "Status",
+        "Duration": "Duration",
+        "NoDuration": "None",
+        "Label": "Label (optional)",
+        "LabelHint": "Custom display text",
+        "Preview": "Preview",
+        "Insert": "Insert"
+      }
+    },
     "Pipeline": {
       "Undo": "Undo",
       "Redo": "Redo",
@@ -122,6 +184,10 @@
       "DurationTurns": "{n} turns",
       "DCNotMet": "DC not met",
       "ApplyEffectDC": "{name} (DC{dc})"
+    },
+    "Socket": {
+      "NoActiveGM": "No active GM is connected to apply this action.",
+      "AlreadyRegistered": "A socket handler named '{name}' is already registered."
     },
     "Duration": {
       "Rounds": "Rounds",
@@ -287,7 +353,7 @@
       "HP": "HP",
       "WP": "WP",
       "Riches": "Riches",
-      "RichesAbbr": "\u00a4",
+      "RichesAbbr": "¤",
       "CostLabelResource": "Cost",
       "CostLabelRiches": "Price"
     },
@@ -794,6 +860,7 @@
         "Attribute": "Attribute",
         "Skill": "Skill",
         "Item": "Item",
+        "Source": "Source",
         "Modifier": "Modifier",
         "Formula": "Formula",
         "Roll": "Roll",
@@ -834,6 +901,52 @@
         "Description": "Effect",
         "NoUnlocked": "No bond ranks unlocked yet."
       }
+    },
+    "Combat": {
+      "StagingPhase": "Staging Phase",
+      "Kind": {
+        "Label": "Encounter Type",
+        "Combat": "Combat",
+        "Negotiation": "Negotiation"
+      },
+      "Initiative": {
+        "Init": "Initiative",
+        "Tooltip": "Initiative"
+      },
+      "Role": {
+        "Summoner": "Summoner",
+        "Daemon": "Daemon",
+        "NPC": "NPC"
+      },
+      "Actions": {
+        "Label": "Actions",
+        "Major": "Major Action",
+        "Minor": "Minor Action",
+        "Free": "Free Action",
+        "NoneLeft": "{name} has no {action} remaining this turn."
+      },
+      "Strain": {
+        "Tooltip": "Will Strain: fielded daemons vs. this summoner’s cap.",
+        "Cost": "Will Strain cost"
+      },
+      "Field": {
+        "Add": "Field this daemon",
+        "Remove": "Bench this daemon",
+        "Empty": "No daemons in stock.",
+        "Bench": "Bench",
+        "Team": "Team",
+        "Stale": "This daemon is rostered to a different summoner. Re-field it to reclaim ownership."
+      }
+    },
+    "Settings": {
+      "AutoRollInitiative": {
+        "Name": "Auto-roll Initiative",
+        "Hint": "Automatically roll initiative for combatants when combat begins."
+      },
+      "AutoApplyViaSocket": {
+        "Name": "Auto-Apply to Unowned Targets",
+        "Hint": "When enabled, inline actions targeting tokens you don't own are automatically applied by the GM client over the socket. When disabled, a request card is posted to chat for manual approval instead."
+      }
     }
   },
   "TYPES": {
@@ -857,6 +970,12 @@
       "scar": "Scar",
       "dejection": "Dejection",
       "tag": "Tag"
+    },
+    "Combat": {
+      "base": "Encounter"
+    },
+    "Combatant": {
+      "base": "Combatant"
     }
   }
 }
