@@ -1,0 +1,29 @@
+{
+  "name": "Nameless Daemon",
+  "type": "daemon",
+  "_id": "9W97q4T2T0mrrx6f",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "biography": "<p>A daemon that has yet to be given a name. A blank slate, waiting to be summoned.</p>",
+    "level": 1,
+    "attributes": {
+      "pow": { "value": 1 },
+      "dex": { "value": 1 },
+      "wil": { "value": 1 },
+      "sta": { "value": 1 }
+    }
+  },
+  "items": [],
+  "effects": [],
+  "flags": {},
+  "prototypeToken": {
+    "actorLink": true,
+    "disposition": 1
+  },
+  "_stats": {
+    "systemId": "dasu",
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!actors!9W97q4T2T0mrrx6f"
+}

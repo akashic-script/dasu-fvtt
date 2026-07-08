@@ -30,6 +30,7 @@ import { FieldsetStateManager } from '../helpers/fieldset-state.mjs';
 import { DASURollDialog } from '../ui/roll-dialog.mjs';
 import { SYSTEM } from '../helpers/config.mjs';
 import { Flags } from '../helpers/flags.mjs';
+import { addDaemonToStock } from '../helpers/daemon-stock.mjs';
 
 export class DASUActorSheet extends SheetLayoutMixin(
   HandlebarsApplicationMixin(ActorSheetV2)
@@ -165,7 +166,10 @@ export class DASUActorSheet extends SheetLayoutMixin(
   /** @override */
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
-    this._mode = options.mode ?? this._mode ?? this.constructor.MODES.PLAY;
+    const { MODES } = this.constructor;
+    const isNewActor = options.renderContext === 'createActor';
+    this._mode =
+      options.mode ?? this._mode ?? (isNewActor ? MODES.EDIT : MODES.PLAY);
   }
 
   /** @override */
@@ -565,6 +569,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
         });
       toggle.addEventListener('dblclick', (e) => e.stopPropagation());
       toggle.addEventListener('pointerdown', (e) => e.stopPropagation());
+      toggle.querySelector('.dasu-mode-checkbox').checked = this.isEditMode;
       header.prepend(toggle);
     } else if (this.isEditable && toggle) {
       toggle.querySelector('.dasu-mode-checkbox').checked = this.isEditMode;
@@ -953,71 +958,8 @@ export class DASUActorSheet extends SheetLayoutMixin(
     }
     if (this.actor.type !== 'summoner')
       return super._onDropActor(event, actorData);
-    let dropped = await fromUuid(actorData.uuid);
-    if (!dropped || dropped.type !== 'daemon') return false;
-
-    // Compendium daemon = template: import a fresh world copy per drop, so each
-    // is uniquely owned and the single-owner invariant holds by construction.
-    if (dropped.pack) {
-      dropped = await this.#importDaemon(dropped);
-      if (!dropped) return false;
-    } else {
-      // A world daemon belongs to at most one summoner: reject if already
-      // rostered by a different live summoner. A stale ref falls through and is
-      // reclaimed. `system.summonerId` is synced by DASUActor.
-      const ownerId = dropped.system?.summonerId;
-      if (ownerId && ownerId !== this.actor.id) {
-        const owner = game.actors.get(ownerId);
-        const stillOwned = owner?.system?.stock?.some(
-          (e) => e.uuid === dropped.uuid
-        );
-        if (owner && stillOwned) {
-          const key = 'DASU.Stock.OwnedByOther';
-          ui.notifications?.warn(
-            game.i18n.has(key)
-              ? game.i18n.format(key, { name: owner.name })
-              : `This daemon is already in ${owner.name}'s stock.`
-          );
-          return false;
-        }
-      }
-    }
-
-    const stock = foundry.utils.deepClone(this.actor.system.stock ?? []);
-    if (stock.some((e) => e.uuid === dropped.uuid)) {
-      ui.notifications?.warn(game.i18n.localize('DASU.Stock.AlreadyAdded'));
-      return false;
-    }
-    stock.push({ uuid: dropped.uuid, active: false });
-    await this.actor.update({ 'system.stock': stock });
-    return true;
-  }
-
-  /**
-   * Import a compendium daemon into the world as a fresh actor, in the "Summoned
-   * Daemons" folder (created on first use). Returns the new Actor, or null.
-   * @param {Actor} packActor  The compendium daemon document.
-   * @returns {Promise<Actor|null>}
-   */
-  async #importDaemon(packActor) {
-    const folderName = 'Summoned Daemons';
-    let folder = game.folders.find(
-      (f) => f.type === 'Actor' && f.name === folderName
-    );
-    if (!folder) {
-      folder = await Folder.create({ name: folderName, type: 'Actor' });
-    }
-    const data = packActor.toObject();
-    delete data._id;
-    data.folder = folder?.id ?? null;
-    const created = await getDocumentClass('Actor').create(data);
-    if (!created) {
-      ui.notifications?.warn(
-        `Failed to import ${packActor.name} into the world.`
-      );
-      return null;
-    }
-    return created;
+    const dropped = await fromUuid(actorData.uuid);
+    return addDaemonToStock(this.actor, dropped);
   }
 
   /** Append a daemon form to this daemon's transformations array. */

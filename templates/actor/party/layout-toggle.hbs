@@ -1,0 +1,12 @@
+<div class="party-layout-toggle" role="group" aria-label="{{localize 'DASU.Party.LayoutLabel'}}">
+  <button type="button" class="party-layout-toggle__btn{{#unless (eq layout 'table')}} party-layout-toggle__btn--on{{/unless}}"
+    data-action="setLayout" data-layout="card" data-tooltip="{{localize 'DASU.Party.LayoutCard'}}"
+    aria-pressed="{{#unless (eq layout 'table')}}true{{else}}false{{/unless}}">
+    <i class="fas fa-grip"></i>
+  </button>
+  <button type="button" class="party-layout-toggle__btn{{#if (eq layout 'table')}} party-layout-toggle__btn--on{{/if}}"
+    data-action="setLayout" data-layout="table" data-tooltip="{{localize 'DASU.Party.LayoutTable'}}"
+    aria-pressed="{{#if (eq layout 'table')}}true{{else}}false{{/if}}">
+    <i class="fas fa-table-list"></i>
+  </button>
+</div>

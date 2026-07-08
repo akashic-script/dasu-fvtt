@@ -1,0 +1,62 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="roster">
+  <div class="party-filter-bar" data-filter-bar="roster">
+    <input type="search" id="party-filter-search-roster" class="party-filter-bar__search-input" data-filter-search autocomplete="off"
+      placeholder="{{localize 'DASU.Party.FilterSearch'}}" />
+    <button type="button" class="party-filter-bar__clear-all" data-action="clearFilters"
+      data-tooltip="{{localize 'DASU.Party.FilterClearAll'}}">
+      <i class="fas fa-filter-circle-xmark"></i>
+    </button>
+    {{> "systems/dasu/templates/actor/party/layout-toggle.hbs"}}
+  </div>
+
+  {{#if (eq layout 'table')}}
+  <div class="party-drop-zone" data-drop-zone="roster">{{{rosterTable}}}</div>
+  {{else}}
+  <div class="party-card-grid party-drop-zone" data-drop-zone="roster">
+    {{#each roster}}
+    <div class="party-card {{#unless active}}party-card--benched{{/unless}}" data-uuid="{{uuid}}" data-owner-uuid="{{ownerUuid}}" data-action="openActor">
+      <div class="party-card__media">
+        <img class="party-card__img" src="{{img}}" alt="{{name}}" />
+        <div class="party-card__toggles">
+          <button type="button" class="party-card__toggle{{#if active}} party-card__toggle--on{{/if}}"
+            data-action="toggleActive"
+            data-tooltip="{{#if active}}{{localize 'DASU.Stock.SetInactive'}}{{else}}{{localize 'DASU.Stock.SetActive'}}{{/if}}">
+            <i class="fa-solid fa-hand-fist"></i>
+          </button>
+          <button type="button" class="party-card__toggle party-card__toggle--channel{{#if channeled}} party-card__toggle--on{{/if}}"
+            data-action="toggleChanneled"
+            data-tooltip="{{#if channeled}}{{localize 'DASU.Stock.StopChannel'}}{{else}}{{localize 'DASU.Stock.Channel'}}{{/if}}">
+            <i class="fa-solid fa-hand-sparkles"></i>
+          </button>
+        </div>
+        <span class="party-card__status{{#if active}} party-card__status--active{{/if}}">
+          {{#if active}}{{localize "DASU.Stock.Active"}}{{else}}{{localize "DASU.Stock.Inactive"}}{{/if}}
+        </span>
+        <div class="party-card__actions">
+          <button type="button" class="party-card__store" data-action="storeDaemon" data-tooltip="{{localize 'DASU.Party.MoveToStorage'}}">
+            <i class="fas fa-box"></i>
+          </button>
+        </div>
+      </div>
+      <div class="party-card__body">
+        <div class="party-card__name-row">
+          <span class="party-card__name">{{name}}</span>
+          {{#if channeled}}<i class="fa-solid fa-hand-sparkles party-card__channeled" data-tooltip="{{localize 'DASU.Stock.Channeled'}}"></i>{{/if}}
+        </div>
+        <span class="party-card__owner">{{localize "DASU.Party.OwnedBy"}} {{ownerName}}</span>
+        <div class="party-card__bar party-card__bar--hp">
+          <div class="party-card__bar-fill" style="width: {{hpPct}}%"></div>
+          <span class="party-card__bar-label">{{hp.value}}/{{hp.max}}</span>
+        </div>
+        <div class="party-card__bar party-card__bar--wp">
+          <div class="party-card__bar-fill" style="width: {{wpPct}}%"></div>
+          <span class="party-card__bar-label">{{wp.value}}/{{wp.max}}</span>
+        </div>
+      </div>
+    </div>
+    {{else}}
+    <p class="party-empty">{{localize "DASU.Party.RosterEmpty"}}</p>
+    {{/each}}
+  </div>
+  {{/if}}
+</section>

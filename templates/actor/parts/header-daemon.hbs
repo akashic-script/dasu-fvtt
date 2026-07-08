@@ -1,6 +1,10 @@
 <header class="sheet-header">
   <div class="actor-header__name-row">
     <h1><input class="actor-header__name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize 'DASU.Actor.DaemonNamePlaceholder'}}" /></h1>
+    <button type="button" class="actor-header__init" data-action="rollInit"
+            data-tooltip="{{localize 'DASU.Combat.Initiative.Tooltip'}}" aria-label="{{localize 'DASU.Combat.Initiative.Init'}}" {{#unless inCombat}}disabled{{/unless}}>
+      <i class="fa-solid fa-angles-right"></i>
+    </button>
     <div class="actor-header__level">
       <span class="actor-header__level-label">{{localize "DASU.Actor.Level.long"}}</span>
       <input class="dasu-pill" type="text" name="system.level" value="{{system.level}}" data-dtype="Number" />
@@ -21,10 +25,6 @@
       {{/if}}
     </span>
     <input class="actor-header__identity" type="text" placeholder="{{localize 'DASU.Actor.ClassPlaceholder'}}" />
-    <button type="button" class="actor-header__init" data-action="rollInit"
-            data-tooltip="{{localize 'DASU.Combat.Initiative.Tooltip'}}" aria-label="{{localize 'DASU.Combat.Initiative.Init'}}" {{#unless inCombat}}disabled{{/unless}}>
-      <i class="fa-solid fa-angles-right"></i>
-    </button>
     {{#if canAdvance}}
     <button type="button" class="actor-header__levelup" data-action="advance" data-tooltip="{{advanceTooltip}}">
       <i class="fa-solid fa-angles-up"></i>
