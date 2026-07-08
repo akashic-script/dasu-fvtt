@@ -1,0 +1,10 @@
+<div class="stock-expand">
+  <div class="stock-expand__resistances">
+    {{#each resistances as |resistance key|}}
+    <div class="stock-expand__resistance {{resistance.cssClass}}" data-tooltip="{{localize (concat 'DASU.DamageType.' (capitalize key))}}">
+      <img class="stock-expand__resistance-icon" src="systems/dasu/assets/resistances/{{key}}.png" alt="{{key}}" />
+      <span class="stock-expand__resistance-value">{{resistance.abbr}}</span>
+    </div>
+    {{/each}}
+  </div>
+</div>

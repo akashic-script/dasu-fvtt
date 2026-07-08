@@ -1,0 +1,33 @@
+<aside class="sheet-sidebar">
+  <div class="actor-sidebar__portrait">
+    <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" />
+  </div>
+
+  <div class="party-member-list" data-tooltip="{{localize 'DASU.Party.FilterHint'}}">
+    {{#each summoners}}
+    <div class="party-member-row" data-member-uuid="{{uuid}}" data-action="selectMember">
+      <img class="party-member-row__img" src="{{img}}" alt="{{name}}" />
+      <div class="party-member-row__body">
+        <div class="party-member-row__top">
+          <span class="party-member-row__name">{{name}}</span>
+          <span class="party-member-row__level">{{localize "DASU.Actor.Level.abbr"}} {{level}}</span>
+        </div>
+        <div class="party-member-row__bar party-member-row__bar--hp">
+          <div class="party-member-row__bar-fill" style="width: {{hpPct}}%"></div>
+          <span class="party-member-row__bar-label">{{hp.value}}/{{hp.max}}</span>
+        </div>
+        <div class="party-member-row__bar party-member-row__bar--wp">
+          <div class="party-member-row__bar-fill" style="width: {{wpPct}}%"></div>
+          <span class="party-member-row__bar-label">{{wp.value}}/{{wp.max}}</span>
+        </div>
+      </div>
+    </div>
+    {{else}}
+    <p class="party-empty">{{localize "DASU.Party.MembersEmpty"}}</p>
+    {{/each}}
+  </div>
+
+  <div class="party-sidebar__notes">
+    <div class="editor" data-edit="system.notes">{{{notesHTML}}}</div>
+  </div>
+</aside>

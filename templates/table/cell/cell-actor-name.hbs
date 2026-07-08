@@ -1,0 +1,13 @@
+<div class="cell-item-name">
+  <div class="cell-item-name__main">
+    <div class="cell-item-name__image">
+      <a data-action="openActor" draggable="true" data-uuid="{{uuid}}" data-tooltip="{{name}}">
+        <img src="{{img}}" alt="{{name}}" width="22" height="22" />
+      </a>
+    </div>
+    <div class="cell-item-name__name">
+      <span class="party-card__name">{{name}}</span>
+      {{#if channeled}}<i class="fa-solid fa-hand-sparkles party-card__channeled" data-tooltip="{{localize 'DASU.Stock.Channeled'}}"></i>{{/if}}
+    </div>
+  </div>
+</div>

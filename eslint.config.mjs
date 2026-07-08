@@ -8,6 +8,7 @@ const foundryGlobals = {
   game: 'readonly',
   ui: 'readonly',
   CONFIG: 'readonly',
+  CONST: 'readonly',
   Hooks: 'readonly',
   foundry: 'readonly',
   canvas: 'readonly',

@@ -1,0 +1,47 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="summoners">
+  <div class="party-filter-bar" data-filter-bar="summoners">
+    <input type="search" id="party-filter-search-summoners" class="party-filter-bar__search-input" data-filter-search autocomplete="off"
+      placeholder="{{localize 'DASU.Party.FilterSearch'}}" />
+    <button type="button" class="party-filter-bar__clear-all" data-action="clearFilters"
+      data-tooltip="{{localize 'DASU.Party.FilterClearAll'}}">
+      <i class="fas fa-filter-circle-xmark"></i>
+    </button>
+    {{> "systems/dasu/templates/actor/party/layout-toggle.hbs"}}
+  </div>
+
+  {{#if (eq layout 'table')}}
+  <div class="party-drop-zone" data-drop-zone="summoners">{{{summonersTable}}}</div>
+  {{else}}
+  <div class="party-card-grid party-drop-zone" data-drop-zone="summoners">
+    {{#each summoners}}
+    <div class="party-card" data-uuid="{{uuid}}" data-action="openActor">
+      <div class="party-card__media">
+        <img class="party-card__img" src="{{img}}" alt="{{name}}" />
+        <span class="party-card__badge">{{localize "DASU.Actor.Level.abbr"}} {{level}}</span>
+        <div class="party-card__actions">
+          <button type="button" class="party-card__remove" data-action="removeMember" data-tooltip="{{localize 'DASU.Party.RemoveFromParty'}}">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+      <div class="party-card__body">
+        <div class="party-card__name-row">
+          <span class="party-card__name">{{name}}</span>
+        </div>
+        <span class="party-card__class">{{#if className}}{{className}}{{else}}{{localize "DASU.Party.Classless"}}{{/if}}</span>
+        <div class="party-card__bar party-card__bar--hp">
+          <div class="party-card__bar-fill" style="width: {{hpPct}}%"></div>
+          <span class="party-card__bar-label">{{hp.value}}/{{hp.max}}</span>
+        </div>
+        <div class="party-card__bar party-card__bar--wp">
+          <div class="party-card__bar-fill" style="width: {{wpPct}}%"></div>
+          <span class="party-card__bar-label">{{wp.value}}/{{wp.max}}</span>
+        </div>
+      </div>
+    </div>
+    {{else}}
+    <p class="party-empty">{{localize "DASU.Party.MembersEmpty"}}</p>
+    {{/each}}
+  </div>
+  {{/if}}
+</section>

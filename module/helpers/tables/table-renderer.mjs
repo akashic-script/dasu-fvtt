@@ -2,7 +2,6 @@
  * Base class for all DASU item table renderers.
  *
  * TODO: restore PseudoItem deeply-nested parentage logic when pseudo-items are added.
- * TODO: 'actor' tablePreset is reserved for future party sheet use.
  *
  * @typedef TableConfig
  * @template {Object} D  the document of the sheet being rendered
@@ -169,7 +168,8 @@ export class DASUTableRenderer {
       }
 
       case 'actor': {
-        // TODO: reserved for party sheet use.
+        // Used by the party sheet's table layout (see PartyTableRenderer),
+        // which overrides getKey/additionalRowAttributes for its view models.
         config.advancedConfig = {
           getKey: (entry) => entry.uuid,
           keyDataAttribute: 'data-uuid',

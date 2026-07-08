@@ -1,5 +1,19 @@
 /** AE change values support `@target.*`, `@source.*`, `@item.*`, and arithmetic. */
 export class DASUActiveEffect extends ActiveEffect {
+  /**
+   * @override
+   * A party-aura mirror (`flags.dasu.auraOrigin`) is managed by the party
+   * effect and may only be removed via that source; block direct deletion
+   * from a member's sheet unless our own teardown passes `dasuForce`.
+   */
+  async _preDelete(options, user) {
+    if (this.getFlag('dasu', 'auraOrigin') && !options.dasuForce) {
+      ui.notifications?.warn(game.i18n.localize('DASU.Party.AuraMirrorLocked'));
+      return false;
+    }
+    return super._preDelete(options, user);
+  }
+
   /** @override */
   apply(target, change) {
     if (
