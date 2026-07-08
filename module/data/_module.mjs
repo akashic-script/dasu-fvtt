@@ -4,6 +4,7 @@ export {default as EquippedDataModel} from "./equipped-data-model.mjs";
 export * from "./fields/index.mjs";
 export {default as DASUSummoner} from "./summoner.mjs";
 export {default as DASUDaemon} from "./daemon.mjs";
+export {default as DASUParty} from "./party.mjs";
 
 export {default as DASUItemBase} from "./item-base.mjs";
 export {default as DASUItem} from "./item.mjs";
