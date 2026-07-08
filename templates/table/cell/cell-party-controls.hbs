@@ -1,0 +1,32 @@
+<div class="party-table__controls">
+  {{#if roster}}
+  <button type="button" class="party-card__toggle{{#if active}} party-card__toggle--on{{/if}}"
+    data-action="toggleActive"
+    data-tooltip="{{#if active}}{{localize 'DASU.Stock.SetInactive'}}{{else}}{{localize 'DASU.Stock.SetActive'}}{{/if}}">
+    <i class="fa-solid fa-hand-fist"></i>
+  </button>
+  {{#if isChanneler}}
+  <button type="button" class="party-card__toggle party-card__toggle--channel{{#if channeled}} party-card__toggle--on{{/if}}"
+    data-action="toggleChanneled"
+    data-tooltip="{{#if channeled}}{{localize 'DASU.Stock.StopChannel'}}{{else}}{{localize 'DASU.Stock.Channel'}}{{/if}}">
+    <i class="fa-solid fa-hand-sparkles"></i>
+  </button>
+  {{/if}}
+  <button type="button" class="party-card__store" data-action="storeDaemon" data-tooltip="{{localize 'DASU.Party.MoveToStorage'}}">
+    <i class="fas fa-box"></i>
+  </button>
+  {{/if}}
+  {{#if storage}}
+  <button type="button" class="party-card__claim" data-action="claimDaemon" data-tooltip="{{localize 'DASU.Party.ClaimFromStorage'}}">
+    <i class="fas fa-hand"></i>
+  </button>
+  <button type="button" class="party-card__remove" data-action="removeFromStorage" data-tooltip="{{localize 'DASU.Party.RemoveFromStorage'}}">
+    <i class="fas fa-xmark"></i>
+  </button>
+  {{/if}}
+  {{#if summoners}}
+  <button type="button" class="party-card__remove" data-action="removeMember" data-tooltip="{{localize 'DASU.Party.RemoveFromParty'}}">
+    <i class="fas fa-xmark"></i>
+  </button>
+  {{/if}}
+</div>
