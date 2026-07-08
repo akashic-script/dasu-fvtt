@@ -1,4 +1,15 @@
 <div class="tab" data-tab="stacks" data-group="sheet">
+  {{#if partyAura.applicable}}
+  <div class="form-group">
+    <label>{{localize "DASU.Party.AuraLabel"}}</label>
+    <div class="form-fields">
+      <input type="checkbox" name="flags.dasu.partyAura"
+             {{checked partyAura.enabled}} />
+    </div>
+    <p class="hint">{{localize "DASU.Party.AuraHint"}}</p>
+  </div>
+  {{/if}}
+
   <div class="form-group">
     <label>{{localize "DASU.Status.StacksLabel"}}</label>
     <div class="form-fields">

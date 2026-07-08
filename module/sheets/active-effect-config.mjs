@@ -57,6 +57,11 @@ export class DASUActiveEffectConfig extends ActiveEffectConfig {
     if (partId !== 'stacks') return context;
 
     const effect = this.document;
+    // Only a party-owned effect can be broadcast to member summoners.
+    context.partyAura = {
+      applicable: effect.parent?.type === 'party',
+      enabled: !!effect.getFlag(SYSTEM, 'partyAura'),
+    };
     const override = effect.getFlag(SYSTEM, 'maxStacksOverride');
     context.stacks = {
       current: stacksOf(effect),
