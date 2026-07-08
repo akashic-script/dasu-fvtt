@@ -1,5 +1,23 @@
 # Changelog
 
+# [14.2.0](https://github.com/spyrella/dasu/compare/v14.1.0...v14.2.0) (2026-07-08)
+
+### Bug Fixes
+
+- **sheet:** move initiative button before level pill in actor header ([bec84ad](https://github.com/spyrella/dasu/commit/bec84ad313eeecca4c01d2008309b01b4c344aee))
+- **system:** no base, a reserved type ([7dc581e](https://github.com/spyrella/dasu/commit/7dc581e5d09aaffdba259ad6b0fac13e6db1af60))
+
+### Features
+
+- **party:** add DASUParty data model with members/storage sets ([a8b4332](https://github.com/spyrella/dasu/commit/a8b433212e4ea68d5f55f1b975e707e4b9cbde26))
+- **party:** add party actor sheet with card/table layout toggle ([92f729d](https://github.com/spyrella/dasu/commit/92f729d4790c7ac25c55b6422b1da11436d572ef))
+- **party:** add party aura mirroring to member summoners ([0902f55](https://github.com/spyrella/dasu/commit/0902f55ecd78d343df58432708424a3d7f2041a6))
+- **party:** add party pseudo-folders to the actors sidebar ([d0d60ee](https://github.com/spyrella/dasu/commit/d0d60ee7ad605ec9546da1ad6b2b434e2e9e8da3))
+- **party:** add table-layout renderer and shared row filter for party sheet ([5289e6d](https://github.com/spyrella/dasu/commit/5289e6d66480e8bd8bfab926a0051c8ea0d31766))
+- **party:** change token desposition and actor link on recruit daemon ([b6047a6](https://github.com/spyrella/dasu/commit/b6047a60c030228ec09b1b56d3f9384a6ab5874c))
+- **party:** implement hotkey for opening active party, set edit mode true on new actor creation ([d6582d4](https://github.com/spyrella/dasu/commit/d6582d432cfe8709d35f6107ee97ddba5387dad5))
+- **party:** register party actor type, sheet, and settings ([c08f8ac](https://github.com/spyrella/dasu/commit/c08f8ac16103f133a3086df4894afacd649306ed))
+
 # [14.1.0](https://github.com/spyrella/dasu/compare/v14.0.0...v14.1.0) (2026-07-06)
 
 ### Features
