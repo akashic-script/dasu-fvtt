@@ -166,7 +166,10 @@ export class DASUActorSheet extends SheetLayoutMixin(
   /** @override */
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
-    this._mode = options.mode ?? this._mode ?? this.constructor.MODES.PLAY;
+    const { MODES } = this.constructor;
+    const isNewActor = options.renderContext === 'createActor';
+    this._mode =
+      options.mode ?? this._mode ?? (isNewActor ? MODES.EDIT : MODES.PLAY);
   }
 
   /** @override */
@@ -566,6 +569,7 @@ export class DASUActorSheet extends SheetLayoutMixin(
         });
       toggle.addEventListener('dblclick', (e) => e.stopPropagation());
       toggle.addEventListener('pointerdown', (e) => e.stopPropagation());
+      toggle.querySelector('.dasu-mode-checkbox').checked = this.isEditMode;
       header.prepend(toggle);
     } else if (this.isEditable && toggle) {
       toggle.querySelector('.dasu-mode-checkbox').checked = this.isEditMode;

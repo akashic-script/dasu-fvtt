@@ -57,7 +57,18 @@ export class DASUPartyActorSheet extends SheetLayoutMixin(
   static DEFAULT_OPTIONS = {
     classes: ['dasu', 'sheet', 'actor', 'party'],
     position: { width: 720, height: 860 },
-    window: { resizable: true, icon: 'fas fa-people-group' },
+    window: {
+      resizable: true,
+      icon: 'fas fa-people-group',
+      controls: [
+        {
+          icon: 'fa-solid fa-star',
+          label: 'DASU.Party.SetActive',
+          action: 'toggleActiveParty',
+          visible: () => game.user.isGM,
+        },
+      ],
+    },
     form: { submitOnChange: true },
     actions: {
       openActor: DASUPartyActorSheet.#onOpenActor,
@@ -70,9 +81,19 @@ export class DASUPartyActorSheet extends SheetLayoutMixin(
       selectMember: DASUPartyActorSheet.#onSelectMember,
       clearFilters: DASUPartyActorSheet.#onClearFilters,
       setLayout: DASUPartyActorSheet.#onSetLayout,
+      toggleActiveParty: DASUPartyActorSheet.#onToggleActiveParty,
     },
     dragDrop: [{ dragSelector: '[data-uuid]', dropSelector: null }],
   };
+
+  /** @override */
+  get title() {
+    const active = game.settings.get('dasu', 'activeParty') === this.actor.id;
+    const prefix = `[${game.i18n.localize(
+      active ? 'DASU.Party.Active' : 'DASU.Party.Inactive'
+    )}] `;
+    return `${prefix}${super.title}`;
+  }
 
   /** @override */
   static TABS = {
@@ -128,6 +149,18 @@ export class DASUPartyActorSheet extends SheetLayoutMixin(
   };
 
   /** @override */
+  _getHeaderControls() {
+    const controls = super._getHeaderControls();
+    const active = game.settings.get('dasu', 'activeParty') === this.actor.id;
+    const toggle = controls.find((c) => c.action === 'toggleActiveParty');
+    if (toggle) {
+      toggle.icon = active ? 'fa-solid fa-star' : 'fa-regular fa-star';
+      toggle.label = active ? 'DASU.Party.UnsetActive' : 'DASU.Party.SetActive';
+    }
+    return controls;
+  }
+
+  /** @override */
   async _preparePartContext(partId, context, options) {
     context = await super._preparePartContext(partId, context, options);
     if (partId === 'tabs' && context.tabs) {
@@ -147,6 +180,8 @@ export class DASUPartyActorSheet extends SheetLayoutMixin(
     context.actor = actor;
     context.system = system;
     context.owner = actor.isOwner;
+    context.isActiveParty =
+      game.settings.get('dasu', 'activeParty') === actor.id;
 
     context.summoners = await system.getMemberCardData();
     context.roster = await system.getRosterCardData();
@@ -606,5 +641,17 @@ export class DASUPartyActorSheet extends SheetLayoutMixin(
     }
     if (this.#isTableLayout) this.#refreshTable(key);
     else this.#applyFilters(bar);
+  }
+
+  /** GM-only: set this party active, or clear it if already active. */
+  static async #onToggleActiveParty() {
+    if (!game.user.isGM) return;
+    const current = game.settings.get('dasu', 'activeParty');
+    await game.settings.set(
+      'dasu',
+      'activeParty',
+      current === this.actor.id ? '' : this.actor.id
+    );
+    this.render({ window: { title: this.title } });
   }
 }

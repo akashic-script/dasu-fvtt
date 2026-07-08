@@ -103,6 +103,30 @@ Hooks.once('init', function () {
     type: String,
     default: 'card',
   });
+  game.settings.register('dasu', 'activeParty', {
+    name: 'DASU.Settings.ActiveParty.Name',
+    hint: 'DASU.Settings.ActiveParty.Hint',
+    scope: 'world',
+    config: true,
+    type: String,
+    choices: activePartyChoices,
+    default: '',
+  });
+
+  game.keybindings.register('dasu', 'openActiveParty', {
+    name: 'DASU.Party.OpenActiveParty',
+    editable: [{ key: 'KeyP' }],
+    onDown: () => {
+      const party = game.actors.get(game.settings.get('dasu', 'activeParty'));
+      if (!party) {
+        ui.notifications.warn(game.i18n.localize('DASU.Party.NoActiveParty'));
+        return true;
+      }
+      if (party.sheet.rendered) party.sheet.close();
+      else party.sheet.render(true);
+      return true;
+    },
+  });
 
   CONFIG.Item.documentClass = DASUItem;
   Object.assign(CONFIG.Item.dataModels, {
@@ -281,6 +305,21 @@ Hooks.once('ready', async function () {
   // Party auras: broadcast flagged party effects onto member summoners.
   initializePartyAuras();
 
+  // Keep every open party sheet's active-party badge/menu label in sync.
+  Hooks.on('updateSetting', (setting) => {
+    if (setting.key !== 'dasu.activeParty') return;
+    for (const app of DASUPartyActorSheet.instances())
+      app.render({ window: { title: app.title } });
+  });
+
+  // Clear the active-party setting if that party is deleted.
+  Hooks.on('deleteActor', (actor) => {
+    if (actor.type !== 'party') return;
+    if (game.settings.get('dasu', 'activeParty') === actor.id) {
+      game.settings.set('dasu', 'activeParty', '');
+    }
+  });
+
   Hooks.callAll('dasu.ready', game.dasu);
 });
 
@@ -350,6 +389,19 @@ async function releaseDaemonOwnership(summonerId, uuids) {
       await daemon.update({ 'system.summonerId': null });
     }
   }
+}
+
+/**
+ * Dropdown choices for the "Active Party" setting.
+ * @returns {Record<string, string>}
+ */
+function activePartyChoices() {
+  const choices = { '': game.i18n.localize('DASU.Settings.ActiveParty.None') };
+  for (const party of game.actors) {
+    if (party.type === 'party')
+      choices[party.id] = `${party.name} (${party.id})`;
+  }
+  return choices;
 }
 
 /**

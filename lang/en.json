@@ -75,7 +75,13 @@
       "ConfirmRemoveFromStorage": "Remove <strong>{name}</strong> from party storage?",
       "AuraLabel": "Party Aura",
       "AuraHint": "Broadcast this effect to every party member. Members receive a linked copy managed from here.",
-      "AuraMirrorLocked": "This is a party aura, managed from the party sheet. Remove it there."
+      "AuraMirrorLocked": "This is a party aura, managed from the party sheet. Remove it there.",
+      "Active": "Active",
+      "Inactive": "Inactive",
+      "SetActive": "Set as Active Party",
+      "UnsetActive": "Unset Active Party",
+      "NoActiveParty": "No active party is set.",
+      "OpenActiveParty": "Open Active Party Sheet"
     },
     "SpecialAbility": {
       "Title": "Special Ability",
@@ -990,6 +996,11 @@
       "AutoApplyViaSocket": {
         "Name": "Auto-Apply to Unowned Targets",
         "Hint": "When enabled, inline actions targeting tokens you don't own are automatically applied by the GM client over the socket. When disabled, a request card is posted to chat for manual approval instead."
+      },
+      "ActiveParty": {
+        "Name": "Active Party",
+        "Hint": "The party opened by the 'P' keybind. Normally set from a party sheet's header menu rather than edited here.",
+        "None": "None"
       }
     }
   },
