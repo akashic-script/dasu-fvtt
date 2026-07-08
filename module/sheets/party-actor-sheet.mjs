@@ -10,6 +10,7 @@ import {
   addDaemonToStock,
   moveToPartyStorage,
   claimFromPartyStorage,
+  linkDaemonToken,
 } from '../helpers/daemon-stock.mjs';
 
 export class DASUPartyActorSheet extends SheetLayoutMixin(
@@ -415,6 +416,7 @@ export class DASUPartyActorSheet extends SheetLayoutMixin(
       // the tab (not just on its drop-zone element) routes correctly.
       if (this.tabGroups?.primary === 'storage') {
         await this.actor.system.addToStorage(dropped.uuid);
+        await linkDaemonToken(dropped);
         return true;
       }
       const summoner = await this.#pickTargetSummoner();

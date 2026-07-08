@@ -1,5 +1,5 @@
 import { SYSTEM } from '../helpers/config.mjs';
-import { addDaemonToStock } from '../helpers/daemon-stock.mjs';
+import { addDaemonToStock, linkDaemonToken } from '../helpers/daemon-stock.mjs';
 import { pruneShownEntries } from './party-directory-tree.mjs';
 import { PartyCollapseState } from './party-collapse-state.mjs';
 
@@ -215,6 +215,7 @@ export class DASUActorDirectory extends ActorDirectory {
     }
     if (actor.type === 'daemon' && onStorage) {
       await party.system.addToStorage(actor.uuid);
+      await linkDaemonToken(actor);
       return true;
     }
     if (actor.type === 'daemon') {

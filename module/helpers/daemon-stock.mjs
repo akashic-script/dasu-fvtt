@@ -26,6 +26,25 @@ export async function importDaemonToWorld(packActor) {
 }
 
 /**
+ * Set a fielded daemon's token to a linked, friendly-disposition token, so it
+ * behaves like a party member on the canvas rather than a hostile NPC. Call
+ * whenever a daemon joins a summoner's stock or party storage.
+ * @param {Actor} daemon
+ */
+export async function linkDaemonToken(daemon) {
+  const token = daemon.prototypeToken;
+  if (
+    token.actorLink &&
+    token.disposition === CONST.TOKEN_DISPOSITIONS.FRIENDLY
+  )
+    return;
+  await daemon.update({
+    'prototypeToken.actorLink': true,
+    'prototypeToken.disposition': CONST.TOKEN_DISPOSITIONS.FRIENDLY,
+  });
+}
+
+/**
  * Add a dropped daemon to a summoner's stock: import-if-from-pack, enforce
  * the single-owner invariant, dedupe, then push `{ uuid, active: false }`.
  * @param {Actor} summoner  The summoner gaining the daemon.
@@ -69,6 +88,7 @@ export async function addDaemonToStock(summoner, dropped) {
   }
   stock.push({ uuid: dropped.uuid, active: false });
   await summoner.update({ 'system.stock': stock });
+  await linkDaemonToken(dropped);
   return true;
 }
 
