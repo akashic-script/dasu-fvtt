@@ -1,0 +1,77 @@
+<ol class="plain parties">
+  {{#each parties}}
+  <li class="directory-item folder flexcol{{#unless collapsed}} expanded{{/unless}}" data-party
+      data-party-id="{{id}}" data-entry-id="{{id}}" data-uuid="{{uuid}}">
+    <header class="folder-header" data-action="togglePartySection" data-collapse-key="{{id}}">
+      <i class="fa-solid fa-folder-open fa-fw" inert></i>
+      <img class="party-folder__img" src="{{img}}" alt="{{name}}" />
+      <span class="folder-name ellipsis">{{name}}</span>
+      <button type="button" class="inline-control icon fa-solid fa-gear" data-action="openParty"
+        data-tooltip="{{localize 'DASU.Party.OpenSheet'}}"></button>
+    </header>
+
+    <ol class="subdirectory plain">
+      <li class="directory-item folder flexcol{{#unless summonersCollapsed}} expanded{{/unless}}"
+          data-section="summoners">
+        <header class="folder-header"
+          data-action="togglePartySection" data-collapse-key="{{../id}}:summoners">
+          <i class="fa-solid fa-folder-open fa-fw" inert></i>
+          <span class="folder-name">{{localize "DASU.Party.Summoners"}}</span>
+        </header>
+        <ol class="subdirectory plain">
+          {{#each summoners}}
+          <li class="directory-item entry document actor flexrow" data-uuid="{{uuid}}"
+              data-action="activateEntry" data-entry-id="{{actor.id}}">
+            <img class="thumbnail" src="{{img}}" alt="{{name}}" loading="lazy">
+            <a class="entry-name ellipsis">{{name}}</a>
+          </li>
+          {{else}}
+          <li class="blank">{{localize "DASU.Party.DropSummoner"}}</li>
+          {{/each}}
+        </ol>
+      </li>
+
+      <li class="directory-item folder flexcol{{#unless rosterCollapsed}} expanded{{/unless}}"
+          data-section="roster">
+        <header class="folder-header"
+          data-action="togglePartySection" data-collapse-key="{{../id}}:roster">
+          <i class="fa-solid fa-folder-open fa-fw" inert></i>
+          <span class="folder-name">{{localize "DASU.Party.Roster"}}</span>
+        </header>
+        <ol class="subdirectory plain">
+          {{#each roster}}
+          <li class="directory-item entry document actor flexrow" data-uuid="{{uuid}}"
+              data-action="activateEntry" data-entry-id="{{actor.id}}">
+            <img class="thumbnail" src="{{img}}" alt="{{name}}" loading="lazy">
+            <a class="entry-name ellipsis">{{name}}</a>
+            <span class="party-folder__owner-tag">{{ownerName}}</span>
+          </li>
+          {{else}}
+          <li class="blank">{{localize "DASU.Party.DropDaemons"}}</li>
+          {{/each}}
+        </ol>
+      </li>
+
+      <li class="directory-item folder flexcol{{#unless storageCollapsed}} expanded{{/unless}}"
+          data-section="storage">
+        <header class="folder-header"
+          data-action="togglePartySection" data-collapse-key="{{../id}}:storage">
+          <i class="fa-solid fa-folder-open fa-fw" inert></i>
+          <span class="folder-name">{{localize "DASU.Party.Storage"}}</span>
+        </header>
+        <ol class="subdirectory plain">
+          {{#each storage}}
+          <li class="directory-item entry document actor flexrow" data-uuid="{{uuid}}"
+              data-action="activateEntry" data-entry-id="{{actor.id}}">
+            <img class="thumbnail" src="{{img}}" alt="{{name}}" loading="lazy">
+            <a class="entry-name ellipsis">{{name}}</a>
+          </li>
+          {{else}}
+          <li class="blank">{{localize "DASU.Party.StorageEmpty"}}</li>
+          {{/each}}
+        </ol>
+      </li>
+    </ol>
+  </li>
+  {{/each}}
+</ol>
