@@ -15,6 +15,9 @@ import { Checks, initializeChecks } from './checks/checks.mjs';
 import { DASUCombat, initializeCombat } from './documents/combat.mjs';
 import { DASUCombatant } from './documents/combatant.mjs';
 import { DASUCombatTracker } from './sheets/combat-tracker.mjs';
+import { DASUActorDirectory } from './ui/actor-directory.mjs';
+import { DASUPartyActorSheet } from './sheets/party-actor-sheet.mjs';
+import { initializePartyAuras } from './helpers/party-aura.mjs';
 import { registerCombatSettings } from './helpers/combat-settings.mjs';
 import { initializePipelines } from './helpers/pipelines/_module.mjs';
 import { DASUSocketHandler } from './helpers/socket.mjs';
@@ -79,12 +82,27 @@ Hooks.once('init', function () {
   Object.assign(CONFIG.Actor.dataModels, {
     summoner: models.DASUSummoner,
     daemon: models.DASUDaemon,
+    party: models.DASUParty,
   });
 
   CONFIG.Actor.trackableAttributes = {
     summoner: { bar: ['resources.hp', 'resources.wp'], value: [] },
     daemon: { bar: ['resources.hp', 'resources.wp'], value: [] },
   };
+
+  CONFIG.ui.actors = DASUActorDirectory;
+  game.settings.register('dasu', 'partySidebarState', {
+    scope: 'client',
+    config: false,
+    type: Array,
+    default: [],
+  });
+  game.settings.register('dasu', 'partyLayout', {
+    scope: 'client',
+    config: false,
+    type: String,
+    default: 'card',
+  });
 
   CONFIG.Item.documentClass = DASUItem;
   Object.assign(CONFIG.Item.dataModels, {
@@ -120,6 +138,12 @@ Hooks.once('init', function () {
     'dasu',
     DASUDaemonActorSheet,
     { types: ['daemon'], makeDefault: true, label: 'DASU.SheetLabels.Actor' }
+  );
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(
+    Actor,
+    'dasu',
+    DASUPartyActorSheet,
+    { types: ['party'], makeDefault: true, label: 'DASU.SheetLabels.Party' }
   );
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
     Item,
@@ -227,6 +251,36 @@ Hooks.once('ready', async function () {
     );
   });
 
+  // When a summoner is deleted, prune it from every party's members. The
+  // Roster is derived from member stocks.
+  Hooks.on('deleteActor', (actor, options, userId) => {
+    if (actor.type !== 'summoner') return;
+    if (game.userId !== userId) return;
+    Promise.resolve(pruneDeletedMemberFromParties(actor.uuid)).catch((err) =>
+      Hooks.onError('deleteActor#pruneDeletedMemberFromParties', err, {
+        log: 'error',
+        notify: 'error',
+      })
+    );
+  });
+
+  // A daemon dragged out of a party's Storage onto the plain sidebar (or a
+  // real Folder) moves via core's own directory drop handling.
+  Hooks.on('updateActor', (actor, changes, options, userId) => {
+    if (actor.type !== 'daemon') return;
+    if (game.userId !== userId) return;
+    if (!foundry.utils.hasProperty(changes, 'folder')) return;
+    Promise.resolve(pruneMovedDaemonFromStorage(actor.uuid)).catch((err) =>
+      Hooks.onError('updateActor#pruneMovedDaemonFromStorage', err, {
+        log: 'error',
+        notify: 'error',
+      })
+    );
+  });
+
+  // Party auras: broadcast flagged party effects onto member summoners.
+  initializePartyAuras();
+
   Hooks.callAll('dasu.ready', game.dasu);
 });
 
@@ -295,6 +349,31 @@ async function releaseDaemonOwnership(summonerId, uuids) {
     if (daemon.system?.summonerId === summonerId) {
       await daemon.update({ 'system.summonerId': null });
     }
+  }
+}
+
+/**
+ * Remove a deleted summoner's uuid from every party's system.members.
+ * @param {string} summonerUuid
+ */
+async function pruneDeletedMemberFromParties(summonerUuid) {
+  for (const party of game.actors) {
+    if (party.type !== 'party') continue;
+    if (!party.system.members.has(summonerUuid)) continue;
+    await party.system.removeMember(summonerUuid);
+  }
+}
+
+/**
+ * Remove a daemon's uuid from every party's system.storage. Used when a
+ * stored daemon is moved to a real folder.
+ * @param {string} daemonUuid
+ */
+async function pruneMovedDaemonFromStorage(daemonUuid) {
+  for (const party of game.actors) {
+    if (party.type !== 'party') continue;
+    if (!party.system.storage.has(daemonUuid)) continue;
+    await party.system.removeFromStorage(daemonUuid);
   }
 }
 

@@ -37,6 +37,46 @@
       "OverStrain": "Fielded daemons ({used}) exceed your Will Strain Cap ({cap}). They risk breaking free of your will.",
       "Channeled": "Channeled"
     },
+    "Party": {
+      "NamePlaceholder": "Party Name",
+      "Summoners": "Summoners",
+      "Roster": "Roster",
+      "Storage": "Storage",
+      "OpenSheet": "Open Party Sheet",
+      "RemoveFromParty": "Remove from Party",
+      "MembersEmpty": "Drag a summoner here",
+      "RosterEmpty": "Add daemons to a summoner's stock",
+      "StorageEmpty": "No daemons in storage",
+      "DropSummoner": "Drag a summoner here",
+      "DropDaemons": "Add daemons to a summoner's stock",
+      "MemberSummonerOnly": "Only summoners may join a party.",
+      "PickSummoner": "Add to which summoner's stock?",
+      "OwnedBy": "Owned by",
+      "MoveToStorage": "Move to Party Storage",
+      "ClaimFromStorage": "Claim into my Stock",
+      "RemoveFromStorage": "Remove from Storage",
+      "Classless": "Classless",
+      "FilterSearch": "Search...",
+      "FilterClearAll": "Clear Filters",
+      "FilterHint": "Click a member to filter the Roster to their daemons",
+      "LayoutLabel": "Layout",
+      "LayoutCard": "Card layout",
+      "LayoutTable": "Table layout",
+      "ColName": "Name",
+      "ColLevel": "Lvl",
+      "ColClass": "Class",
+      "ColOwner": "Owner",
+      "ColStatus": "Status",
+      "ColHP": "HP",
+      "ColWP": "WP",
+      "ConfirmRemoveFromPartyTitle": "Remove from Party",
+      "ConfirmRemoveFromParty": "Remove <strong>{name}</strong> from the party?",
+      "ConfirmRemoveFromStorageTitle": "Remove from Storage",
+      "ConfirmRemoveFromStorage": "Remove <strong>{name}</strong> from party storage?",
+      "AuraLabel": "Party Aura",
+      "AuraHint": "Broadcast this effect to every party member. Members receive a linked copy managed from here.",
+      "AuraMirrorLocked": "This is a party aura, managed from the party sheet. Remove it there."
+    },
     "SpecialAbility": {
       "Title": "Special Ability",
       "Kind": {
@@ -252,7 +292,8 @@
     "SheetLabels": {
       "Actor": "DASU Actor Sheet",
       "Item": "DASU Item Sheet",
-      "Effect": "DASU Effect Config"
+      "Effect": "DASU Effect Config",
+      "Party": "Party"
     },
     "Effect": {
       "Source": "Source",
@@ -584,7 +625,10 @@
         "Effects": "Effects",
         "Description": "Description",
         "Advanced": "Advanced",
-        "Planner": "Level Planner"
+        "Planner": "Level Planner",
+        "Summoners": "Summoners",
+        "Roster": "Roster",
+        "Storage": "Storage"
       },
       "Syn": {
         "Innate": "Innate",
@@ -952,7 +996,8 @@
   "TYPES": {
     "Actor": {
       "summoner": "Summoner",
-      "daemon": "Daemon"
+      "daemon": "Daemon",
+      "party": "Party"
     },
     "Item": {
       "item": "Item",

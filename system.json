@@ -32,7 +32,8 @@
   "documentTypes": {
     "Actor": {
       "summoner": {},
-      "daemon": {}
+      "daemon": {},
+      "party": {}
     },
     "Item": {
       "item": {},
@@ -113,6 +114,15 @@
       "system": "dasu",
       "private": false,
       "flags": {}
+    },
+    {
+      "name": "daemons",
+      "label": "Daemons",
+      "path": "packs/daemons",
+      "type": "Actor",
+      "system": "dasu",
+      "private": false,
+      "flags": {}
     }
   ],
   "packFolders": [
@@ -125,6 +135,11 @@
       "name": "Effects",
       "sorting": "m",
       "packs": ["tags", "statuses", "actor-effects"]
+    },
+    {
+      "name": "Actors",
+      "sorting": "m",
+      "packs": ["daemons"]
     }
   ],
   "socket": true,
