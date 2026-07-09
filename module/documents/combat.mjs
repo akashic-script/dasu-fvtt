@@ -124,6 +124,11 @@ export class DASUCombat extends Combat {
 
 /** Register combat-lifecycle hooks that live outside the document class. */
 export function initializeCombat() {
+  // Party actors are a roster container, not a combat participant
+  Hooks.on('preCreateCombatant', (combatant) => {
+    if (combatant.actor?.type === 'party') return false;
+  });
+
   Hooks.on('createCombatant', (combatant, options, userId) => {
     const combat = combatant.parent;
     if (!(combat instanceof DASUCombat)) return;
