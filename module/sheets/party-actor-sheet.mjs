@@ -420,7 +420,7 @@ export class DASUPartyActorSheet extends SheetLayoutMixin(
    */
   #bindMemberRefresh() {
     const refreshIfMember = (actor) => {
-      if (actor.type !== 'summoner') return;
+      if (actor?.type !== 'summoner') return;
       if (!this.actor.system.members.has(actor.uuid)) return;
       this.render();
     };

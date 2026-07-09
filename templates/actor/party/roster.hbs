@@ -23,11 +23,13 @@
             data-tooltip="{{#if active}}{{localize 'DASU.Stock.SetInactive'}}{{else}}{{localize 'DASU.Stock.SetActive'}}{{/if}}">
             <i class="fa-solid fa-hand-fist"></i>
           </button>
+          {{#if isChanneler}}
           <button type="button" class="party-card__toggle party-card__toggle--channel{{#if channeled}} party-card__toggle--on{{/if}}"
             data-action="toggleChanneled"
             data-tooltip="{{#if channeled}}{{localize 'DASU.Stock.StopChannel'}}{{else}}{{localize 'DASU.Stock.Channel'}}{{/if}}">
             <i class="fa-solid fa-hand-sparkles"></i>
           </button>
+          {{/if}}
         </div>
         <span class="party-card__status{{#if active}} party-card__status--active{{/if}}">
           {{#if active}}{{localize "DASU.Stock.Active"}}{{else}}{{localize "DASU.Stock.Inactive"}}{{/if}}
