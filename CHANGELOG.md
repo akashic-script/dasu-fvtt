@@ -1,5 +1,12 @@
 # Changelog
 
+## [14.2.1](https://github.com/spyrella/dasu/compare/v14.2.0...v14.2.1) (2026-07-09)
+
+### Bug Fixes
+
+- **combat:** prevent party actors from being created as combatants ([41cdbb7](https://github.com/spyrella/dasu/commit/41cdbb76195881754fe99a34a9414f3293508b11))
+- **roster:** conditionally render channel toggle button for channelers ([1560946](https://github.com/spyrella/dasu/commit/156094676b4906a71fb5f708f6e6027dd9c52af0))
+
 # [14.2.0](https://github.com/spyrella/dasu/compare/v14.1.0...v14.2.0) (2026-07-08)
 
 ### Bug Fixes
