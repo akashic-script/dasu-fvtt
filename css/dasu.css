@@ -143,6 +143,10 @@
       padding: 0 2px;
       opacity: 0.4;
     }
+
+    .resource-popover__max {
+      cursor: pointer;
+    }
   }
 
   .dasu .dasu-specialties-popover {

@@ -1191,6 +1191,14 @@ export class DASUActorSheet extends SheetLayoutMixin(
     pop
       .querySelector('.resource-popover__value')
       .addEventListener('change', (e) => update(parseInt(e.target.value) || 0));
+    // Clicking the readonly max field fills the value up to max (HP/WP).
+    pop
+      .querySelector('.resource-popover__max')
+      ?.addEventListener('click', () => {
+        const max = cfg.max ?? int('.resource-popover__max');
+        pop.querySelector('.resource-popover__value').value = max;
+        update(max);
+      });
     pop.querySelectorAll('input').forEach((input) =>
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {

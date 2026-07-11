@@ -134,8 +134,6 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
 
     this.resources.hp.max = (sta + pow) * 10 + (this.resources.hp.bonus ?? 0);
     this.resources.wp.max = (dex + wil) * 10 + (this.resources.wp.bonus ?? 0);
-    this.resources.hp.value = Math.min(this.resources.hp.value, this.resources.hp.max);
-    this.resources.wp.value = Math.min(this.resources.wp.value, this.resources.wp.max);
 
     const avoidBase = 11 + Math.floor((dex + sta) / 2);
     const defenseBase = 11 + Math.floor((pow + wil) / 2);
@@ -144,5 +142,14 @@ export default class DASUActorBase extends foundry.abstract.TypeDataModel {
     this.stats.hit.value = 0 + (this.stats.hit.bonus ?? 0);
     this.stats.land.value = 0 + (this.stats.land.bonus ?? 0);
     this.stats.critical.value = Math.max(2, 11 - (this.stats.critical.bonus ?? 0));
+  }
+
+  /**
+   * Clamp hp/wp value to their max. Call once, after all subclass max modifiers
+   * (archetype bonuses, dejection penalties) have been applied.
+   */
+  _clampResources() {
+    this.resources.hp.value = Math.min(this.resources.hp.value, this.resources.hp.max);
+    this.resources.wp.value = Math.min(this.resources.wp.value, this.resources.wp.max);
   }
 }
