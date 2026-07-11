@@ -1022,12 +1022,12 @@ export class DASUActorSheet extends SheetLayoutMixin(
       );
       return false;
     }
-    if (
-      (item?.type === 'ability' || item?.type === 'tactic') &&
-      !this.#canAddSlotItem(item.type)
-    ) {
-      return false;
-    }
+    // if (
+    //   (item?.type === 'ability' || item?.type === 'tactic') &&
+    //   !this.#canAddSlotItem(item.type)
+    // ) {
+    //   return false;
+    // }
     return super._onDropItem(event, item);
   }
 
@@ -1041,20 +1041,20 @@ export class DASUActorSheet extends SheetLayoutMixin(
    * @param {"ability"|"tactic"} type
    * @returns {boolean}
    */
-  #canAddSlotItem(type) {
-    const slot = this.actor.system.slots?.[type];
-    if (!slot || slot.max == null) return true; // no subtype, no cap
-    if (slot.used >= slot.max) {
-      ui.notifications?.warn(
-        game.i18n.format('DASU.Subtype.SlotsFull', {
-          type: game.i18n.localize(`TYPES.Item.${type}`),
-          max: slot.max,
-        })
-      );
-      return false;
-    }
-    return true;
-  }
+  // #canAddSlotItem(type) {
+  //   const slot = this.actor.system.slots?.[type];
+  //   if (!slot || slot.max == null) return true; // no subtype, no cap
+  //   if (slot.used >= slot.max) {
+  //     ui.notifications?.warn(
+  //       game.i18n.format('DASU.Subtype.SlotsFull', {
+  //         type: game.i18n.localize(`TYPES.Item.${type}`),
+  //         max: slot.max,
+  //       })
+  //     );
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
   static #onRoll(event, target) {
     if (this.isEditMode) return;

@@ -2962,6 +2962,10 @@
         &:hover {
           filter: brightness(1.2);
         }
+
+        &.dasu-table__badge--over {
+          background: #d96a6a;
+        }
       }
 
       /* Row container - item accent by type */

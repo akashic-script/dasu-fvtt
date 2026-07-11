@@ -218,8 +218,11 @@ export class DASUItemSheet extends SheetLayoutMixin(
         template: 'systems/dasu/templates/item/parts/bond-advanced.hbs',
         scrollable: [''],
       };
-    } else if (this.document.type === 'ability') {
-      // Every ability sub-category gets the "Apply Effects" advanced tab.
+    } else if (
+      this.document.type === 'ability' ||
+      this.document.type === 'specialAbility'
+    ) {
+      // Abilities and special abilities get the tag + "Apply Effects" tab.
       parts.advanced = {
         template:
           'systems/dasu/templates/item/parts/ability-effects-advanced.hbs',
@@ -371,7 +374,8 @@ export class DASUItemSheet extends SheetLayoutMixin(
       context.isAbility ||
       context.isWeapon ||
       context.isTactic ||
-      context.isTag
+      context.isTag ||
+      context.isSpecialAbility
     ) {
       context.abilityEffects = item.effects
         .filter((e) => e.getFlag(SYSTEM, 'applied'))
@@ -441,7 +445,12 @@ export class DASUItemSheet extends SheetLayoutMixin(
       ];
     }
 
-    if (context.isAbility || context.isWeapon || context.isTactic) {
+    if (
+      context.isAbility ||
+      context.isWeapon ||
+      context.isTactic ||
+      context.isSpecialAbility
+    ) {
       if (!this.#slottedTagTable) {
         this.#slottedTagTable = new SlottedTagTableRenderer({
           item,
@@ -452,11 +461,14 @@ export class DASUItemSheet extends SheetLayoutMixin(
         this.#slottedTagTable._editable = context.editable;
       }
       context.slottedTagTable = await this.#slottedTagTable.renderTable(item);
-      context.tagBudget = item.system.tagBudget ?? 0;
+      const budget = item.system.tagBudget ?? 0;
       context.tagSlotsUsed = item.system.tagSlotsUsed ?? 0;
       context.tagBudgetFree = item.system.tagBudgetFree ?? 0;
       context.tagUsesFlatBudget = context.isWeapon || context.isTactic;
-      context.tagMaxSlots = item.system.tagBudget ?? 0;
+      // Special abilities have an unlimited (Infinity) budget; show ∞ rather
+      // than the literal "Infinity" string.
+      context.tagBudget = Number.isFinite(budget) ? budget : '∞';
+      context.tagMaxSlots = Number.isFinite(budget) ? budget : '∞';
     }
 
     // Retrieve the roll data for TinyMCE editors.
@@ -517,6 +529,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
         active: 'DASU.SpecialAbility.Kind.Active',
         reactive: 'DASU.SpecialAbility.Kind.Reactive',
       });
+      context.resourceTypeOptions = localize(DASU.resourceTypes);
     }
 
     if (context.isSkillAbility) {
