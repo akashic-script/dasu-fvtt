@@ -535,6 +535,7 @@ export class DASUTableRenderer {
         type: type ?? null,
         text: max != null ? `${used}/${max}` : String(used),
         tooltip: tooltip ?? null,
+        over: max != null && Number(used) > Number(max),
       };
     }
 

@@ -4,9 +4,9 @@
   "_id": "Wnmt5snUS511rIgg",
   "img": "icons/svg/item-bag.svg",
   "system": {
-    "description": "<p>A growing individual. Despite the name, the Child is not a literal child. Also referred to as the Fool in the Tarot canon, the Child is the beginning of the Journey. The Child, while generally weaker and naive, is a being burgeoning with potential. Sometimes, the Child is the younger form of an existing daemon, a snapshot of them from the start of their Journey. Usually, they manifest as weaker fae sprites or local traditions. Regardless, you will find that the Child is usually willing to help a mortal who is starting their Journey.</p><ul><li><p>Child daemons will have +4 added to stat allocation. 4 max ability and tactics slots.</p></li></ul>",
+    "description": "<p>A growing individual. Despite the name, the Child is not a literal child. Also referred to as the Fool in the Tarot canon, the Child is the beginning of the Journey. The Child, while generally weaker and naive, is a being burgeoning with potential. Sometimes, the Child is the younger form of an existing daemon, a snapshot of them from the start of their Journey. Usually, they manifest as weaker fae sprites or local traditions. Regardless, you will find that the Child is usually willing to help a mortal who is starting their Journey.</p><ul><li><p>Child daemons do not receive any beneficial stats. 4 max ability and tactics slots.</p></li></ul>",
     "dsid": "child",
-    "statAllocationBonus": 4,
+    "statAllocationBonus": 0,
     "maxAbilitySlots": 4,
     "maxTacticSlots": 4
   },

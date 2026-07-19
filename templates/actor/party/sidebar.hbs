@@ -10,7 +10,10 @@
       <div class="party-member-row__body">
         <div class="party-member-row__top">
           <span class="party-member-row__name">{{name}}</span>
-          <span class="party-member-row__level">{{localize "DASU.Actor.Level.abbr"}} {{level}}</span>
+          <span class="party-member-row__strain{{#if willStrain.over}} party-member-row__strain--over{{/if}}"
+            data-tooltip="{{localize 'DASU.Actor.Stat.Strain.long'}}">
+            {{willStrain.used}}/{{willStrain.cap}}
+          </span>
         </div>
         <div class="party-member-row__bar party-member-row__bar--hp">
           <div class="party-member-row__bar-fill" style="width: {{hpPct}}%"></div>

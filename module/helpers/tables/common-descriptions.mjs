@@ -68,7 +68,8 @@ function slottedTagCaption() {
     const tags = item.system?.tags ? [...item.system.tags] : [];
     if (!tags.length) return '';
     const used = item.system?.tagSlotsUsed ?? 0;
-    const max = item.system?.tagBudget ?? 0;
+    const rawMax = item.system?.tagBudget ?? 0;
+    const max = Number.isFinite(rawMax) ? rawMax : '∞';
     const budget = `<span class="item-tag-caption__budget" data-tooltip="${game.i18n.localize(
       'DASU.Tag.SlotsUsed'
     )}">${used}/${max}</span>`;

@@ -215,6 +215,9 @@ function registerHandlebarsHelpers() {
   Handlebars.registerHelper('eq', (a, b) => a === b);
   Handlebars.registerHelper('add', (a, b) => Number(a) + Number(b));
   Handlebars.registerHelper('concat', (...args) => args.slice(0, -1).join(''));
+  Handlebars.registerHelper('includes', (list, value) =>
+    Array.isArray(list) ? list.includes(value) : false
+  );
 }
 
 Hooks.once('ready', async function () {

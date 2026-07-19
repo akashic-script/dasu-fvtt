@@ -65,16 +65,21 @@ DASU.attributeAbbreviations = {
 
 /**
  * Maximum tick a single attribute may be raised to, banded by character level.
- *   Levels  1–5 -> 3
- *   Levels  6–10 -> 4
- *   Levels 11–15 -> 5
- *   Levels 16–20 -> 6
+ *   Levels  1–4  -> 2
+ *   Levels  5–9  -> 3
+ *   Levels 10–14 -> 4
+ *   Levels 15–19 -> 5
+ *   Levels 20–30 -> 6
  * @param {number} level
  * @returns {number}
  */
 DASU.attributeTickMax = function (level) {
   const lvl = Math.max(1, Number(level) || 1);
-  return Math.min(6, 3 + Math.floor((Math.min(lvl, 20) - 1) / 5));
+  if (lvl <= 4) return 2;
+  if (lvl <= 9) return 3;
+  if (lvl <= 14) return 4;
+  if (lvl <= 19) return 5;
+  return 6;
 };
 
 /**
@@ -203,37 +208,19 @@ DASU.resistanceTypes = [
 
 /**
  * Difficulty tiers for skill/attribute checks.
- * Each entry: { key, i18nKey, tn: [lvl1-4, lvl5-9, lvl10-14, lvl15-19, lvl20-24, lvl25-30] }
+ * Each entry: { key, i18nKey, tn }
  */
 DASU.difficulties = [
-  {
-    key: 'routine',
-    i18nKey: 'DASU.Difficulty.Routine',
-    baseTn: [11, 12, 13, 14, 15, 16],
-  },
-  {
-    key: 'standard',
-    i18nKey: 'DASU.Difficulty.Standard',
-    baseTn: [13, 14, 15, 16, 17, 18],
-  },
-  {
-    key: 'hard',
-    i18nKey: 'DASU.Difficulty.Hard',
-    baseTn: [15, 16, 17, 18, 19, 20],
-  },
-  {
-    key: 'extreme',
-    i18nKey: 'DASU.Difficulty.Extreme',
-    baseTn: [17, 18, 19, 20, 21, 22],
-  },
+  { key: 'routine', i18nKey: 'DASU.Difficulty.Routine', tn: 11 },
+  { key: 'standard', i18nKey: 'DASU.Difficulty.Standard', tn: 13 },
+  { key: 'hard', i18nKey: 'DASU.Difficulty.Hard', tn: 15 },
+  { key: 'extreme', i18nKey: 'DASU.Difficulty.Extreme', tn: 17 },
 ];
 
-/** Returns the TN for a given difficulty key and actor level (1-based). */
-DASU.getDifficultyTn = function (difficultyKey, level) {
+/** Returns the fixed TN for a given difficulty key. */
+DASU.getDifficultyTn = function (difficultyKey) {
   const diff = DASU.difficulties.find((d) => d.key === difficultyKey);
-  if (!diff) return null;
-  const band = Math.min(Math.floor((Math.max(1, level) - 1) / 5), 5);
-  return diff.baseTn[band];
+  return diff ? diff.tn : null;
 };
 
 DASU.resistanceLevels = {
@@ -534,7 +521,7 @@ DASU.stackableStatuses = Object.fromEntries(
 );
 
 /** Item types that can have tags slotted onto them. */
-DASU.taggableTypes = ['weapon', 'ability', 'tactic'];
+DASU.taggableTypes = ['weapon', 'ability', 'tactic', 'specialAbility'];
 
 /** Sub-type choices keyed by taggable item type. Tactic has no sub-types. */
 DASU.tagSubTypes = {

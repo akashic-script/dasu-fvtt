@@ -12,6 +12,15 @@ const RESISTANCE_CLASS = {
   3: 'resistance--drain',
 };
 
+/** One resistance level -> its chip view model `{ abbr, cssClass }`. */
+export function resistanceChip(level) {
+  const key = String(level);
+  return {
+    abbr: RESISTANCE_ABBR[key] ?? '–',
+    cssClass: RESISTANCE_CLASS[key] ?? '',
+  };
+}
+
 /**
  * Build the `{ <type>: { abbr, cssClass } }` view model the resistance chips
  * template expects, from an actor's system data. Shared by the stock table and
@@ -21,15 +30,9 @@ const RESISTANCE_CLASS = {
  */
 export function resistanceChips(sys) {
   return Object.fromEntries(
-    DASU.resistanceTypes.map((key) => {
-      const base = sys?.resistances?.[key]?.base ?? 0;
-      return [
-        key,
-        {
-          abbr: RESISTANCE_ABBR[String(base)] ?? '–',
-          cssClass: RESISTANCE_CLASS[String(base)] ?? '',
-        },
-      ];
-    })
+    DASU.resistanceTypes.map((key) => [
+      key,
+      resistanceChip(sys?.resistances?.[key]?.base ?? 0),
+    ])
   );
 }

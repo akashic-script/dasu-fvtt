@@ -51,21 +51,21 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
     }
 
     // Enforce the subtype's ability/tactic slot cap.
-    if (
-      (data.type === 'ability' || data.type === 'tactic') &&
-      this.actor?.type === 'daemon'
-    ) {
-      const slot = this.actor.system.slots?.[data.type];
-      if (slot?.max != null && slot.used >= slot.max) {
-        ui.notifications.warn(
-          game.i18n.format('DASU.Subtype.SlotsFull', {
-            type: game.i18n.localize(`TYPES.Item.${data.type}`),
-            max: slot.max,
-          })
-        );
-        return false;
-      }
-    }
+    // if (
+    //   (data.type === 'ability' || data.type === 'tactic') &&
+    //   this.actor?.type === 'daemon'
+    // ) {
+    //   const slot = this.actor.system.slots?.[data.type];
+    //   if (slot?.max != null && slot.used >= slot.max) {
+    //     ui.notifications.warn(
+    //       game.i18n.format('DASU.Subtype.SlotsFull', {
+    //         type: game.i18n.localize(`TYPES.Item.${data.type}`),
+    //         max: slot.max,
+    //       })
+    //     );
+    //     return false;
+    //   }
+    // }
   }
 
   /** @override */
@@ -111,6 +111,7 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
       }
       if (
         item.type === 'item' ||
+        item.type === 'specialAbility' ||
         (item.type === 'ability' && category === 'restorative')
       ) {
         return DASURollDialog.openItem(this.actor, item, 'display');

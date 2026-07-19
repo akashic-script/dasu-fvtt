@@ -1,0 +1,434 @@
+<section class="tab {{tab.cssClass}} party-fusion" data-group="primary" data-tab="fusion">
+  <nav class="party-fusion__subnav">
+    <button type="button" class="party-fusion__subnav-btn{{#if (eq fusion.panel 'daemon')}} active{{/if}}"
+      data-action="setFusionPanel" data-panel="daemon">
+      <i class="fas fa-dragon"></i> {{localize "DASU.Party.Fusion.DaemonPanel"}}
+    </button>
+    <button type="button" class="party-fusion__subnav-btn{{#if (eq fusion.panel 'ability')}} active{{/if}}"
+      data-action="setFusionPanel" data-panel="ability">
+      <i class="fas fa-wand-sparkles"></i> {{localize "DASU.Party.Fusion.AbilityPanel"}}
+    </button>
+  </nav>
+
+  {{#if (eq fusion.panel 'daemon')}}
+  <div class="party-fusion__panel" data-fusion="daemon">
+    {{#if fusion.daemon.pool.length}}
+    {{#with fusion.daemon}}
+    <fieldset class="dasu-fieldset">
+      <legend class="dasu-fieldset__legend">{{localize "DASU.Party.Fusion.Parents"}}</legend>
+      <p class="party-fusion__intro">{{localize "DASU.Party.Fusion.Intro"}}</p>
+      <div class="party-fusion__chosen">
+        {{#if a}}
+        <div class="party-fusion__chosen-card" data-action="pickFusionParent" data-uuid="{{a.uuid}}"
+          data-tooltip="{{localize 'DASU.Party.Fusion.ClickToClear'}}">
+          <span class="party-fusion__chosen-slot">A</span>
+          <img src="{{a.img}}" alt="{{a.name}}" />
+          <span class="party-fusion__chosen-info">
+            <span class="party-fusion__chosen-name">{{a.name}}</span>
+            <span class="party-fusion__chosen-meta">Lv {{a.level}}{{#if aRoles.length}} · {{#each aRoles}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}</span>
+          </span>
+          <i class="fas fa-xmark party-fusion__chosen-clear"></i>
+        </div>
+        {{else}}
+        <div class="party-fusion__chosen-card party-fusion__chosen-card--empty">
+          <span class="party-fusion__chosen-slot">A</span>
+          <i class="fas fa-plus"></i>
+          <span class="party-fusion__chosen-name">{{localize "DASU.Party.Fusion.PickParent"}}</span>
+        </div>
+        {{/if}}
+        <i class="fas fa-plus party-fusion__chosen-plus"></i>
+        {{#if b}}
+        <div class="party-fusion__chosen-card" data-action="pickFusionParent" data-uuid="{{b.uuid}}"
+          data-tooltip="{{localize 'DASU.Party.Fusion.ClickToClear'}}">
+          <span class="party-fusion__chosen-slot">B</span>
+          <img src="{{b.img}}" alt="{{b.name}}" />
+          <span class="party-fusion__chosen-info">
+            <span class="party-fusion__chosen-name">{{b.name}}</span>
+            <span class="party-fusion__chosen-meta">Lv {{b.level}}{{#if bRoles.length}} · {{#each bRoles}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}</span>
+          </span>
+          <i class="fas fa-xmark party-fusion__chosen-clear"></i>
+        </div>
+        {{else}}
+        <div class="party-fusion__chosen-card party-fusion__chosen-card--empty">
+          <span class="party-fusion__chosen-slot">B</span>
+          <i class="fas fa-plus"></i>
+          <span class="party-fusion__chosen-name">{{localize "DASU.Party.Fusion.PickParent"}}</span>
+        </div>
+        {{/if}}
+      </div>
+
+      {{#unless bothPicked}}
+      <div class="party-fusion__pick-grid">
+        {{#each poolCards}}
+        <button type="button" class="party-fusion__pick-card"
+          data-action="pickFusionParent" data-uuid="{{uuid}}" data-tooltip="{{name}}">
+          <img src="{{img}}" alt="{{name}}" />
+          <span class="party-fusion__pick-name">{{name}}</span>
+          <span class="party-fusion__pick-meta">Lv {{level}}</span>
+        </button>
+        {{/each}}
+      </div>
+      {{/unless}}
+    </fieldset>
+
+    {{#if bothPicked}}
+
+    <div class="party-fusion__preview">
+      <div class="party-fusion__roll-strip{{#if roll}} party-fusion__roll-strip--{{roll.kind}}{{/if}}">
+        {{#if roll}}
+        <span class="party-fusion__roll-dice"><i class="fas fa-dice-d20"></i> {{roll.a}} + {{roll.b}}</span>
+        <span class="party-fusion__roll-title">
+          {{#if (eq roll.kind 'great')}}{{localize "DASU.Party.Fusion.Great"}}{{/if}}
+          {{#if (eq roll.kind 'accident')}}{{localize "DASU.Party.Fusion.Accident"}}{{/if}}
+          {{#if (eq roll.kind 'clean')}}{{localize "DASU.Party.Fusion.Clean"}}{{/if}}
+        </span>
+        {{else}}
+        <span class="party-fusion__roll-hint"><i class="fas fa-circle-info"></i> {{localize "DASU.Party.Fusion.RollFirstHint"}}</span>
+        {{/if}}
+        <button type="button" class="party-fusion__btn party-fusion__roll-btn" data-action="rollDaemonFusion">
+          <i class="fas fa-dice"></i> {{#if roll}}{{localize "DASU.Party.Fusion.RollAgain"}}{{else}}{{localize "DASU.Party.Fusion.Roll"}}{{/if}}
+        </button>
+      </div>
+      <div class="party-fusion__preview-main">
+        <img class="party-fusion__preview-img" src="{{baseImg}}" alt="" />
+        <div class="party-fusion__preview-body">
+          <span class="party-fusion__preview-name">{{previewName}}</span>
+          <span class="party-fusion__preview-tags">
+            Lv {{level}} · {{roleLabel}} · {{localize (concat "DASU.Party.Fusion.Sub" (capitalize subtype))}}
+          </span>
+          <div class="party-fusion__preview-slotrow">
+            <div class="party-fusion__preview-slots">
+              <span class="party-fusion__preview-slots-label">{{localize "DASU.Party.Fusion.CatAbilities"}}</span>
+              <div class="party-fusion__preview-slotbar">
+                <div class="party-fusion__preview-slotfill party-fusion__preview-slotfill--ability{{#if (gte abilitySlotsUsed abilitySlots)}} party-fusion__preview-slotfill--full{{/if}}" style="width: {{abilitySlotsPct}}%"></div>
+              </div>
+              <span>{{abilitySlotsUsed}} / {{abilitySlots}}</span>
+            </div>
+            <div class="party-fusion__preview-slots">
+              <span class="party-fusion__preview-slots-label">{{localize "DASU.Party.Fusion.CatTactics"}}</span>
+              <div class="party-fusion__preview-slotbar">
+                <div class="party-fusion__preview-slotfill party-fusion__preview-slotfill--tactic{{#if (gte tacticSlotsUsed tacticSlots)}} party-fusion__preview-slotfill--full{{/if}}" style="width: {{tacticSlotsPct}}%"></div>
+              </div>
+              <span>{{tacticSlotsUsed}} / {{tacticSlots}}</span>
+            </div>
+          </div>
+          {{#if previewResistances.length}}
+          <div class="party-fusion__preview-resistances">
+            {{#each previewResistances}}
+            <div class="party-fusion__preview-resistance {{cssClass}}" data-tooltip="{{label}}">
+              <img class="party-fusion__preview-resistance-icon" src="systems/dasu/assets/resistances/{{key}}.png" alt="{{key}}" />
+              <span class="party-fusion__preview-resistance-value">{{abbr}}</span>
+            </div>
+            {{/each}}
+          </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+
+    <fieldset class="dasu-fieldset">
+      <legend class="dasu-fieldset__legend">{{localize "DASU.Party.Fusion.Result"}}</legend>
+      <div class="dasu-fieldset__row">
+        <div class="dasu-fieldset__field flex-none">
+          <label>{{localize "DASU.Party.Fusion.Level"}}</label>
+          <span class="party-fusion__stat-value">{{level}}</span>
+        </div>
+        <div class="dasu-fieldset__field">
+          <label>{{localize "DASU.Party.Fusion.ResultName"}}</label>
+          <input type="text" data-fusion-field="daemonName" value="{{name}}" placeholder="{{a.name}} / {{b.name}}" />
+        </div>
+      </div>
+      <div class="dasu-fieldset__row">
+        <div class="dasu-fieldset__field">
+          <label>{{localize "DASU.Party.Fusion.Role"}}</label>
+          <select data-fusion-field="role">
+            {{#each @root.fusion.roles}}
+            <option value="{{id}}" {{#if (eq id ../role)}}selected{{/if}}>{{label}}</option>
+            {{/each}}
+          </select>
+        </div>
+        <div class="dasu-fieldset__field">
+          <label>{{localize "DASU.Party.Fusion.Subtype"}}</label>
+          <select data-fusion-field="subtype">
+            <option value="child" {{#if (eq subtype 'child')}}selected{{/if}}>{{localize "DASU.Party.Fusion.SubChild"}}</option>
+            <option value="self" {{#if (eq subtype 'self')}}selected{{/if}}>{{localize "DASU.Party.Fusion.SubSelf"}}</option>
+            <option value="god" {{#if (eq subtype 'god')}}selected{{/if}}>{{localize "DASU.Party.Fusion.SubGod"}}</option>
+          </select>
+        </div>
+        {{#if specialAbilityOptions.length}}
+        <div class="dasu-fieldset__field">
+          <label>{{localize "DASU.Party.Fusion.SpecialAbility"}}</label>
+          <select data-fusion-field="specialAbility">
+            {{#each specialAbilityOptions}}
+            <option value="{{ref}}" {{#if (eq ref ../specialAbility)}}selected{{/if}}>{{name}} ({{ownerName}})</option>
+            {{/each}}
+          </select>
+        </div>
+        {{/if}}
+      </div>
+      {{#if showResultHints}}
+      <p class="dasu-fieldset__value">
+        {{#if subtypeAuto}}· {{localize "DASU.Party.Fusion.SubtypeAuto"}}{{/if}}
+        {{#if specialAbilityOptions.length}}· {{localize "DASU.Party.Fusion.SpecialAbilityHint"}}{{/if}}
+      </p>
+      {{/if}}
+    </fieldset>
+
+    <fieldset class="dasu-fieldset">
+      <legend class="dasu-fieldset__legend">{{localize "DASU.Party.Fusion.Keepsakes"}}</legend>
+      <p class="dasu-fieldset__value">{{localize "DASU.Party.Fusion.KeepHint"}}</p>
+
+      {{#if keepAbilities.length}}
+      <div class="party-fusion__keep-group">
+        <span class="party-fusion__keep-cat">{{localize "DASU.Party.Fusion.CatAbilities"}}</span>
+        <div class="party-fusion__keep-grid">
+          {{#each keepAbilities}}
+          <label class="party-fusion__keep{{#if inPair}} party-fusion__keep--paired{{/if}}">
+            <input type="checkbox" data-fusion-field="keep" value="{{ref}}"
+              {{#if checked}}checked{{/if}} {{#if inPair}}disabled{{/if}} />
+            <span class="party-fusion__keep-name">{{name}}</span>
+            <span class="party-fusion__keep-meta">{{ownerName}}{{#if inPair}} · {{localize "DASU.Party.Fusion.InPair"}}{{/if}}</span>
+          </label>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+
+      {{#if keepTactics.length}}
+      <div class="party-fusion__keep-group">
+        <span class="party-fusion__keep-cat">{{localize "DASU.Party.Fusion.CatTactics"}}</span>
+        <div class="party-fusion__keep-grid">
+          {{#each keepTactics}}
+          <label class="party-fusion__keep">
+            <input type="checkbox" data-fusion-field="keep" value="{{ref}}" {{#if checked}}checked{{/if}} />
+            <span class="party-fusion__keep-name">{{name}}</span>
+            <span class="party-fusion__keep-meta">{{ownerName}}</span>
+          </label>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+
+      {{#unless keepAbilities.length}}{{#unless keepTactics.length}}
+      <span class="dasu-fieldset__value">{{localize "DASU.Party.Fusion.NoKeepItems"}}</span>
+      {{/unless}}{{/unless}}
+    </fieldset>
+
+    {{#if showPairFieldset}}
+    <fieldset class="dasu-fieldset">
+      <legend class="dasu-fieldset__legend">{{localize "DASU.Party.Fusion.AbilityFusions"}}</legend>
+      <p class="dasu-fieldset__value">{{localize "DASU.Party.Fusion.PairHint"}}</p>
+
+      {{#each pairs}}
+      <div class="party-fusion__pair" data-pair-index="{{index}}">
+        <div class="party-fusion__pair-head">
+          <span class="party-fusion__pair-title"><i class="fas fa-wand-sparkles"></i> {{baseName}} + {{otherName}}</span>
+          <button type="button" class="party-fusion__pair-remove" data-action="removeFusionPair"
+            data-pair-index="{{index}}" data-tooltip="{{localize 'DASU.Party.Fusion.RemovePair'}}">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <p class="dasu-fieldset__value">
+          {{localize "DASU.Party.Fusion.BlendChassisHint"}} <b>{{baseName}}</b>
+          {{#if chassis}}({{chassis.category}} · {{localize "DASU.Item.Ability.Aptitude"}} {{chassis.aptitude}}){{/if}}
+        </p>
+        <div class="dasu-fieldset__row party-fusion__tags">
+          <div class="party-fusion__tag-col">
+            <label>{{localize "DASU.Party.Fusion.DropTags"}}: {{baseName}}</label>
+            {{#each dropTags}}
+            <label class="party-fusion__tag">
+              <input type="checkbox" data-fusion-field="pairDrop" value="{{id}}" {{#if checked}}checked{{/if}} />
+              <span>{{name}}{{#if (gte rank 2)}} <em>×{{rank}}</em>{{/if}}</span>
+            </label>
+            {{else}}
+            <span class="dasu-fieldset__value">{{localize "DASU.Party.Fusion.NoBaseTags"}}</span>
+            {{/each}}
+          </div>
+          <div class="party-fusion__tag-col">
+            <label>{{localize "DASU.Party.Fusion.AddTags"}}: {{otherName}}</label>
+            {{#each addTags}}
+            <label class="party-fusion__tag">
+              <input type="checkbox" data-fusion-field="pairAdd" value="{{id}}" {{#if checked}}checked{{/if}} />
+              <span>{{name}}{{#if (gte rank 2)}} <em>×{{rank}}</em>{{/if}}</span>
+            </label>
+            {{else}}
+            <span class="dasu-fieldset__value">{{localize "DASU.Party.Fusion.NoSecTags"}}</span>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+      {{/each}}
+
+      {{#if canAddPair}}
+      <div class="dasu-fieldset__row party-fusion__pair-builder">
+        <div class="dasu-fieldset__field">
+          <select data-fusion-field="pairBase">
+            <option value="">{{localize "DASU.Party.Fusion.PairBase"}}</option>
+            {{#each pairCandidates}}
+            <option value="{{ref}}" {{#if (eq ref ../pairBase)}}selected{{/if}}>{{name}} ({{ownerName}})</option>
+            {{/each}}
+          </select>
+        </div>
+        <i class="fas fa-plus party-fusion__plus"></i>
+        <div class="dasu-fieldset__field">
+          <select data-fusion-field="pairOther">
+            <option value="">{{localize "DASU.Party.Fusion.PairOther"}}</option>
+            {{#each pairCandidates}}
+            <option value="{{ref}}" {{#if (eq ref ../pairOther)}}selected{{/if}}>{{name}} ({{ownerName}})</option>
+            {{/each}}
+          </select>
+        </div>
+        <button type="button" class="party-fusion__btn party-fusion__pair-add" data-action="addFusionPair">
+          <i class="fas fa-plus"></i> {{localize "DASU.Party.Fusion.AddPair"}}
+        </button>
+      </div>
+      {{/if}}
+    </fieldset>
+    {{else}}
+    <p class="party-fusion__inline-hint">{{localize "DASU.Party.Fusion.PairNeedTwoKept"}}</p>
+    {{/if}}
+
+    <div class="party-fusion__actionbar">
+      <span class="party-fusion__ready">
+        {{#if roll}}
+        {{#if overSlots}}
+        <i class="fas fa-circle-info"></i> {{localize "DASU.Party.Fusion.OverSlots"}}
+        {{/if}}
+        {{else}}
+        <i class="fas fa-circle-info"></i> {{localize "DASU.Party.Fusion.RollFirstHint"}}
+        {{/if}}
+      </span>
+      <button type="button" class="party-fusion__btn party-fusion__btn--ghost" data-action="resetDaemonFusion"
+        data-tooltip="{{localize 'DASU.Party.Fusion.Reset'}}">
+        <i class="fas fa-rotate-left"></i>
+      </button>
+      <button type="button" class="party-fusion__btn party-fusion__btn--primary" data-action="createFusedDaemon"
+        {{#if createDisabled}}disabled{{/if}}>
+        <i class="fas fa-atom"></i> {{localize "DASU.Party.Fusion.CreateDaemon"}}
+      </button>
+    </div>
+    {{else}}
+    <p class="party-empty">{{localize "DASU.Party.Fusion.PickTwoHint"}}</p>
+    {{/if}}
+
+    {{/with}}
+    {{else}}
+    <p class="party-empty">{{localize "DASU.Party.Fusion.PoolEmpty"}}</p>
+    {{/if}}
+  </div>
+
+  {{else}}
+  <div class="party-fusion__panel" data-fusion="ability">
+    {{#if fusion.ability.abilities.length}}
+    {{#with fusion.ability}}
+
+    <fieldset class="dasu-fieldset">
+      <legend class="dasu-fieldset__legend">{{localize "DASU.Party.Fusion.Abilities"}}</legend>
+      <div class="dasu-fieldset__row party-fusion__parents">
+        <div class="dasu-fieldset__field">
+          <label>{{localize "DASU.Party.Fusion.BaseAbility"}}</label>
+          <select data-fusion-field="baseAbility">
+            <option value="">{{localize "DASU.Party.Fusion.PickAbility"}}</option>
+            {{#each abilities}}
+            <option value="{{uuid}}" {{#if (eq uuid ../base)}}selected{{/if}}>{{name}} ({{ownerName}})</option>
+            {{/each}}
+          </select>
+        </div>
+        <i class="fas fa-plus party-fusion__plus"></i>
+        <div class="dasu-fieldset__field">
+          <label>{{localize "DASU.Party.Fusion.SecondaryAbility"}}</label>
+          <select data-fusion-field="secondaryAbility">
+            <option value="">{{localize "DASU.Party.Fusion.PickAbility"}}</option>
+            {{#each abilities}}
+            <option value="{{uuid}}" {{#if (eq uuid ../secondary)}}selected{{/if}}>{{name}} ({{ownerName}})</option>
+            {{/each}}
+          </select>
+        </div>
+      </div>
+    </fieldset>
+
+    {{#if bothPicked}}
+
+    <fieldset class="dasu-fieldset">
+      <legend class="dasu-fieldset__legend">{{localize "DASU.Party.Fusion.LockedChassis"}}</legend>
+      <div class="party-fusion__chassis-grid">
+        <span><label>{{localize "DASU.Item.Ability.Category"}}</label>{{baseChassis.category}}</span>
+        <span><label>{{localize "DASU.Item.Ability.Aptitude"}}</label>{{baseChassis.aptitude}}</span>
+        <span><label>{{localize "DASU.Item.Ability.Damage"}}</label>{{baseChassis.damage}}</span>
+        <span><label>{{localize "DASU.Item.Ability.Heal"}}</label>{{baseChassis.heal}}</span>
+        <span><label>{{localize "DASU.Item.Ability.Cost"}}</label>{{baseChassis.cost}}</span>
+        <span><label>{{localize "DASU.Item.Ability.ToHit"}}</label>{{baseChassis.toHit}}</span>
+      </div>
+      <p class="dasu-fieldset__value party-fusion__slots{{#if (gte overridesUsed overrideSlots)}} party-fusion__slots--full{{/if}}">
+        {{localize "DASU.Party.Fusion.OverrideSlots"}}: {{overridesUsed}} / {{overrideSlots}} · {{localize "DASU.Party.Fusion.OverrideHint"}}
+      </p>
+    </fieldset>
+
+    <fieldset class="dasu-fieldset">
+      <legend class="dasu-fieldset__legend">{{localize "DASU.Party.Fusion.Tags"}}</legend>
+      <div class="dasu-fieldset__row party-fusion__tags">
+        <div class="party-fusion__tag-col">
+          <label>{{localize "DASU.Party.Fusion.DropTags"}}</label>
+          {{#each baseTags}}
+          <label class="party-fusion__tag">
+            <input type="checkbox" data-fusion-field="dropTag" value="{{id}}" {{#if (includes ../dropTags id)}}checked{{/if}} />
+            <span>{{name}}{{#if (gte rank 2)}} <em>×{{rank}}</em>{{/if}}</span>
+          </label>
+          {{else}}
+          <span class="dasu-fieldset__value">{{localize "DASU.Party.Fusion.NoBaseTags"}}</span>
+          {{/each}}
+        </div>
+        <div class="party-fusion__tag-col">
+          <label>{{localize "DASU.Party.Fusion.AddTags"}}</label>
+          {{#each secTags}}
+          <label class="party-fusion__tag">
+            <input type="checkbox" data-fusion-field="addTag" value="{{id}}" {{#if (includes ../addTags id)}}checked{{/if}} />
+            <span>{{name}}{{#if (gte rank 2)}} <em>×{{rank}}</em>{{/if}}</span>
+          </label>
+          {{else}}
+          <span class="dasu-fieldset__value">{{localize "DASU.Party.Fusion.NoSecTags"}}</span>
+          {{/each}}
+        </div>
+      </div>
+      <div class="dasu-fieldset__row">
+        <div class="dasu-fieldset__field">
+          <label>{{localize "DASU.Party.Fusion.ResultName"}}</label>
+          <input type="text" data-fusion-field="abilityName" value="{{name}}" placeholder="{{baseInfo.name}}" />
+        </div>
+      </div>
+    </fieldset>
+
+    {{#if roll}}
+    <div class="party-fusion__result party-fusion__result--{{roll.kind}}">
+      <span class="party-fusion__result-dice"><i class="fas fa-dice-d20"></i> {{roll.a}} + {{roll.b}}</span>
+      <div class="party-fusion__result-text">
+        <span class="party-fusion__result-title">
+          {{#if (eq roll.kind 'accident')}}{{localize "DASU.Party.Fusion.Accident"}}{{else}}{{localize "DASU.Party.Fusion.Clean"}}{{/if}}
+        </span>
+      </div>
+    </div>
+    {{/if}}
+
+    <div class="party-fusion__actions">
+      <button type="button" class="party-fusion__btn" data-action="rollAbilityFusion">
+        <i class="fas fa-dice"></i> {{localize "DASU.Party.Fusion.Roll"}}
+      </button>
+      <button type="button" class="party-fusion__btn party-fusion__btn--primary" data-action="createFusedAbility">
+        <i class="fas fa-wand-sparkles"></i> {{localize "DASU.Party.Fusion.CreateAbility"}}
+      </button>
+      <button type="button" class="party-fusion__btn party-fusion__btn--ghost" data-action="resetAbilityFusion"
+        data-tooltip="{{localize 'DASU.Party.Fusion.Reset'}}">
+        <i class="fas fa-rotate-left"></i>
+      </button>
+    </div>
+    {{else}}
+    <p class="party-empty">{{localize "DASU.Party.Fusion.PickTwoAbilitiesHint"}}</p>
+    {{/if}}
+
+    {{/with}}
+    {{else}}
+    <p class="party-empty">{{localize "DASU.Party.Fusion.NoAbilities"}}</p>
+    {{/if}}
+  </div>
+  {{/if}}
+</section>

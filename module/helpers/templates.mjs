@@ -18,6 +18,7 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/dasu/templates/actor/party/summoners.hbs',
     'systems/dasu/templates/actor/party/roster.hbs',
     'systems/dasu/templates/actor/party/storage.hbs',
+    'systems/dasu/templates/actor/party/fusion.hbs',
     'systems/dasu/templates/actor/party/items.hbs',
     'systems/dasu/templates/actor/party/effects.hbs',
     'systems/dasu/templates/actor/party/layout-toggle.hbs',

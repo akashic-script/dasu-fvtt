@@ -132,6 +132,11 @@
       "packs": ["archetypes", "subtypes"]
     },
     {
+      "name": "Summoner Building",
+      "sorting": "m",
+      "packs": ["classes"]
+    },
+    {
       "name": "Effects",
       "sorting": "m",
       "packs": ["tags", "statuses", "actor-effects"]
