@@ -1,6 +1,7 @@
 import { DASUTableRenderer } from './table-renderer.mjs';
 import { CommonColumns } from './common-columns.mjs';
 import { resistanceChips } from './resistance-display.mjs';
+import { toggleStockActive, toggleStockChanneled } from '../daemon-stock.mjs';
 
 /**
  * @typedef StockEntry
@@ -117,49 +118,18 @@ export class StockTableRenderer extends DASUTableRenderer {
     const li = target.closest('[data-stock-index]');
     const index = Number(li?.dataset?.stockIndex);
     const actor = this.document;
-    if (!actor) return;
-    const stock = foundry.utils.deepClone(actor.system.stock ?? []);
-    if (!stock[index]) return;
-    const activating = !stock[index].active;
-    stock[index].active = activating;
-    // An inactive daemon cannot be channeled; drop the channel when it leaves the field.
-    if (!activating) stock[index].channeled = false;
-    await actor.update({ 'system.stock': stock });
-
-    // Fielding a daemon may exceed the summoner's Will Strain Cap; warn but allow.
-    if (activating) {
-      const cap = actor.system.willStrain?.cap ?? 0;
-      const used = stock
-        .filter((e) => e.active)
-        .reduce(
-          (sum, e) => sum + (fromUuidSync(e.uuid)?.system?.strain?.value ?? 0),
-          0
-        );
-      if (used > cap) {
-        ui.notifications?.warn(
-          game.i18n.format('DASU.Stock.OverStrain', { used, cap })
-        );
-      }
-    }
+    const uuid = actor?.system.stock?.[index]?.uuid;
+    if (!uuid) return;
+    await toggleStockActive(actor, uuid);
   }
 
-  // Channelers channel one daemon at a time, a layer separate from Will Strain.
   static async #onChannel(event, target) {
     const li = target.closest('[data-stock-index]');
     const index = Number(li?.dataset?.stockIndex);
     const actor = this.document;
-    if (!actor) return;
-    const stock = foundry.utils.deepClone(actor.system.stock ?? []);
-    if (!stock[index]) return;
-    const channeling = !stock[index].channeled;
-    // Channeling an inactive daemon also fields it; a daemon can't be channeled off-field.
-    if (channeling) {
-      stock[index].active = true;
-      // Only one daemon may be channeled; clear any other before setting this one.
-      for (const e of stock) e.channeled = false;
-    }
-    stock[index].channeled = channeling;
-    await actor.update({ 'system.stock': stock });
+    const uuid = actor?.system.stock?.[index]?.uuid;
+    if (!uuid) return;
+    await toggleStockChanneled(actor, uuid);
   }
 
   static async #renderDescription(entry) {

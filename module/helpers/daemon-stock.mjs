@@ -126,3 +126,54 @@ export async function claimFromPartyStorage(party, summoner, uuid) {
   await party.system.removeFromStorage(uuid);
   return true;
 }
+
+/** Warn (but don't block) if fielded daemons exceed the Will Strain Cap. */
+function warnIfOverStrain(summoner, stock) {
+  const cap = summoner.system.willStrain?.cap ?? 0;
+  const used = stock
+    .filter((e) => e.active)
+    .reduce(
+      (sum, e) => sum + (fromUuidSync(e.uuid)?.system?.strain?.value ?? 0),
+      0
+    );
+  if (used > cap) {
+    ui.notifications?.warn(
+      game.i18n.format('DASU.Stock.OverStrain', { used, cap })
+    );
+  }
+}
+
+/**
+ * Field/bench a daemon by flipping its `active` flag. Benching also clears
+ * channeling, since a daemon can't be channeled off-field.
+ */
+export async function toggleStockActive(summoner, uuid) {
+  const stock = foundry.utils.deepClone(summoner.system.stock ?? []);
+  const entry = stock.find((e) => e.uuid === uuid);
+  if (!entry) return false;
+  const activating = !entry.active;
+  entry.active = activating;
+  if (!activating) entry.channeled = false;
+  await summoner.update({ 'system.stock': stock });
+  if (activating) warnIfOverStrain(summoner, stock);
+  return true;
+}
+
+/**
+ * Toggle a daemon's `channeled` flag. Exclusive per summoner. Channeling an
+ * inactive daemon also fields it, since it can't be channeled off-field.
+ */
+export async function toggleStockChanneled(summoner, uuid) {
+  const stock = foundry.utils.deepClone(summoner.system.stock ?? []);
+  const entry = stock.find((e) => e.uuid === uuid);
+  if (!entry) return false;
+  const channeling = !entry.channeled;
+  if (channeling) {
+    entry.active = true;
+    for (const e of stock) e.channeled = false;
+  }
+  entry.channeled = channeling;
+  await summoner.update({ 'system.stock': stock });
+  if (channeling) warnIfOverStrain(summoner, stock);
+  return true;
+}

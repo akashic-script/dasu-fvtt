@@ -465,6 +465,17 @@
         {{selectOptions kindOptions selected=system.kind}}
       </select>
     </div>
+    <div class="item-sidebar__divider"></div>
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Ability.ResourceType"}}</label>
+      <select name="system.resource.type">
+        {{selectOptions resourceTypeOptions selected=system.resource.type}}
+      </select>
+    </div>
+    <div class="item-sidebar__field">
+      <label>{{#if (eq system.resource.type "riches")}}{{localize "DASU.Resource.CostLabelRiches"}}{{else}}{{localize "DASU.Resource.CostLabelResource"}}{{/if}}</label>
+      <input type="text" name="system.resource.cost" value="{{system.resource.cost}}" />
+    </div>
   </div>
   {{/if}}
 

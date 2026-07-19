@@ -1022,12 +1022,12 @@ export class DASUActorSheet extends SheetLayoutMixin(
       );
       return false;
     }
-    if (
-      (item?.type === 'ability' || item?.type === 'tactic') &&
-      !this.#canAddSlotItem(item.type)
-    ) {
-      return false;
-    }
+    // if (
+    //   (item?.type === 'ability' || item?.type === 'tactic') &&
+    //   !this.#canAddSlotItem(item.type)
+    // ) {
+    //   return false;
+    // }
     return super._onDropItem(event, item);
   }
 
@@ -1041,20 +1041,20 @@ export class DASUActorSheet extends SheetLayoutMixin(
    * @param {"ability"|"tactic"} type
    * @returns {boolean}
    */
-  #canAddSlotItem(type) {
-    const slot = this.actor.system.slots?.[type];
-    if (!slot || slot.max == null) return true; // no subtype, no cap
-    if (slot.used >= slot.max) {
-      ui.notifications?.warn(
-        game.i18n.format('DASU.Subtype.SlotsFull', {
-          type: game.i18n.localize(`TYPES.Item.${type}`),
-          max: slot.max,
-        })
-      );
-      return false;
-    }
-    return true;
-  }
+  // #canAddSlotItem(type) {
+  //   const slot = this.actor.system.slots?.[type];
+  //   if (!slot || slot.max == null) return true; // no subtype, no cap
+  //   if (slot.used >= slot.max) {
+  //     ui.notifications?.warn(
+  //       game.i18n.format('DASU.Subtype.SlotsFull', {
+  //         type: game.i18n.localize(`TYPES.Item.${type}`),
+  //         max: slot.max,
+  //       })
+  //     );
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
   static #onRoll(event, target) {
     if (this.isEditMode) return;
@@ -1191,6 +1191,14 @@ export class DASUActorSheet extends SheetLayoutMixin(
     pop
       .querySelector('.resource-popover__value')
       .addEventListener('change', (e) => update(parseInt(e.target.value) || 0));
+    // Clicking the readonly max field fills the value up to max (HP/WP).
+    pop
+      .querySelector('.resource-popover__max')
+      ?.addEventListener('click', () => {
+        const max = cfg.max ?? int('.resource-popover__max');
+        pop.querySelector('.resource-popover__value').value = max;
+        update(max);
+      });
     pop.querySelectorAll('input').forEach((input) =>
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {

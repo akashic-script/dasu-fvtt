@@ -200,11 +200,10 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     const tick = this.#computeTick(selectedKey);
 
     const dicePart = this.#advantage !== 'normal' ? '3d10' : '2d10';
-    const level = this.#actor.system?.level ?? 1;
     const difficulties = CONFIG.DASU.difficulties.map((d) => ({
       key: d.key,
       label: game.i18n.localize(d.i18nKey),
-      tn: CONFIG.DASU.getDifficultyTn(d.key, level),
+      tn: CONFIG.DASU.getDifficultyTn(d.key),
     }));
 
     const overrideCtx = isItem ? this.#overrideContext() : {};
@@ -379,6 +378,11 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     htmlElement
       .querySelector('[name="mod"]')
       ?.addEventListener('input', updatePreview);
+    htmlElement
+      .querySelector('[name="difficulty"]')
+      ?.addEventListener('change', (e) => {
+        this.#difficulty = e.target.value || null;
+      });
   }
 
   /** Exclusive specialty toggle: clicking the active one clears it (none). */
@@ -429,10 +433,7 @@ export class DASURollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     const checks = game.dasu?.Checks;
     if (!checks) return this.close();
 
-    const level = this.#actor.system?.level ?? 1;
-    const tn = difficulty
-      ? CONFIG.DASU.getDifficultyTn(difficulty, level)
-      : null;
+    const tn = difficulty ? CONFIG.DASU.getDifficultyTn(difficulty) : null;
 
     const overrides = this.#mode === 'item' ? this.#readOverrides(form) : null;
 

@@ -132,6 +132,7 @@ export default class DASUDaemon extends DASUActorBase {
     };
 
     this._applyArchetypeBonuses();
+    this._clampResources();
   }
 
   /**
@@ -158,9 +159,6 @@ export default class DASUDaemon extends DASUActorBase {
       const current = foundry.utils.getProperty(this, target) ?? 0;
       foundry.utils.setProperty(this, target, current + value);
     }
-
-    this.resources.hp.value = Math.min(this.resources.hp.value, this.resources.hp.max);
-    this.resources.wp.value = Math.min(this.resources.wp.value, this.resources.wp.max);
   }
 
   getRollData() {

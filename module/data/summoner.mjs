@@ -56,6 +56,7 @@ export default class DASUSummoner extends DASUActorBase {
 
     this._prepareDerivedStats();
     this._applyDejection();
+    this._clampResources();
 
     const cls = this.parent?.itemTypes?.class?.[0] ?? null;
     const apMax = cls ? cls.system.apMax(this.level) : Math.floor((this.level + 1) / 2) + 1;
@@ -125,7 +126,6 @@ export default class DASUSummoner extends DASUActorBase {
     let wpMax = wpMax0 - penalties.wpMaxFlat;
     if (penalties.wpMaxPct) wpMax -= Math.floor((wpMax * penalties.wpMaxPct) / 100);
     this.resources.wp.max = Math.max(0, wpMax);
-    this.resources.wp.value = Math.min(this.resources.wp.value, this.resources.wp.max);
 
     // Avoid / To Hit reductions.
     this.stats.avoid.value = Math.max(0, this.stats.avoid.value - penalties.avoid);

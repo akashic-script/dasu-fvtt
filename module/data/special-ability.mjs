@@ -1,6 +1,8 @@
 import DASUItemBase from './item-base.mjs';
+import { ResourceField } from './fields/index.mjs';
+import { TaggableMixin } from './mixins/taggable.mjs';
 
-export default class DASUSpecialAbility extends DASUItemBase {
+export default class DASUSpecialAbility extends TaggableMixin(DASUItemBase) {
   static defineSchema() {
     const fields = foundry.data.fields;
     const schema = super.defineSchema();
@@ -16,6 +18,12 @@ export default class DASUSpecialAbility extends DASUItemBase {
       },
     });
 
+    schema.resource = ResourceField({ defaultType: 'wp' });
+
     return schema;
+  }
+
+  _tagBudget() {
+    return Infinity;
   }
 }
