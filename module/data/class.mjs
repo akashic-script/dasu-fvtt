@@ -22,12 +22,37 @@ export default class DASUClass extends DASUItemBase {
 
     schema.advancements = new PseudoDocumentCollectionField(BaseAdvancement);
 
+    // Which special mechanic this class drives, if any. See CONFIG.DASU.classKinds.
+    schema.kind = new fields.StringField({
+      required: true,
+      blank: true,
+      initial: '',
+      // '' = a plain class; merged in so the default validates against `choices`.
+      choices: () => ({
+        '': 'DASU.Item.Class.KindNone',
+        ...CONFIG.DASU.classKinds,
+      }),
+    });
+
     return schema;
   }
 
-  /**
-   */
   static migrateData(source) {
+    // Fold the legacy isChanneler flag / dsid === 'channeler' into `kind`.
+    if (source && source.kind === undefined) {
+      const dsid = (
+        source.dsid ??
+        (source.identifier ?? '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '')
+      ).trim();
+      if (source.isChanneler === true || dsid === 'channeler') {
+        source.kind = 'channeler';
+      }
+    }
+    delete source.isChanneler;
+
     const advs = source?.advancements;
     if (Array.isArray(advs) && advs.some((a) => a && a.type === undefined)) {
       const migrated = [];

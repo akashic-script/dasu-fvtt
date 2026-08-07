@@ -69,5 +69,8 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/dasu/templates/chat/partials/chat-check-targets.hbs',
     'systems/dasu/templates/chat/partials/chat-check-outcome.hbs',
     'systems/dasu/templates/chat/partials/chat-check-description.hbs',
+    // Compendium browser
+    'systems/dasu/templates/ui/compendium-browser/sidebar.hbs',
+    'systems/dasu/templates/ui/compendium-browser/content-tab.hbs',
   ]);
 };

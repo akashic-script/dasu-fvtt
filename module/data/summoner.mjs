@@ -100,13 +100,8 @@ export default class DASUSummoner extends DASUActorBase {
       cap: baseWil * (CONFIG.DASU.willStrainMultiplier ?? 2),
     };
 
-    // Channelers may channel one daemon as a layer separate from fielded stock.
-    // dsid may be stored or derived-from-name; fall back to the class name.
-    const classDsid =
-      cls?.system?.dsid ||
-      cls?._source?.system?.dsid ||
-      (cls?.name ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    this.isChanneler = classDsid === 'channeler';
+    // Class kind drives special mechanics; consumers test it directly.
+    this.classKind = cls?.system?.kind ?? '';
   }
 
   /**

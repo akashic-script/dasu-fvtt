@@ -1,5 +1,50 @@
 {
   "DASU": {
+    "Name": "Name",
+    "Level": "Level",
+    "CompendiumBrowser": {
+      "Title": "Compendium Browser",
+      "OpenBrowser": "Open Compendium Browser",
+      "Refresh": "Refresh Index",
+      "Refreshed": "Compendium index refreshed.",
+      "SearchPlaceholder": "Search by name…",
+      "Empty": "No entries found in the loaded compendiums.",
+      "Open": "Open sheet",
+      "Source": "Compendium",
+      "Type": "Type",
+      "AbilitySubtype": "Ability Subtype",
+      "ItemSubtype": "Item Subtype",
+      "Archetype": "Archetype",
+      "Subtype": "Subtype",
+      "Has": "Has",
+      "HasSpecialAbility": "Special Ability",
+      "HasTransformations": "Transformations",
+      "Yes": "Has",
+      "Summary": "Summary",
+      "SummaryDmg": "{value} {type}",
+      "SummaryHeal": "Heal {value} {resource}",
+      "SummaryHit": "Hit {value}",
+      "Passive": "Passive",
+      "Stackable": "Stackable",
+      "MaxStacks": "Stacks up to {max}",
+      "Duration": "Duration",
+      "DurationUnit": {
+        "turns": "turns",
+        "rounds": "rounds",
+        "seconds": "sec",
+        "minutes": "min",
+        "hours": "hrs",
+        "days": "days"
+      },
+      "RangeMin": "Min",
+      "RangeMax": "Max",
+      "Tab": {
+        "Daemons": "Daemons",
+        "Items": "Items",
+        "Tags": "Tags",
+        "Effects": "Effects"
+      }
+    },
     "Archetype": {
       "Bonuses": "Bonuses",
       "BonusHint": "Each bonus adds the result of its formula to a stat. Formulas may use roll data such as @lvl and @attributes.pow.value.",
@@ -209,6 +254,7 @@
       }
     },
     "Daemon": {
+      "Roles": "Roles",
       "Role": {
         "Title": "Roles",
         "Add": "Add role",
@@ -742,6 +788,9 @@
       "NamePlaceholder": "Item Name",
       "Dsid": "ID",
       "DsidRegenerate": "Regenerate from name",
+      "DsidUnlock": "Unlock to edit",
+      "DsidLock": "Lock",
+      "DsidLocked": "Unlock the ID field before regenerating it.",
       "Govern": "Governs",
       "DamageResource": "Target Resource",
       "Item": {
@@ -848,6 +897,10 @@
         "ApBase": "AP Base",
         "ApPerStep": "AP / Step",
         "ApStepEvery": "AP Step Every",
+        "Kind": "Class Kind",
+        "KindNone": "None",
+        "KindChanneler": "Channeler",
+        "KindEidolonist": "Eidolonist",
         "Advancement": "Advancement",
         "AddAdvancement": "Add Advancement",
         "DeleteAdvancement": "Remove Advancement",

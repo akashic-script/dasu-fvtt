@@ -199,7 +199,7 @@ export class StockTableRenderer extends DASUTableRenderer {
 
   async getItems(document) {
     const slot = this._slot;
-    const isChanneler = !!document.system.isChanneler;
+    const isChanneler = document.system.classKind === 'channeler';
     return (document.system.stock ?? [])
       .map((entry, index) => ({
         ...entry,

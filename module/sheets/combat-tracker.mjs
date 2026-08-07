@@ -125,7 +125,7 @@ export class DASUCombatTracker extends CombatTracker {
     // Fielding mirrors the actor's stock (active = fielded, inactive = benched).
     // A daemon whose system.summonerId doesn't point back here has drifted
     // (double-rostered / not migrated); surface it as a `stale` badge, don't hide.
-    const isChanneler = !!actor.system?.isChanneler;
+    const isChanneler = actor.system?.classKind === 'channeler';
     const fielded = [];
     const bench = [];
     let strainUsed = 0;

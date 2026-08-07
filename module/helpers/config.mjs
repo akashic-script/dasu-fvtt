@@ -301,6 +301,11 @@ DASU.specialAbilityKinds = {
   reactive: 'DASU.SpecialAbility.Kind.Reactive',
 };
 
+DASU.classKinds = {
+  channeler: 'DASU.Item.Class.KindChanneler',
+  eidolonist: 'DASU.Item.Class.KindEidolonist',
+};
+
 DASU.itemResources = {
   hp: 'DASU.Item.Item.ResourceHP',
   wp: 'DASU.Item.Item.ResourceWP',
