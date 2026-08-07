@@ -32,6 +32,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
       addItemEffect: DASUItemSheet.#onAddItemEffect,
       deleteItemEffect: DASUItemSheet.#onDeleteItemEffect,
       clearGrantUuid: DASUItemSheet.#onClearGrantUuid,
+      toggleDsidLock: DASUItemSheet.#onToggleDsidLock,
       regenerateDsid: DASUItemSheet.#onRegenerateDsid,
       addArchetypeBonus: DASUItemSheet.#onAddArchetypeBonus,
       deleteArchetypeBonus: DASUItemSheet.#onDeleteArchetypeBonus,
@@ -495,6 +496,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     }
 
     if (context.isClass) {
+      context.classKindOptions = localize(DASU.classKinds);
       if (!this.#advancementTable) {
         this.#advancementTable = new AdvancementTableRenderer({
           editable: context.editable,
@@ -1012,7 +1014,33 @@ export class DASUItemSheet extends SheetLayoutMixin(
 
   /* -------------------------------------------- */
 
-  static async #onRegenerateDsid() {
+  /** @this {DASUItemSheet} */
+  static #onToggleDsidLock(event, target) {
+    const input = DASUItemSheet.#dsidInput(target);
+    if (!input) return;
+    const locked = !input.readOnly;
+    input.readOnly = locked;
+    const icon = target.querySelector('i');
+    icon?.classList.toggle('fa-lock', locked);
+    icon?.classList.toggle('fa-lock-open', !locked);
+    target.title = game.i18n.localize(
+      locked ? 'DASU.Item.DsidUnlock' : 'DASU.Item.DsidLock'
+    );
+    if (!locked) input.focus();
+  }
+
+  static #dsidInput(target) {
+    return target
+      .closest('.item-sidebar__input-adornment')
+      ?.querySelector('[data-dsid-input]');
+  }
+
+  static async #onRegenerateDsid(event, target) {
+    const input = DASUItemSheet.#dsidInput(target);
+    if (input?.readOnly) {
+      ui.notifications.warn(game.i18n.localize('DASU.Item.DsidLocked'));
+      return;
+    }
     const name = this.item.name ?? '';
     const dsid = name
       .toLowerCase()

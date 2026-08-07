@@ -1,11 +1,25 @@
 # Changelog
 
-## [14.2.1](https://github.com/spyrella/dasu/compare/v14.2.0...v14.2.1) (2026-07-09)
+# [14.4.0](https://github.com/akashic-script/dasu-fvtt/compare/v14.3.0...v14.4.0) (2026-08-07)
+
+### Features
+
+- add compendium browser ([3b783a1](https://github.com/akashic-script/dasu-fvtt/commit/3b783a167030c639095bcbd13f200217541b73d6))
+- **item:** lock the dsid field behind an edit toggle ([6c16872](https://github.com/akashic-script/dasu-fvtt/commit/6c168722d9ec75de8b77a1154e53bddfdd621d23))
+
+# [14.3.0](https://github.com/akashic-script/dasu-fvtt/compare/v14.2.0...v14.3.0) (2026-07-19)
 
 ### Bug Fixes
 
-- **combat:** prevent party actors from being created as combatants ([41cdbb7](https://github.com/spyrella/dasu/commit/41cdbb76195881754fe99a34a9414f3293508b11))
-- **roster:** conditionally render channel toggle button for channelers ([1560946](https://github.com/spyrella/dasu/commit/156094676b4906a71fb5f708f6e6027dd9c52af0))
+- **combat:** prevent party actors from being created as combatants ([41cdbb7](https://github.com/akashic-script/dasu-fvtt/commit/41cdbb76195881754fe99a34a9414f3293508b11))
+- **roster:** conditionally render channel toggle button for channelers ([1560946](https://github.com/akashic-script/dasu-fvtt/commit/156094676b4906a71fb5f708f6e6027dd9c52af0))
+
+### Features
+
+- add apply-effects/cost to special abilities; make slot caps advisory ([e779fbf](https://github.com/akashic-script/dasu-fvtt/commit/e779fbf32bd6d18a9b93916f6ba6ec9d91181b05))
+- fix hp/wp resource clamping, fix child ([72bf708](https://github.com/akashic-script/dasu-fvtt/commit/72bf7082cfa2cf91a90086555c59d4881dd119bd))
+- **party:** add daemon/ability fusion workbench ([4c8ad17](https://github.com/akashic-script/dasu-fvtt/commit/4c8ad17e875b93abd8106e0ae41d7d3a97c67fa2))
+- rework tick caps and difficulty TN to fixed values; fix roll dialog difficulty reset ([679ad6a](https://github.com/akashic-script/dasu-fvtt/commit/679ad6aee3be7a8953c353b9cb518ac6c4cdfeaf))
 
 # [14.2.0](https://github.com/spyrella/dasu/compare/v14.1.0...v14.2.0) (2026-07-08)
 

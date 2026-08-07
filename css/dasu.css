@@ -1648,8 +1648,14 @@
               width: auto;
               height: 22px;
               box-sizing: border-box;
+
+              &[readonly] {
+                opacity: 0.6;
+                cursor: default;
+              }
             }
 
+            .item-sidebar__dsid-lock,
             .item-sidebar__regenerate-dsid {
               flex: 0 0 22px;
               align-self: center;
@@ -3547,6 +3553,22 @@
     }
     .tag-catalog-table {
       grid-template-columns: [name] auto [price] 64px [applicableTypes] 120px [controls] 54px;
+    }
+    .compendium-daemon-table {
+      grid-template-columns: [name] minmax(0, 1fr) [level] 48px [roles] 160px [open] 32px;
+    }
+    .compendium-tag-table {
+      grid-template-columns: [name] minmax(0, 1fr) [price] 64px [types] 160px [open] 32px;
+    }
+    .compendium-item-mixed-table {
+      grid-template-columns:
+        [name] minmax(0, 1fr) [type] 120px [summary] minmax(0, 1fr)
+        [open] 32px;
+    }
+    .compendium-effect-table {
+      grid-template-columns:
+        [name] minmax(0, 1fr) [duration] 72px [summary] minmax(0, 1fr)
+        [open] 32px;
     }
     .tactic-table {
       grid-template-columns: [name] auto [damage] 80px [cost] 54px [toLand] 48px [controls] 54px;
@@ -8512,4 +8534,228 @@ a.inline-broken {
   margin-left: auto;
   padding: 0 10px;
   color: var(--dasu-tab-icon);
+}
+
+/* ============================================================
+   Compendium Browser
+   ============================================================ */
+
+.dasu-compendium-browser .window-content {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 8px;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.dasu-compendium-browser [data-application-part='tabs'] {
+  grid-column: 1 / -1;
+}
+
+.dasu-compendium-browser__sidebar {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dasu-hp) rgb(var(--dasu-panel) / 40%);
+}
+
+.dasu-compendium-browser
+  .window-content
+  > [data-application-part]:not([data-application-part='tabs']):not(
+    [data-application-part='sidebar']
+  ) {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dasu-hp) rgb(var(--dasu-panel) / 40%);
+}
+
+.dasu-compendium-browser__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dasu-compendium-browser__search i {
+  position: absolute;
+  left: 8px;
+  color: var(--dasu-muted);
+  pointer-events: none;
+}
+
+.dasu-compendium-browser__search input[type='search'] {
+  width: 100%;
+  padding: 4px 6px 4px 26px;
+  border: 1px solid var(--dasu-border);
+  border-radius: 0;
+  background: var(--dasu-surface-1);
+  color: var(--dasu-on-panel);
+}
+
+.dasu-compendium-browser__filter-group {
+  border: 1px solid var(--dasu-border-subtle);
+  border-radius: 0;
+  margin: 0;
+}
+
+.dasu-compendium-browser__filter-group[open] {
+  padding-bottom: 6px;
+}
+
+.dasu-compendium-browser__filter-group > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dasu-muted);
+  list-style: none;
+  user-select: none;
+}
+
+.dasu-compendium-browser__filter-group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.dasu-compendium-browser__filter-group > summary::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 4px 0 4px 5px;
+  border-color: transparent transparent transparent currentColor;
+  transition: transform 0.12s ease;
+}
+
+.dasu-compendium-browser__filter-group[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.dasu-compendium-browser__filter-group > summary:hover {
+  color: var(--dasu-on-panel);
+}
+
+.dasu-compendium-browser__filter-group > :not(summary) {
+  margin: 4px 8px 0;
+}
+
+.dasu-compendium-browser__filter-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px 10px;
+}
+
+.dasu-compendium-browser__filter-option {
+  display: flex;
+  align-items: start;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+  line-height: 1.3;
+}
+
+.dasu-compendium-browser__filter-option input[type='checkbox'] {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.dasu-compendium-browser__filter-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--dasu-muted);
+}
+
+.dasu-compendium-browser__filter-range-inputs input[type='number'] {
+  width: 0;
+  flex: 1 1 0;
+  padding: 2px 4px;
+  border: 1px solid var(--dasu-border);
+  border-radius: 0;
+  background: var(--dasu-surface-1);
+  color: var(--dasu-on-panel);
+  text-align: center;
+}
+
+.dasu-compendium-browser__content {
+  height: 100%;
+}
+
+.dasu-compendium-browser__content .cell-text--start {
+  justify-content: flex-start;
+}
+
+.dasu-compendium-browser__content
+  .dasu-table__header-cell--start:not([data-column='name']) {
+  padding-left: 6px;
+}
+
+.dasu-compendium-browser__content .dasu-table__header-cell[data-sortable] {
+  cursor: pointer;
+  user-select: none;
+}
+
+.dasu-compendium-browser__content
+  .dasu-table__header-cell[data-sortable]:hover {
+  color: var(--dasu-on-panel);
+}
+
+.dasu-compendium-browser__content
+  .dasu-table__header-cell[data-sortable]::after {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 4px;
+  border-style: solid;
+  border-width: 5px 4px 0 4px;
+  border-color: currentColor transparent transparent transparent;
+  opacity: 0;
+}
+
+.dasu-compendium-browser__content
+  .dasu-table__header-cell[data-sort-dir]::after {
+  opacity: 1;
+}
+
+.dasu-compendium-browser__content
+  .dasu-table__header-cell[data-sort-dir='asc']::after {
+  border-width: 0 4px 5px 4px;
+  border-color: transparent transparent currentColor transparent;
+}
+
+.dasu-compendium-browser__empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--dasu-muted);
+  font-style: italic;
+}
+
+.dasu-compendium-browser .dasu-compendium-open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--dasu-tab-icon);
+  cursor: pointer;
+}
+
+.dasu-compendium-browser .dasu-compendium-open:hover {
+  color: var(--dasu-tab-icon-active);
 }
