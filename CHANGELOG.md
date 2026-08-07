@@ -1,5 +1,12 @@
 # Changelog
 
+# [14.4.0](https://github.com/akashic-script/dasu-fvtt/compare/v14.3.0...v14.4.0) (2026-08-07)
+
+### Features
+
+- add compendium browser ([3b783a1](https://github.com/akashic-script/dasu-fvtt/commit/3b783a167030c639095bcbd13f200217541b73d6))
+- **item:** lock the dsid field behind an edit toggle ([6c16872](https://github.com/akashic-script/dasu-fvtt/commit/6c168722d9ec75de8b77a1154e53bddfdd621d23))
+
 # [14.3.0](https://github.com/akashic-script/dasu-fvtt/compare/v14.2.0...v14.3.0) (2026-07-19)
 
 ### Bug Fixes
