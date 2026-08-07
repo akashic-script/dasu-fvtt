@@ -16,6 +16,7 @@
       "ItemSubtype": "Item Subtype",
       "Archetype": "Archetype",
       "Subtype": "Subtype",
+      "Has": "Has",
       "HasSpecialAbility": "Special Ability",
       "HasTransformations": "Transformations",
       "Yes": "Has",

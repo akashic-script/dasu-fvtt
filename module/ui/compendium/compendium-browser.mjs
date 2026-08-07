@@ -151,14 +151,7 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(
             label: game.i18n.localize(label),
           })),
         },
-        ...this.#booleanCategory('hasSpecialAbility', entries, {
-          label: 'DASU.CompendiumBrowser.HasSpecialAbility',
-          propertyPath: '_filter.hasSpecialAbility',
-        }),
-        ...this.#booleanCategory('hasTransformations', entries, {
-          label: 'DASU.CompendiumBrowser.HasTransformations',
-          propertyPath: '_filter.hasTransformations',
-        }),
+        ...this.#featureCategory(entries),
         ...this.#sourceCategory(entries),
       }),
       ranges: () => ({
@@ -282,13 +275,14 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(
   #decorateDaemon(daemon) {
     if (daemon._filter) return;
     const itemTypes = daemon.itemTypes ?? {};
+    const features = [];
+    if (itemTypes.specialAbility?.length) features.push('specialAbility');
+    if (daemon.system?.transformations?.length)
+      features.push('transformations');
     const value = {
       archetype: itemTypes.archetype?.[0]?.name,
       subtype: itemTypes.subtype?.[0]?.name,
-      hasSpecialAbility: itemTypes.specialAbility?.length ? 'yes' : undefined,
-      hasTransformations: daemon.system?.transformations?.length
-        ? 'yes'
-        : undefined,
+      features,
     };
     Object.defineProperty(daemon, '_filter', { value, configurable: true });
   }
@@ -311,6 +305,40 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(
     );
     if (!options.length) return {};
     return { [id]: { label, propertyPath, options } };
+  }
+
+  /**
+   * One "Has" group holding a checkbox per boolean daemon feature, instead of a
+   * separate single-checkbox group each. Checking several is OR (has any). Only
+   * features present in the current facet are offered.
+   */
+  #featureCategory(entries) {
+    const features = [
+      {
+        value: 'specialAbility',
+        key: 'DASU.CompendiumBrowser.HasSpecialAbility',
+      },
+      {
+        value: 'transformations',
+        key: 'DASU.CompendiumBrowser.HasTransformations',
+      },
+    ];
+    const present = new Set(
+      this.#facetEntries(entries, 'features').flatMap(
+        (e) => e._filter?.features ?? []
+      )
+    );
+    const options = features
+      .filter((f) => present.has(f.value))
+      .map((f) => ({ value: f.value, label: game.i18n.localize(f.key) }));
+    if (!options.length) return {};
+    return {
+      features: {
+        label: 'DASU.CompendiumBrowser.Has',
+        propertyPath: '_filter.features',
+        options,
+      },
+    };
   }
 
   /** Single-checkbox filter matching entries whose `propertyPath` is `'yes'`. */
