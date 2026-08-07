@@ -1,0 +1,62 @@
+<aside class="dasu-compendium-browser__sidebar" data-group="primary">
+  <div class="dasu-compendium-browser__search">
+    <i class="fas fa-magnifying-glass" inert></i>
+    <input
+      type="search"
+      data-filter-search
+      autocomplete="off"
+      value="{{search}}"
+      placeholder="{{localize 'DASU.CompendiumBrowser.SearchPlaceholder'}}"
+    />
+  </div>
+
+  {{#each ranges}}
+    <details
+      class="dasu-compendium-browser__filter-group dasu-compendium-browser__filter-range"
+      data-group="{{id}}"
+      {{#unless collapsed}}open{{/unless}}
+    >
+      <summary>{{localize label}}</summary>
+      <div class="dasu-compendium-browser__filter-range-inputs">
+        <input
+          type="number"
+          data-range="{{id}}"
+          data-bound="min"
+          value="{{min}}"
+          placeholder="{{localize 'DASU.CompendiumBrowser.RangeMin'}}"
+        />
+        <span>–</span>
+        <input
+          type="number"
+          data-range="{{id}}"
+          data-bound="max"
+          value="{{max}}"
+          placeholder="{{localize 'DASU.CompendiumBrowser.RangeMax'}}"
+        />
+      </div>
+    </details>
+  {{/each}}
+
+  {{#each categories}}
+    <details
+      class="dasu-compendium-browser__filter-group"
+      data-group="{{id}}"
+      {{#unless collapsed}}open{{/unless}}
+    >
+      <summary>{{localize label}}</summary>
+      <div class="dasu-compendium-browser__filter-options">
+        {{#each options}}
+          <label class="dasu-compendium-browser__filter-option">
+            <input
+              type="checkbox"
+              data-category="{{../id}}"
+              data-option="{{value}}"
+              {{#if checked}}checked{{/if}}
+            />
+            <span>{{label}}</span>
+          </label>
+        {{/each}}
+      </div>
+    </details>
+  {{/each}}
+</aside>

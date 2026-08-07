@@ -29,6 +29,7 @@ import {
   handleCatalogTagDeleted,
 } from './helpers/tag-slotting.mjs';
 import * as models from './data/_module.mjs';
+import { CompendiumBrowser } from './ui/compendium/compendium-browser.mjs';
 
 Hooks.once('init', function () {
   game.dasu = {
@@ -40,6 +41,13 @@ Hooks.once('init', function () {
     DASUTableRenderer,
     CommonColumns,
     CommonDescriptions,
+    CompendiumBrowser,
+    openCompendiumBrowser: (tab) => {
+      const app = CompendiumBrowser.instance;
+      app.render(true);
+      if (tab) app.changeTab(tab, 'primary');
+      return app;
+    },
     registerItemTable: DASUActorSheet.registerItemTable.bind(DASUActorSheet),
     advancements: {
       BaseAdvancement: models.BaseAdvancement,
@@ -63,6 +71,7 @@ Hooks.once('init', function () {
   initializeStatusEffects();
   initializeInlineEnrichers();
   initializeCombat();
+  CompendiumBrowser.initialize();
 
   // Initiative is rolled through the DASU check pipeline (2d10 + DEX / skill),
   // not a static formula; see DASUCombat#rollInitiative. `decimals` still tunes
@@ -124,6 +133,17 @@ Hooks.once('init', function () {
       }
       if (party.sheet.rendered) party.sheet.close();
       else party.sheet.render(true);
+      return true;
+    },
+  });
+
+  game.keybindings.register('dasu', 'openCompendiumBrowser', {
+    name: 'DASU.CompendiumBrowser.OpenBrowser',
+    editable: [{ key: 'KeyB' }],
+    onDown: () => {
+      const app = CompendiumBrowser.instance;
+      if (app.rendered) app.close();
+      else app.render(true);
       return true;
     },
   });
