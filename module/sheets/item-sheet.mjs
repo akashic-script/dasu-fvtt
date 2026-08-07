@@ -496,6 +496,7 @@ export class DASUItemSheet extends SheetLayoutMixin(
     }
 
     if (context.isClass) {
+      context.classKindOptions = localize(DASU.classKinds);
       if (!this.#advancementTable) {
         this.#advancementTable = new AdvancementTableRenderer({
           editable: context.editable,

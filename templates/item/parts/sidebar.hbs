@@ -14,6 +14,14 @@
         <button type="button" class="item-sidebar__regenerate-dsid" data-action="regenerateDsid" title="{{localize "DASU.Item.DsidRegenerate"}}"><i class="fa-solid fa-rotate"></i></button>
       </div>
     </div>
+    {{#if isClass}}
+    <div class="item-sidebar__field item-sidebar__field--wide">
+      <label>{{localize "DASU.Item.Class.Kind"}}</label>
+      <select name="system.kind">
+        {{selectOptions classKindOptions selected=system.kind blank=(localize "DASU.Item.Class.KindNone")}}
+      </select>
+    </div>
+    {{/if}}
   </div>
 
   {{#if isItem}}
