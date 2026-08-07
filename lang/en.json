@@ -788,6 +788,9 @@
       "NamePlaceholder": "Item Name",
       "Dsid": "ID",
       "DsidRegenerate": "Regenerate from name",
+      "DsidUnlock": "Unlock to edit",
+      "DsidLock": "Lock",
+      "DsidLocked": "Unlock the ID field before regenerating it.",
       "Govern": "Governs",
       "DamageResource": "Target Resource",
       "Item": {

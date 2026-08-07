@@ -9,7 +9,8 @@
     <div class="item-sidebar__field item-sidebar__field--dsid">
       <label>{{localize "DASU.Item.Dsid"}}</label>
       <div class="item-sidebar__input-adornment">
-        <input type="text" name="system.dsid" value="{{system.dsid}}" />
+        <input type="text" name="system.dsid" value="{{system.dsid}}" readonly data-dsid-input />
+        <button type="button" class="item-sidebar__dsid-lock" data-action="toggleDsidLock" title="{{localize "DASU.Item.DsidUnlock"}}"><i class="fa-solid fa-lock"></i></button>
         <button type="button" class="item-sidebar__regenerate-dsid" data-action="regenerateDsid" title="{{localize "DASU.Item.DsidRegenerate"}}"><i class="fa-solid fa-rotate"></i></button>
       </div>
     </div>
