@@ -1148,6 +1148,7 @@
       "item": "Item",
       "weapon": "Weapon",
       "feature": "Feature",
+      "channel": "Channel",
       "class": "Class",
       "ability": "Ability",
       "tactic": "Tactic",

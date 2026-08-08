@@ -2,6 +2,7 @@ import { EnablePseudoDocumentsMixin } from './enable-pseudo-documents-mixin.mjs'
 import { DASURollDialog } from '../ui/roll-dialog.mjs';
 import { DASUSchemaDialog } from '../ui/schema-dialog.mjs';
 import { DASUBondDialog } from '../ui/bond-dialog.mjs';
+import DASUFeature from '../data/feature.mjs';
 
 /**
  * Extend the basic Item document. Pseudo-document collections declared on the system data model
@@ -9,6 +10,27 @@ import { DASUBondDialog } from '../ui/bond-dialog.mjs';
  * @extends {Item}
  */
 export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
+  static #hiddenCreateTypes() {
+    return new Set(
+      Object.entries(CONFIG.Item.dataModels)
+        .filter(
+          ([, m]) => m !== DASUFeature && m?.prototype instanceof DASUFeature
+        )
+        .map(([type]) => type)
+    );
+  }
+
+  /** @override */
+  static async createDialog(data = {}, createOptions = {}, options = {}) {
+    if (!options.types) {
+      const hidden = DASUItem.#hiddenCreateTypes();
+      options.types = Object.keys(CONFIG.Item.dataModels).filter(
+        (t) => !hidden.has(t)
+      );
+    }
+    return super.createDialog(data, createOptions, options);
+  }
+
   /** @override */
   async _preDelete(options, user) {
     const blocked = this.effects.some((e) => e.getFlag('dasu', 'undeletable'));
@@ -105,8 +127,7 @@ export class DASUItem extends EnablePseudoDocumentsMixin(Item) {
       if (item.type === 'dejection') {
         return game.dasu.Checks.displayCheck(this.actor, item);
       }
-      const NO_DIALOG_TYPES = ['class', 'feature'];
-      if (NO_DIALOG_TYPES.includes(item.type)) {
+      if (item.type === 'class' || item.system instanceof DASUFeature) {
         return game.dasu.Checks.displayCheck(this.actor, item);
       }
       if (

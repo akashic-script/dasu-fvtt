@@ -1,4 +1,5 @@
 import DASUActorBase from "./actor-base.mjs";
+import DASUFeature from "./feature.mjs";
 
 export default class DASUSummoner extends DASUActorBase {
 
@@ -38,6 +39,8 @@ export default class DASUSummoner extends DASUActorBase {
         // Channelers may channel one daemon as a separate layer; it does not
         // count toward Will Strain like fielded (active) daemons do.
         channeled: new fields.BooleanField({ initial: false }),
+        // Per-feature state, keyed by feature sub-type.
+        featureData: new fields.ObjectField({ required: true, initial: {} }),
       }),
       { required: true, initial: [] }
     );
@@ -102,6 +105,16 @@ export default class DASUSummoner extends DASUActorBase {
 
     // Class kind drives special mechanics; consumers test it directly.
     this.classKind = cls?.system?.kind ?? '';
+
+    // Feature data models the actor owns (any item whose system extends DASUFeature).
+    this.features = this.parent.items
+      .filter((i) => i.system instanceof DASUFeature)
+      .map((i) => i.system);
+    for (const f of this.features) f.prepareActor?.(this.parent);
+  }
+
+  hasFeature(type) {
+    return this.parent.items.some((i) => i.type === type);
   }
 
   /**

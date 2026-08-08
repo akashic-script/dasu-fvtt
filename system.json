@@ -38,6 +38,7 @@
     "Item": {
       "item": {},
       "feature": {},
+      "channel": {},
       "class": {},
       "ability": {},
       "weapon": {},

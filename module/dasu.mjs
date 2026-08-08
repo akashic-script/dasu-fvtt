@@ -59,6 +59,11 @@ Hooks.once('init', function () {
       TAG_TYPES: models.TAG_TYPES,
       register: (cls) => models.BaseTag.registerType(cls),
     },
+    models: {
+      DASUFeature: models.DASUFeature,
+      DASUChannelFeature: models.DASUChannelFeature,
+      DASUClass: models.DASUClass,
+    },
     socket: new DASUSocketHandler(),
   };
 
@@ -153,6 +158,7 @@ Hooks.once('init', function () {
     item: models.DASUItem,
     weapon: models.DASUWeapon,
     feature: models.DASUFeature,
+    channel: models.DASUChannelFeature,
     class: models.DASUClass,
     ability: models.DASUAbility,
     tactic: models.DASUTactic,
@@ -198,6 +204,7 @@ Hooks.once('init', function () {
         'item',
         'weapon',
         'feature',
+        'channel',
         'class',
         'ability',
         'tactic',

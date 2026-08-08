@@ -30,6 +30,7 @@ export {default as DASUCombatantData} from "./combat/combatant.mjs";
 
 export * from "./advancements/_module.mjs";
 export * from "./tags/_module.mjs";
+export * from "./features/_module.mjs";
 
 export { PseudoDocument } from "./pseudo/pseudo-document.mjs";
 export { TypedPseudoDocument } from "./pseudo/typed-pseudo-document.mjs";
