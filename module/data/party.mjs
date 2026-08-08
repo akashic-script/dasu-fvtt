@@ -125,8 +125,8 @@ export default class DASUParty extends foundry.abstract.TypeDataModel {
       ownerName: owner.name,
       active,
       channeled,
-      // The channel toggle is a Channeler-class ability of the owning summoner.
-      isChanneler: owner.system.classKind === 'channeler',
+      // The channel toggle is provided by the owner's channel feature.
+      isChanneler: owner.system.hasFeature?.('channel') ?? false,
     }));
   }
 

@@ -1,6 +1,8 @@
 import DASUItemBase from './item-base.mjs';
 
 export default class DASUFeature extends DASUItemBase {
+  static TYPE = '';
+
   prepareActor(_actor) {}
 
   renderStockRow(_entry, _actor) {

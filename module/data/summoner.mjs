@@ -1,5 +1,6 @@
 import DASUActorBase from "./actor-base.mjs";
 import DASUFeature from "./feature.mjs";
+import DASUChannelFeature from "./features/channel.mjs";
 
 export default class DASUSummoner extends DASUActorBase {
 
@@ -110,11 +111,20 @@ export default class DASUSummoner extends DASUActorBase {
     this.features = this.parent.items
       .filter((i) => i.system instanceof DASUFeature)
       .map((i) => i.system);
+    if (
+      this.classKind === 'channeler' &&
+      !this.features.some((f) => f instanceof DASUChannelFeature)
+    ) {
+      this.features.push(new DASUChannelFeature({}));
+    }
+    this.featureTypes = new Set(
+      this.features.map((f) => f.constructor.TYPE).filter(Boolean)
+    );
     for (const f of this.features) f.prepareActor?.(this.parent);
   }
 
   hasFeature(type) {
-    return this.parent.items.some((i) => i.type === type);
+    return this.featureTypes?.has(type) ?? false;
   }
 
   /**

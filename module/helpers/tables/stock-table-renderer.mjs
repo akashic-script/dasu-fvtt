@@ -1,7 +1,7 @@
 import { DASUTableRenderer } from './table-renderer.mjs';
 import { CommonColumns } from './common-columns.mjs';
 import { resistanceChips } from './resistance-display.mjs';
-import { toggleStockActive, toggleStockChanneled } from '../daemon-stock.mjs';
+import { toggleStockActive } from '../daemon-stock.mjs';
 
 /**
  * @typedef StockEntry
@@ -65,7 +65,7 @@ export class StockTableRenderer extends DASUTableRenderer {
     renderDescription: StockTableRenderer.#renderDescription,
     actions: {
       stockToggle: StockTableRenderer.#onToggle,
-      stockChannel: StockTableRenderer.#onChannel,
+      featureStock: StockTableRenderer.#onFeatureClick,
       stockMenu: StockTableRenderer.#onMenu,
     },
   };
@@ -92,21 +92,10 @@ export class StockTableRenderer extends DASUTableRenderer {
     const toggleLabel = entry.active
       ? game.i18n.localize('DASU.Stock.SetInactive')
       : game.i18n.localize('DASU.Stock.SetActive');
-    // Channelers get a channel toggle first in the row, separate from the active
-    // layer. On/off is shown via the --active highlight (the icon has no regular
-    // variant); matches the combat tracker's channeled indicator.
-    let channelBtn = '';
-    if (entry.isChanneler) {
-      const channelLabel = entry.channeled
-        ? game.i18n.localize('DASU.Stock.StopChannel')
-        : game.i18n.localize('DASU.Stock.Channel');
-      const channelCls = entry.channeled
-        ? ' cell-item-controls__control--active'
-        : '';
-      channelBtn = `<a class="cell-item-controls__control${channelCls}" data-action="stockChannel" data-tooltip="${channelLabel}"><i class="fa-solid fa-hand-sparkles"></i></a>`;
-    }
+    // Feature controls (e.g. the channeler's channel toggle) render first in the
+    // row. Each active feature contributes its own control via renderStockRow.
     return `<div class="cell-item-controls">
-      ${channelBtn}
+      ${entry.featureControls ?? ''}
       <a class="cell-item-controls__control" data-action="stockToggle" data-tooltip="${toggleLabel}"><i class="fa-regular ${toggleIcon}"></i></a>
       <a class="cell-item-controls__control" data-action="stockMenu" data-tooltip="${game.i18n.localize(
         'DASU.Sheet.MoreOptions'
@@ -123,13 +112,16 @@ export class StockTableRenderer extends DASUTableRenderer {
     await toggleStockActive(actor, uuid);
   }
 
-  static async #onChannel(event, target) {
+  static async #onFeatureClick(event, target) {
     const li = target.closest('[data-stock-index]');
     const index = Number(li?.dataset?.stockIndex);
     const actor = this.document;
-    const uuid = actor?.system.stock?.[index]?.uuid;
-    if (!uuid) return;
-    await toggleStockChanneled(actor, uuid);
+    const entry = actor?.system.stock?.[index];
+    if (!entry) return;
+    const feature = (actor.system.features ?? []).find(
+      (f) => f.constructor.TYPE === target.dataset.featureType
+    );
+    await feature?.onStockClick?.(actor, entry, index, event);
   }
 
   static async #renderDescription(entry) {
@@ -199,12 +191,14 @@ export class StockTableRenderer extends DASUTableRenderer {
 
   async getItems(document) {
     const slot = this._slot;
-    const isChanneler = document.system.classKind === 'channeler';
+    const features = document.system.features ?? [];
     return (document.system.stock ?? [])
       .map((entry, index) => ({
         ...entry,
         index,
-        isChanneler,
+        featureControls: features
+          .map((f) => f.renderStockRow(entry, document))
+          .join(''),
         actor: fromUuidSync(entry.uuid) ?? null,
       }))
       .filter((entry) => (slot === 'active' ? entry.active : !entry.active));
