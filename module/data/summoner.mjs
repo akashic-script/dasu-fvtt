@@ -46,6 +46,15 @@ export default class DASUSummoner extends DASUActorBase {
       { required: true, initial: [] }
     );
 
+    // Class-feature resources (value/max), keyed by slug. Declared by a feature's
+    // actorResources(); max is derived each prep, value persists and clamps.
+    schema.classResources = new fields.TypedObjectField(
+      new fields.SchemaField({
+        value: new fields.NumberField({ required: false, integer: true, initial: 0, min: 0 }),
+        max: new fields.NumberField({ required: false, integer: true, initial: 0, min: 0 }),
+      })
+    );
+
     return schema;
   }
 
@@ -120,7 +129,20 @@ export default class DASUSummoner extends DASUActorBase {
     this.featureTypes = new Set(
       this.features.map((f) => f.constructor.TYPE).filter(Boolean)
     );
-    for (const f of this.features) f.prepareActor?.(this.parent);
+    this.classResources ??= {};
+    for (const f of this.features) {
+      f.prepareActor?.(this.parent);
+      for (const [slug, def] of Object.entries(f.actorResources?.() ?? {})) {
+        const max = def.max?.(this.parent) ?? 0;
+        const min = def.min ?? 0;
+        const value = this.classResources[slug]?.value ?? 0;
+        this.classResources[slug] = {
+          value: Math.max(min, Math.min(max, value)),
+          max,
+          label: def.label,
+        };
+      }
+    }
   }
 
   hasFeature(type) {

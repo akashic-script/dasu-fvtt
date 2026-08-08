@@ -28,6 +28,16 @@
         <div class="actor-sidebar__resource-fill actor-sidebar__resource-fill--wp" style="width: {{powerPercent}}%"></div>
       </div>
     </div>
+    {{#each system.classResources}}
+    <div class="actor-sidebar__resource-row">
+      <span class="actor-sidebar__resource-label" data-tooltip="{{localize this.label}}">{{localize this.label}}</span>
+      <div class="actor-sidebar__resource-current">
+        <input class="actor-sidebar__resource-val" type="number" min="0" max="{{this.max}}" name="system.classResources.{{@key}}.value" value="{{this.value}}" />
+        <span class="actor-sidebar__resource-sep">/</span>
+        <span class="actor-sidebar__resource-max">{{this.max}}</span>
+      </div>
+    </div>
+    {{/each}}
   </div>
 
   {{!-- Attributes --}}
